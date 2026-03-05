@@ -46,20 +46,20 @@ export function WhatsAppButton() {
         href="https://wa.me/5521965140612?text=Olá! Gostaria de saber mais sobre as películas de controle solar."
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center gap-2 sm:gap-3 px-3 py-3 sm:px-5 sm:py-4 rounded-full bg-[#25d366] text-white shadow-lg transition-all duration-500 hover:scale-105 hover:shadow-xl group"
+        className="flex items-center justify-center gap-2 sm:gap-3 w-14 h-14 sm:w-auto sm:px-6 sm:py-4 rounded-full bg-[#25d366] text-white shadow-lg transition-all duration-500 hover:scale-105 hover:shadow-xl group relative overflow-visible"
         style={{
           boxShadow: '0 4px 20px rgba(37, 211, 102, 0.4)',
         }}
         aria-label="Falar no WhatsApp"
       >
-        {/* Pulse animation - softened */}
-        <span className="absolute inset-0 rounded-full bg-[#25d366] animate-ping opacity-10 group-hover:animate-none" />
+        {/* Pulse animation - softened and slower */}
+        <span className="absolute inset-0 rounded-full bg-[#25d366] animate-soft-ping opacity-20 group-hover:animate-none" />
 
         {/* Icon */}
-        <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 relative z-10" />
+        <MessageCircle className="w-6 h-6 sm:w-6 sm:h-6 relative z-10" />
 
         {/* Text */}
-        <span className="font-semibold text-xs sm:text-sm relative z-10 hidden sm:inline whitespace-nowrap">
+        <span className="font-semibold text-sm relative z-10 hidden sm:inline whitespace-nowrap">
           Falar com Especialista
         </span>
       </a>
