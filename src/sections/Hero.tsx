@@ -82,7 +82,7 @@ export function Hero() {
       <Particles />
 
       {/* Content */}
-      <div className="relative z-20 container-lume pt-28 sm:pt-24 pb-12 sm:pb-16">
+      <div className="relative z-20 container-lume pt-24 sm:pt-20 pb-10 sm:pb-12">
         <div className="max-w-3xl">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-[#c9a227]/10 border border-[#c9a227]/30 mb-4 sm:mb-6">

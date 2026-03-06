@@ -64,7 +64,7 @@ export function Footer() {
   return (
     <footer
       ref={footerRef}
-      className="relative bg-[#070f1a] pt-20 pb-8 overflow-hidden"
+      className="relative bg-[#070f1a] pt-12 pb-6 overflow-hidden"
     >
       {/* Grid pattern overlay */}
       <div

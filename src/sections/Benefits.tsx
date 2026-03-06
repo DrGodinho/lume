@@ -53,25 +53,25 @@ function AnimatedCounter({ target, suffix = '' }: { target: string; suffix?: str
       (entries) => {
         if (entries[0].isIntersecting && !hasAnimated.current) {
           hasAnimated.current = true;
-          
+
           const duration = 2000;
           const startTime = Date.now();
-          
+
           const animate = () => {
             const elapsed = Date.now() - startTime;
             const progress = Math.min(elapsed / duration, 1);
-            
+
             // Ease out expo
             const easeOut = 1 - Math.pow(1 - progress, 3);
             setCount(Math.floor(easeOut * numTarget));
-            
+
             if (progress < 1) {
               requestAnimationFrame(animate);
             } else {
               setCount(numTarget);
             }
           };
-          
+
           requestAnimationFrame(animate);
         }
       },
@@ -86,7 +86,7 @@ function AnimatedCounter({ target, suffix = '' }: { target: string; suffix?: str
   }, [target]);
 
   const displayValue = target.startsWith('-') ? `-${count}` : `${count}`;
-  
+
   return (
     <span ref={counterRef}>
       {displayValue}{suffix}
@@ -170,7 +170,7 @@ export function Benefits() {
 
       <div className="container-lume relative z-10">
         {/* Section Header */}
-        <div ref={titleRef} className="text-center mb-10 sm:mb-16">
+        <div ref={titleRef} className="text-center mb-8 sm:mb-12">
           <div className="flex items-center justify-center gap-2 sm:gap-4 mb-3 sm:mb-4">
             <div className="h-px w-10 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
             <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
@@ -211,9 +211,9 @@ export function Benefits() {
               {/* Stat */}
               <div className="mb-3 sm:mb-4">
                 <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-gradient-gold font-['Montserrat']">
-                  <AnimatedCounter 
-                    target={benefit.stat.replace(/[^0-9-]/g, '')} 
-                    suffix={benefit.stat.replace(/[0-9-]/g, '')} 
+                  <AnimatedCounter
+                    target={benefit.stat.replace(/[^0-9-]/g, '')}
+                    suffix={benefit.stat.replace(/[0-9-]/g, '')}
                   />
                 </span>
                 <p className="text-xs sm:text-sm text-gray-500 mt-1">{benefit.statLabel}</p>

@@ -145,7 +145,7 @@ export function Products() {
 
       <div className="container-lume relative z-10">
         {/* Section Header */}
-        <div ref={titleRef} className="text-center mb-10 sm:mb-16">
+        <div ref={titleRef} className="text-center mb-8 sm:mb-12">
           <div className="flex items-center justify-center gap-2 sm:gap-4 mb-3 sm:mb-4">
             <div className="h-px w-10 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
             <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
