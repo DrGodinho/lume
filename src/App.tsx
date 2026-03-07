@@ -11,6 +11,7 @@ import { Footer } from './sections/Footer';
 import { WhatsAppButton } from './components/WhatsAppButton';
 import { QuotePage } from './pages/QuotePage';
 import { AdminCalculator } from './pages/AdminCalculator';
+import { SimulatorPage } from './pages/Simulator';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -18,7 +19,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 function App() {
-  const [currentPage, setCurrentPage] = useState<'landing' | 'quote' | 'admin'>('landing');
+  const [currentPage, setCurrentPage] = useState<'landing' | 'quote' | 'admin' | 'simulator'>('landing');
 
   useEffect(() => {
     // Basic "router" without extra dependencies
@@ -27,6 +28,8 @@ function App() {
         setCurrentPage('quote');
       } else if (window.location.hash === '#admincalculator') {
         setCurrentPage('admin');
+      } else if (window.location.hash === '#simulador') {
+        setCurrentPage('simulator');
       } else {
         setCurrentPage('landing');
       }
@@ -58,6 +61,10 @@ function App() {
 
   if (currentPage === 'quote') {
     return <QuotePage />;
+  }
+
+  if (currentPage === 'simulator') {
+    return <SimulatorPage />;
   }
 
   return (

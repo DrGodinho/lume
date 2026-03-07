@@ -31,11 +31,10 @@ export function Navbar() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled
           ? 'glass-effect border-b border-[#c9a227]/20'
           : 'bg-transparent'
-      }`}
+        }`}
     >
       <div className="container-lume">
         <div className="flex items-center justify-between h-20">
@@ -77,13 +76,20 @@ export function Navbar() {
           {/* CTA Button */}
           <div className="hidden lg:flex items-center gap-4">
             <a
+              href="#simulador"
+              className="btn-secondary flex items-center gap-2 text-xs py-2 px-4"
+              onClick={() => { window.location.hash = '#simulador'; }}
+            >
+              Qual película escolher?
+            </a>
+            <a
               href="https://wa.me/5521965140612"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-primary flex items-center gap-2 text-xs"
+              className="btn-primary flex items-center gap-2 text-xs py-2 px-4"
             >
               <Phone className="w-4 h-4" />
-              Falar com Especialista
+              Especialista
             </a>
           </div>
 
@@ -100,9 +106,8 @@ export function Navbar() {
 
       {/* Mobile Menu */}
       <div
-        className={`lg:hidden absolute top-full left-0 right-0 glass-effect border-b border-[#c9a227]/20 transition-all duration-300 ${
-          isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
-        }`}
+        className={`lg:hidden absolute top-full left-0 right-0 glass-effect border-b border-[#c9a227]/20 transition-all duration-300 ${isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+          }`}
       >
         <div className="container-lume py-6">
           <div className="flex flex-col gap-4">
@@ -120,6 +125,13 @@ export function Navbar() {
               </a>
             ))}
             <a
+              href="#simulador"
+              className="btn-secondary flex items-center justify-center gap-2 mt-2"
+              onClick={() => { window.location.hash = '#simulador'; setIsMobileMenuOpen(false); }}
+            >
+              Qual película escolher?
+            </a>
+            <a
               href="https://wa.me/5521965140612"
               target="_blank"
               rel="noopener noreferrer"
@@ -134,9 +146,8 @@ export function Navbar() {
 
       {/* Gold accent line */}
       <div
-        className={`absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#c9a227] to-transparent transition-opacity duration-500 ${
-          isScrolled ? 'opacity-100' : 'opacity-0'
-        }`}
+        className={`absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#c9a227] to-transparent transition-opacity duration-500 ${isScrolled ? 'opacity-100' : 'opacity-0'
+          }`}
       />
     </nav>
   );

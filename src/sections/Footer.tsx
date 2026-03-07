@@ -9,6 +9,7 @@ const quickLinks = [
   { name: 'Início', href: '#hero' },
   { name: 'Produtos', href: '#produtos' },
   { name: 'Benefícios', href: '#beneficios' },
+  { name: 'Simulador Online', href: '#simulador' },
   { name: 'Contato', href: '#contato' },
 ];
 
@@ -140,8 +141,12 @@ export function Footer() {
                   <a
                     href={link.href}
                     onClick={(e) => {
-                      e.preventDefault();
-                      scrollToSection(link.href);
+                      if (link.href === '#simulador') {
+                        window.location.hash = '#simulador';
+                      } else {
+                        e.preventDefault();
+                        scrollToSection(link.href);
+                      }
                     }}
                     className="text-gray-400 hover:text-[#c9a227] transition-colors text-xs sm:text-sm inline-flex items-center gap-2 group"
                   >
