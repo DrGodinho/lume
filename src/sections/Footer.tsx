@@ -18,6 +18,7 @@ const products = [
   { name: 'Nano Cerâmica', href: '/nano-ceramica' },
   { name: 'Linha Carbono', href: '/carbono' },
   { name: 'Dupla Camada', href: '/dupla-camada' },
+  { name: 'Linha Refletiva', href: '/refletiva' },
   { name: 'Linha Smoke', href: '#produtos' },
   { name: 'Jateados', href: '#produtos' },
 ];

@@ -18,6 +18,7 @@
 /admin           /index.html   200
 /carbono         /index.html   200
 /dupla-camada    /index.html   200
+/refletiva       /index.html   200
 
 /* Fallback para todas as outras rotas SPA */
 /*  /index.html  200
