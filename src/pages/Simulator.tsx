@@ -13,14 +13,15 @@ interface ProductInfo {
     light: string;
     privacy: string;
     color: string;
+    tip: string;
 }
 
 const PRODUCTS: Record<string, ProductInfo> = {
-    nano: { id: 'nano', name: 'NANO CERÂMICA', description: 'A joia da coroa. Bloqueio de calor extremo com transparência cristalina.', price: '220', heat: '95%', light: 'Alta (~75%)', privacy: 'Baixa', color: '#c9a227' },
-    dupla: { id: 'dupla', name: 'DUPLA CAMADA', description: 'Visão relaxante e alta redução de calor com baixíssima refletividade interna.', price: '120', heat: '80%', light: 'Média', privacy: 'Média/Alta', color: '#34d399' },
-    refletiva: { id: 'refletiva', name: 'REFLETIVA PREMIUM', description: 'Máxima privacidade diurna (efeito espelhado) e alta rejeição solar.', price: '95', heat: '87%', light: 'Média/Baixa', privacy: 'Alta (Dia)', color: '#fbbf24' },
-    carbono: { id: 'carbono', name: 'CARBONO ELITE', description: 'Estética grafite profunda que não desbota. Ótimo custo-benefício.', price: '80', heat: '70%', light: 'Baixa', privacy: 'Alta', color: '#60a5fa' },
-    jateado: { id: 'jateado', name: 'JATEADO DESIGN', description: 'Foco 100% em privacidade e estética sem perder luminosidade.', price: '90', heat: '5%', light: 'Alta (Difusa)', privacy: 'Total', color: '#94a3b8' }
+    nano: { id: 'nano', name: 'NANO CERÂMICA (A Escolha de Luxo)', description: 'A joia da coroa. Bloqueio de calor extremo com transparência cristalina.', price: '220', heat: '95%', light: 'Alta (~75%)', privacy: 'Baixa', color: '#c9a227', tip: 'No Rio, a vista é nosso maior patrimônio. A Nano Cerâmica é a única que protege seus móveis e sua pele sem que você precise \'fechar\' a casa. É o investimento favorito para varandas gourmet e salas com grandes vãos de vidro, mantendo a temperatura agradável sem gastar uma fortuna em ar-condicionado.' },
+    dupla: { id: 'dupla', name: 'DUPLA CAMADA (Conforto Noturno)', description: 'Visão relaxante e alta redução de calor com baixíssima refletividade interna.', price: '120', heat: '80%', light: 'Média', privacy: 'Média/Alta', color: '#34d399', tip: 'Muitos clientes reclamam que, ao colocar película, o vidro vira um espelho para dentro da sala à noite. A Dupla Camada resolve isso com tecnologia anti-reflexo. Recomendo muito para quartos e salas de TV, onde o conforto visual noturno e a privacidade são prioridade absoluta.' },
+    refletiva: { id: 'refletiva', name: 'REFLETIVA PREMIUM (Privacidade e Performance)', description: 'Máxima privacidade diurna (efeito espelhado) e alta rejeição solar.', price: '95', heat: '87%', light: 'Média/Baixa', privacy: 'Alta (Dia)', color: '#fbbf24', tip: 'É a campeã em redução térmica por um preço justo. Ideal para casas de rua ou apartamentos onde o condomínio permite o efeito espelhado. Durante o dia, você vê tudo lá fora, mas ninguém vê você. É o \'efeito bunker\' contra o sol forte do Rio.' },
+    carbono: { id: 'carbono', name: 'CARBONO ELITE (Estética e Durabilidade)', description: 'Estética grafite profunda que não desbota. Ótimo custo-benefício.', price: '80', heat: '70%', light: 'Baixa', privacy: 'Alta', color: '#60a5fa', tip: 'Se você busca aquele visual \'grafite\' sofisticado e quer fugir das películas baratas que ficam roxas com o tempo, a Carbono é o caminho. Ela dá um ar moderno à fachada e é excelente para reduzir o brilho excessivo em escritórios ou quartos muito claros.' },
+    jateado: { id: 'jateado', name: 'JATEADO DESIGN (Privacidade Total)', description: 'Foco 100% em privacidade e estética sem perder luminosidade.', price: '90', heat: '5%', light: 'Alta (Difusa)', privacy: 'Total', color: '#94a3b8', tip: 'O Jateado transforma o vidro em um elemento de decoração. No box do banheiro, ele esconde a bagunça dos produtos e dá um ar de \'spa\'. Em escritórios, garante a privacidade das reuniões sem bloquear a luz. Lembre-se: ele é focado em privacidade, não em calor!' }
 };
 
 export function SimulatorPage() {
@@ -46,6 +47,15 @@ export function SimulatorPage() {
             { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }
         );
     }, [step]);
+
+    // SEO Optimization for the Simulator Page
+    useEffect(() => {
+        document.title = "Simulador LUME | Descubra a Película Ideal para seu Ambiente";
+        const metaDescription = document.querySelector('meta[name="description"]');
+        if (metaDescription) {
+            metaDescription.setAttribute("content", "Utilize o Simulador da LUME e descubra gratuitamente a melhor película de controle solar (insulfilm) para sua casa ou apartamento no Rio de Janeiro.");
+        }
+    }, []);
 
     const handlePriorityToggle = (id: string) => {
         if (priorities.includes(id)) {
@@ -166,7 +176,7 @@ export function SimulatorPage() {
         setRefinePrivacy('');
         setBestMatch(null);
         setAlternativeMatch(null);
-        setStep('location');
+        setStep('welcome');
     };
 
     const sendWhatsApp = () => {
@@ -370,6 +380,13 @@ export function SimulatorPage() {
                                     A combinação ideal para o seu perfil. {bestMatch.description}
                                 </p>
 
+                                <div className="bg-[#c9a227]/10 border border-[#c9a227]/30 rounded-xl p-4 mb-6">
+                                    <h4 className="text-[10px] uppercase font-bold tracking-widest text-[#c9a227] mb-2">💡 Dica do Especialista</h4>
+                                    <p className="text-xs text-gray-300 italic leading-relaxed">
+                                        "{bestMatch.tip}"
+                                    </p>
+                                </div>
+
                                 <div className="bg-[#0a1628]/50 rounded-xl p-5 border border-white/5 space-y-3 mb-6">
                                     <h4 className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-2">Ficha Técnica</h4>
                                     <div className="flex justify-between items-center pb-2 border-b border-white/5">
@@ -404,10 +421,19 @@ export function SimulatorPage() {
                                 </div>
                             )}
 
-                            <button onClick={resetSimulator} className="mt-6 w-full text-center text-sm text-gray-500 hover:text-white transition-colors underline underline-offset-4">
+                            <button onClick={resetSimulator} className="mt-8 w-full text-center text-sm text-gray-500 hover:text-white transition-colors underline underline-offset-4">
                                 Refazer o Teste
                             </button>
                         </div>
+                    )}
+
+                    {step !== 'welcome' && step !== 'result' && (
+                        <button
+                            onClick={resetSimulator}
+                            className="mt-6 text-gray-500 hover:text-[#c9a227] text-xs uppercase tracking-widest font-bold transition-colors flex items-center justify-center gap-2 mx-auto"
+                        >
+                            <ArrowLeft size={12} /> Reiniciar / Voltar ao Início
+                        </button>
                     )}
                 </div>
             </div>
