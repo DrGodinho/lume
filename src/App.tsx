@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { Navbar } from './sections/Navbar';
 import { Hero } from './sections/Hero';
 import { Products } from './sections/Products';
@@ -19,32 +20,38 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger);
 
-function App() {
-  const [currentPage, setCurrentPage] = useState<'landing' | 'quote' | 'admin' | 'simulator' | 'nano-ceramica'>('landing');
+function ScrollToTop() {
+  const { pathname, hash } = useLocation();
 
   useEffect(() => {
-    // Basic "router" without extra dependencies
-    const handleHashChange = () => {
-      if (window.location.hash === '#orcamento') {
-        setCurrentPage('quote');
-      } else if (window.location.hash === '#admincalculator') {
-        setCurrentPage('admin');
-      } else if (window.location.hash === '#simulador') {
-        setCurrentPage('simulator');
-      } else if (window.location.hash === '#nano-ceramica') {
-        setCurrentPage('nano-ceramica');
-      } else {
-        setCurrentPage('landing');
+    if (!hash) {
+      window.scrollTo(0, 0);
+    } else {
+      const element = document.querySelector(hash);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
       }
-    };
+    }
+  }, [pathname, hash]);
 
-    // Check on mount
-    handleHashChange();
+  return null;
+}
 
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
-  }, []);
+function LandingPage() {
+  return (
+    <>
+      <Hero />
+      <Products />
+      <Benefits />
+      <About />
+      <Coverage />
+      <Reviews />
+      <ContactCTA />
+    </>
+  );
+}
 
+function App() {
   useEffect(() => {
     // Smooth scroll behavior
     document.documentElement.style.scrollBehavior = 'smooth';
@@ -58,68 +65,22 @@ function App() {
     };
   }, []);
 
-  if (currentPage === 'admin') {
-    return <AdminCalculator />;
-  }
-
-  if (currentPage === 'quote') {
-    return <QuotePage />;
-  }
-
-  if (currentPage === 'simulator') {
-    return (
-      <div className="min-h-screen">
-        <Navbar />
-        <SimulatorPage />
-        <Footer />
-        <WhatsAppButton />
-      </div>
-    );
-  }
-
-  if (currentPage === 'nano-ceramica') {
-    return (
-      <div className="min-h-screen bg-[#0a1628]">
-        <Navbar />
-        <NanoCeramicaPage />
-        <Footer />
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-[#0a1628] text-white overflow-x-hidden">
-      {/* Navigation */}
+      <ScrollToTop />
       <Navbar />
 
-      {/* Main Content */}
       <main>
-        {/* Hero Section */}
-        <Hero />
-
-        {/* Products Section */}
-        <Products />
-
-        {/* Benefits Section */}
-        <Benefits />
-
-        {/* About Section */}
-        <About />
-
-        {/* Coverage Section */}
-        <Coverage />
-
-        {/* Reviews Section */}
-        <Reviews />
-
-        {/* Contact CTA Section */}
-        <ContactCTA />
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/orcamento" element={<QuotePage />} />
+          <Route path="/admin" element={<AdminCalculator />} />
+          <Route path="/simulador" element={<SimulatorPage />} />
+          <Route path="/nano-ceramica" element={<NanoCeramicaPage />} />
+        </Routes>
       </main>
 
-      {/* Footer */}
       <Footer />
-
-      {/* Floating WhatsApp Button */}
       <WhatsAppButton />
     </div>
   );

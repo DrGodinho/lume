@@ -1,20 +1,21 @@
 import { useEffect, useRef } from 'react';
 import { MapPin, Phone, Mail, Clock, Facebook, Instagram, ExternalLink } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const quickLinks = [
-  { name: 'Início', href: '#hero' },
+  { name: 'Início', href: '/' },
   { name: 'Produtos', href: '#produtos' },
   { name: 'Benefícios', href: '#beneficios' },
-  { name: 'Simulador Online', href: '#simulador' },
+  { name: 'Simulador Online', href: '/simulador' },
   { name: 'Contato', href: '#contato' },
 ];
 
 const products = [
-  { name: 'Nano Cerâmica', href: '#nano-ceramica' },
+  { name: 'Nano Cerâmica', href: '/nano-ceramica' },
   { name: 'Linha Carbono', href: '#produtos' },
   { name: 'Linha Refletiva', href: '#produtos' },
   { name: 'Linha Smoke', href: '#produtos' },
@@ -55,10 +56,12 @@ export function Footer() {
     return () => ctx.revert();
   }, []);
 
-  const scrollToSection = (href: string) => {
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+  const handleNavClick = (href: string) => {
+    if (href.startsWith('#')) {
+      const element = document.querySelector(href);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   };
 
@@ -86,11 +89,11 @@ export function Footer() {
         >
           {/* Column 1: Logo & About */}
           <div className="footer-col sm:col-span-2 lg:col-span-1">
-            <a href="#hero" onClick={(e) => { e.preventDefault(); scrollToSection('#hero'); }} className="inline-block mb-3 sm:mb-4">
+            <Link to="/" className="inline-block mb-3 sm:mb-4">
               <span className="text-2xl sm:text-3xl font-bold text-white font-['Montserrat']">
                 LU<span className="text-gradient-gold">ME</span>
               </span>
-            </a>
+            </Link>
             <p className="text-xs sm:text-sm text-gray-400 uppercase tracking-widest mb-3 sm:mb-4">
               Películas de Controle Solar
             </p>
@@ -138,21 +141,23 @@ export function Footer() {
             <ul className="space-y-2 sm:space-y-3">
               {quickLinks.map((link) => (
                 <li key={link.name}>
-                  <a
-                    href={link.href}
-                    onClick={(e) => {
-                      if (link.href === '#simulador') {
-                        window.location.hash = '#simulador';
-                      } else {
-                        e.preventDefault();
-                        scrollToSection(link.href);
-                      }
-                    }}
-                    className="text-gray-400 hover:text-[#c9a227] transition-colors text-xs sm:text-sm inline-flex items-center gap-2 group"
-                  >
-                    <span className="w-0 h-px bg-[#c9a227] transition-all duration-300 group-hover:w-3" />
-                    {link.name}
-                  </a>
+                  {link.href.startsWith('#') ? (
+                    <button
+                      onClick={() => handleNavClick(link.href)}
+                      className="text-gray-400 hover:text-[#c9a227] transition-colors text-xs sm:text-sm inline-flex items-center gap-2 group"
+                    >
+                      <span className="w-0 h-px bg-[#c9a227] transition-all duration-300 group-hover:w-3" />
+                      {link.name}
+                    </button>
+                  ) : (
+                    <Link
+                      to={link.href}
+                      className="text-gray-400 hover:text-[#c9a227] transition-colors text-xs sm:text-sm inline-flex items-center gap-2 group"
+                    >
+                      <span className="w-0 h-px bg-[#c9a227] transition-all duration-300 group-hover:w-3" />
+                      {link.name}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -166,21 +171,23 @@ export function Footer() {
             <ul className="space-y-2 sm:space-y-3">
               {products.map((product) => (
                 <li key={product.name}>
-                  <a
-                    href={product.href}
-                    onClick={(e) => {
-                      if (product.href === '#nano-ceramica') {
-                        window.location.hash = '#nano-ceramica';
-                      } else {
-                        e.preventDefault();
-                        scrollToSection(product.href);
-                      }
-                    }}
-                    className="text-gray-400 hover:text-[#c9a227] transition-colors text-xs sm:text-sm inline-flex items-center gap-2 group"
-                  >
-                    <span className="w-0 h-px bg-[#c9a227] transition-all duration-300 group-hover:w-3" />
-                    {product.name}
-                  </a>
+                  {product.href.startsWith('#') ? (
+                    <button
+                      onClick={() => handleNavClick(product.href)}
+                      className="text-gray-400 hover:text-[#c9a227] transition-colors text-xs sm:text-sm inline-flex items-center gap-2 group"
+                    >
+                      <span className="w-0 h-px bg-[#c9a227] transition-all duration-300 group-hover:w-3" />
+                      {product.name}
+                    </button>
+                  ) : (
+                    <Link
+                      to={product.href}
+                      className="text-gray-400 hover:text-[#c9a227] transition-colors text-xs sm:text-sm inline-flex items-center gap-2 group"
+                    >
+                      <span className="w-0 h-px bg-[#c9a227] transition-all duration-300 group-hover:w-3" />
+                      {product.name}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
