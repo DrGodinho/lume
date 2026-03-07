@@ -1,0 +1,22 @@
+/* Redirects for SPAs (React Router) on Netlify */
+/* Redirect all paths to index.html so React Router can handle them */
+/* See: https://docs.netlify.com/routing/redirects/rewrites-proxies/#history-pushstate-and-single-page-applications */
+
+/* Path   Target         Symbolic Status */
+/* ----   ------         --------------- */
+/* /      /index.html    200 */
+/* /*     /index.html    200 */
+
+/* Formato Netlify _redirects */
+/* (Isso garante que ao dar F5 em /nano-ceramica, o Netlify não dê erro 404) */
+
+/* Os comentários acima explicam o funcionamento. O conteúdo real abaixo é o que vale: */
+
+/* Redirecionamentos para SEO e Landing Pages */
+/nano-ceramica    /index.html   200
+/simulador       /index.html   200
+/orcamento       /index.html   200
+/admin           /index.html   200
+
+/* Fallback para todas as outras rotas SPA */
+/*  /index.html  200
