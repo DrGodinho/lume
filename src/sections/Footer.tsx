@@ -14,11 +14,11 @@ const quickLinks = [
 ];
 
 const products = [
-  'Nano Cerâmica',
-  'Linha Carbono',
-  'Linha Refletiva',
-  'Linha Smoke',
-  'Jateados',
+  { name: 'Nano Cerâmica', href: '#nano-ceramica' },
+  { name: 'Linha Carbono', href: '#produtos' },
+  { name: 'Linha Refletiva', href: '#produtos' },
+  { name: 'Linha Smoke', href: '#produtos' },
+  { name: 'Jateados', href: '#produtos' },
 ];
 
 const contactInfo = [
@@ -165,17 +165,21 @@ export function Footer() {
             </h4>
             <ul className="space-y-2 sm:space-y-3">
               {products.map((product) => (
-                <li key={product}>
+                <li key={product.name}>
                   <a
-                    href="#produtos"
+                    href={product.href}
                     onClick={(e) => {
-                      e.preventDefault();
-                      scrollToSection('#produtos');
+                      if (product.href === '#nano-ceramica') {
+                        window.location.hash = '#nano-ceramica';
+                      } else {
+                        e.preventDefault();
+                        scrollToSection(product.href);
+                      }
                     }}
                     className="text-gray-400 hover:text-[#c9a227] transition-colors text-xs sm:text-sm inline-flex items-center gap-2 group"
                   >
                     <span className="w-0 h-px bg-[#c9a227] transition-all duration-300 group-hover:w-3" />
-                    {product}
+                    {product.name}
                   </a>
                 </li>
               ))}

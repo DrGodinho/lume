@@ -12,6 +12,7 @@ import { WhatsAppButton } from './components/WhatsAppButton';
 import { QuotePage } from './pages/QuotePage';
 import { AdminCalculator } from './pages/AdminCalculator';
 import { SimulatorPage } from './pages/Simulator';
+import { NanoCeramicaPage } from './pages/NanoCeramica';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -19,7 +20,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 function App() {
-  const [currentPage, setCurrentPage] = useState<'landing' | 'quote' | 'admin' | 'simulator'>('landing');
+  const [currentPage, setCurrentPage] = useState<'landing' | 'quote' | 'admin' | 'simulator' | 'nano-ceramica'>('landing');
 
   useEffect(() => {
     // Basic "router" without extra dependencies
@@ -30,6 +31,8 @@ function App() {
         setCurrentPage('admin');
       } else if (window.location.hash === '#simulador') {
         setCurrentPage('simulator');
+      } else if (window.location.hash === '#nano-ceramica') {
+        setCurrentPage('nano-ceramica');
       } else {
         setCurrentPage('landing');
       }
@@ -64,7 +67,24 @@ function App() {
   }
 
   if (currentPage === 'simulator') {
-    return <SimulatorPage />;
+    return (
+      <div className="min-h-screen">
+        <Navbar />
+        <SimulatorPage />
+        <Footer />
+        <WhatsAppButton />
+      </div>
+    );
+  }
+
+  if (currentPage === 'nano-ceramica') {
+    return (
+      <div className="min-h-screen bg-[#0a1628]">
+        <Navbar />
+        <NanoCeramicaPage />
+        <Footer />
+      </div>
+    );
   }
 
   return (
