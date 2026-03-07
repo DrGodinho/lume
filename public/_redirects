@@ -12,11 +12,12 @@
 
 /* Os comentários acima explicam o funcionamento. O conteúdo real abaixo é o que vale: */
 
-/* Redirecionamentos para SEO e Landing Pages */
 /nano-ceramica    /index.html   200
 /simulador       /index.html   200
 /orcamento       /index.html   200
 /admin           /index.html   200
+/carbono         /index.html   200
+/dupla-camada    /index.html   200
 
 /* Fallback para todas as outras rotas SPA */
 /*  /index.html  200

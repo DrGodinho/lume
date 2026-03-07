@@ -15,6 +15,7 @@ import { AdminCalculator } from './pages/AdminCalculator';
 import { SimulatorPage } from './pages/Simulator';
 import { NanoCeramicaPage } from './pages/NanoCeramica';
 import { CarbonoPage } from './pages/Carbono';
+import { DuplaCamadaPage } from './pages/DuplaCamada';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -79,6 +80,7 @@ function App() {
           <Route path="/simulador" element={<SimulatorPage />} />
           <Route path="/nano-ceramica" element={<NanoCeramicaPage />} />
           <Route path="/carbono" element={<CarbonoPage />} />
+          <Route path="/dupla-camada" element={<DuplaCamadaPage />} />
         </Routes>
       </main>
 

@@ -17,7 +17,7 @@ const quickLinks = [
 const products = [
   { name: 'Nano Cerâmica', href: '/nano-ceramica' },
   { name: 'Linha Carbono', href: '/carbono' },
-  { name: 'Linha Refletiva', href: '#produtos' },
+  { name: 'Dupla Camada', href: '/dupla-camada' },
   { name: 'Linha Smoke', href: '#produtos' },
   { name: 'Jateados', href: '#produtos' },
 ];
