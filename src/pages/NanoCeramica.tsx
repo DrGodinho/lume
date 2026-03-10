@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Helmet } from 'react-helmet';
 import { Shield, Sun, Thermometer, CheckCircle, Zap, Wifi, ArrowRight } from 'lucide-react';
 import { WhatsAppButton } from '../components/WhatsAppButton';
 import { ContactCTA } from '../sections/ContactCTA';
@@ -7,125 +8,112 @@ import gsap from 'gsap';
 
 export function NanoCeramicaPage() {
     useEffect(() => {
-        // SEO Meta Tags
-        document.title = "Insulfilm Nano Cerâmica Premium RJ | Redução de Calor em Bangu - LUME";
-        const metaDescription = document.querySelector('meta[name="description"]');
-        if (metaDescription) {
-            metaDescription.setAttribute("content", "Conheça o Insulfilm Nano Cerâmica Premium da LUME. Máxima redução de calor sem escurecer os vidros. Atendimento especializado em Bangu e Zona Oeste RJ.");
-        }
-
         // Entrance Animation
         gsap.fromTo('.page-entrance',
             { opacity: 0, y: 20 },
             { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out', stagger: 0.1 }
         );
-
-        // Inject JSON-LD Schema
-        const schemaLocalBusiness = {
-            "@context": "https://schema.org",
-            "@type": "LocalBusiness",
-            "name": "LUME Películas de Controle Solar",
-            "image": "https://seusite.com.br/logo.png",
-            "@id": "",
-            "url": "https://seusite.com.br/nano-ceramica",
-            "telephone": "+5521965140612",
-            "priceRange": "$$$",
-            "address": {
-                "@type": "PostalAddress",
-                "streetAddress": "Zona Oeste",
-                "addressLocality": "Rio de Janeiro",
-                "addressRegion": "RJ",
-                "postalCode": "21810-000",
-                "addressCountry": "BR"
-            },
-            "geo": {
-                "@type": "GeoCoordinates",
-                "latitude": -22.8767,
-                "longitude": -43.4651
-            },
-            "areaServed": ["Bangu", "Campo Grande", "Realengo", "Barra da Tijuca", "Recreio", "Zona Oeste RJ"],
-            "description": "Especialistas em instalação de Insulfilm Nano Cerâmica Premium no Rio de Janeiro. Conforto térmico, proteção UV e redução de calor sem espelhar."
-        };
-
-        const schemaFAQ = {
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            "mainEntity": [
-                {
-                    "@type": "Question",
-                    "name": "O Insulfilm Nano Cerâmica pode ser instalado em apartamentos e condomínios?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Sim! Como a película de Nano Cerâmica possui baixíssima refletividade (não é espelhada) e mantém a transparência do vidro, ela é a opção número um para apartamentos e condomínios com regras rígidas de fachada no Rio de Janeiro."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "A película Nano Cerâmica desbota com o forte calor do Rio de Janeiro?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Não. Diferente das películas tintadas comuns que ficam roxas com o tempo, a Nano Cerâmica Premium da LUME possui estabilidade de cor permanente. Sua tecnologia não baseada em tintas garante a estética original por muitos anos."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "É possível economizar luz na conta usando película térmica?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Absolutamente. Com uma rejeição de calor (IRR) de até 95%, o ambiente interno esfria muito mais rápido, reduzindo drasticamente o esforço e o tempo de uso do seu ar-condicionado. Em locais muito quentes como Bangu e Zona Oeste, nossos clientes relatam melhorias extremas no consumo de energia."
-                    }
-                }
-            ]
-        };
-
-        const schemaProduct = {
-            "@context": "https://schema.org",
-            "@type": "Product",
-            "name": "Insulfilm Nano Cerâmica Premium",
-            "image": "https://lumecontrolesolar.com.br/product-nano-ceramica.jpg",
-            "description": "Máxima redução de calor sem escurecer os vidros. Ideal para varandas gourmet e vitrines.",
-            "brand": {
-                "@type": "Brand",
-                "name": "LUME Películas"
-            },
-            "offers": {
-                "@type": "Offer",
-                "url": "https://lumecontrolesolar.com.br/nano-ceramica",
-                "priceCurrency": "BRL",
-                "price": "220.00",
-                "unitText": "m²",
-                "availability": "https://schema.org/InStock",
-                "seller": {
-                    "@type": "LocalBusiness",
-                    "name": "LUME Controle Solar"
-                }
-            }
-        };
-
-        const scriptLB = document.createElement('script');
-        scriptLB.type = 'application/ld+json';
-        scriptLB.text = JSON.stringify(schemaLocalBusiness);
-        document.head.appendChild(scriptLB);
-
-        const scriptFAQ = document.createElement('script');
-        scriptFAQ.type = 'application/ld+json';
-        scriptFAQ.text = JSON.stringify(schemaFAQ);
-        document.head.appendChild(scriptFAQ);
-
-        const scriptProduct = document.createElement('script');
-        scriptProduct.type = 'application/ld+json';
-        scriptProduct.text = JSON.stringify(schemaProduct);
-        document.head.appendChild(scriptProduct);
-
-        return () => {
-            document.head.removeChild(scriptLB);
-            document.head.removeChild(scriptFAQ);
-            document.head.removeChild(scriptProduct);
-        };
     }, []);
 
     return (
         <div className="bg-[#070f1a] text-white min-h-screen">
+            <Helmet>
+                <title>Insulfilm Nano Cerâmica Premium RJ | Redução de Calor em Bangu - LUME</title>
+                <meta name="description" content="Conheça o Insulfilm Nano Cerâmica Premium da LUME. Máxima redução de calor sem escurecer os vidros. Atendimento especializado em Bangu e Zona Oeste RJ." />
+                
+                <script type="application/ld+json">
+                    {`
+                        {
+                            "@context": "https://schema.org",
+                            "@type": "LocalBusiness",
+                            "name": "LUME Películas de Controle Solar",
+                            "image": "https://lumecontrolesolar.netlify.app/novo-logo-lume.png",
+                            "@id": "https://lumecontrolesolar.netlify.app/nano-ceramica",
+                            "url": "https://lumecontrolesolar.netlify.app/nano-ceramica",
+                            "telephone": "+5521965140612",
+                            "priceRange": "$$$",
+                            "address": {
+                                "@type": "PostalAddress",
+                                "streetAddress": "estrada do realengo 973",
+                                "addressLocality": "Rio de Janeiro",
+                                "addressRegion": "RJ",
+                                "postalCode": "21715-331",
+                                "addressCountry": "BR"
+                            },
+                            "geo": {
+                                "@type": "GeoCoordinates",
+                                "latitude": -22.8767,
+                                "longitude": -43.4651
+                            },
+                            "areaServed": ["Bangu", "Campo Grande", "Realengo", "Barra da Tijuca", "Recreio", "Zona Oeste RJ"],
+                            "description": "Especialistas em instalação de Insulfilm Nano Cerâmica Premium no Rio de Janeiro. Conforto térmico, proteção UV e redução de calor sem espelhar."
+                        }
+                    `}
+                </script>
+
+                <script type="application/ld+json">
+                    {`
+                        {
+                            "@context": "https://schema.org",
+                            "@type": "FAQPage",
+                            "mainEntity": [
+                                {
+                                    "@type": "Question",
+                                    "name": "O Insulfilm Nano Cerâmica pode ser instalado em apartamentos e condomínios?",
+                                    "acceptedAnswer": {
+                                        "@type": "Answer",
+                                        "text": "Sim! Como a película de Nano Cerâmica possui baixíssima refletividade (não é espelhada) e mantém a transparência do vidro, ela é a opção número um para apartamentos e condomínios com regras rígidas de fachada no Rio de Janeiro."
+                                    }
+                                },
+                                {
+                                    "@type": "Question",
+                                    "name": "A película Nano Cerâmica desbota com o forte calor do Rio de Janeiro?",
+                                    "acceptedAnswer": {
+                                        "@type": "Answer",
+                                        "text": "Não. Diferente das películas tintadas comuns que ficam roxas com o tempo, a Nano Cerâmica Premium da LUME possui estabilidade de cor permanente. Sua tecnologia não baseada em tintas garante a estética original por muitos anos."
+                                    }
+                                },
+                                {
+                                    "@type": "Question",
+                                    "name": "É possível economizar luz na conta usando película térmica?",
+                                    "acceptedAnswer": {
+                                        "@type": "Answer",
+                                        "text": "Absolutamente. Com uma rejeição de calor (IRR) de até 95%, o ambiente interno esfria muito mais rápido, reduzindo drasticamente o esforço e o tempo de uso do seu ar-condicionado. Em locais muito quentes como Bangu e Zona Oeste, nossos clientes relatam melhorias extremas no consumo de energia."
+                                    }
+                                }
+                            ]
+                        }
+                    `}
+                </script>
+
+                <script type="application/ld+json">
+                    {`
+                        {
+                            "@context": "https://schema.org",
+                            "@type": "Product",
+                            "name": "Insulfilm Nano Cerâmica Premium",
+                            "image": "https://lumecontrolesolar.netlify.app/novo-logo-lume.png",
+                            "description": "Máxima redução de calor sem escurecer os vidros. Ideal para varandas gourmet e vitrines.",
+                            "brand": {
+                                "@type": "Brand",
+                                "name": "LUME Películas"
+                            },
+                            "offers": {
+                                "@type": "Offer",
+                                "url": "https://lumecontrolesolar.netlify.app/nano-ceramica",
+                                "priceCurrency": "BRL",
+                                "price": "220.00",
+                                "unitText": "m²",
+                                "availability": "https://schema.org/InStock",
+                                "seller": {
+                                    "@type": "LocalBusiness",
+                                    "name": "LUME Controle Solar"
+                                }
+                            }
+                        }
+                    `}
+                </script>
+            </Helmet>
             {/* WhatsApp Floating Button */}
             <WhatsAppButton />
 

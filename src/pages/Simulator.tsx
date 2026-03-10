@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet';
 import { Sun, CheckCircle, Smartphone, Home, Shield, Thermometer, Eye, Wind, Building2, Droplets, ChevronRight, ArrowLeft } from 'lucide-react';
 import gsap from 'gsap';
 
@@ -48,14 +49,6 @@ export function SimulatorPage() {
         );
     }, [step]);
 
-    // SEO Optimization for the Simulator Page
-    useEffect(() => {
-        document.title = "Simulador LUME | Descubra a Película Ideal para seu Ambiente";
-        const metaDescription = document.querySelector('meta[name="description"]');
-        if (metaDescription) {
-            metaDescription.setAttribute("content", "Utilize o Simulador da LUME e descubra gratuitamente a melhor película de controle solar (insulfilm) para sua casa ou apartamento no Rio de Janeiro.");
-        }
-    }, []);
 
     const handlePriorityToggle = (id: string) => {
         if (priorities.includes(id)) {
@@ -187,6 +180,10 @@ export function SimulatorPage() {
 
     return (
         <div className="min-h-screen bg-[#070f1a] text-white py-12 px-4 sm:px-6 relative flex flex-col items-center">
+            <Helmet>
+                <title>Simulador LUME | Descubra a Película Ideal para seu Ambiente</title>
+                <meta name="description" content="Utilize o Simulador da LUME e descubra gratuitamente a melhor película de controle solar (insulfilm) para sua casa ou apartamento no Rio de Janeiro." />
+            </Helmet>
             {/* Background Decor */}
             <div className="fixed top-0 left-0 w-full h-full pointer-events-none -z-10 overflow-hidden">
                 <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#c9a227]/5 rounded-full blur-[120px]" />

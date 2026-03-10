@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Helmet } from 'react-helmet';
 import { EyeOff, ShieldCheck, ThermometerSnowflake, Ruler, ArrowRight, Home } from 'lucide-react';
 import { WhatsAppButton } from '../components/WhatsAppButton';
 import { ContactCTA } from '../sections/ContactCTA';
@@ -7,125 +8,112 @@ import gsap from 'gsap';
 
 export function RefletivaPage() {
     useEffect(() => {
-        // SEO Meta Tags
-        document.title = "Insulfilm Refletivo Prata RJ | Privacidade e Fim do Calor - LUME";
-        const metaDescription = document.querySelector('meta[name="description"]');
-        if (metaDescription) {
-            metaDescription.setAttribute("content", "Película Refletiva (Espelhada) no Rio de Janeiro. Efeito One-Way Mirror para privacidade diurna absoluta e redução drástica de calor. Excelente para Bangu.");
-        }
-
         // Entrance Animation
         gsap.fromTo('.page-entrance',
             { opacity: 0, y: 20 },
             { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out', stagger: 0.1 }
         );
-
-        // Inject JSON-LD Schema
-        const schemaLocalBusiness = {
-            "@context": "https://schema.org",
-            "@type": "LocalBusiness",
-            "name": "LUME Películas de Controle Solar",
-            "image": "https://lumecontrolesolar.com.br/logo.png",
-            "@id": "",
-            "url": "https://lumecontrolesolar.com.br/refletiva",
-            "telephone": "+5521965140612",
-            "priceRange": "$$",
-            "address": {
-                "@type": "PostalAddress",
-                "streetAddress": "Zona Oeste",
-                "addressLocality": "Rio de Janeiro",
-                "addressRegion": "RJ",
-                "postalCode": "21810-000",
-                "addressCountry": "BR"
-            },
-            "geo": {
-                "@type": "GeoCoordinates",
-                "latitude": -22.8767,
-                "longitude": -43.4651
-            },
-            "areaServed": ["Bangu", "Campo Grande", "Realengo", "Barra da Tijuca", "Recreio", "Zona Oeste RJ"],
-            "description": "Especialistas em instalação de Insulfilm Refletivo (Prata/Espelhado) no Rio de Janeiro. A solução clássica para privacidade diurna e rejeição de calor extrema."
-        };
-
-        const schemaProduct = {
-            "@context": "https://schema.org",
-            "@type": "Product",
-            "name": "Insulfilm Refletivo Clássico (Prata)",
-            "image": "https://lumecontrolesolar.com.br/logo.png",
-            "description": "Película espelhada prata com altíssima rejeição térmica (até 85% IRR). Garante privacidade diurna total com o efeito One-Way Mirror.",
-            "brand": {
-                "@type": "Brand",
-                "name": "LUME Películas"
-            },
-            "offers": {
-                "@type": "Offer",
-                "url": "https://lumecontrolesolar.com.br/refletiva",
-                "priceCurrency": "BRL",
-                "price": "95.00",
-                "unitText": "m²",
-                "availability": "https://schema.org/InStock",
-                "seller": {
-                    "@type": "LocalBusiness",
-                    "name": "LUME Controle Solar"
-                }
-            }
-        };
-
-        const schemaFAQ = {
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            "mainEntity": [
-                {
-                    "@type": "Question",
-                    "name": "Como funciona o efeito espelhado do Insulfilm Refletivo?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "O 'One-Way Mirror' (espelho de mão única) funciona pela diferença de iluminação. Durante o dia, com o sol batendo na janela, quem está do lado de fora na rua vê as janelas da sua casa parecendo verdadeiros espelhos de prata, impedindo qualquer visão do seu interior. Quem está dentro de casa, consegue ver a rua normalmente. Lembre-se: à noite, com as luzes acesas dentro de casa, o efeito se inverte."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "O filme prata/espelhado pode ser instalado em qualquer tipo de vidro?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Como as películas refletivas rejeitam uma massa monstruosa de calor do sol espelhando-o de volta, vidros muito antigos, aramados ou vidros duplos que não sejam temperados podem sofrer estresse térmico. A equipe da LUME sempre faz uma avaliação técnica antes da instalação para garantir que o vidro do seu condomínio ou residência é 100% compatível."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "Qual a durabilidade desta película diante do sol do Rio de Janeiro?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Extremamente alta. Formada por uma matriz de poliéster e uma camada densa de deposição metálica que reflete em torno de 70% de todo calor (TSER), ela é muito mais resistente e fria do que filmes tingidos comuns, aguentando tranquilamente não apenas o calor do Rio, como anos de maresia."
-                    }
-                }
-            ]
-        };
-
-        const scriptLB = document.createElement('script');
-        scriptLB.type = 'application/ld+json';
-        scriptLB.text = JSON.stringify(schemaLocalBusiness);
-        document.head.appendChild(scriptLB);
-
-        const scriptProduct = document.createElement('script');
-        scriptProduct.type = 'application/ld+json';
-        scriptProduct.text = JSON.stringify(schemaProduct);
-        document.head.appendChild(scriptProduct);
-
-        const scriptFAQ = document.createElement('script');
-        scriptFAQ.type = 'application/ld+json';
-        scriptFAQ.text = JSON.stringify(schemaFAQ);
-        document.head.appendChild(scriptFAQ);
-
-        return () => {
-            document.head.removeChild(scriptLB);
-            document.head.removeChild(scriptProduct);
-            document.head.removeChild(scriptFAQ);
-        };
     }, []);
 
     return (
         <div className="bg-[#070f1a] text-white min-h-screen">
+            <Helmet>
+                <title>Insulfilm Refletivo Prata RJ | Privacidade e Fim do Calor - LUME</title>
+                <meta name="description" content="Película Refletiva (Espelhada) no Rio de Janeiro. Efeito One-Way Mirror para privacidade diurna absoluta e redução drástica de calor. Excelente para Bangu." />
+                
+                <script type="application/ld+json">
+                    {`
+                        {
+                            "@context": "https://schema.org",
+                            "@type": "LocalBusiness",
+                            "name": "LUME Películas de Controle Solar",
+                            "image": "https://lumecontrolesolar.com.br/novo-logo-lume.png",
+                            "@id": "https://lumecontrolesolar.com.br/refletiva",
+                            "url": "https://lumecontrolesolar.com.br/refletiva",
+                            "telephone": "+5521965140612",
+                            "priceRange": "$$",
+                            "address": {
+                                "@type": "PostalAddress",
+                                "streetAddress": "Zona Oeste",
+                                "addressLocality": "Rio de Janeiro",
+                                "addressRegion": "RJ",
+                                "postalCode": "21810-000",
+                                "addressCountry": "BR"
+                            },
+                            "geo": {
+                                "@type": "GeoCoordinates",
+                                "latitude": -22.8767,
+                                "longitude": -43.4651
+                            },
+                            "areaServed": ["Bangu", "Campo Grande", "Realengo", "Barra da Tijuca", "Recreio", "Zona Oeste RJ"],
+                            "description": "Especialistas em instalação de Insulfilm Refletivo (Prata/Espelhado) no Rio de Janeiro. A solução clássica para privacidade diurna e rejeição de calor extrema."
+                        }
+                    `}
+                </script>
+
+                <script type="application/ld+json">
+                    {`
+                        {
+                            "@context": "https://schema.org",
+                            "@type": "Product",
+                            "name": "Insulfilm Refletivo Clássico (Prata)",
+                            "image": "https://lumecontrolesolar.com.br/logo.png",
+                            "description": "Película espelhada prata com altíssima rejeição térmica (até 85% IRR). Garante privacidade diurna total com o efeito One-Way Mirror.",
+                            "brand": {
+                                "@type": "Brand",
+                                "name": "LUME Películas"
+                            },
+                            "offers": {
+                                "@type": "Offer",
+                                "url": "https://lumecontrolesolar.com.br/refletiva",
+                                "priceCurrency": "BRL",
+                                "price": "95.00",
+                                "unitText": "m²",
+                                "availability": "https://schema.org/InStock",
+                                "seller": {
+                                    "@type": "LocalBusiness",
+                                    "name": "LUME Controle Solar"
+                                }
+                            }
+                        }
+                    `}
+                </script>
+
+                <script type="application/ld+json">
+                    {`
+                        {
+                            "@context": "https://schema.org",
+                            "@type": "FAQPage",
+                            "mainEntity": [
+                                {
+                                    "@type": "Question",
+                                    "name": "Como funciona o efeito espelhado do Insulfilm Refletivo?",
+                                    "acceptedAnswer": {
+                                        "@type": "Answer",
+                                        "text": "O 'One-Way Mirror' (espelho de mão única) funciona pela diferença de iluminação. Durante o dia, com o sol batendo na janela, quem está do lado de fora na rua vê as janelas da sua casa parecendo verdadeiros espelhos de prata, impedindo qualquer visão do seu interior. Quem está dentro de casa, consegue ver a rua normalmente. Lembre-se: à noite, com as luzes acesas dentro de casa, o efeito se inverte."
+                                    }
+                                },
+                                {
+                                    "@type": "Question",
+                                    "name": "O filme prata/espelhado pode ser instalado em qualquer tipo de vidro?",
+                                    "acceptedAnswer": {
+                                        "@type": "Answer",
+                                        "text": "Como as películas refletivas rejeitam uma massa monstruosa de calor do sol espelhando-o de volta, vidros muito antigos, aramados ou vidros duplos que não sejam temperados podem sofrer estresse térmico. A equipe da LUME sempre faz uma avaliação técnica antes da instalação para garantir que o vidro do seu condomínio ou residência é 100% compatível."
+                                    }
+                                },
+                                {
+                                    "@type": "Question",
+                                    "name": "Qual a durabilidade desta película diante do sol do Rio de Janeiro?",
+                                    "acceptedAnswer": {
+                                        "@type": "Answer",
+                                        "text": "Extremamente alta. Formada por uma matriz de poliéster e uma camada densa de deposição metálica que reflete em torno de 70% de todo calor (TSER), ela é muito mais resistente e fria do que filmes tingidos comuns, aguentando tranquilamente não apenas o calor do Rio, como anos de maresia."
+                                    }
+                                }
+                            ]
+                        }
+                    `}
+                </script>
+            </Helmet>
             <WhatsAppButton />
 
             {/* Hero Section */}

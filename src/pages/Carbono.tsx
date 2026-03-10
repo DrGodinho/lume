@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Helmet } from 'react-helmet';
 import { Shield, CheckCircle, EyeOff, Wifi, ArrowRight } from 'lucide-react';
 import { WhatsAppButton } from '../components/WhatsAppButton';
 import { ContactCTA } from '../sections/ContactCTA';
@@ -7,125 +8,112 @@ import gsap from 'gsap';
 
 export function CarbonoPage() {
     useEffect(() => {
-        // SEO Meta Tags
-        document.title = "Insulfilm Carbono Premium RJ (G5 e G20) | Privacidade em Bangu - LUME";
-        const metaDescription = document.querySelector('meta[name="description"]');
-        if (metaDescription) {
-            metaDescription.setAttribute("content", "Insulfilm Carbono Premium G5 e G20. Privacidade máxima, preto intenso que não desbota e rejeição de calor de até 90%. Instalação em Bangu e Zona Oeste RJ.");
-        }
-
         // Entrance Animation
         gsap.fromTo('.page-entrance',
             { opacity: 0, y: 20 },
             { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out', stagger: 0.1 }
         );
-
-        // Inject JSON-LD Schema
-        const schemaLocalBusiness = {
-            "@context": "https://schema.org",
-            "@type": "LocalBusiness",
-            "name": "LUME Películas de Controle Solar",
-            "image": "https://seusite.com.br/logo.png",
-            "@id": "",
-            "url": "https://seusite.com.br/carbono",
-            "telephone": "+5521965140612",
-            "priceRange": "$$",
-            "address": {
-                "@type": "PostalAddress",
-                "streetAddress": "Zona Oeste",
-                "addressLocality": "Rio de Janeiro",
-                "addressRegion": "RJ",
-                "postalCode": "21810-000",
-                "addressCountry": "BR"
-            },
-            "geo": {
-                "@type": "GeoCoordinates",
-                "latitude": -22.8767,
-                "longitude": -43.4651
-            },
-            "areaServed": ["Bangu", "Campo Grande", "Realengo", "Barra da Tijuca", "Recreio", "Zona Oeste RJ"],
-            "description": "Especialistas em instalação de Insulfilm Carbono Premium G5 e G20 no Rio de Janeiro. A solução definitiva para privacidade absoluta e altíssimo conforto térmico."
-        };
-
-        const schemaFAQ = {
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            "mainEntity": [
-                {
-                    "@type": "Question",
-                    "name": "A película Carbono G5 tira a visão de dentro para fora à noite?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "A linha Carbono Premium possui excelente nitidez ótica de dentro para fora durante o dia. À noite, por ser um grau muito escuro (G5 com VLT de 5%), a visibilidade noturna para fora é reduzida. Para quem prioriza visão noturna perfeita mantendo o tom escuro por fora, a nossa recomendação costuma ser o Carbono G20."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "Qual a diferença entre o Insulfilm Carbono Premium e o filme comum tingido?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "A diferença é brutal. O filme comum tingido perde a cor, desbota, fica roxo em poucos meses sob o forte sol do Rio de Janeiro e retém baixíssimo calor. A película Carbono Premium possui nano-partículas de carbono em sua estrutura, garantindo uma proteção térmica massiva (até 90% IRR) e uma estabilidade de cor permanente (nunca ficará roxo)."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "O filme Carbono interfere no sinal de celular ou GPS em casa?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Não! Totalmente zero interferência. Por ser uma tecnologia não-metálica (ao contrário das antigas películas refletivas ou espelhadas), a linha Carbono permite a passagem livre de todos os sinais de rádio, Wi-Fi, 5G e GPS."
-                    }
-                }
-            ]
-        };
-
-        const schemaProduct = {
-            "@context": "https://schema.org",
-            "@type": "Product",
-            "name": "Insulfilm Carbono Premium G5 e G20",
-            "image": "https://lumecontrolesolar.com.br/product-carbono.jpg",
-            "description": "Cor preto profundo que não desbota. Privacidade máxima com rejeição de calor de até 90%.",
-            "brand": {
-                "@type": "Brand",
-                "name": "LUME Películas"
-            },
-            "offers": {
-                "@type": "Offer",
-                "url": "https://lumecontrolesolar.com.br/carbono",
-                "priceCurrency": "BRL",
-                "price": "80.00",
-                "unitText": "m²",
-                "availability": "https://schema.org/InStock",
-                "seller": {
-                    "@type": "LocalBusiness",
-                    "name": "LUME Controle Solar"
-                }
-            }
-        };
-
-        const scriptLB = document.createElement('script');
-        scriptLB.type = 'application/ld+json';
-        scriptLB.text = JSON.stringify(schemaLocalBusiness);
-        document.head.appendChild(scriptLB);
-
-        const scriptFAQ = document.createElement('script');
-        scriptFAQ.type = 'application/ld+json';
-        scriptFAQ.text = JSON.stringify(schemaFAQ);
-        document.head.appendChild(scriptFAQ);
-
-        const scriptProduct = document.createElement('script');
-        scriptProduct.type = 'application/ld+json';
-        scriptProduct.text = JSON.stringify(schemaProduct);
-        document.head.appendChild(scriptProduct);
-
-        return () => {
-            document.head.removeChild(scriptLB);
-            document.head.removeChild(scriptFAQ);
-            document.head.removeChild(scriptProduct);
-        };
     }, []);
 
     return (
         <div className="bg-[#070f1a] text-white min-h-screen">
+            <Helmet>
+                <title>Insulfilm Carbono Premium RJ (G5 e G20) | Privacidade em Bangu - LUME</title>
+                <meta name="description" content="Insulfilm Carbono Premium G5 e G20. Privacidade máxima, preto intenso que não desbota e rejeição de calor de até 90%. Instalação em Bangu e Zona Oeste RJ." />
+                
+                <script type="application/ld+json">
+                    {`
+                        {
+                            "@context": "https://schema.org",
+                            "@type": "LocalBusiness",
+                            "name": "LUME Películas de Controle Solar",
+                            "image": "https://lumecontrolesolar.com.br/novo-logo-lume.png",
+                            "@id": "https://lumecontrolesolar.com.br/carbono",
+                            "url": "https://lumecontrolesolar.com.br/carbono",
+                            "telephone": "+5521965140612",
+                            "priceRange": "$$",
+                            "address": {
+                                "@type": "PostalAddress",
+                                "streetAddress": "Zona Oeste",
+                                "addressLocality": "Rio de Janeiro",
+                                "addressRegion": "RJ",
+                                "postalCode": "21810-000",
+                                "addressCountry": "BR"
+                            },
+                            "geo": {
+                                "@type": "GeoCoordinates",
+                                "latitude": -22.8767,
+                                "longitude": -43.4651
+                            },
+                            "areaServed": ["Bangu", "Campo Grande", "Realengo", "Barra da Tijuca", "Recreio", "Zona Oeste RJ"],
+                            "description": "Especialistas em instalação de Insulfilm Carbono Premium G5 e G20 no Rio de Janeiro. A solução definitiva para privacidade absoluta e altíssimo conforto térmico."
+                        }
+                    `}
+                </script>
+
+                <script type="application/ld+json">
+                    {`
+                        {
+                            "@context": "https://schema.org",
+                            "@type": "FAQPage",
+                            "mainEntity": [
+                                {
+                                    "@type": "Question",
+                                    "name": "A película Carbono G5 tira a visão de dentro para fora à noite?",
+                                    "acceptedAnswer": {
+                                        "@type": "Answer",
+                                        "text": "A linha Carbono Premium possui excelente nitidez ótica de dentro para fora durante o dia. À noite, por ser um grau muito escuro (G5 com VLT de 5%), a visibilidade noturna para fora é reduzida. Para quem prioriza visão noturna perfeita mantendo o tom escuro por fora, a nossa recomendação costuma ser o Carbono G20."
+                                    }
+                                },
+                                {
+                                    "@type": "Question",
+                                    "name": "Qual a diferença entre o Insulfilm Carbono Premium e o filme comum tingido?",
+                                    "acceptedAnswer": {
+                                        "@type": "Answer",
+                                        "text": "A diferença é brutal. O filme comum tingido perde a cor, desbota, fica roxo em poucos meses sob o forte sol do Rio de Janeiro e retém baixíssimo calor. A película Carbono Premium possui nano-partículas de carbono em sua estrutura, garantindo uma proteção térmica massiva (até 90% IRR) e uma estabilidade de cor permanente (nunca ficará roxo)."
+                                    }
+                                },
+                                {
+                                    "@type": "Question",
+                                    "name": "O filme Carbono interfere no sinal de celular ou GPS em casa?",
+                                    "acceptedAnswer": {
+                                        "@type": "Answer",
+                                        "text": "Não! Totalmente zero interferência. Por ser uma tecnologia não-metálica (ao contrário das antigas películas refletivas ou espelhadas), a linha Carbono permite a passagem livre de todos os sinais de rádio, Wi-Fi, 5G e GPS."
+                                    }
+                                }
+                            ]
+                        }
+                    `}
+                </script>
+
+                <script type="application/ld+json">
+                    {`
+                        {
+                            "@context": "https://schema.org",
+                            "@type": "Product",
+                            "name": "Insulfilm Carbono Premium G5 e G20",
+                            "image": "https://lumecontrolesolar.com.br/product-carbono.jpg",
+                            "description": "Cor preto profundo que não desbota. Privacidade máxima com rejeição de calor de até 90%.",
+                            "brand": {
+                                "@type": "Brand",
+                                "name": "LUME Películas"
+                            },
+                            "offers": {
+                                "@type": "Offer",
+                                "url": "https://lumecontrolesolar.com.br/carbono",
+                                "priceCurrency": "BRL",
+                                "price": "80.00",
+                                "unitText": "m²",
+                                "availability": "https://schema.org/InStock",
+                                "seller": {
+                                    "@type": "LocalBusiness",
+                                    "name": "LUME Controle Solar"
+                                }
+                            }
+                        }
+                    `}
+                </script>
+            </Helmet>
             {/* WhatsApp Floating Button */}
             <WhatsAppButton />
 

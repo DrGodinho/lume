@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Helmet } from 'react-helmet';
 import { Sun, Droplets, Zap, ShieldCheck, Layers, ArrowRight } from 'lucide-react';
 import { WhatsAppButton } from '../components/WhatsAppButton';
 import { ContactCTA } from '../sections/ContactCTA';
@@ -7,146 +8,131 @@ import gsap from 'gsap';
 
 export function DuplaCamadaPage() {
     useEffect(() => {
-        // SEO Meta Tags
-        document.title = "Insulfilm Dupla Camada RJ (G5 e G20) | Fim do Calor em Bangu - LUME";
-        const metaDescription = document.querySelector('meta[name="description"]');
-        if (metaDescription) {
-            metaDescription.setAttribute("content", "Insulfilm Dupla Camada G5 e G20 no Rio de Janeiro. A solução definitiva com arquitetura metalizada para até 95% de bloqueio de calor. Especialistas em Bangu.");
-        }
-
         // Entrance Animation
         gsap.fromTo('.page-entrance',
             { opacity: 0, y: 20 },
             { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out', stagger: 0.1 }
         );
-
-        // Inject JSON-LD Schema
-        const schemaLocalBusiness = {
-            "@context": "https://schema.org",
-            "@type": "LocalBusiness",
-            "name": "LUME Películas de Controle Solar",
-            "image": "https://seusite.com.br/logo.png",
-            "@id": "",
-            "url": "https://seusite.com.br/dupla-camada",
-            "telephone": "+5521965140612",
-            "priceRange": "$$",
-            "address": {
-                "@type": "PostalAddress",
-                "streetAddress": "Zona Oeste",
-                "addressLocality": "Rio de Janeiro",
-                "addressRegion": "RJ",
-                "postalCode": "21810-000",
-                "addressCountry": "BR"
-            },
-            "geo": {
-                "@type": "GeoCoordinates",
-                "latitude": -22.8767,
-                "longitude": -43.4651
-            },
-            "areaServed": ["Bangu", "Campo Grande", "Realengo", "Barra da Tijuca", "Recreio", "Zona Oeste RJ"],
-            "description": "Especialistas em instalação de Insulfilm Dupla Camada (G5 e G20) na Zona Oeste do Rio. Alta redução de calor e excelente custo-benefício."
-        };
-
-        const schemaService = {
-            "@context": "https://schema.org",
-            "@type": "Service",
-            "serviceType": "Instalação de Insulfilm Dupla Camada (Residencial e Comercial)",
-            "provider": {
-                "@type": "LocalBusiness",
-                "name": "LUME Películas de Controle Solar"
-            },
-            "areaServed": {
-                "@type": "City",
-                "name": "Rio de Janeiro"
-            },
-            "description": "Instalação profissional de película Dupla Camada G5 e G20. Rejeição de até 95% do infravermelho, proteção UV extrema e estética premium para fechamento de varandas e janelas em Bangu, Campo Grande, e toda Zona Oeste do RJ."
-        };
-
-        const schemaFAQ = {
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            "mainEntity": [
-                {
-                    "@type": "Question",
-                    "name": "Qual a durabilidade da película Dupla Camada contra o sol do Rio de Janeiro?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Ao contrário dos filmes tintados que duram meses, a arquitetura Dupla Camada (com deposição de alumínio ou titânio) possui estabilidade prolongada, sendo fabricada para suportar a radiação intensa do Rio de Janeiro por longos e belos anos sem gerar bolhas."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "A visibilidade interna é afetada fechando a varanda com Dupla Camada?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "A percepção visual depende do grau escolhido. O G5 fecha a visão diurna completamente de fora para dentro (privacidade máxima), mas obscurece a visão noturna de dentro para fora. Já a versão G20 entrega a melhor claridade ótica e conforto visual sem esforçar a vista de quem está dentro de casa."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "Essa película funciona para fechamento de varandas de vidro?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Perfeitamente. A película Dupla Camada é a atual campeã em custo-benefício (custando em média R$ 120/m² instalada) para envidraçamentos de grandes varandas na Barra da Tijuca e Recreio, onde a necessidade de bloquear o calor do sol da tarde é crítica para a usabilidade do ambiente."
-                    }
-                }
-            ]
-        };
-
-        const schemaProduct = {
-            "@context": "https://schema.org",
-            "@type": "Product",
-            "name": "Insulfilm Dupla Camada G5 e G20",
-            "image": "https://lumecontrolesolar.com.br/product-smoke.jpg",
-            "description": "Alta redução de calor com tecnologia de dupla camada. Rejeição de até 95% do infravermelho.",
-            "brand": {
-                "@type": "Brand",
-                "name": "LUME Películas"
-            },
-            "offers": {
-                "@type": "Offer",
-                "url": "https://lumecontrolesolar.com.br/dupla-camada",
-                "priceCurrency": "BRL",
-                "price": "120.00",
-                "unitText": "m²",
-                "availability": "https://schema.org/InStock",
-                "seller": {
-                    "@type": "LocalBusiness",
-                    "name": "LUME Controle Solar"
-                }
-            }
-        };
-
-        const scriptLB = document.createElement('script');
-        scriptLB.type = 'application/ld+json';
-        scriptLB.text = JSON.stringify(schemaLocalBusiness);
-        document.head.appendChild(scriptLB);
-
-        const scriptService = document.createElement('script');
-        scriptService.type = 'application/ld+json';
-        scriptService.text = JSON.stringify(schemaService);
-        document.head.appendChild(scriptService);
-
-        const scriptFAQ = document.createElement('script');
-        scriptFAQ.type = 'application/ld+json';
-        scriptFAQ.text = JSON.stringify(schemaFAQ);
-        document.head.appendChild(scriptFAQ);
-
-        const scriptProduct = document.createElement('script');
-        scriptProduct.type = 'application/ld+json';
-        scriptProduct.text = JSON.stringify(schemaProduct);
-        document.head.appendChild(scriptProduct);
-
-        return () => {
-            document.head.removeChild(scriptLB);
-            document.head.removeChild(scriptService);
-            document.head.removeChild(scriptFAQ);
-            document.head.removeChild(scriptProduct);
-        };
     }, []);
 
     return (
         <div className="bg-[#070f1a] text-white min-h-screen">
+            <Helmet>
+                <title>Insulfilm Dupla Camada RJ (G5 e G20) | Fim do Calor em Bangu - LUME</title>
+                <meta name="description" content="Insulfilm Dupla Camada G5 e G20 no Rio de Janeiro. A solução definitiva com arquitetura metalizada para até 95% de bloqueio de calor. Especialistas em Bangu." />
+                
+                <script type="application/ld+json">
+                    {`
+                        {
+                            "@context": "https://schema.org",
+                            "@type": "LocalBusiness",
+                            "name": "LUME Películas de Controle Solar",
+                            "image": "https://lumecontrolesolar.com.br/novo-logo-lume.png",
+                            "@id": "https://lumecontrolesolar.com.br/dupla-camada",
+                            "url": "https://lumecontrolesolar.com.br/dupla-camada",
+                            "telephone": "+5521965140612",
+                            "priceRange": "$$",
+                            "address": {
+                                "@type": "PostalAddress",
+                                "streetAddress": "Zona Oeste",
+                                "addressLocality": "Rio de Janeiro",
+                                "addressRegion": "RJ",
+                                "postalCode": "21810-000",
+                                "addressCountry": "BR"
+                            },
+                            "geo": {
+                                "@type": "GeoCoordinates",
+                                "latitude": -22.8767,
+                                "longitude": -43.4651
+                            },
+                            "areaServed": ["Bangu", "Campo Grande", "Realengo", "Barra da Tijuca", "Recreio", "Zona Oeste RJ"],
+                            "description": "Especialistas em instalação de Insulfilm Dupla Camada (G5 e G20) na Zona Oeste do Rio. Alta redução de calor e excelente custo-benefício."
+                        }
+                    `}
+                </script>
+
+                <script type="application/ld+json">
+                    {`
+                        {
+                            "@context": "https://schema.org",
+                            "@type": "Service",
+                            "serviceType": "Instalação de Insulfilm Dupla Camada (Residencial e Comercial)",
+                            "provider": {
+                                "@type": "LocalBusiness",
+                                "name": "LUME Películas de Controle Solar"
+                            },
+                            "areaServed": {
+                                "@type": "City",
+                                "name": "Rio de Janeiro"
+                            },
+                            "description": "Instalação profissional de película Dupla Camada G5 e G20. Rejeição de até 95% do infravermelho, proteção UV extrema e estética premium para fechamento de varandas e janelas em Bangu, Campo Grande, e toda Zona Oeste do RJ."
+                        }
+                    `}
+                </script>
+
+                <script type="application/ld+json">
+                    {`
+                        {
+                            "@context": "https://schema.org",
+                            "@type": "FAQPage",
+                            "mainEntity": [
+                                {
+                                    "@type": "Question",
+                                    "name": "Qual a durabilidade da película Dupla Camada contra o sol do Rio de Janeiro?",
+                                    "acceptedAnswer": {
+                                        "@type": "Answer",
+                                        "text": "Ao contrário dos filmes tintados que duram meses, a arquitetura Dupla Camada (com deposição de alumínio ou titânio) possui estabilidade prolongada, sendo fabricada para suportar a radiação intensa do Rio de Janeiro por longos e belos anos sem gerar bolhas."
+                                    }
+                                },
+                                {
+                                    "@type": "Question",
+                                    "name": "A visibilidade interna é afetada fechando a varanda com Dupla Camada?",
+                                    "acceptedAnswer": {
+                                        "@type": "Answer",
+                                        "text": "A percepção visual depende do grau escolhido. O G5 fecha a visão diurna completamente de fora para dentro (privacidade máxima), mas obscurece a visão noturna de dentro para fora. Já a versão G20 entrega a melhor claridade ótica e conforto visual sem esforçar a vista de quem está dentro de casa."
+                                    }
+                                },
+                                {
+                                    "@type": "Question",
+                                    "name": "Essa película funciona para fechamento de varandas de vidro?",
+                                    "acceptedAnswer": {
+                                        "@type": "Answer",
+                                        "text": "Perfeitamente. A película Dupla Camada é a atual campeã em custo-benefício (custando em média R$ 120/m² instalada) para envidraçamentos de grandes varandas na Barra da Tijuca e Recreio, onde a necessidade de bloquear o calor do sol da tarde é crítica para a usabilidade do ambiente."
+                                    }
+                                }
+                            ]
+                        }
+                    `}
+                </script>
+
+                <script type="application/ld+json">
+                    {`
+                        {
+                            "@context": "https://schema.org",
+                            "@type": "Product",
+                            "name": "Insulfilm Dupla Camada G5 e G20",
+                            "image": "https://lumecontrolesolar.com.br/product-smoke.jpg",
+                            "description": "Alta redução de calor com tecnologia de dupla camada. Rejeição de até 95% do infravermelho.",
+                            "brand": {
+                                "@type": "Brand",
+                                "name": "LUME Películas"
+                            },
+                            "offers": {
+                                "@type": "Offer",
+                                "url": "https://lumecontrolesolar.com.br/dupla-camada",
+                                "priceCurrency": "BRL",
+                                "price": "120.00",
+                                "unitText": "m²",
+                                "availability": "https://schema.org/InStock",
+                                "seller": {
+                                    "@type": "LocalBusiness",
+                                    "name": "LUME Controle Solar"
+                                }
+                            }
+                        }
+                    `}
+                </script>
+            </Helmet>
             <WhatsAppButton />
 
             {/* Hero Section */}

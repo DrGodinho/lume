@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Helmet } from 'react-helmet';
 import { EyeOff, Sun, Layers, Droplets, Gem, ArrowRight, Building2, ShieldCheck } from 'lucide-react';
 import { WhatsAppButton } from '../components/WhatsAppButton';
 import { ContactCTA } from '../sections/ContactCTA';
@@ -7,125 +8,112 @@ import gsap from 'gsap';
 
 export function JateadoPage() {
     useEffect(() => {
-        // SEO Meta Tags
-        document.title = "Película Jateada RJ | Privacidade com Elegância - LUME";
-        const metaDescription = document.querySelector('meta[name="description"]');
-        if (metaDescription) {
-            metaDescription.setAttribute("content", "Película Jateada (Fosca) no Rio de Janeiro. A solução perfeita para divisórias de escritório, portas e banheiros. Privacidade total mantendo 85% da luz.");
-        }
-
         // Entrance Animation
         gsap.fromTo('.page-entrance',
             { opacity: 0, y: 20 },
             { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out', stagger: 0.1 }
         );
-
-        // Inject JSON-LD Schema
-        const schemaLocalBusiness = {
-            "@context": "https://schema.org",
-            "@type": "LocalBusiness",
-            "name": "LUME Películas de Controle Solar",
-            "image": "https://lumecontrolesolar.com.br/logo.png",
-            "@id": "",
-            "url": "https://lumecontrolesolar.com.br/jateado",
-            "telephone": "+5521965140612",
-            "priceRange": "$$",
-            "address": {
-                "@type": "PostalAddress",
-                "streetAddress": "Zona Oeste",
-                "addressLocality": "Rio de Janeiro",
-                "addressRegion": "RJ",
-                "postalCode": "21810-000",
-                "addressCountry": "BR"
-            },
-            "geo": {
-                "@type": "GeoCoordinates",
-                "latitude": -22.8767,
-                "longitude": -43.4651
-            },
-            "areaServed": ["Bangu", "Campo Grande", "Realengo", "Barra da Tijuca", "Recreio", "Zona Oeste RJ"],
-            "description": "Especialistas em instalação de Película Jateada (Fosca) para escritórios, clínicas e residências no Rio de Janeiro. Privacidade com alta sofisticação."
-        };
-
-        const schemaProduct = {
-            "@context": "https://schema.org",
-            "@type": "Product",
-            "name": "Película Jateada (Acabamento Fosco)",
-            "image": "https://lumecontrolesolar.com.br/logo.png",
-            "description": "Filme com efeito fosco/jateado para vidros. Garante privacidade visual bi-direcional preservando até 85% da luminosidade natural do ambiente.",
-            "brand": {
-                "@type": "Brand",
-                "name": "LUME Películas"
-            },
-            "offers": {
-                "@type": "Offer",
-                "url": "https://lumecontrolesolar.com.br/jateado",
-                "priceCurrency": "BRL",
-                "price": "90.00",
-                "unitText": "m²",
-                "availability": "https://schema.org/InStock",
-                "seller": {
-                    "@type": "LocalBusiness",
-                    "name": "LUME Controle Solar"
-                }
-            }
-        };
-
-        const schemaFAQ = {
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            "mainEntity": [
-                {
-                    "@type": "Question",
-                    "name": "A película jateada escurece o ambiente interno?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "De forma alguma! Essa é a maior vantagem do material jateado. Ele possui uma Transmissão de Luz Visível (VLT) altíssima, variando entre 50% a 85%. Isso significa que ele apenas difunde (espalha) a luz, bloqueando a visão detalhada, mas mantendo a sua sala, clínica ou escritório totalmente iluminados com a luz do dia."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "Pode ser instalada dentro do box do banheiro?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Sim, a película jateada é extremamente popular para box de banheiros e janelas de lavanderias. O material é feito de poliéster de alta resistência e possui um adesivo projetado para suportar ambientes com variações de umidade e vapor diárias, garantindo extrema privacidade para a hora do banho sem deixar o banheiro escuro."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "O Jateado deixa marcas de dedo com facilidade?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "As linhas premium de películas jateadas que utilizamos na LUME recebem um tratamento superficial específico anti-marcas. Ao contrário de vidros jateados na areia (que encardem profundamente com a gordura das mãos), a película possui um acabamento liso e lavável que dificulta a marcação digital e facilita muito a limpeza no dia a dia."
-                    }
-                }
-            ]
-        };
-
-        const scriptLB = document.createElement('script');
-        scriptLB.type = 'application/ld+json';
-        scriptLB.text = JSON.stringify(schemaLocalBusiness);
-        document.head.appendChild(scriptLB);
-
-        const scriptProduct = document.createElement('script');
-        scriptProduct.type = 'application/ld+json';
-        scriptProduct.text = JSON.stringify(schemaProduct);
-        document.head.appendChild(scriptProduct);
-
-        const scriptFAQ = document.createElement('script');
-        scriptFAQ.type = 'application/ld+json';
-        scriptFAQ.text = JSON.stringify(schemaFAQ);
-        document.head.appendChild(scriptFAQ);
-
-        return () => {
-            document.head.removeChild(scriptLB);
-            document.head.removeChild(scriptProduct);
-            document.head.removeChild(scriptFAQ);
-        };
     }, []);
 
     return (
         <div className="bg-[#070f1a] text-white min-h-screen">
+            <Helmet>
+                <title>Película Jateada RJ | Privacidade com Elegância - LUME</title>
+                <meta name="description" content="Película Jateada (Fosca) no Rio de Janeiro. A solução perfeita para divisórias de escritório, portas e banheiros. Privacidade total mantendo 85% da luz." />
+                
+                <script type="application/ld+json">
+                    {`
+                        {
+                            "@context": "https://schema.org",
+                            "@type": "LocalBusiness",
+                            "name": "LUME Películas de Controle Solar",
+                            "image": "https://lumecontrolesolar.com.br/novo-logo-lume.png",
+                            "@id": "https://lumecontrolesolar.com.br/jateado",
+                            "url": "https://lumecontrolesolar.com.br/jateado",
+                            "telephone": "+5521965140612",
+                            "priceRange": "$$",
+                            "address": {
+                                "@type": "PostalAddress",
+                                "streetAddress": "Zona Oeste",
+                                "addressLocality": "Rio de Janeiro",
+                                "addressRegion": "RJ",
+                                "postalCode": "21810-000",
+                                "addressCountry": "BR"
+                            },
+                            "geo": {
+                                "@type": "GeoCoordinates",
+                                "latitude": -22.8767,
+                                "longitude": -43.4651
+                            },
+                            "areaServed": ["Bangu", "Campo Grande", "Realengo", "Barra da Tijuca", "Recreio", "Zona Oeste RJ"],
+                            "description": "Especialistas em instalação de Película Jateada (Fosca) para escritórios, clínicas e residências no Rio de Janeiro. Privacidade com alta sofisticação."
+                        }
+                    `}
+                </script>
+
+                <script type="application/ld+json">
+                    {`
+                        {
+                            "@context": "https://schema.org",
+                            "@type": "Product",
+                            "name": "Película Jateada (Acabamento Fosco)",
+                            "image": "https://lumecontrolesolar.com.br/logo.png",
+                            "description": "Filme com efeito fosco/jateado para vidros. Garante privacidade visual bi-direcional preservando até 85% da luminosidade natural do ambiente.",
+                            "brand": {
+                                "@type": "Brand",
+                                "name": "LUME Películas"
+            },
+                            "offers": {
+                                "@type": "Offer",
+                                "url": "https://lumecontrolesolar.com.br/jateado",
+                                "priceCurrency": "BRL",
+                                "price": "90.00",
+                                "unitText": "m²",
+                                "availability": "https://schema.org/InStock",
+                                "seller": {
+                                    "@type": "LocalBusiness",
+                                    "name": "LUME Controle Solar"
+                                }
+                            }
+                        }
+                    `}
+                </script>
+
+                <script type="application/ld+json">
+                    {`
+                        {
+                            "@context": "https://schema.org",
+                            "@type": "FAQPage",
+                            "mainEntity": [
+                                {
+                                    "@type": "Question",
+                                    "name": "A película jateada escurece o ambiente interno?",
+                                    "acceptedAnswer": {
+                                        "@type": "Answer",
+                                        "text": "De forma alguma! Essa é a maior vantagem do material jateado. Ele possui uma Transmissão de Luz Visível (VLT) altíssima, variando entre 50% a 85%. Isso significa que ele apenas difunde (espalha) a luz, bloqueando a visão detalhada, mas mantendo a sua sala, clínica ou escritório totalmente iluminados com a luz do dia."
+                                    }
+                                },
+                                {
+                                    "@type": "Question",
+                                    "name": "Pode ser instalada dentro do box do banheiro?",
+                                    "acceptedAnswer": {
+                                        "@type": "Answer",
+                                        "text": "Sim, a película jateada é extremamente popular para box de banheiros e janelas de lavanderias. O material é feito de poliéster de alta resistência e possui um adesivo projetado para suportar ambientes com variações de umidade e vapor diárias, garantindo extrema privacidade para a hora do banho sem deixar o banheiro escuro."
+                                    }
+                                },
+                                {
+                                    "@type": "Question",
+                                    "name": "O Jateado deixa marcas de dedo com facilidade?",
+                                    "acceptedAnswer": {
+                                        "@type": "Answer",
+                                        "text": "As linhas premium de películas jateadas que utilizamos na LUME recebem um tratamento superficial específico anti-marcas. Ao contrário de vidros jateados na areia (que encardem profundamente com a gordura das mãos), a película possui um acabamento liso e lavável que dificulta a marcação digital e facilita muito a limpeza no dia a dia."
+                                    }
+                                }
+                            ]
+                        }
+                    `}
+                </script>
+            </Helmet>
             <WhatsAppButton />
 
             {/* Hero Section */}

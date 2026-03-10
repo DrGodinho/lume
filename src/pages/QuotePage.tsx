@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet';
 import {
     Plus,
     Send,
@@ -151,6 +152,10 @@ export function QuotePage() {
 
     return (
         <div className="min-h-screen bg-[#070f1a] text-white py-12 px-4 sm:px-6">
+            <Helmet>
+                <title>Orçamento Online | LUME Películas de Controle Solar</title>
+                <meta name="description" content="Solicite um orçamento personalizado para instalação de insulfilm residencial ou comercial no Rio de Janeiro. Escolha entre Nano Cerâmica, Carbono, Refletiva e muito mais." />
+            </Helmet>
             <div className="max-w-xl mx-auto">
 
                 {/* Header */}

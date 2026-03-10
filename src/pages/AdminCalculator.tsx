@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { Helmet } from 'react-helmet';
 import {
     Plus,
     Trash2,
@@ -228,6 +229,10 @@ export function AdminCalculator() {
 
     return (
         <div className="min-h-screen bg-[#040811] text-white py-10 px-4 sm:px-6">
+            <Helmet>
+                <title>Admin - Otimizador de Corte | LUME</title>
+                <meta name="robots" content="noindex, nofollow" />
+            </Helmet>
             <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-6">
 
                 {/* Cabeçalho */}
