@@ -6,7 +6,7 @@ import { Products } from './sections/Products';
 import { Benefits } from './sections/Benefits';
 import { About } from './sections/About';
 import { Coverage } from './sections/Coverage';
-import { Reviews } from './sections/Reviews';
+// import { Reviews } from './sections/Reviews';
 import { ContactCTA } from './sections/ContactCTA';
 import { Footer } from './sections/Footer';
 import { WhatsAppButton } from './components/WhatsAppButton';
@@ -49,7 +49,7 @@ function LandingPage() {
       <Benefits />
       <About />
       <Coverage />
-      <Reviews />
+      {/* <Reviews /> */}
       <ContactCTA />
     </>
   );
