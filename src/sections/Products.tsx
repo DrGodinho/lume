@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
-import { ArrowRight, Star, Thermometer, Sun, Eye, Droplets } from 'lucide-react';
+import { ArrowRight, Star, Thermometer, Sun, Eye, Droplets, Sparkles } from 'lucide-react';
 import gsap from 'gsap';
+import { Link } from 'react-router-dom';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -20,6 +21,7 @@ const products = [
     price: 'A partir de R$ 220/m²',
     cta: 'Quero Nano Cerâmica',
     icon: Star,
+    path: '/nano-ceramica',
   },
   {
     id: 2,
@@ -35,6 +37,7 @@ const products = [
     price: 'A partir de R$ 120/m²',
     cta: 'Quero Dupla Camada',
     icon: Droplets,
+    path: '/dupla-camada',
   },
   {
     id: 3,
@@ -50,6 +53,7 @@ const products = [
     price: 'A partir de R$ 80/m²',
     cta: 'Quero Carbono',
     icon: Eye,
+    path: '/carbono',
   },
   {
     id: 4,
@@ -65,6 +69,7 @@ const products = [
     price: 'A partir de R$ 95/m²',
     cta: 'Quero Refletiva',
     icon: Sun,
+    path: '/refletiva',
   },
   {
     id: 5,
@@ -80,6 +85,7 @@ const products = [
     price: 'A partir de R$ 90/m²',
     cta: 'Quero Jateado',
     icon: Thermometer,
+    path: '/jateado',
   },
 ];
 
@@ -180,47 +186,51 @@ export function Products() {
                 </div>
               )}
 
-              {/* Image */}
-              <div className="relative h-40 sm:h-48 overflow-hidden">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-transparent to-transparent" />
-              </div>
-
-              {/* Content */}
-              <div className="p-4 sm:p-5">
-                <div className="flex items-center gap-2 mb-2 sm:mb-3">
-                  <product.icon className="w-4 h-4 sm:w-5 sm:h-5 text-[#c9a227]" />
-                  <h3 className="text-sm sm:text-lg font-bold text-white font-['Montserrat']">
-                    {product.name}
-                  </h3>
+              <Link to={product.path} className="block cursor-pointer">
+                {/* Image */}
+                <div className="relative h-40 sm:h-48 overflow-hidden">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-transparent to-transparent" />
                 </div>
 
-                <p className="text-xs sm:text-sm text-gray-400 mb-3 sm:mb-4">
-                  {product.description}
-                </p>
+                {/* Content */}
+                <div className="p-4 sm:p-5">
+                  <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                    <product.icon className="w-4 h-4 sm:w-5 sm:h-5 text-[#c9a227]" />
+                    <h3 className="text-sm sm:text-lg font-bold text-white font-['Montserrat']">
+                      {product.name}
+                    </h3>
+                  </div>
 
-                {/* Specs */}
-                <div className="grid grid-cols-2 gap-2 mb-3 sm:mb-4">
-                  {product.specs.slice(0, 2).map((spec, i) => (
-                    <div key={i} className="text-[10px] sm:text-xs">
-                      <span className="text-gray-500 block">{spec.label}</span>
-                      <span className="text-[#c9a227] font-semibold">{spec.value}</span>
-                    </div>
-                  ))}
+                  <p className="text-xs sm:text-sm text-gray-400 mb-3 sm:mb-4">
+                    {product.description}
+                  </p>
+
+                  {/* Specs */}
+                  <div className="grid grid-cols-2 gap-2 mb-3 sm:mb-4">
+                    {product.specs.slice(0, 2).map((spec, i) => (
+                      <div key={i} className="text-[10px] sm:text-xs">
+                        <span className="text-gray-500 block">{spec.label}</span>
+                        <span className="text-[#c9a227] font-semibold">{spec.value}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Price */}
+                  <div className="mb-3 sm:mb-4">
+                    <span className="text-sm sm:text-lg font-bold text-gradient-gold">
+                      {product.price}
+                    </span>
+                  </div>
                 </div>
+              </Link>
 
-                {/* Price */}
-                <div className="mb-3 sm:mb-4">
-                  <span className="text-sm sm:text-lg font-bold text-gradient-gold">
-                    {product.price}
-                  </span>
-                </div>
-
-                {/* CTA */}
+              {/* Botão de WhatsApp fixo dentro do card, mas fora do Link da página */}
+              <div className="p-4 sm:p-5 pt-0 mt-[-20px]">
                 <a
                   href={`https://wa.me/5521965140612?text=Olá! Tenho interesse na ${product.name}`}
                   target="_blank"
@@ -235,20 +245,24 @@ export function Products() {
           ))}
         </div>
 
-        {/* Bottom CTA */}
-        <div className="text-center mt-10 sm:mt-16">
-          <p className="text-gray-400 text-sm sm:text-base mb-4">
-            Não sabe qual escolher? Nossos especialistas podem ajudar!
-          </p>
-          <a
-            href="https://wa.me/5521965140612"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-primary inline-flex items-center gap-2"
-          >
-            Falar com Especialista
-            <ArrowRight className="w-4 h-4" />
-          </a>
+        {/* Bottom CTA - Simulator Highlight */}
+        <div className="text-center mt-12 sm:mt-20">
+          <div className="inline-block p-[1px] rounded-xl bg-gradient-to-r from-transparent via-[#c9a227]/50 to-transparent mb-6">
+            <div className="bg-[#0a1628] rounded-xl px-6 py-4 border border-white/5">
+              <p className="text-gray-300 text-sm sm:text-base mb-6 font-medium">
+                Dúvida na escolha? <span className="text-white">Veja na prática</span> como cada película transforma seu ambiente.
+              </p>
+              <Link
+                to="/simulador"
+                className="btn-primary inline-flex items-center gap-3 py-4 px-8 text-lg group relative overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                <Sparkles className="w-5 h-5 animate-pulse" />
+                Testar Simulador de Ambientes
+                <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </section>

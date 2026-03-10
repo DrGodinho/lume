@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { EyeOff, ShieldCheck, ThermometerSnowflake, Ruler, ArrowRight, Home } from 'lucide-react';
 import { WhatsAppButton } from '../components/WhatsAppButton';
+import { ContactCTA } from '../sections/ContactCTA';
+import { SpecTooltip } from '../components/SpecTooltip';
 import gsap from 'gsap';
 
 export function RefletivaPage() {
@@ -59,7 +61,7 @@ export function RefletivaPage() {
                 "@type": "Offer",
                 "url": "https://lumecontrolesolar.com.br/refletiva",
                 "priceCurrency": "BRL",
-                "price": "90.00",
+                "price": "95.00",
                 "unitText": "m²",
                 "availability": "https://schema.org/InStock",
                 "seller": {
@@ -237,7 +239,7 @@ export function RefletivaPage() {
                     <h2 className="text-3xl lg:text-4xl font-bold font-['Montserrat'] mb-4 text-white">O Raio-X da Linha Refletiva Prata</h2>
                     <p className="text-gray-400 max-w-2xl mx-auto text-lg mb-8">Performance testada e garantida para o calor subtropical. E a melhor parte? O preço incrivelmente acessível.</p>
                     <span className="inline-flex px-6 py-2 bg-gradient-to-r from-[#c9a227]/80 to-[#c9a227] text-black font-black uppercase text-xl rounded-lg shadow-[0_0_20px_rgba(201,162,39,0.3)] tracking-wider">
-                        R$ 90/m² Instalado
+                        R$ 95/m² Instalado
                     </span>
                 </div>
 
@@ -260,7 +262,7 @@ export function RefletivaPage() {
                                 <div className="space-y-6">
                                     <div className="pb-4 border-b border-white/5">
                                         <div className="flex justify-between items-center mb-2">
-                                            <span className="font-semibold text-gray-300">VLT (Transmissão de Luz)</span>
+                                            <SpecTooltip term="VLT"><span className="font-semibold text-gray-300">VLT (Transmissão de Luz)</span></SpecTooltip>
                                             <span className="font-black text-xl text-white">35% a 50%</span>
                                         </div>
                                         <p className="text-xs text-gray-500">Nível agradável de claridade natural dentro de casa cruzando a prata escurecida.</p>
@@ -268,7 +270,7 @@ export function RefletivaPage() {
 
                                     <div className="pb-4 border-b border-white/5">
                                         <div className="flex justify-between items-center mb-2">
-                                            <span className="font-semibold text-gray-300">Rejeição UV</span>
+                                            <SpecTooltip term="UVR"><span className="font-semibold text-gray-300">Rejeição UV</span></SpecTooltip>
                                             <span className="font-black text-xl text-[#c9a227]">99%</span>
                                         </div>
                                         <p className="text-xs text-gray-500">Móveis, estofados, tapetes e pele blindados.</p>
@@ -276,7 +278,7 @@ export function RefletivaPage() {
 
                                     <div className="pb-4 border-b border-white/5">
                                         <div className="flex justify-between items-center mb-2">
-                                            <span className="font-semibold text-gray-300">Infravermelho (IRR)</span>
+                                            <SpecTooltip term="IRR"><span className="font-semibold text-gray-300">Infravermelho (IRR)</span></SpecTooltip>
                                             <span className="font-black text-xl text-blue-400">Até 85%</span>
                                         </div>
                                         <p className="text-xs text-gray-500">Supressão fortíssima das ondas diretas do calor sentidas na pele.</p>
@@ -284,7 +286,7 @@ export function RefletivaPage() {
 
                                     <div className="pt-2">
                                         <div className="flex justify-between items-center mb-2">
-                                            <span className="font-semibold text-white uppercase tracking-wider">TSER (Poder Total)</span>
+                                            <SpecTooltip term="TSER"><span className="font-semibold text-white uppercase tracking-wider">TSER (Poder Total)</span></SpecTooltip>
                                             <span className="font-black text-2xl text-white">Até 70%</span>
                                         </div>
                                         <p className="text-xs text-gray-500">A métrica definitiva. O balanço total energético combatido.</p>
@@ -332,6 +334,9 @@ export function RefletivaPage() {
                     </div>
                 </div>
             </section>
+
+            {/* Contact CTA Section */}
+            <ContactCTA />
         </div>
     );
 }

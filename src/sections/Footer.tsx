@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { MapPin, Phone, Mail, Clock, Facebook, Instagram, ExternalLink } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -16,11 +16,10 @@ const quickLinks = [
 
 const products = [
   { name: 'Nano Cerâmica', href: '/nano-ceramica' },
-  { name: 'Linha Carbono', href: '/carbono' },
+  { name: 'Carbono Premium', href: '/carbono' },
   { name: 'Dupla Camada', href: '/dupla-camada' },
-  { name: 'Linha Refletiva', href: '/refletiva' },
-  { name: 'Linha Smoke', href: '#produtos' },
-  { name: 'Jateados', href: '#produtos' },
+  { name: 'Refletiva Clássica', href: '/refletiva' },
+  { name: 'Linha Jateada', href: '/jateado' },
 ];
 
 const contactInfo = [
@@ -33,35 +32,23 @@ const contactInfo = [
 export function Footer() {
   const footerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        contentRef.current?.querySelectorAll('.footer-col') || [],
-        { opacity: 0, y: 30 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.5,
-          stagger: 0.1,
-          ease: 'expo.out',
-          scrollTrigger: {
-            trigger: footerRef.current,
-            start: 'top 90%',
-            toggleActions: 'play none none reverse',
-          },
-        }
-      );
-    }, footerRef);
 
-    return () => ctx.revert();
-  }, []);
 
   const handleNavClick = (href: string) => {
     if (href.startsWith('#')) {
-      const element = document.querySelector(href);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+      if (pathname !== '/') {
+        // Se não estiver na home, navega para a home com o hash
+        navigate('/' + href);
+      } else {
+        // Se já estiver na home, apenas faz o scroll
+        const id = href.substring(1);
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
       }
     }
   };

@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { Shield, Sun, Thermometer, CheckCircle, Zap, Wifi, ArrowRight } from 'lucide-react';
 import { WhatsAppButton } from '../components/WhatsAppButton';
+import { ContactCTA } from '../sections/ContactCTA';
+import { SpecTooltip } from '../components/SpecTooltip';
 import gsap from 'gsap';
 
 export function NanoCeramicaPage() {
@@ -76,6 +78,30 @@ export function NanoCeramicaPage() {
             ]
         };
 
+        const schemaProduct = {
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": "Insulfilm Nano Cerâmica Premium",
+            "image": "https://lumecontrolesolar.com.br/product-nano-ceramica.jpg",
+            "description": "Máxima redução de calor sem escurecer os vidros. Ideal para varandas gourmet e vitrines.",
+            "brand": {
+                "@type": "Brand",
+                "name": "LUME Películas"
+            },
+            "offers": {
+                "@type": "Offer",
+                "url": "https://lumecontrolesolar.com.br/nano-ceramica",
+                "priceCurrency": "BRL",
+                "price": "220.00",
+                "unitText": "m²",
+                "availability": "https://schema.org/InStock",
+                "seller": {
+                    "@type": "LocalBusiness",
+                    "name": "LUME Controle Solar"
+                }
+            }
+        };
+
         const scriptLB = document.createElement('script');
         scriptLB.type = 'application/ld+json';
         scriptLB.text = JSON.stringify(schemaLocalBusiness);
@@ -86,9 +112,15 @@ export function NanoCeramicaPage() {
         scriptFAQ.text = JSON.stringify(schemaFAQ);
         document.head.appendChild(scriptFAQ);
 
+        const scriptProduct = document.createElement('script');
+        scriptProduct.type = 'application/ld+json';
+        scriptProduct.text = JSON.stringify(schemaProduct);
+        document.head.appendChild(scriptProduct);
+
         return () => {
             document.head.removeChild(scriptLB);
             document.head.removeChild(scriptFAQ);
+            document.head.removeChild(scriptProduct);
         };
     }, []);
 
@@ -200,12 +232,16 @@ export function NanoCeramicaPage() {
                         <div className="glass-card p-8 sm:p-10 rounded-3xl border border-[#c9a227]/20 relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-[#c9a227] blur-[100px] opacity-20" />
 
-                            <h3 className="text-2xl font-bold font-['Montserrat'] text-white mb-8 border-b border-white/10 pb-4">Tabela de Performance</h3>
+                            <h3 className="text-2xl font-bold font-['Montserrat'] text-white mb-2 border-b border-white/10 pb-4">Tabela de Performance</h3>
+                            <div className="mb-8 text-[#c9a227] font-bold text-xl uppercase tracking-wider">A partir de R$ 220/m² instalado</div>
 
                             <div className="space-y-6">
                                 <div>
                                     <div className="flex justify-between items-center mb-2">
-                                        <span className="text-gray-300 font-medium flex items-center gap-2"><Sun size={18} className="text-[#c9a227]" /> Bloqueio UV (UltraVioleta)</span>
+                                        <span className="text-gray-300 font-medium flex items-center gap-2">
+                                            <Sun size={18} className="text-[#c9a227]" />
+                                            <SpecTooltip term="UVR">Bloqueio UV (UltraVioleta)</SpecTooltip>
+                                        </span>
                                         <span className="font-bold text-white text-lg">99,9%</span>
                                     </div>
                                     <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
@@ -216,7 +252,10 @@ export function NanoCeramicaPage() {
 
                                 <div>
                                     <div className="flex justify-between items-center mb-2">
-                                        <span className="text-gray-300 font-medium flex items-center gap-2"><Thermometer size={18} className="text-[#c9a227]" /> Rejeição de Calor (IRR)</span>
+                                        <span className="text-gray-300 font-medium flex items-center gap-2">
+                                            <Thermometer size={18} className="text-[#c9a227]" />
+                                            <SpecTooltip term="IRR">Rejeição de Calor (IRR)</SpecTooltip>
+                                        </span>
                                         <span className="font-bold text-white text-lg">Até 95%</span>
                                     </div>
                                     <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
@@ -227,7 +266,10 @@ export function NanoCeramicaPage() {
 
                                 <div>
                                     <div className="flex justify-between items-center mb-2">
-                                        <span className="text-gray-300 font-medium flex items-center gap-2"><Zap size={18} className="text-[#c9a227]" /> TSER (Energia Rejeitada)</span>
+                                        <span className="text-gray-300 font-medium flex items-center gap-2">
+                                            <Zap size={18} className="text-[#c9a227]" />
+                                            <SpecTooltip term="TSER">TSER (Energia Rejeitada)</SpecTooltip>
+                                        </span>
                                         <span className="font-bold text-white text-lg">55% a 65%</span>
                                     </div>
                                     <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
@@ -278,6 +320,9 @@ export function NanoCeramicaPage() {
                     </div>
                 </div>
             </section>
+
+            {/* Contact CTA Section */}
+            <ContactCTA />
         </div>
     );
 }

@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { Shield, CheckCircle, EyeOff, Wifi, ArrowRight } from 'lucide-react';
 import { WhatsAppButton } from '../components/WhatsAppButton';
+import { ContactCTA } from '../sections/ContactCTA';
+import { SpecTooltip } from '../components/SpecTooltip';
 import gsap from 'gsap';
 
 export function CarbonoPage() {
@@ -76,6 +78,30 @@ export function CarbonoPage() {
             ]
         };
 
+        const schemaProduct = {
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": "Insulfilm Carbono Premium G5 e G20",
+            "image": "https://lumecontrolesolar.com.br/product-carbono.jpg",
+            "description": "Cor preto profundo que não desbota. Privacidade máxima com rejeição de calor de até 90%.",
+            "brand": {
+                "@type": "Brand",
+                "name": "LUME Películas"
+            },
+            "offers": {
+                "@type": "Offer",
+                "url": "https://lumecontrolesolar.com.br/carbono",
+                "priceCurrency": "BRL",
+                "price": "80.00",
+                "unitText": "m²",
+                "availability": "https://schema.org/InStock",
+                "seller": {
+                    "@type": "LocalBusiness",
+                    "name": "LUME Controle Solar"
+                }
+            }
+        };
+
         const scriptLB = document.createElement('script');
         scriptLB.type = 'application/ld+json';
         scriptLB.text = JSON.stringify(schemaLocalBusiness);
@@ -86,9 +112,15 @@ export function CarbonoPage() {
         scriptFAQ.text = JSON.stringify(schemaFAQ);
         document.head.appendChild(scriptFAQ);
 
+        const scriptProduct = document.createElement('script');
+        scriptProduct.type = 'application/ld+json';
+        scriptProduct.text = JSON.stringify(schemaProduct);
+        document.head.appendChild(scriptProduct);
+
         return () => {
             document.head.removeChild(scriptLB);
             document.head.removeChild(scriptFAQ);
+            document.head.removeChild(scriptProduct);
         };
     }, []);
 
@@ -167,19 +199,31 @@ export function CarbonoPage() {
 
                             <div className="space-y-6">
                                 <div>
-                                    <div className="flex justify-between text-sm mb-1"><span className="text-gray-400">VLT (Transmissão de Luz)</span> <span className="font-bold">5% a 8%</span></div>
+                                    <div className="flex justify-between text-sm mb-1">
+                                        <SpecTooltip term="VLT"><span className="text-gray-400">VLT (Transmissão de Luz)</span></SpecTooltip>
+                                        <span className="font-bold">5% a 8%</span>
+                                    </div>
                                     <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-white h-1.5 rounded" style={{ width: '8%' }}></div></div>
                                 </div>
                                 <div>
-                                    <div className="flex justify-between text-sm mb-1"><span className="text-gray-400">Proteção UV</span> <span className="font-bold text-[#c9a227]">99%</span></div>
+                                    <div className="flex justify-between text-sm mb-1">
+                                        <SpecTooltip term="UVR"><span className="text-gray-400">Proteção UV</span></SpecTooltip>
+                                        <span className="font-bold text-[#c9a227]">99%</span>
+                                    </div>
                                     <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227] h-1.5 rounded" style={{ width: '99%' }}></div></div>
                                 </div>
                                 <div>
-                                    <div className="flex justify-between text-sm mb-1"><span className="text-gray-400">Rejeição de Calor (IRR)</span> <span className="font-bold text-[#c9a227]">Até 90%</span></div>
+                                    <div className="flex justify-between text-sm mb-1">
+                                        <SpecTooltip term="IRR"><span className="text-gray-400">Rejeição de Calor (IRR)</span></SpecTooltip>
+                                        <span className="font-bold text-[#c9a227]">Até 90%</span>
+                                    </div>
                                     <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227] h-1.5 rounded" style={{ width: '90%' }}></div></div>
                                 </div>
                                 <div>
-                                    <div className="flex justify-between text-sm mb-1"><span className="text-gray-400">TSER (Poder Total)</span> <span className="font-bold">Até 70%</span></div>
+                                    <div className="flex justify-between text-sm mb-1">
+                                        <SpecTooltip term="TSER"><span className="text-gray-400">TSER (Poder Total)</span></SpecTooltip>
+                                        <span className="font-bold">Até 70%</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -199,24 +243,36 @@ export function CarbonoPage() {
 
                             <div className="space-y-6">
                                 <div>
-                                    <div className="flex justify-between text-sm mb-1"><span className="text-gray-400">VLT (Transmissão de Luz)</span> <span className="font-bold">18% a 25%</span></div>
+                                    <div className="flex justify-between text-sm mb-1">
+                                        <SpecTooltip term="VLT"><span className="text-gray-400">VLT (Transmissão de Luz)</span></SpecTooltip>
+                                        <span className="font-bold">18% a 25%</span>
+                                    </div>
                                     <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-white/60 h-1.5 rounded" style={{ width: '22%' }}></div></div>
                                 </div>
                                 <div>
-                                    <div className="flex justify-between text-sm mb-1"><span className="text-gray-400">Proteção UV</span> <span className="font-bold text-[#c9a227]">99%</span></div>
+                                    <div className="flex justify-between text-sm mb-1">
+                                        <SpecTooltip term="UVR"><span className="text-gray-400">Proteção UV</span></SpecTooltip>
+                                        <span className="font-bold text-[#c9a227]">99%</span>
+                                    </div>
                                     <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227] h-1.5 rounded" style={{ width: '99%' }}></div></div>
                                 </div>
                                 <div>
-                                    <div className="flex justify-between text-sm mb-1"><span className="text-gray-400">Rejeição de Calor (IRR)</span> <span className="font-bold text-[#c9a227]">Até 85%</span></div>
+                                    <div className="flex justify-between text-sm mb-1">
+                                        <SpecTooltip term="IRR"><span className="text-gray-400">Rejeição de Calor (IRR)</span></SpecTooltip>
+                                        <span className="font-bold text-[#c9a227]">Até 85%</span>
+                                    </div>
                                     <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227] h-1.5 rounded" style={{ width: '85%' }}></div></div>
                                 </div>
                                 <div>
-                                    <div className="flex justify-between text-sm mb-1"><span className="text-gray-400">TSER (Poder Total)</span> <span className="font-bold">Até 60%</span></div>
+                                    <div className="flex justify-between text-sm mb-1">
+                                        <SpecTooltip term="TSER"><span className="text-gray-400">TSER (Poder Total)</span></SpecTooltip>
+                                        <span className="font-bold">Até 60%</span>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
                     </div>
-
                 </div>
             </section>
 
@@ -281,6 +337,8 @@ export function CarbonoPage() {
                 </div>
             </section>
 
+            {/* Contact CTA Section */}
+            <ContactCTA />
         </div>
     );
 }

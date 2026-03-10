@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { Sun, Droplets, Zap, ShieldCheck, Layers, ArrowRight } from 'lucide-react';
 import { WhatsAppButton } from '../components/WhatsAppButton';
+import { ContactCTA } from '../sections/ContactCTA';
+import { SpecTooltip } from '../components/SpecTooltip';
 import gsap from 'gsap';
 
 export function DuplaCamadaPage() {
@@ -85,10 +87,34 @@ export function DuplaCamadaPage() {
                     "name": "Essa película funciona para fechamento de varandas de vidro?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Perfeitamente. A película Dupla Camada é a atual campeã em custo-benefício (custando em média R$ 150/m² instalada) para envidraçamentos de grandes varandas na Barra da Tijuca e Recreio, onde a necessidade de bloquear o calor do sol da tarde é crítica para a usabilidade do ambiente."
+                        "text": "Perfeitamente. A película Dupla Camada é a atual campeã em custo-benefício (custando em média R$ 120/m² instalada) para envidraçamentos de grandes varandas na Barra da Tijuca e Recreio, onde a necessidade de bloquear o calor do sol da tarde é crítica para a usabilidade do ambiente."
                     }
                 }
             ]
+        };
+
+        const schemaProduct = {
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": "Insulfilm Dupla Camada G5 e G20",
+            "image": "https://lumecontrolesolar.com.br/product-smoke.jpg",
+            "description": "Alta redução de calor com tecnologia de dupla camada. Rejeição de até 95% do infravermelho.",
+            "brand": {
+                "@type": "Brand",
+                "name": "LUME Películas"
+            },
+            "offers": {
+                "@type": "Offer",
+                "url": "https://lumecontrolesolar.com.br/dupla-camada",
+                "priceCurrency": "BRL",
+                "price": "120.00",
+                "unitText": "m²",
+                "availability": "https://schema.org/InStock",
+                "seller": {
+                    "@type": "LocalBusiness",
+                    "name": "LUME Controle Solar"
+                }
+            }
         };
 
         const scriptLB = document.createElement('script');
@@ -106,10 +132,16 @@ export function DuplaCamadaPage() {
         scriptFAQ.text = JSON.stringify(schemaFAQ);
         document.head.appendChild(scriptFAQ);
 
+        const scriptProduct = document.createElement('script');
+        scriptProduct.type = 'application/ld+json';
+        scriptProduct.text = JSON.stringify(schemaProduct);
+        document.head.appendChild(scriptProduct);
+
         return () => {
             document.head.removeChild(scriptLB);
             document.head.removeChild(scriptService);
             document.head.removeChild(scriptFAQ);
+            document.head.removeChild(scriptProduct);
         };
     }, []);
 
@@ -157,7 +189,7 @@ export function DuplaCamadaPage() {
                             Se você mora ou possui comércio em <strong>Bangu, Campo Grande, Realengo ou adjacências</strong>, sabe que as temperaturas de verão não são uma mera inconveniência; elas são um dreno financeiro maciço na sua conta de energia por causa dos aparelhos de Ar Condicionado ligados no 16ºC, operando em pico durante o dia todo.
                         </p>
                         <p className="text-gray-400 leading-relaxed text-lg">
-                            O <strong>Insulfilm Dupla Camada</strong> é projetado especificamente para barrar esse ciclo destrutivo. Ao instalar esse material nas suas janelas de vidro ou varandas fechadas, a película rejeita brutalmente a radiação solar térmica *antes* mesmo dela aquecer o ar da sua sala. Quando a temperatura interna é estabilizada pela película, o seu Inverter gela o ambiente com <strong>metade do esforço</strong>. O retorno do investimento dessa película ($150/m²) se paga mês a mês reduzindo sua tarifa de energia elétrica.
+                            O <strong>Insulfilm Dupla Camada</strong> é projetado especificamente para barrar esse ciclo destrutivo. Ao instalar esse material nas suas janelas de vidro ou varandas fechadas, a película rejeita brutalmente a radiação solar térmica *antes* mesmo dela aquecer o ar da sua sala. Quando a temperatura interna é estabilizada pela película, o seu Inverter gela o ambiente com <strong>metade do esforço</strong>. O retorno do investimento dessa película ($120/m²) se paga mês a mês reduzindo sua tarifa de energia elétrica.
                         </p>
                     </div>
                 </div>
@@ -194,7 +226,7 @@ export function DuplaCamadaPage() {
                 <div className="container-lume page-entrance text-center mb-16">
                     <div className="inline-flex flex-col items-center">
                         <h2 className="text-3xl lg:text-4xl font-bold font-['Montserrat'] mb-2 text-white">Escolha sua Dupla Camada</h2>
-                        <span className="text-[#c9a227] font-semibold tracking-wide bg-[#c9a227]/10 px-4 py-1 rounded-full text-sm">Apenas R$ 150/m² Instalado</span>
+                        <span className="text-[#c9a227] font-semibold tracking-wide bg-[#c9a227]/10 px-4 py-1 rounded-full text-sm">Apenas R$ 120/m² Instalado</span>
                     </div>
                 </div>
 
@@ -215,19 +247,31 @@ export function DuplaCamadaPage() {
 
                             <div className="space-y-6">
                                 <div>
-                                    <div className="flex justify-between text-sm mb-1"><span className="text-gray-400 flex items-center gap-1">VLT <span className="text-xs text-gray-600">(Luz)</span></span> <span className="font-bold">5% a 8%</span></div>
+                                    <div className="flex justify-between text-sm mb-1">
+                                        <SpecTooltip term="VLT"><span className="text-gray-400 flex items-center gap-1">VLT <span className="text-xs text-gray-600">(Luz)</span></span></SpecTooltip>
+                                        <span className="font-bold">5% a 8%</span>
+                                    </div>
                                     <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-white/90 shadow-[0_0_10px_rgba(255,255,255,0.5)] h-1.5 rounded" style={{ width: '8%' }}></div></div>
                                 </div>
                                 <div>
-                                    <div className="flex justify-between text-sm mb-1"><span className="text-gray-400 flex items-center gap-1">Proteção UV</span> <span className="font-bold text-[#c9a227]">99%</span></div>
+                                    <div className="flex justify-between text-sm mb-1">
+                                        <SpecTooltip term="UVR"><span className="text-gray-400 flex items-center gap-1">Proteção UV</span></SpecTooltip>
+                                        <span className="font-bold text-[#c9a227]">99%</span>
+                                    </div>
                                     <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227] shadow-[0_0_10px_rgba(201,162,39,0.5)] h-1.5 rounded" style={{ width: '99%' }}></div></div>
                                 </div>
                                 <div>
-                                    <div className="flex justify-between text-sm mb-1"><span className="text-gray-400 flex items-center gap-1">Rejeição de Calor (IRR)</span> <span className="font-bold text-[#c9a227]">Arrasadores 95%</span></div>
+                                    <div className="flex justify-between text-sm mb-1">
+                                        <SpecTooltip term="IRR"><span className="text-gray-400 flex items-center gap-1">Rejeição de Calor (IRR)</span></SpecTooltip>
+                                        <span className="font-bold text-[#c9a227]">Arrasadores 95%</span>
+                                    </div>
                                     <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227] shadow-[0_0_10px_rgba(201,162,39,0.5)] h-1.5 rounded" style={{ width: '95%' }}></div></div>
                                 </div>
                                 <div>
-                                    <div className="flex justify-between text-sm pt-2 border-t border-white/5"><span className="text-gray-400 flex items-center gap-1"><Zap size={14} className="text-[#c9a227]" /> TSER Térmico Total</span> <span className="font-bold text-lg text-white">Até 75%</span></div>
+                                    <div className="flex justify-between text-sm pt-2 border-t border-white/5">
+                                        <SpecTooltip term="TSER"><span className="text-gray-400 flex items-center gap-1"><Zap size={14} className="text-[#c9a227]" /> TSER Térmico Total</span></SpecTooltip>
+                                        <span className="font-bold text-lg text-white">Até 75%</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -248,19 +292,31 @@ export function DuplaCamadaPage() {
 
                             <div className="space-y-6">
                                 <div>
-                                    <div className="flex justify-between text-sm mb-1"><span className="text-gray-400 flex items-center gap-1">VLT <span className="text-xs text-gray-600">(Luz)</span></span> <span className="font-bold">18% a 25%</span></div>
+                                    <div className="flex justify-between text-sm mb-1">
+                                        <SpecTooltip term="VLT"><span className="text-gray-400 flex items-center gap-1">VLT <span className="text-xs text-gray-600">(Luz)</span></span></SpecTooltip>
+                                        <span className="font-bold">18% a 25%</span>
+                                    </div>
                                     <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-white/70 h-1.5 rounded" style={{ width: '25%' }}></div></div>
                                 </div>
                                 <div>
-                                    <div className="flex justify-between text-sm mb-1"><span className="text-gray-400 flex items-center gap-1">Proteção UV</span> <span className="font-bold text-blue-400">99%</span></div>
+                                    <div className="flex justify-between text-sm mb-1">
+                                        <SpecTooltip term="UVR"><span className="text-gray-400 flex items-center gap-1">Proteção UV</span></SpecTooltip>
+                                        <span className="font-bold text-blue-400">99%</span>
+                                    </div>
                                     <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-blue-400/80 h-1.5 rounded shadow-[0_0_10px_rgba(96,165,250,0.5)]" style={{ width: '99%' }}></div></div>
                                 </div>
                                 <div>
-                                    <div className="flex justify-between text-sm mb-1"><span className="text-gray-400 flex items-center gap-1">Rejeição de Calor (IRR)</span> <span className="font-bold text-blue-400">Poderosos 90%</span></div>
+                                    <div className="flex justify-between text-sm mb-1">
+                                        <SpecTooltip term="IRR"><span className="text-gray-400 flex items-center gap-1">Rejeição de Calor (IRR)</span></SpecTooltip>
+                                        <span className="font-bold text-blue-400">Poderosos 90%</span>
+                                    </div>
                                     <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-blue-400/80 shadow-[0_0_10px_rgba(96,165,250,0.5)] h-1.5 rounded" style={{ width: '90%' }}></div></div>
                                 </div>
                                 <div>
-                                    <div className="flex justify-between text-sm pt-2 border-t border-white/5"><span className="text-gray-400 flex items-center gap-1"><Zap size={14} className="text-blue-400" /> TSER Térmico Total</span> <span className="font-bold text-lg text-white">Até 65%</span></div>
+                                    <div className="flex justify-between text-sm pt-2 border-t border-white/5">
+                                        <SpecTooltip term="TSER"><span className="text-gray-400 flex items-center gap-1"><Zap size={14} className="text-blue-400" /> TSER Térmico Total</span></SpecTooltip>
+                                        <span className="font-bold text-lg text-white">Até 65%</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -305,6 +361,9 @@ export function DuplaCamadaPage() {
                     </div>
                 </div>
             </section>
+
+            {/* Contact CTA Section */}
+            <ContactCTA />
         </div>
     );
 }
