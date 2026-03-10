@@ -1,0 +1,17 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[[plugins]]
+  package = "@netlify/plugin-sitemap"
+
+  [plugins.inputs]
+  # Lista manual de todas as páginas da Lume para o Google
+  urls = [
+    "https://lumecontrolesolar.netlify.app/",
+    "https://lumecontrolesolar.netlify.app/nano-ceramica",
+    "https://lumecontrolesolar.netlify.app/jateado",
+    "https://lumecontrolesolar.netlify.app/refletiva",
+    "https://lumecontrolesolar.netlify.app/dupla-camada",
+    "https://lumecontrolesolar.netlify.app/carbono"
+  ]
