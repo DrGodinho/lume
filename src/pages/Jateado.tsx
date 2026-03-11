@@ -267,13 +267,13 @@ export function JateadoPage() {
                                     <div>
                                         <div className="flex justify-between items-center mb-2">
                                             <span className="text-gray-300 font-medium flex items-center gap-2">
-                                                <ShieldCheck size={18} className="text-gray-400" />
+                                                <ShieldCheck size={18} className="text-[#c9a227]" />
                                                 <SpecTooltip term="UVR">Bloqueio UV (UltraVioleta)</SpecTooltip>
                                             </span>
-                                            <span className="font-bold text-gray-300 text-lg">99%</span>
+                                            <span className="font-bold text-[#c9a227] text-lg">99%</span>
                                         </div>
                                         <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
-                                            <div className="bg-gray-400 h-2 rounded-full" style={{ width: '99%' }}></div>
+                                            <div className="bg-[#c9a227] h-2 rounded-full shadow-[0_0_10px_rgba(201,162,39,0.3)]" style={{ width: '99%' }}></div>
                                         </div>
                                         <p className="text-xs text-gray-500 mt-2">Padrão da base PET Premium da película auxiliando objetos próximos.</p>
                                     </div>
@@ -281,13 +281,13 @@ export function JateadoPage() {
                                     <div>
                                         <div className="flex justify-between items-center mb-2">
                                             <span className="text-gray-300 font-medium flex items-center gap-2">
-                                                <Thermometer size={18} className="text-gray-600" />
+                                                <Thermometer size={18} className="text-gray-400" />
                                                 <SpecTooltip term="IRR">Infravermelho (IRR)</SpecTooltip>
                                             </span>
-                                            <span className="font-bold text-gray-600 text-lg">Baixa</span>
+                                            <span className="font-bold text-gray-400 text-lg">Inferior a 10%</span>
                                         </div>
                                         <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
-                                            <div className="bg-gray-600 h-2 rounded-full" style={{ width: '15%' }}></div>
+                                            <div className="bg-gray-600 h-2 rounded-full" style={{ width: '10%' }}></div>
                                         </div>
                                         <p className="text-xs text-gray-500 mt-2">Filme decorativo, sem propósito térmico primário.</p>
                                     </div>
@@ -295,15 +295,15 @@ export function JateadoPage() {
                                     <div>
                                         <div className="flex justify-between items-center mb-2">
                                             <span className="text-white font-bold flex items-center gap-2 uppercase tracking-wider">
-                                                <Zap size={18} className="text-gray-600" />
+                                                <Zap size={18} className="text-gray-400" />
                                                 <SpecTooltip term="TSER">TSER (Poder Total)</SpecTooltip>
                                             </span>
-                                            <span className="font-bold text-gray-600 text-xl">Baixa</span>
+                                            <span className="font-bold text-gray-400 text-xl">15% a 25%</span>
                                         </div>
-                                        <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
-                                            <div className="bg-gray-700 h-2 rounded-full" style={{ width: '15%' }}></div>
+                                        <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden border border-white/5">
+                                            <div className="bg-gray-700 h-2 rounded-full" style={{ width: '25%' }}></div>
                                         </div>
-                                        <p className="text-xs text-gray-500 mt-2">Não reflete energia solar global severa como as linhas Refletivas.</p>
+                                        <p className="text-xs text-gray-500 mt-2">Bloqueio solar focado em luminosidade e privacidade.</p>
                                     </div>
                                 </div>
                             </div>
