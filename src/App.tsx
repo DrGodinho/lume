@@ -18,6 +18,7 @@ import { CarbonoPage } from './pages/Carbono';
 import { DuplaCamadaPage } from './pages/DuplaCamada';
 import { RefletivaPage } from './pages/Refletiva';
 import { JateadoPage } from './pages/Jateado';
+import { GuiaInsulfilm } from './pages/GuiaInsulfilm';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -85,6 +86,7 @@ function App() {
           <Route path="/dupla-camada" element={<DuplaCamadaPage />} />
           <Route path="/refletiva" element={<RefletivaPage />} />
           <Route path="/jateado" element={<JateadoPage />} />
+          <Route path="/guia-insulfilm" element={<GuiaInsulfilm />} />
         </Routes>
       </main>
 

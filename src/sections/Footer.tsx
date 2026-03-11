@@ -10,6 +10,7 @@ const quickLinks = [
   { name: 'Início', href: '/' },
   { name: 'Produtos', href: '#produtos' },
   { name: 'Benefícios', href: '#beneficios' },
+  { name: 'Guia: Tudo sobre Insulfilm', href: '/guia-insulfilm' },
   { name: 'Simulador Online', href: '/simulador' },
   { name: 'Contato', href: '#contato' },
 ];
