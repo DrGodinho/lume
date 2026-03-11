@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import { EyeOff, ShieldCheck, ThermometerSnowflake, Ruler, ArrowRight, Home } from 'lucide-react';
+import { EyeOff, ShieldCheck, ThermometerSnowflake, Ruler, ArrowRight, Home, Sun, Zap } from 'lucide-react';
 import { WhatsAppButton } from '../components/WhatsAppButton';
 import { ContactCTA } from '../sections/ContactCTA';
 import { SpecTooltip } from '../components/SpecTooltip';
@@ -247,37 +247,61 @@ export function RefletivaPage() {
 
                             {/* Table Data */}
                             <div className="p-8 md:p-12 bg-[#02050A]">
-                                <div className="space-y-6">
-                                    <div className="pb-4 border-b border-white/5">
+                                <div className="space-y-8">
+                                    <div>
                                         <div className="flex justify-between items-center mb-2">
-                                            <SpecTooltip term="VLT"><span className="font-semibold text-gray-300">VLT (Transmissão de Luz)</span></SpecTooltip>
-                                            <span className="font-black text-xl text-white">35% a 50%</span>
+                                            <span className="text-gray-300 font-medium flex items-center gap-2">
+                                                <Sun size={18} className="text-[#c9a227]" />
+                                                <SpecTooltip term="VLT">VLT (Transmissão de Luz)</SpecTooltip>
+                                            </span>
+                                            <span className="font-bold text-white text-lg">35% a 50%</span>
                                         </div>
-                                        <p className="text-xs text-gray-500">Nível agradável de claridade natural dentro de casa cruzando a prata escurecida.</p>
+                                        <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+                                            <div className="bg-[#c9a227] h-2 rounded-full" style={{ width: '45%' }}></div>
+                                        </div>
+                                        <p className="text-xs text-gray-500 mt-2">Nível agradável de claridade natural dentro de casa cruzando a prata escurecida.</p>
                                     </div>
 
-                                    <div className="pb-4 border-b border-white/5">
+                                    <div>
                                         <div className="flex justify-between items-center mb-2">
-                                            <SpecTooltip term="UVR"><span className="font-semibold text-gray-300">Rejeição UV</span></SpecTooltip>
-                                            <span className="font-black text-xl text-[#c9a227]">99%</span>
+                                            <span className="text-gray-300 font-medium flex items-center gap-2">
+                                                <ShieldCheck size={18} className="text-[#c9a227]" />
+                                                <SpecTooltip term="UVR">Bloqueio UV (UltraVioleta)</SpecTooltip>
+                                            </span>
+                                            <span className="font-bold text-[#c9a227] text-lg">99%</span>
                                         </div>
-                                        <p className="text-xs text-gray-500">Móveis, estofados, tapetes e pele blindados.</p>
+                                        <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+                                            <div className="bg-[#c9a227] h-2 rounded-full" style={{ width: '99%' }}></div>
+                                        </div>
+                                        <p className="text-xs text-gray-500 mt-2">Móveis, estofados, tapetes e pele blindados.</p>
                                     </div>
 
-                                    <div className="pb-4 border-b border-white/5">
+                                    <div>
                                         <div className="flex justify-between items-center mb-2">
-                                            <SpecTooltip term="IRR"><span className="font-semibold text-gray-300">Infravermelho (IRR)</span></SpecTooltip>
-                                            <span className="font-black text-xl text-blue-400">Até 85%</span>
+                                            <span className="text-gray-300 font-medium flex items-center gap-2">
+                                                <ThermometerSnowflake size={18} className="text-blue-400" />
+                                                <SpecTooltip term="IRR">Infravermelho (IRR)</SpecTooltip>
+                                            </span>
+                                            <span className="font-bold text-blue-400 text-lg">Até 85%</span>
                                         </div>
-                                        <p className="text-xs text-gray-500">Supressão fortíssima das ondas diretas do calor sentidas na pele.</p>
+                                        <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+                                            <div className="bg-blue-400 h-2 rounded-full" style={{ width: '85%' }}></div>
+                                        </div>
+                                        <p className="text-xs text-gray-500 mt-2">Supressão fortíssima das ondas diretas do calor sentidas na pele.</p>
                                     </div>
 
-                                    <div className="pt-2">
+                                    <div>
                                         <div className="flex justify-between items-center mb-2">
-                                            <SpecTooltip term="TSER"><span className="font-semibold text-white uppercase tracking-wider">TSER (Poder Total)</span></SpecTooltip>
-                                            <span className="font-black text-2xl text-white">Até 70%</span>
+                                            <span className="text-white font-bold flex items-center gap-2 uppercase tracking-wider">
+                                                <Zap size={18} className="text-[#c9a227]" />
+                                                <SpecTooltip term="TSER">TSER (Poder Total)</SpecTooltip>
+                                            </span>
+                                            <span className="font-bold text-white text-xl">Até 70%</span>
                                         </div>
-                                        <p className="text-xs text-gray-500">A métrica definitiva. O balanço total energético combatido.</p>
+                                        <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden border border-white/5">
+                                            <div className="bg-gradient-to-r from-[#c9a227] to-white h-2 rounded-full" style={{ width: '70%' }}></div>
+                                        </div>
+                                        <p className="text-xs text-gray-500 mt-2">A métrica definitiva. O balanço total energético combatido.</p>
                                     </div>
                                 </div>
                             </div>

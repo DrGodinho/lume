@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import { EyeOff, Sun, Layers, Droplets, Gem, ArrowRight, Building2, ShieldCheck } from 'lucide-react';
+import { EyeOff, Sun, Layers, Droplets, Gem, ArrowRight, Building2, ShieldCheck, Thermometer, Zap } from 'lucide-react';
 import { WhatsAppButton } from '../components/WhatsAppButton';
 import { ContactCTA } from '../sections/ContactCTA';
 import { SpecTooltip } from '../components/SpecTooltip';
@@ -248,38 +248,62 @@ export function JateadoPage() {
 
                             {/* Table Data */}
                             <div className="p-8 md:p-12 bg-[#02050A]">
-                                <div className="space-y-6">
-                                    <div className="pb-4 border-b border-white/5 relative">
+                                <div className="space-y-8">
+                                    <div className="relative">
                                         <div className="flex justify-between items-center mb-2">
-                                            <SpecTooltip term="VLT"><span className="font-semibold text-gray-300">VLT (Transmissão de Luz)</span></SpecTooltip>
-                                            <span className="font-black text-xl text-white">50% a 85%</span>
+                                            <span className="text-gray-300 font-medium flex items-center gap-2">
+                                                <Sun size={18} className="text-white" />
+                                                <SpecTooltip term="VLT">VLT (Transmissão de Luz)</SpecTooltip>
+                                            </span>
+                                            <span className="font-bold text-white text-lg">50% a 85%</span>
                                         </div>
-                                        <p className="text-xs text-gray-500">Altíssima taxa, ambiente incrivelmente claro e convidativo.</p>
-                                        <div className="absolute right-0 top-1/2 -translate-y-1/2 -translate-x-32 w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.8)] animate-pulse"></div>
+                                        <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+                                            <div className="bg-white/80 h-2 rounded-full" style={{ width: '85%' }}></div>
+                                        </div>
+                                        <p className="text-xs text-gray-500 mt-2">Altíssima taxa, ambiente incrivelmente claro e convidativo.</p>
+                                        <div className="absolute -right-2 top-0 w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.8)] animate-pulse"></div>
                                     </div>
 
-                                    <div className="pb-4 border-b border-white/5">
+                                    <div>
                                         <div className="flex justify-between items-center mb-2">
-                                            <SpecTooltip term="UVR"><span className="font-semibold text-gray-300">Rejeição UV</span></SpecTooltip>
-                                            <span className="font-black text-xl text-gray-200">99%</span>
+                                            <span className="text-gray-300 font-medium flex items-center gap-2">
+                                                <ShieldCheck size={18} className="text-gray-400" />
+                                                <SpecTooltip term="UVR">Bloqueio UV (UltraVioleta)</SpecTooltip>
+                                            </span>
+                                            <span className="font-bold text-gray-300 text-lg">99%</span>
                                         </div>
-                                        <p className="text-xs text-gray-500">Padrão da base PET Premium da película auxiliando objetos próximos.</p>
+                                        <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+                                            <div className="bg-gray-400 h-2 rounded-full" style={{ width: '99%' }}></div>
+                                        </div>
+                                        <p className="text-xs text-gray-500 mt-2">Padrão da base PET Premium da película auxiliando objetos próximos.</p>
                                     </div>
 
-                                    <div className="pb-4 border-b border-white/5">
+                                    <div>
                                         <div className="flex justify-between items-center mb-2">
-                                            <SpecTooltip term="IRR"><span className="font-semibold text-gray-300">Infravermelho (IRR)</span></SpecTooltip>
-                                            <span className="font-black text-xl text-gray-600">Baixa</span>
+                                            <span className="text-gray-300 font-medium flex items-center gap-2">
+                                                <Thermometer size={18} className="text-gray-600" />
+                                                <SpecTooltip term="IRR">Infravermelho (IRR)</SpecTooltip>
+                                            </span>
+                                            <span className="font-bold text-gray-600 text-lg">Baixa</span>
                                         </div>
-                                        <p className="text-xs text-gray-500">Filme sem propósito térmico primário.</p>
+                                        <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+                                            <div className="bg-gray-600 h-2 rounded-full" style={{ width: '15%' }}></div>
+                                        </div>
+                                        <p className="text-xs text-gray-500 mt-2">Filme decorativo, sem propósito térmico primário.</p>
                                     </div>
 
-                                    <div className="pt-2">
+                                    <div>
                                         <div className="flex justify-between items-center mb-2">
-                                            <SpecTooltip term="TSER"><span className="font-semibold text-white uppercase tracking-wider">TSER (Poder Total)</span></SpecTooltip>
-                                            <span className="font-black text-2xl text-gray-600">Baixa</span>
+                                            <span className="text-white font-bold flex items-center gap-2 uppercase tracking-wider">
+                                                <Zap size={18} className="text-gray-600" />
+                                                <SpecTooltip term="TSER">TSER (Poder Total)</SpecTooltip>
+                                            </span>
+                                            <span className="font-bold text-gray-600 text-xl">Baixa</span>
                                         </div>
-                                        <p className="text-xs text-gray-500">Não reflete energia solar global severa como as linhas G5 Refletivas.</p>
+                                        <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+                                            <div className="bg-gray-700 h-2 rounded-full" style={{ width: '15%' }}></div>
+                                        </div>
+                                        <p className="text-xs text-gray-500 mt-2">Não reflete energia solar global severa como as linhas Refletivas.</p>
                                     </div>
                                 </div>
                             </div>
