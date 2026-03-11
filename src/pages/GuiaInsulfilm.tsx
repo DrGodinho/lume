@@ -278,9 +278,9 @@ export function GuiaInsulfilm() {
                     ]} />
                 </section>
 
-                {/* 7. Remoção */}
+                {/* 6. Remoção */}
                 <section>
-                    <h2 className="text-3xl font-bold font-['Montserrat'] text-white mb-6">7. Remoção: Quando é Hora de Mudar?</h2>
+                    <h2 className="text-3xl font-bold font-['Montserrat'] text-white mb-6">6. Remoção: Quando é Hora de Mudar?</h2>
                     
                     <div className="text-gray-400 space-y-6 text-lg leading-relaxed mb-8">
                         <p>
