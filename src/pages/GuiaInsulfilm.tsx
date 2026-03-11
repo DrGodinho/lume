@@ -253,6 +253,84 @@ export function GuiaInsulfilm() {
                     ]} />
                 </section>
 
+                {/* Tabela Comparativa */}
+                <section>
+                    <h2 className="text-3xl font-bold font-['Montserrat'] text-white mb-8 text-center md:text-left">Comparativo Técnico das Películas</h2>
+                    
+                    <div className="overflow-x-auto rounded-2xl glass-card border border-white/10 shadow-2xl">
+                        <table className="w-full text-left border-collapse min-w-[800px]">
+                            <thead>
+                                <tr className="bg-[#c9a227]/10 border-b border-white/10">
+                                    <th className="p-4 md:p-6 text-[#c9a227] font-bold uppercase tracking-wider text-xs md:text-sm">Película</th>
+                                    <th className="p-4 md:p-6 text-[#c9a227] font-bold uppercase tracking-wider text-xs md:text-sm">VLT (Luz)</th>
+                                    <th className="p-4 md:p-6 text-[#c9a227] font-bold uppercase tracking-wider text-xs md:text-sm">UVR (Raios UV)</th>
+                                    <th className="p-4 md:p-6 text-[#c9a227] font-bold uppercase tracking-wider text-xs md:text-sm">IRR (Calor Int)</th>
+                                    <th className="p-4 md:p-6 text-[#c9a227] font-bold uppercase tracking-wider text-xs md:text-sm">TSER (Energia)</th>
+                                    <th className="p-4 md:p-6 text-[#c9a227] font-bold uppercase tracking-wider text-xs md:text-sm">Preço/m²</th>
+                                </tr>
+                            </thead>
+                            <tbody className="text-gray-300 divide-y divide-white/5">
+                                <tr className="hover:bg-white/[0.02] transition-colors">
+                                    <td className="p-4 md:p-6 font-bold text-white">Nano Cerâmica</td>
+                                    <td className="p-4 md:p-6">35-70%</td>
+                                    <td className="p-4 md:p-6 text-green-400 font-medium">99,9%</td>
+                                    <td className="p-4 md:p-6 font-bold text-white">95% a 99%</td>
+                                    <td className="p-4 md:p-6">70% a 80%</td>
+                                    <td className="p-4 md:p-6 text-white font-bold">R$ 220</td>
+                                </tr>
+                                <tr className="hover:bg-white/[0.02] transition-colors">
+                                    <td className="p-4 md:p-6 font-bold text-white">Dupla Camada G5</td>
+                                    <td className="p-4 md:p-6">5-8%</td>
+                                    <td className="p-4 md:p-6 text-green-400 font-medium">99%</td>
+                                    <td className="p-4 md:p-6 font-bold text-white">60% a 70%</td>
+                                    <td className="p-4 md:p-6">65% a 75%</td>
+                                    <td className="p-4 md:p-6 text-white font-bold">R$ 150</td>
+                                </tr>
+                                <tr className="hover:bg-white/[0.02] transition-colors">
+                                    <td className="p-4 md:p-6 font-bold text-white">Dupla Camada G20</td>
+                                    <td className="p-4 md:p-6">18-25%</td>
+                                    <td className="p-4 md:p-6 text-green-400 font-medium">99%</td>
+                                    <td className="p-4 md:p-6 font-bold text-white">50% a 60%</td>
+                                    <td className="p-4 md:p-6">55% a 65%</td>
+                                    <td className="p-4 md:p-6 text-white font-bold">R$ 150</td>
+                                </tr>
+                                <tr className="hover:bg-white/[0.02] transition-colors">
+                                    <td className="p-4 md:p-6 font-bold text-white">Carbono Premium G5</td>
+                                    <td className="p-4 md:p-6">5-8%</td>
+                                    <td className="p-4 md:p-6 text-green-400 font-medium">99%</td>
+                                    <td className="p-4 md:p-6 font-bold text-white">45% a 55%</td>
+                                    <td className="p-4 md:p-6">50% a 60%</td>
+                                    <td className="p-4 md:p-6 text-white font-bold">R$ 80</td>
+                                </tr>
+                                <tr className="hover:bg-white/[0.02] transition-colors">
+                                    <td className="p-4 md:p-6 font-bold text-white">Carbono Premium G20</td>
+                                    <td className="p-4 md:p-6">18-25%</td>
+                                    <td className="p-4 md:p-6 text-green-400 font-medium">99%</td>
+                                    <td className="p-4 md:p-6 font-bold text-white">40% a 50%</td>
+                                    <td className="p-4 md:p-6">45% a 55%</td>
+                                    <td className="p-4 md:p-6 text-white font-bold">R$ 80</td>
+                                </tr>
+                                <tr className="hover:bg-white/[0.02] transition-colors">
+                                    <td className="p-4 md:p-6 font-bold text-white">Refletiva Clássica</td>
+                                    <td className="p-4 md:p-6">8-35%</td>
+                                    <td className="p-4 md:p-6 text-green-400 font-medium">99%</td>
+                                    <td className="p-4 md:p-6 font-bold text-white">70% a 85%</td>
+                                    <td className="p-4 md:p-6">65% a 78%</td>
+                                    <td className="p-4 md:p-6 text-white font-bold">R$ 90</td>
+                                </tr>
+                                <tr className="hover:bg-white/[0.02] transition-colors">
+                                    <td className="p-4 md:p-6 font-bold text-white">Jateada</td>
+                                    <td className="p-4 md:p-6">50-85%</td>
+                                    <td className="p-4 md:p-6 text-green-400 font-medium">99%</td>
+                                    <td className="p-4 md:p-6 font-medium text-gray-500">{'< 10%'}</td>
+                                    <td className="p-4 md:p-6">15% a 25%</td>
+                                    <td className="p-4 md:p-6 text-white font-bold">R$ 90</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
                 {/* 5 e 6: Durabilidade, Cuidados e Remoção */}
                 <section>
                     <h2 className="text-3xl font-bold font-['Montserrat'] text-white mb-8">5. Qualidade e Cuidados Diários</h2>
