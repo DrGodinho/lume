@@ -274,6 +274,35 @@ export function GuiaInsulfilm() {
                     ]} />
                 </section>
 
+                {/* 7. Remoção */}
+                <section>
+                    <h2 className="text-3xl font-bold font-['Montserrat'] text-white mb-6">7. Remoção: Quando é Hora de Mudar?</h2>
+                    
+                    <div className="text-gray-400 space-y-6 text-lg leading-relaxed mb-8">
+                        <p>
+                            A remoção de insulfilm antigo é uma arte ingrata. Se a película for velha e estiver ressecada, ela sairá em pedacinhos minúsculos, deixando uma cola grudenta e fedorenta no vidro.
+                        </p>
+                        <h3 className="text-xl font-bold text-white mt-8 mb-4">Por que não fazer sozinho?</h3>
+                        <p>
+                            Você corre o risco de riscar o vidro com estiletes ou usar produtos químicos que podem manchar suas esquadrias de alumínio ou madeira. Profissionais usam vaporetos de alta temperatura e solventes específicos que preservam o vidro intacto.
+                        </p>
+                        <p>
+                            Se você já tem uma película antiga, ressecada ou com bolhas, a <strong>LUME Controle Solar</strong> oferece o serviço especializado de remoção.
+                        </p>
+                        <div className="bg-red-500/10 border-l-4 border-red-500 p-4 rounded-r-lg">
+                            <p className="text-white font-bold mb-1">Atenção:</p>
+                            <p className="text-gray-300 text-sm">
+                                A remoção é um processo técnico que exige tempo e solventes específicos para não riscar o vidro. Este serviço possui um custo adicional e deve ser informado antecipadamente no momento do orçamento, para que possamos planejar o tempo necessário de execução na sua residência.
+                            </p>
+                        </div>
+                    </div>
+
+                    <FAQAccordion items={[
+                        { q: "A remoção estraga o vidro?", a: "Se feita corretamente por um profissional, o vidro volta a ser exatamente o que era antes." },
+                        { q: "Quanto tempo leva para remover?", a: "Depende do estado da película. Uma janela muito queimada pelo sol pode levar o dobro do tempo de uma instalação nova." }
+                    ]} />
+                </section>
+
             </main>
 
             <ContactCTA />
