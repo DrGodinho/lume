@@ -254,12 +254,12 @@ export function RefletivaPage() {
                                                 <Sun size={18} className="text-[#c9a227]" />
                                                 <SpecTooltip term="VLT">VLT (Transmissão de Luz)</SpecTooltip>
                                             </span>
-                                            <span className="font-bold text-white text-lg">35% a 50%</span>
+                                            <span className="font-bold text-white text-lg">8% a 35%</span>
                                         </div>
                                         <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
-                                            <div className="bg-[#c9a227] h-2 rounded-full" style={{ width: '45%' }}></div>
+                                            <div className="bg-[#c9a227] h-2 rounded-full shadow-[0_0_10px_rgba(201,162,39,0.3)]" style={{ width: '35%' }}></div>
                                         </div>
-                                        <p className="text-xs text-gray-500 mt-2">Nível agradável de claridade natural dentro de casa cruzando a prata escurecida.</p>
+                                        <p className="text-xs text-gray-500 mt-2">Nível agressivo de escurecimento para máxima proteção diurna.</p>
                                     </div>
 
                                     <div>
@@ -271,7 +271,7 @@ export function RefletivaPage() {
                                             <span className="font-bold text-[#c9a227] text-lg">99%</span>
                                         </div>
                                         <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
-                                            <div className="bg-[#c9a227] h-2 rounded-full" style={{ width: '99%' }}></div>
+                                            <div className="bg-[#c9a227] h-2 rounded-full shadow-[0_0_10px_rgba(201,162,39,0.5)]" style={{ width: '99%' }}></div>
                                         </div>
                                         <p className="text-xs text-gray-500 mt-2">Móveis, estofados, tapetes e pele blindados.</p>
                                     </div>
@@ -282,10 +282,10 @@ export function RefletivaPage() {
                                                 <ThermometerSnowflake size={18} className="text-blue-400" />
                                                 <SpecTooltip term="IRR">Infravermelho (IRR)</SpecTooltip>
                                             </span>
-                                            <span className="font-bold text-blue-400 text-lg">Até 85%</span>
+                                            <span className="font-bold text-blue-400 text-lg">70% a 85%</span>
                                         </div>
                                         <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
-                                            <div className="bg-blue-400 h-2 rounded-full" style={{ width: '85%' }}></div>
+                                            <div className="bg-blue-400 h-2 rounded-full shadow-[0_0_10px_rgba(96,165,250,0.5)]" style={{ width: '85%' }}></div>
                                         </div>
                                         <p className="text-xs text-gray-500 mt-2">Supressão fortíssima das ondas diretas do calor sentidas na pele.</p>
                                     </div>
@@ -296,12 +296,12 @@ export function RefletivaPage() {
                                                 <Zap size={18} className="text-[#c9a227]" />
                                                 <SpecTooltip term="TSER">TSER (Poder Total)</SpecTooltip>
                                             </span>
-                                            <span className="font-bold text-white text-xl">Até 70%</span>
+                                            <span className="font-bold text-white text-xl">65% a 78%</span>
                                         </div>
                                         <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden border border-white/5">
-                                            <div className="bg-gradient-to-r from-[#c9a227] to-white h-2 rounded-full" style={{ width: '70%' }}></div>
+                                            <div className="bg-gradient-to-r from-[#c9a227] to-white h-2 rounded-full" style={{ width: '78%' }}></div>
                                         </div>
-                                        <p className="text-xs text-gray-500 mt-2">A métrica definitiva. O balanço total energético combatido.</p>
+                                        <p className="text-xs text-gray-500 mt-2">A métrica definitiva da eficiência energética no calor extremo.</p>
                                     </div>
                                 </div>
                             </div>

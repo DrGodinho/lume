@@ -228,6 +228,20 @@ export function NanoCeramicaPage() {
                                     <div className="flex justify-between items-center mb-2">
                                         <span className="text-gray-300 font-medium flex items-center gap-2">
                                             <Sun size={18} className="text-[#c9a227]" />
+                                            <SpecTooltip term="VLT">VLT (Transmissão de Luz)</SpecTooltip>
+                                        </span>
+                                        <span className="font-bold text-white text-lg">70%</span>
+                                    </div>
+                                    <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+                                        <div className="bg-[#c9a227] h-2 rounded-full" style={{ width: '70%' }}></div>
+                                    </div>
+                                    <p className="text-xs text-gray-500 mt-2">Ambiente iluminado com visão cristalina do Rio.</p>
+                                </div>
+
+                                <div>
+                                    <div className="flex justify-between items-center mb-2">
+                                        <span className="text-gray-300 font-medium flex items-center gap-2">
+                                            <Shield size={18} className="text-[#c9a227]" />
                                             <SpecTooltip term="UVR">Bloqueio UV (UltraVioleta)</SpecTooltip>
                                         </span>
                                         <span className="font-bold text-white text-lg">99,9%</span>
