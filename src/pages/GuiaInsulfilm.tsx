@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import gsap from 'gsap';
+import { Link } from 'react-router-dom';
 import { ContactCTA } from '../sections/ContactCTA';
 import { ArrowRight, Zap, Target, Shield, CheckCircle } from 'lucide-react';
 
@@ -122,7 +123,7 @@ export function GuiaInsulfilm() {
                         </p>
                         <h3 className="text-xl font-bold text-white mt-8 mb-4">Alta Tecnologia: Nanocerâmica e Películas Claras</h3>
                         <p>
-                            Muitas pessoas acreditam que, para tirar o calor, é preciso "escuridão total". Isso é coisa do passado. Graças à <strong>Tecnologia de Nanocerâmica</strong>, hoje é possível ter películas quase transparentes com uma performance térmica superior às películas escuras comuns.
+                            Muitas pessoas acreditam que, para tirar o calor, é preciso "escuridão total". Isso é coisa do passado. Graças à <Link to="/nano-ceramica" className="text-[#c9a227] hover:underline font-bold">Tecnologia de Nanocerâmica</Link>, hoje é possível ter películas quase transparentes com uma performance térmica superior às películas escuras comuns.
                         </p>
                     </div>
 
@@ -155,6 +156,9 @@ export function GuiaInsulfilm() {
                             <li>Quadros e objetos de decoração.</li>
                             <li><strong>A sua pele:</strong> O câncer de pele também pode ser causado pela exposição contínua ao sol pela janela de casa.</li>
                         </ul>
+                        <p>
+                            Destaque para a linha <Link to="/jateado" className="text-[#c9a227] hover:underline font-bold">Jateada</Link>, que além de decorativa, mantém 99% de bloqueio UV mesmo sendo fosca.
+                        </p>
                     </div>
 
                     <FAQAccordion items={[
@@ -187,7 +191,7 @@ export function GuiaInsulfilm() {
                             Viver em grandes centros como o Rio de Janeiro traz o desafio da proximidade. Vizinhos em prédios em frente ou pessoas na rua podem acabar tirando a sua liberdade dentro de casa.
                         </p>
                         <p>
-                            As películas Carbono G5 ou as versões Refletivas criam o efeito de <strong>"visão única"</strong>: você enxerga tudo lá fora com nitidez, mas quem está do lado de fora vê apenas um reflexo ou uma superfície escura. Além disso, o filme segura estilhaços em caso de quebra de vidro, prevenindo acidentes.
+                            As películas <Link to="/carbono" className="text-[#c9a227] hover:underline font-bold">Carbono G5</Link> ou as versões <Link to="/refletiva" className="text-[#c9a227] hover:underline font-bold">Refletivas</Link> criam o efeito de <strong>"visão única"</strong>: você enxerga tudo lá fora com nitidez, mas quem está do lado de fora vê apenas um reflexo ou uma superfície escura. Além disso, o filme segura estilhaços em caso de quebra de vidro, prevenindo acidentes.
                         </p>
                     </div>
 
@@ -204,41 +208,41 @@ export function GuiaInsulfilm() {
 
                     <div className="grid md:grid-cols-2 gap-6">
                         {/* Cenário 1 */}
-                        <div className="glass-card border border-white/10 rounded-2xl p-6 hover:border-[#c9a227]/30 transition-all">
+                        <div className="glass-card border border-white/10 rounded-2xl p-6 hover:border-[#c9a227]/30 transition-all text-left">
                             <h3 className="text-[#c9a227] font-bold text-xl mb-2">Cenário 1: Privacidade Máxima</h3>
                             <p className="text-sm text-gray-500 mb-4 uppercase tracking-wider">Para salas e quartos térreos</p>
                             <ul className="space-y-3 text-gray-300">
-                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <strong>Dupla Camada G5:</strong> Espelhada por fora, clara por dentro.</li>
-                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <strong>Carbono G5:</strong> Visual preto absoluto.</li>
+                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <Link to="/dupla-camada" className="hover:underline"><strong>Dupla Camada G5:</strong></Link> Espelhada por fora, clara por dentro.</li>
+                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <Link to="/carbono" className="hover:underline"><strong>Carbono G5:</strong></Link> Visual preto absoluto.</li>
                             </ul>
                         </div>
 
                         {/* Cenário 2 */}
-                        <div className="glass-card border border-white/10 rounded-2xl p-6 hover:border-[#c9a227]/30 transition-all">
+                        <div className="glass-card border border-white/10 rounded-2xl p-6 hover:border-[#c9a227]/30 transition-all text-left">
                             <h3 className="text-[#c9a227] font-bold text-xl mb-2">Cenário 2: Foco em Luz Natural</h3>
                             <p className="text-sm text-gray-500 mb-4 uppercase tracking-wider">Tira o calor sem escurecer</p>
                             <ul className="space-y-3 text-gray-300">
-                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <strong>Nano Cerâmica:</strong> Rejeita 97% do calor, alta transparência.</li>
-                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <strong>Jateada:</strong> Difunde luz suavemente (fosco).</li>
+                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <Link to="/nano-ceramica" className="hover:underline"><strong>Nano Cerâmica:</strong></Link> Rejeita 97% do calor, alta transparência.</li>
+                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <Link to="/jateado" className="hover:underline"><strong>Jateada:</strong></Link> Difunde luz suavemente (fosco).</li>
                             </ul>
                         </div>
 
                         {/* Cenário 3 */}
-                        <div className="glass-card border border-white/10 rounded-2xl p-6 hover:border-[#c9a227]/30 transition-all">
+                        <div className="glass-card border border-white/10 rounded-2xl p-6 hover:border-[#c9a227]/30 transition-all text-left">
                             <h3 className="text-[#c9a227] font-bold text-xl mb-2">Cenário 3: Custo-Benefício</h3>
                             <p className="text-sm text-gray-500 mb-4 uppercase tracking-wider">Proteção com orçamento controlado</p>
                             <ul className="space-y-3 text-gray-300">
-                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <strong>Carbono Premium:</strong> A partir de R$ 80/m².</li>
-                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <strong>Refletiva Clássica:</strong> Melhor custo para redução de abafamento bruto.</li>
+                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <Link to="/carbono" className="hover:underline"><strong>Carbono Premium:</strong></Link> A partir de R$ 80/m².</li>
+                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <Link to="/refletiva" className="hover:underline"><strong>Refletiva Clássica:</strong></Link> Melhor custo para redução bruta.</li>
                             </ul>
                         </div>
 
                         {/* Cenário 4 */}
-                        <div className="glass-card border border-white/10 rounded-2xl p-6 hover:border-[#c9a227]/30 transition-all bg-gradient-to-br from-[#c9a227]/5 to-transparent">
+                        <div className="glass-card border border-white/10 rounded-2xl p-6 hover:border-[#c9a227]/30 transition-all bg-gradient-to-br from-[#c9a227]/5 to-transparent text-left">
                             <h3 className="text-[#c9a227] font-bold text-xl mb-2">Cenário Especial: O Astro-Rei</h3>
                             <p className="text-sm text-gray-500 mb-4 uppercase tracking-wider">Contra o sol da tarde extremo</p>
                             <ul className="space-y-3 text-gray-300">
-                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <strong>Dupla Camada G5:</strong> A barreira térmica definitiva (TSER 75%).</li>
+                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <Link to="/dupla-camada" className="hover:underline"><strong>Dupla Camada G5:</strong></Link> A barreira térmica definitiva (TSER 75%).</li>
                             </ul>
                         </div>
                     </div>
