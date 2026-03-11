@@ -271,31 +271,39 @@ export function GuiaInsulfilm() {
                             </thead>
                             <tbody className="text-gray-300 divide-y divide-white/5">
                                 <tr className="hover:bg-white/[0.02] transition-colors">
-                                    <td className="p-4 md:p-6 font-bold text-white">Nano Cerâmica</td>
-                                    <td className="p-4 md:p-6">35-70%</td>
+                                    <td className="p-4 md:p-6 font-bold text-white">
+                                        <Link to="/nano-ceramica" className="hover:text-[#c9a227] transition-colors">Nano Cerâmica</Link>
+                                    </td>
+                                    <td className="p-4 md:p-6 text-[#c9a227] font-bold">70%</td>
                                     <td className="p-4 md:p-6 text-green-400 font-medium">99,9%</td>
                                     <td className="p-4 md:p-6 font-bold text-white">95% a 99%</td>
                                     <td className="p-4 md:p-6">70% a 80%</td>
                                     <td className="p-4 md:p-6 text-white font-bold">R$ 220</td>
                                 </tr>
                                 <tr className="hover:bg-white/[0.02] transition-colors">
-                                    <td className="p-4 md:p-6 font-bold text-white">Dupla Camada G5</td>
+                                    <td className="p-4 md:p-6 font-bold text-white">
+                                        <Link to="/dupla-camada" className="hover:text-[#c9a227] transition-colors">Dupla Camada G5</Link>
+                                    </td>
                                     <td className="p-4 md:p-6">5-8%</td>
                                     <td className="p-4 md:p-6 text-green-400 font-medium">99%</td>
                                     <td className="p-4 md:p-6 font-bold text-white">60% a 70%</td>
                                     <td className="p-4 md:p-6">65% a 75%</td>
-                                    <td className="p-4 md:p-6 text-white font-bold">R$ 150</td>
+                                    <td className="p-4 md:p-6 text-white font-bold">R$ 120</td>
                                 </tr>
                                 <tr className="hover:bg-white/[0.02] transition-colors">
-                                    <td className="p-4 md:p-6 font-bold text-white">Dupla Camada G20</td>
+                                    <td className="p-4 md:p-6 font-bold text-white">
+                                        <Link to="/dupla-camada" className="hover:text-[#c9a227] transition-colors">Dupla Camada G20</Link>
+                                    </td>
                                     <td className="p-4 md:p-6">18-25%</td>
                                     <td className="p-4 md:p-6 text-green-400 font-medium">99%</td>
                                     <td className="p-4 md:p-6 font-bold text-white">50% a 60%</td>
                                     <td className="p-4 md:p-6">55% a 65%</td>
-                                    <td className="p-4 md:p-6 text-white font-bold">R$ 150</td>
+                                    <td className="p-4 md:p-6 text-white font-bold">R$ 120</td>
                                 </tr>
                                 <tr className="hover:bg-white/[0.02] transition-colors">
-                                    <td className="p-4 md:p-6 font-bold text-white">Carbono Premium G5</td>
+                                    <td className="p-4 md:p-6 font-bold text-white">
+                                        <Link to="/carbono" className="hover:text-[#c9a227] transition-colors">Carbono Premium G5</Link>
+                                    </td>
                                     <td className="p-4 md:p-6">5-8%</td>
                                     <td className="p-4 md:p-6 text-green-400 font-medium">99%</td>
                                     <td className="p-4 md:p-6 font-bold text-white">45% a 55%</td>
@@ -303,7 +311,9 @@ export function GuiaInsulfilm() {
                                     <td className="p-4 md:p-6 text-white font-bold">R$ 80</td>
                                 </tr>
                                 <tr className="hover:bg-white/[0.02] transition-colors">
-                                    <td className="p-4 md:p-6 font-bold text-white">Carbono Premium G20</td>
+                                    <td className="p-4 md:p-6 font-bold text-white">
+                                        <Link to="/carbono" className="hover:text-[#c9a227] transition-colors">Carbono Premium G20</Link>
+                                    </td>
                                     <td className="p-4 md:p-6">18-25%</td>
                                     <td className="p-4 md:p-6 text-green-400 font-medium">99%</td>
                                     <td className="p-4 md:p-6 font-bold text-white">40% a 50%</td>
@@ -311,15 +321,19 @@ export function GuiaInsulfilm() {
                                     <td className="p-4 md:p-6 text-white font-bold">R$ 80</td>
                                 </tr>
                                 <tr className="hover:bg-white/[0.02] transition-colors">
-                                    <td className="p-4 md:p-6 font-bold text-white">Refletiva Clássica</td>
+                                    <td className="p-4 md:p-6 font-bold text-white">
+                                        <Link to="/refletiva" className="hover:text-[#c9a227] transition-colors">Refletiva Clássica</Link>
+                                    </td>
                                     <td className="p-4 md:p-6">8-35%</td>
                                     <td className="p-4 md:p-6 text-green-400 font-medium">99%</td>
                                     <td className="p-4 md:p-6 font-bold text-white">70% a 85%</td>
                                     <td className="p-4 md:p-6">65% a 78%</td>
-                                    <td className="p-4 md:p-6 text-white font-bold">R$ 90</td>
+                                    <td className="p-4 md:p-6 text-white font-bold">R$ 95</td>
                                 </tr>
                                 <tr className="hover:bg-white/[0.02] transition-colors">
-                                    <td className="p-4 md:p-6 font-bold text-white">Jateada</td>
+                                    <td className="p-4 md:p-6 font-bold text-white">
+                                        <Link to="/jateado" className="hover:text-[#c9a227] transition-colors">Jateada</Link>
+                                    </td>
                                     <td className="p-4 md:p-6">50-85%</td>
                                     <td className="p-4 md:p-6 text-green-400 font-medium">99%</td>
                                     <td className="p-4 md:p-6 font-medium text-gray-500">{'< 10%'}</td>
@@ -328,6 +342,46 @@ export function GuiaInsulfilm() {
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+
+                    {/* Glossário Técnico */}
+                    <div className="mt-12 grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 className="text-white font-bold mb-2 flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-[#c9a227]" />
+                                VLT (Visible Light Transmission)
+                            </h4>
+                            <p className="text-gray-400 text-sm leading-relaxed">
+                                Percentual de luz visível que atravessa o vidro com película aplicada. Valores mais baixos indicam películas mais escuras. Por exemplo, <span className="text-white">VLT de 5%</span> significa maior privacidade, enquanto <span className="text-white">VLT de 70%</span> mantém o ambiente bem iluminado.
+                            </p>
+                        </div>
+                        <div>
+                            <h4 className="text-white font-bold mb-2 flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-[#c9a227]" />
+                                UVR (UV Rejection)
+                            </h4>
+                            <p className="text-gray-400 text-sm leading-relaxed">
+                                Percentual de radiação ultravioleta bloqueada. Raios UV são responsáveis pelo desbotamento de móveis e são prejudiciais à pele. Películas de qualidade LUME rejeitam <span className="text-white">99% ou mais</span> da radiação UV.
+                            </p>
+                        </div>
+                        <div>
+                            <h4 className="text-white font-bold mb-2 flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-[#c9a227]" />
+                                IRR (Infrared Rejection)
+                            </h4>
+                            <p className="text-gray-400 text-sm leading-relaxed">
+                                Percentual de radiação infravermelha bloqueada, a principal responsável pela sensação de calor. Maiores índices significam maior conforto térmico. Películas de <span className="text-white">Nano Cerâmica</span> atingem até 99% de IRR.
+                            </p>
+                        </div>
+                        <div>
+                            <h4 className="text-white font-bold mb-2 flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-[#c9a227]" />
+                                TSER (Total Solar Energy Rejected)
+                            </h4>
+                            <p className="text-gray-400 text-sm leading-relaxed">
+                                A medida mais completa: representa o total de energia solar rejeitada (luz + UV + IR). É o melhor indicador para comparar a <strong>eficiência térmica real</strong> entre diferentes películas.
+                            </p>
+                        </div>
                     </div>
                 </section>
 
