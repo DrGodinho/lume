@@ -226,7 +226,7 @@ export function DuplaCamadaPage() {
                             <h3 className="text-5xl font-black text-white/90 z-20 font-['Montserrat'] tracking-tighter">G5</h3>
                             <span className="absolute bottom-4 right-4 text-xs font-bold bg-[#c9a227] text-black px-2 py-1 rounded shadow-lg">MÁXIMA PERFORMANCE</span>
                         </div>
-                        <div className="p-8 md:p-10 flex-grow relative z-10">
+                        <div className="p-8 md:p-10 pb-12 flex-grow relative z-10">
                             <p className="text-gray-300 mb-8 leading-relaxed">
                                 A couraça impenetrável do calor. Recomendamos avidamente o G5 Dupla Camada para <strong>Salas de TV</strong> e <strong>Quartos</strong> muito ensolarados, onde você necessita barrar 100% da visão dos vizinhos (efeito diurno) garantindo uma densa redução térmica e luminosidade controlada extrema para assistir telas.
                             </p>
@@ -235,9 +235,9 @@ export function DuplaCamadaPage() {
                                 <div>
                                     <div className="flex justify-between text-sm mb-1">
                                         <SpecTooltip term="VLT"><span className="text-gray-400 flex items-center gap-1">VLT <span className="text-xs text-gray-600">(Luz)</span></span></SpecTooltip>
-                                        <span className="font-bold">5% a 8%</span>
+                                        <span className="font-bold text-[#c9a227]">5% a 8%</span>
                                     </div>
-                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-white/90 shadow-[0_0_10px_rgba(255,255,255,0.5)] h-1.5 rounded" style={{ width: '8%' }}></div></div>
+                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227]/80 shadow-[0_0_10px_rgba(201,162,39,0.3)] h-1.5 rounded" style={{ width: '8%' }}></div></div>
                                 </div>
                                 <div>
                                     <div className="flex justify-between text-sm mb-1">
@@ -254,24 +254,25 @@ export function DuplaCamadaPage() {
                                     <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227] shadow-[0_0_10px_rgba(201,162,39,0.5)] h-1.5 rounded" style={{ width: '95%' }}></div></div>
                                 </div>
                                 <div>
-                                    <div className="flex justify-between text-sm pt-2 border-t border-white/5">
+                                    <div className="flex justify-between text-sm mb-1 pt-2 border-t border-white/5">
                                         <SpecTooltip term="TSER"><span className="text-gray-400 flex items-center gap-1"><Zap size={14} className="text-[#c9a227]" /> TSER Térmico Total</span></SpecTooltip>
-                                        <span className="font-bold text-lg text-white">Até 75%</span>
+                                        <span className="font-bold text-white">Até 75%</span>
                                     </div>
+                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227] h-1.5 rounded opacity-50" style={{ width: '75%' }}></div></div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     {/* G20 Card */}
-                    <div className="glass-card rounded-3xl border border-white/5 hover:border-blue-500/30 transition-all duration-300 page-entrance overflow-hidden flex flex-col relative group">
-                        <div className="absolute inset-0 bg-gradient-to-t from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="glass-card rounded-3xl border border-white/5 hover:border-[#c9a227]/30 transition-all duration-300 page-entrance overflow-hidden flex flex-col relative group">
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#c9a227]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                         <div className="h-32 bg-[#121b2b] border-b border-white/10 flex items-center justify-center relative">
                             <div className="absolute inset-0 bg-gradient-to-b from-[#0a101a] to-transparent opacity-80 z-10"></div>
                             <h3 className="text-5xl font-black text-white/90 z-20 font-['Montserrat'] tracking-tighter">G20</h3>
-                            <span className="absolute bottom-4 left-4 text-xs font-bold border border-blue-400/50 text-blue-300/90 px-2 py-1 rounded bg-blue-900/20 backdrop-blur-sm">LUZ NATURAL + CONFORTO</span>
+                            <span className="absolute bottom-4 left-4 text-xs font-bold border border-[#c9a227]/50 text-[#c9a227]/90 px-2 py-1 rounded bg-[#c9a227]/10 backdrop-blur-sm">LUZ NATURAL + CONFORTO</span>
                         </div>
-                        <div className="p-8 md:p-10 flex-grow relative z-10">
+                        <div className="p-8 md:p-10 pb-12 flex-grow relative z-10">
                             <p className="text-gray-300 mb-8 leading-relaxed">
                                 A tonalidade clássica de altíssima busca para <strong>Fechamento Completo de Varandas</strong> Gourmet e salas envidraçadas onde a vista externa da praia, piscina ou horizonte não pode ser estrangulada, porém a radiação solar ardida da tarde é aniquilada pelos metais internos antes de queimar você.
                             </p>
@@ -280,29 +281,30 @@ export function DuplaCamadaPage() {
                                 <div>
                                     <div className="flex justify-between text-sm mb-1">
                                         <SpecTooltip term="VLT"><span className="text-gray-400 flex items-center gap-1">VLT <span className="text-xs text-gray-600">(Luz)</span></span></SpecTooltip>
-                                        <span className="font-bold">18% a 25%</span>
+                                        <span className="font-bold text-[#c9a227]">18% a 25%</span>
                                     </div>
-                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-white/70 h-1.5 rounded" style={{ width: '25%' }}></div></div>
+                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227]/80 shadow-[0_0_10px_rgba(201,162,39,0.3)] h-1.5 rounded" style={{ width: '25%' }}></div></div>
                                 </div>
                                 <div>
                                     <div className="flex justify-between text-sm mb-1">
                                         <SpecTooltip term="UVR"><span className="text-gray-400 flex items-center gap-1">Proteção UV</span></SpecTooltip>
-                                        <span className="font-bold text-blue-400">99%</span>
+                                        <span className="font-bold text-[#c9a227]">99%</span>
                                     </div>
-                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-blue-400/80 h-1.5 rounded shadow-[0_0_10px_rgba(96,165,250,0.5)]" style={{ width: '99%' }}></div></div>
+                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227]/80 h-1.5 rounded shadow-[0_0_10px_rgba(201,162,39,0.3)]" style={{ width: '99%' }}></div></div>
                                 </div>
                                 <div>
                                     <div className="flex justify-between text-sm mb-1">
                                         <SpecTooltip term="IRR"><span className="text-gray-400 flex items-center gap-1">Rejeição de Calor (IRR)</span></SpecTooltip>
-                                        <span className="font-bold text-blue-400">Poderosos 90%</span>
+                                        <span className="font-bold text-[#c9a227]">Poderosos 90%</span>
                                     </div>
-                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-blue-400/80 shadow-[0_0_10px_rgba(96,165,250,0.5)] h-1.5 rounded" style={{ width: '90%' }}></div></div>
+                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227]/80 shadow-[0_0_10px_rgba(201,162,39,0.3)] h-1.5 rounded" style={{ width: '90%' }}></div></div>
                                 </div>
                                 <div>
-                                    <div className="flex justify-between text-sm pt-2 border-t border-white/5">
-                                        <SpecTooltip term="TSER"><span className="text-gray-400 flex items-center gap-1"><Zap size={14} className="text-blue-400" /> TSER Térmico Total</span></SpecTooltip>
-                                        <span className="font-bold text-lg text-white">Até 65%</span>
+                                    <div className="flex justify-between text-sm mb-1 pt-2 border-t border-white/5">
+                                        <SpecTooltip term="TSER"><span className="text-gray-400 flex items-center gap-1"><Zap size={14} className="text-[#c9a227]" /> TSER Térmico Total</span></SpecTooltip>
+                                        <span className="font-bold text-white">Até 65%</span>
                                     </div>
+                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227] h-1.5 rounded opacity-50" style={{ width: '65%' }}></div></div>
                                 </div>
                             </div>
                         </div>

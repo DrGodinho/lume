@@ -175,12 +175,12 @@ export function CarbonoPage() {
 
                     {/* G5 Card */}
                     <div className="glass-card rounded-3xl border border-white/5 hover:border-[#c9a227]/40 transition-all duration-300 page-entrance overflow-hidden flex flex-col">
-                        <div className="h-32 bg-black flex items-center justify-center relative">
+                        <div className="h-32 bg-black flex items-center justify-center relative border-b border-white/5">
                             <div className="absolute inset-0 bg-gradient-to-b from-black to-transparent opacity-80 z-10"></div>
                             <h3 className="text-5xl font-black text-white/90 z-20 font-['Montserrat'] tracking-tighter">G5</h3>
                             <span className="absolute bottom-4 right-4 text-xs font-bold bg-[#c9a227] text-black px-2 py-1 rounded">PRIVACIDADE ABSOLUTA</span>
                         </div>
-                        <div className="p-8 md:p-10 flex-grow">
+                        <div className="p-8 md:p-10 flex-grow relative z-10">
                             <p className="text-gray-300 mb-8 leading-relaxed">
                                 A escolha número um para fechamento total de visão de fora para dentro. Ideal para janelas de térreo, guaritas, e portas de vidro voltadas para ruas movimentadas. Onde a discrição máxima manda.
                             </p>
@@ -189,29 +189,30 @@ export function CarbonoPage() {
                                 <div>
                                     <div className="flex justify-between text-sm mb-1">
                                         <SpecTooltip term="VLT"><span className="text-gray-400">VLT (Transmissão de Luz)</span></SpecTooltip>
-                                        <span className="font-bold">5% a 8%</span>
+                                        <span className="font-bold text-white">5% a 8%</span>
                                     </div>
-                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-white h-1.5 rounded" style={{ width: '8%' }}></div></div>
+                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227] h-1.5 rounded shadow-[0_0_10px_rgba(201,162,39,0.3)]" style={{ width: '8%' }}></div></div>
                                 </div>
                                 <div>
                                     <div className="flex justify-between text-sm mb-1">
                                         <SpecTooltip term="UVR"><span className="text-gray-400">Proteção UV</span></SpecTooltip>
                                         <span className="font-bold text-[#c9a227]">99%</span>
                                     </div>
-                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227] h-1.5 rounded" style={{ width: '99%' }}></div></div>
+                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227] h-1.5 rounded shadow-[0_0_10px_rgba(201,162,39,0.3)]" style={{ width: '99%' }}></div></div>
                                 </div>
                                 <div>
                                     <div className="flex justify-between text-sm mb-1">
                                         <SpecTooltip term="IRR"><span className="text-gray-400">Rejeição de Calor (IRR)</span></SpecTooltip>
                                         <span className="font-bold text-[#c9a227]">Até 90%</span>
                                     </div>
-                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227] h-1.5 rounded" style={{ width: '90%' }}></div></div>
+                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227] h-1.5 rounded shadow-[0_0_10px_rgba(201,162,39,0.3)]" style={{ width: '90%' }}></div></div>
                                 </div>
                                 <div>
                                     <div className="flex justify-between text-sm mb-1">
                                         <SpecTooltip term="TSER"><span className="text-gray-400">TSER (Poder Total)</span></SpecTooltip>
-                                        <span className="font-bold">Até 70%</span>
+                                        <span className="font-bold text-white text-lg">Até 70%</span>
                                     </div>
+                                    <div className="w-full bg-gray-800 rounded h-1.5 border border-white/5"><div className="bg-[#c9a227] h-1.5 rounded opacity-60" style={{ width: '70%' }}></div></div>
                                 </div>
                             </div>
                         </div>
@@ -219,12 +220,12 @@ export function CarbonoPage() {
 
                     {/* G20 Card */}
                     <div className="glass-card rounded-3xl border border-white/5 hover:border-[#c9a227]/40 transition-all duration-300 page-entrance overflow-hidden flex flex-col">
-                        <div className="h-32 bg-[#1a1a1a] flex items-center justify-center relative">
+                        <div className="h-32 bg-[#1a1a1a] flex items-center justify-center relative border-b border-white/5">
                             <div className="absolute inset-0 bg-gradient-to-b from-[#1a1a1a] to-transparent opacity-80 z-10"></div>
                             <h3 className="text-5xl font-black text-white/90 z-20 font-['Montserrat'] tracking-tighter">G20</h3>
-                            <span className="absolute bottom-4 left-4 text-xs font-bold border border-white/30 text-white px-2 py-1 rounded">EQUILÍBRIO PERFEITO</span>
+                            <span className="absolute bottom-4 left-4 text-xs font-bold border border-[#c9a227]/30 text-[#c9a227] px-2 py-1 rounded">EQUILÍBRIO PERFEITO</span>
                         </div>
-                        <div className="p-8 md:p-10 flex-grow">
+                        <div className="p-8 md:p-10 flex-grow relative z-10">
                             <p className="text-gray-300 mb-8 leading-relaxed">
                                 A tonalidade mais vendida para apartamentos e escritórios. Oferece uma excelente estética fumê por fora garantindo privacidade diurna, mas permite uma espetacular claridade visual suave de dentro para fora, excelente para visão noturna.
                             </p>
@@ -233,30 +234,30 @@ export function CarbonoPage() {
                                 <div>
                                     <div className="flex justify-between text-sm mb-1">
                                         <SpecTooltip term="VLT"><span className="text-gray-400">VLT (Transmissão de Luz)</span></SpecTooltip>
-                                        <span className="font-bold">18% a 25%</span>
+                                        <span className="font-bold text-white">18% a 25%</span>
                                     </div>
-                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-white/60 h-1.5 rounded" style={{ width: '22%' }}></div></div>
+                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227] h-1.5 rounded shadow-[0_0_10px_rgba(201,162,39,0.3)]" style={{ width: '22%' }}></div></div>
                                 </div>
                                 <div>
                                     <div className="flex justify-between text-sm mb-1">
                                         <SpecTooltip term="UVR"><span className="text-gray-400">Proteção UV</span></SpecTooltip>
                                         <span className="font-bold text-[#c9a227]">99%</span>
                                     </div>
-                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227] h-1.5 rounded" style={{ width: '99%' }}></div></div>
+                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227] h-1.5 rounded shadow-[0_0_10px_rgba(201,162,39,0.3)]" style={{ width: '99%' }}></div></div>
                                 </div>
                                 <div>
                                     <div className="flex justify-between text-sm mb-1">
                                         <SpecTooltip term="IRR"><span className="text-gray-400">Rejeição de Calor (IRR)</span></SpecTooltip>
                                         <span className="font-bold text-[#c9a227]">Até 85%</span>
                                     </div>
-                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227] h-1.5 rounded" style={{ width: '85%' }}></div></div>
+                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227] h-1.5 rounded shadow-[0_0_10px_rgba(201,162,39,0.3)]" style={{ width: '85%' }}></div></div>
                                 </div>
                                 <div>
                                     <div className="flex justify-between text-sm mb-1">
                                         <SpecTooltip term="TSER"><span className="text-gray-400">TSER (Poder Total)</span></SpecTooltip>
-                                        <span className="font-bold">Até 60%</span>
+                                        <span className="font-bold text-white text-lg">Até 60%</span>
                                     </div>
-
+                                    <div className="w-full bg-gray-800 rounded h-1.5 border border-white/5"><div className="bg-[#c9a227] h-1.5 rounded opacity-60" style={{ width: '60%' }}></div></div>
                                 </div>
                             </div>
                         </div>

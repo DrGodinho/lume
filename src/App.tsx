@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { Capacitor } from '@capacitor/core';
 import { Navbar } from './sections/Navbar';
 import { Hero } from './sections/Hero';
 import { Products } from './sections/Products';
@@ -57,6 +58,9 @@ function LandingPage() {
 }
 
 function App() {
+  const location = useLocation();
+  const isAdmin = location.pathname.startsWith('/admin');
+
   useEffect(() => {
     // Smooth scroll behavior
     document.documentElement.style.scrollBehavior = 'smooth';
@@ -73,11 +77,11 @@ function App() {
   return (
     <div className="min-h-screen bg-[#0a1628] text-white overflow-x-hidden">
       <ScrollToTop />
-      <Navbar />
+      {!isAdmin && <Navbar />}
 
       <main>
         <Routes>
-          <Route path="/" element={<LandingPage />} />
+          <Route path="/" element={Capacitor.isNativePlatform() ? <Navigate to="/admin" replace /> : <LandingPage />} />
           <Route path="/orcamento" element={<QuotePage />} />
           <Route path="/admin" element={<AdminCalculator />} />
           <Route path="/simulador" element={<SimulatorPage />} />
@@ -90,10 +94,15 @@ function App() {
         </Routes>
       </main>
 
-      <Footer />
-      <WhatsAppButton />
+      {!isAdmin && (
+        <>
+          <Footer />
+          <WhatsAppButton />
+        </>
+      )}
     </div>
   );
 }
+
 
 export default App;

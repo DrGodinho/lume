@@ -232,7 +232,7 @@ export function JateadoPage() {
                     </span>
                 </div>
 
-                <div className="container-lume max-w-4xl mx-auto page-entrance">
+                <div className="container-lume max-w-5xl mx-auto page-entrance">
                     <div className="glass-card rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
                         <div className="grid grid-cols-1 md:grid-cols-2">
                             {/* Features Text */}
@@ -252,13 +252,13 @@ export function JateadoPage() {
                                     <div className="relative">
                                         <div className="flex justify-between items-center mb-2">
                                             <span className="text-gray-300 font-medium flex items-center gap-2">
-                                                <Sun size={18} className="text-white" />
+                                                <Sun size={18} className="text-[#c9a227]" />
                                                 <SpecTooltip term="VLT">VLT (Transmissão de Luz)</SpecTooltip>
                                             </span>
                                             <span className="font-bold text-white text-lg">50% a 85%</span>
                                         </div>
                                         <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
-                                            <div className="bg-white/80 h-2 rounded-full" style={{ width: '85%' }}></div>
+                                            <div className="bg-[#c9a227] h-2 rounded-full shadow-[0_0_10px_rgba(201,162,39,0.3)]" style={{ width: '85%' }}></div>
                                         </div>
                                         <p className="text-xs text-gray-500 mt-2">Altíssima taxa, ambiente incrivelmente claro e convidativo.</p>
                                         <div className="absolute -right-2 top-0 w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.8)] animate-pulse"></div>
@@ -270,7 +270,7 @@ export function JateadoPage() {
                                                 <ShieldCheck size={18} className="text-[#c9a227]" />
                                                 <SpecTooltip term="UVR">Bloqueio UV (UltraVioleta)</SpecTooltip>
                                             </span>
-                                            <span className="font-bold text-[#c9a227] text-lg">99%</span>
+                                            <span className="font-bold text-white text-lg">99%</span>
                                         </div>
                                         <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
                                             <div className="bg-[#c9a227] h-2 rounded-full shadow-[0_0_10px_rgba(201,162,39,0.3)]" style={{ width: '99%' }}></div>
@@ -281,13 +281,13 @@ export function JateadoPage() {
                                     <div>
                                         <div className="flex justify-between items-center mb-2">
                                             <span className="text-gray-300 font-medium flex items-center gap-2">
-                                                <Thermometer size={18} className="text-gray-400" />
+                                                <Thermometer size={18} className="text-[#c9a227]" />
                                                 <SpecTooltip term="IRR">Infravermelho (IRR)</SpecTooltip>
                                             </span>
-                                            <span className="font-bold text-gray-400 text-lg">Inferior a 10%</span>
+                                            <span className="font-bold text-white text-lg">Inferior a 10%</span>
                                         </div>
                                         <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
-                                            <div className="bg-gray-600 h-2 rounded-full" style={{ width: '10%' }}></div>
+                                            <div className="bg-[#c9a227] h-2 rounded-full" style={{ width: '10%' }}></div>
                                         </div>
                                         <p className="text-xs text-gray-500 mt-2">Filme decorativo, sem propósito térmico primário.</p>
                                     </div>
@@ -295,13 +295,13 @@ export function JateadoPage() {
                                     <div>
                                         <div className="flex justify-between items-center mb-2">
                                             <span className="text-white font-bold flex items-center gap-2 uppercase tracking-wider">
-                                                <Zap size={18} className="text-gray-400" />
+                                                <Zap size={18} className="text-[#c9a227]" />
                                                 <SpecTooltip term="TSER">TSER (Poder Total)</SpecTooltip>
                                             </span>
-                                            <span className="font-bold text-gray-400 text-xl">15% a 25%</span>
+                                            <span className="font-bold text-white text-xl">15% a 25%</span>
                                         </div>
                                         <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden border border-white/5">
-                                            <div className="bg-gray-700 h-2 rounded-full" style={{ width: '25%' }}></div>
+                                            <div className="bg-[#c9a227] h-2 rounded-full" style={{ width: '25%' }}></div>
                                         </div>
                                         <p className="text-xs text-gray-500 mt-2">Bloqueio solar focado em luminosidade e privacidade.</p>
                                     </div>

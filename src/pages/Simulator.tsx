@@ -100,7 +100,7 @@ export function SimulatorPage() {
             scores.dupla += 4; scores.nano += 2;
         }
         if (priorities.includes('estetica')) {
-            scores.carbono += 3; scores.dupla += 2;
+            scores.carbono += 10; scores.dupla += 2;
         }
         if (priorities.includes('preco')) {
             scores.carbono += 3; scores.refletiva += 2;

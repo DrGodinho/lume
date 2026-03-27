@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import { EyeOff, ShieldCheck, ThermometerSnowflake, Ruler, ArrowRight, Home, Sun, Zap } from 'lucide-react';
+import { EyeOff, ShieldCheck, ThermometerSnowflake, Ruler, ArrowRight, Home, Sun, Zap, Thermometer } from 'lucide-react';
 import { WhatsAppButton } from '../components/WhatsAppButton';
 import { ContactCTA } from '../sections/ContactCTA';
 import { SpecTooltip } from '../components/SpecTooltip';
@@ -279,13 +279,13 @@ export function RefletivaPage() {
                                     <div>
                                         <div className="flex justify-between items-center mb-2">
                                             <span className="text-gray-300 font-medium flex items-center gap-2">
-                                                <ThermometerSnowflake size={18} className="text-blue-400" />
+                                                <Thermometer size={18} className="text-[#c9a227]" />
                                                 <SpecTooltip term="IRR">Infravermelho (IRR)</SpecTooltip>
                                             </span>
-                                            <span className="font-bold text-blue-400 text-lg">70% a 85%</span>
+                                            <span className="font-bold text-white text-lg">70% a 85%</span>
                                         </div>
                                         <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
-                                            <div className="bg-blue-400 h-2 rounded-full shadow-[0_0_10px_rgba(96,165,250,0.5)]" style={{ width: '85%' }}></div>
+                                            <div className="bg-[#c9a227] h-2 rounded-full shadow-[0_0_10px_rgba(201,162,39,0.3)]" style={{ width: '85%' }}></div>
                                         </div>
                                         <p className="text-xs text-gray-500 mt-2">Supressão fortíssima das ondas diretas do calor sentidas na pele.</p>
                                     </div>

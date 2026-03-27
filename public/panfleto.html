@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panfleto LUME</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        @page {
+            size: A6 portrait;
+            margin: 0;
+        }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #2a2a2a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .flyer {
+            /* Tamanho A5 em milímetros */
+            width: 148mm;
+            height: 210mm;
+            background-color: #071224; /* Azul profundo / Preto */
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        
+        .text-gold {
+            color: #d1ab45;
+        }
+        .bg-gold {
+            background: linear-gradient(135deg, #e4c16a 0%, #c9a227 50%, #e4c16a 100%);
+        }
+        
+        /* Estilos para impressão */
+        @media print {
+            body { 
+                padding: 0; 
+                background: white; 
+                display: block;
+            }
+            .flyer { 
+                box-shadow: none; 
+                width: 100%; 
+                height: 100%; 
+                margin: 0;
+                page-break-after: avoid;
+            }
+            * { 
+                -webkit-print-color-adjust: exact !important; 
+                print-color-adjust: exact !important; 
+            }
+        }
+
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.4);
+            opacity: 0.8;
+        }
+        .star-gold {
+            background: #d1ab45;
+            box-shadow: 0 0 10px 2px rgba(209, 171, 69, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="flyer flex flex-col items-center pt-10 px-10 pb-6 relative text-center">
+        <!-- Fundo com Imagem Subliminar -->
+        <div class="absolute inset-0 z-0 opacity-50">
+            <img src="/product-carbono.jpg" class="w-full h-full object-cover" style="object-position: center;" />
+            <div class="absolute inset-0 bg-gradient-to-b from-[#071224]/90 via-[#071224]/50 to-[#071224]/90"></div>
+        </div>
+
+        <!-- Estrelinhas no fundo -->
+        <div class="absolute top-10 left-12 w-1 h-1 star star-gold"></div>
+        <div class="absolute top-20 right-16 w-0.5 h-0.5 star"></div>
+        <div class="absolute top-64 left-6 w-0.5 h-0.5 star"></div>
+        <div class="absolute bottom-40 right-10 w-1 h-1 star star-gold"></div>
+        <div class="absolute bottom-20 left-16 w-1 h-1 star"></div>
+
+        <div class="relative z-10 w-full flex flex-col items-center h-full">
+            
+            <!-- Logo e Subtítulo -->
+            <div class="mb-5 flex flex-col items-center">
+                <h1 class="font-black tracking-tighter" style="line-height: 0.8; font-size: 80px; font-weight: 900;">
+                    <span class="text-white">LU</span><span class="text-gold">ME</span>
+                </h1>
+                <p class="text-gold font-bold tracking-[0.35em] uppercase mt-0.5" style="font-size: 11px;">
+                    Películas de Controle Solar
+                </p>
+            </div>
+
+            <!-- Headline Principal -->
+            <div class="w-full mb-8 mt-2 relative">
+                <h2 class="text-gold font-black uppercase tracking-tight" style="font-size: 26px; line-height: 1.1; text-shadow: 2px 2px 4px rgba(0,0,0,0.8), 0 0 10px rgba(0,0,0,0.6);">
+                    Instalação de Insulfilm<br/>Residencial Premium:
+                </h2>
+                <h2 class="text-white font-black uppercase tracking-tighter mt-1.5" style="font-size: 32px; line-height: 1; text-shadow: 2px 2px 4px rgba(0,0,0,0.8), 0 0 10px rgba(0,0,0,0.6);">
+                    Economia e Conforto!
+                </h2>
+            </div>
+
+            <!-- Tópicos (Checklist) -->
+            <div class="w-full text-left space-y-4 mb-9 px-1 relative z-10" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.9);">
+                <!-- Tópico 1 -->
+                <div class="flex items-start gap-2.5">
+                    <svg class="w-6 h-6 text-gold flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3.5" style="filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.8));">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <p class="leading-tight text-white" style="font-size: 15.5px;">
+                        <strong class="uppercase font-black" style="font-size: 17px;">Proteção UV Total:</strong> 
+                        Proteja sua pele e evite o desbotamento de móveis e pisos.
+                    </p>
+                </div>
+                <!-- Tópico 2 -->
+                <div class="flex items-start gap-2.5">
+                    <svg class="w-6 h-6 text-gold flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3.5" style="filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.8));">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <p class="leading-tight text-white" style="font-size: 15.5px;">
+                        <strong class="uppercase font-black" style="font-size: 17px;">Privacidade e Segurança:</strong> 
+                        Visualize o exterior sem ser visto e reforce seus vidros.
+                    </p>
+                </div>
+                <!-- Tópico 3 (DESTAQUE) -->
+                <div class="flex items-start gap-2.5">
+                    <svg class="w-6 h-6 text-gold flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3.5" style="filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.8));">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <p class="leading-tight text-gold font-bold" style="font-size: 15.5px;">
+                        <strong class="uppercase font-black" style="font-size: 17px;">Redução na conta de luz:</strong> 
+                        Economia de até 30% no uso do ar-condicionado.
+                    </p>
+                </div>
+                <!-- Tópico 4 -->
+                <div class="flex items-start gap-2.5">
+                    <svg class="w-6 h-6 text-gold flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3.5" style="filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.8));">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <p class="leading-tight text-white" style="font-size: 15.5px;">
+                        <strong class="uppercase font-black" style="font-size: 17px;">Conforto Térmico:</strong> 
+                        Ambientes até 8°C mais agradáveis e protegidos.
+                    </p>
+                </div>
+                <!-- Tópico 5 -->
+                <div class="flex items-start gap-2.5">
+                    <svg class="w-6 h-6 text-gold flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3.5" style="filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.8));">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <p class="leading-tight text-white" style="font-size: 15px;">
+                        <strong class="uppercase font-black" style="font-size: 16px;">Alta Qualidade:</strong> 
+                        Linha Carbono não gera bolhas e não fica roxa.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Botão CTA -->
+            <div class="bg-gold text-black rounded-lg h-[54px] flex items-center justify-center font-black uppercase shadow-xl mb-4 shadow-[#c9a227]/30 border-2 border-[#e4c16a]/70" style="font-size: 19px; width: 95%; white-space: nowrap;">
+                Orçamento grátis! Instalação em 24h
+            </div>
+
+            <!-- Seção WhatsApp -->
+            <div class="flex items-center gap-4 mb-4 w-full justify-center">
+                <!-- Ícone Verde do WhatsApp -->
+                <div class="w-16 h-16 bg-[#25D366] rounded-full flex items-center justify-center border-2 border-white shadow-[0_0_15px_rgba(37,211,102,0.4)]">
+                    <svg class="w-9 h-9 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12.031 0C5.385 0 0 5.385 0 12.031c0 2.128.553 4.195 1.595 6.008L.024 23.976l6.096-1.599c1.764.981 3.766 1.498 5.911 1.498 6.646 0 12.031-5.385 12.031-12.031S18.677 0 12.031 0zm0 21.938c-1.801 0-3.565-.483-5.113-1.401l-.367-.217-3.8.997 1.018-3.704-.239-.379c-1.008-1.596-1.54-3.447-1.54-5.365 0-5.553 4.516-10.069 10.069-10.069 5.553 0 10.069 4.516 10.069 10.069s-4.516 10.069-10.069 10.069zm5.526-7.534c-.303-.152-1.794-.886-2.074-.987-.28-.101-.484-.152-.686.152-.202.303-.787.986-.964 1.189-.177.202-.354.227-.657.075-1.428-.714-2.584-1.514-3.585-3.085-.259-.406-.027-.626.126-.777.135-.136.303-.353.454-.53.152-.176.202-.303.303-.505.101-.202.051-.379-.025-.53-.076-.151-.686-1.656-.938-2.261-.246-.593-.497-.508-.686-.517-.176-.008-.379-.008-.582-.008-.202 0-.53.076-.807.379s-1.06 1.035-1.06 2.525 1.085 2.929 1.237 3.131c.152.202 2.135 3.256 5.174 4.568 2.057.886 2.651.986 3.535.91.802-.069 2.146-.886 2.45-1.745.303-.86.303-1.597.212-1.748-.09-.151-.303-.252-.606-.404z"/>
+                    </svg>
+                </div>
+                <div class="text-left" style="line-height: 1.1;">
+                    <p class="text-white font-bold mb-1" style="font-size: 18px;">Peça no WhatsApp agora!</p>
+                    <p class="text-gold font-black drop-shadow-md" style="font-size: 34px;">(21) 96514-0612</p>
+                </div>
+            </div>
+
+            <!-- Seção Instagram -->
+            <div class="flex items-center justify-center gap-2 mb-4 bg-white/5 py-1.5 px-4 rounded-full border border-white/10">
+                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+                </svg>
+                <p class="text-white font-bold" style="font-size: 15px;">@lumecontrolesolar</p>
+            </div>
+
+            <!-- Footer / Garantia -->
+            <div class="text-center w-full mt-auto mb-2 border-t border-white/10 pt-4">
+                <div class="flex items-center justify-center font-black italic uppercase text-gold tracking-wide" style="font-size: 15px;">
+                    Garantia de 5 Anos em todas as películas
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>
