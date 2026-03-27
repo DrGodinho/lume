@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+Allow: /nano-ceramica
+Allow: /carbono
+Allow: /dupla-camada
+Allow: /refletiva
+Allow: /jateado
+Allow: /simulador
+Allow: /guia-insulfilm
+
+# Bloqueia ferramentas internas e orçamentos para não aparecerem no Google
+Disallow: /admin
+Disallow: /orcamento
+
+# Caminho para o Sitemap
+Sitemap: https://lumecontrolesolar.com.br/sitemap.xml

@@ -62,6 +62,15 @@ function App() {
   const isAdmin = location.pathname.startsWith('/admin');
 
   useEffect(() => {
+    // PWA: Só registrar e gerenciar instalação se for Admin
+    if (isAdmin) {
+      import('virtual:pwa-register').then(({ registerSW }) => {
+        registerSW({ immediate: true });
+      }).catch(() => {
+        // Ignora erro se o módulo não estiver disponível (ex: em dev sem plugin)
+      });
+    }
+
     // Smooth scroll behavior
     document.documentElement.style.scrollBehavior = 'smooth';
 
@@ -72,7 +81,7 @@ function App() {
       // Cleanup ScrollTrigger instances on unmount
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     };
-  }, []);
+  }, [isAdmin]);
 
   return (
     <div className="min-h-screen bg-[#0a1628] text-white overflow-x-hidden">
