@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { MessageCircle, X } from 'lucide-react';
+import { handleGtagClick } from '../lib/gtag';
 
 export function WhatsAppButton() {
   const [isVisible, setIsVisible] = useState(false);
@@ -46,6 +47,10 @@ export function WhatsAppButton() {
         href="https://wa.me/5521965140612?text=Olá! Gostaria de saber mais sobre as películas de controle solar."
         target="_blank"
         rel="noopener noreferrer"
+        onClick={(e) => {
+          e.preventDefault();
+          handleGtagClick((e.currentTarget as HTMLAnchorElement).href);
+        }}
         className="flex items-center justify-center gap-2 sm:gap-3 w-14 h-14 sm:w-auto sm:px-6 sm:py-4 rounded-full bg-[#25d366] text-white shadow-lg transition-all duration-500 hover:scale-105 hover:shadow-xl group relative overflow-visible"
         style={{
           boxShadow: '0 4px 20px rgba(37, 211, 102, 0.4)',

@@ -147,7 +147,13 @@ export function QuotePage() {
         msg += `*CÓDIGO DE IMPORTAÇÃO:*%0A${code}`;
 
         const seuNumero = "5521965140612";
-        window.open(`https://wa.me/${seuNumero}?text=${msg}`, '_blank');
+        const url = `https://wa.me/${seuNumero}?text=${msg}`;
+        
+        if (typeof (window as any).gtagSendEvent === 'function') {
+            (window as any).gtagSendEvent(url);
+        } else {
+            window.open(url, '_blank');
+        }
     };
 
     return (
@@ -160,7 +166,7 @@ export function QuotePage() {
 
                 {/* Header */}
                 <header className="page-entrance text-center mb-10">
-                    <a href="#" className="inline-block hover:opacity-80 transition-opacity group">
+                    <a href="/" className="inline-block hover:opacity-80 transition-opacity group">
                         <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl font-['Montserrat']">
                             LU<span className="text-gradient-gold">ME</span>
                         </h1>

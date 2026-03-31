@@ -175,7 +175,13 @@ export function SimulatorPage() {
     const sendWhatsApp = () => {
         if (!bestMatch) return;
         const msg = `Olá! O Assistente LUME me recomendou a película *${bestMatch.name}*. Gostaria de mais informações e um orçamento!`;
-        window.open(`https://wa.me/5521965140612?text=${msg}`, '_blank');
+        const url = `https://wa.me/5521965140612?text=${msg}`;
+        
+        if (typeof (window as any).gtagSendEvent === 'function') {
+            (window as any).gtagSendEvent(url);
+        } else {
+            window.open(url, '_blank');
+        }
     };
 
     return (
@@ -193,7 +199,7 @@ export function SimulatorPage() {
             <div className="w-full max-w-xl mx-auto flex-1 flex flex-col">
                 {/* Header Back Link */}
                 <header className="text-center mb-8">
-                    <a href="#" className="inline-block hover:opacity-80 transition-opacity group">
+                    <a href="/" className="inline-block hover:opacity-80 transition-opacity group">
                         <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl font-['Montserrat']">
                             LU<span className="text-gradient-gold">ME</span>
                         </h1>

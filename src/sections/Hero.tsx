@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { ArrowRight, Check, MessageCircle } from 'lucide-react';
 import { Particles } from '../components/Particles';
 import gsap from 'gsap';
+import { handleGtagClick } from '../lib/gtag';
 
 export function Hero() {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -120,6 +121,10 @@ export function Hero() {
               href="https://wa.me/5521965140612"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={(e) => {
+                e.preventDefault();
+                handleGtagClick((e.currentTarget as HTMLAnchorElement).href);
+              }}
               className="btn-primary flex items-center justify-center gap-2 group w-full sm:w-auto"
             >
               <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />

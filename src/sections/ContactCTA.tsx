@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { MessageCircle, Phone, Check } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { handleGtagClick } from '../lib/gtag';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -113,6 +114,10 @@ export function ContactCTA() {
                 href="https://wa.me/5521965140612"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleGtagClick((e.currentTarget as HTMLAnchorElement).href);
+                }}
                 className="btn-primary flex items-center justify-center gap-2 text-sm sm:text-base animate-pulse-glow w-full sm:w-auto"
               >
                 <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />

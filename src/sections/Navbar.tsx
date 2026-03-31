@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Menu, X, Phone } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { handleGtagClick } from '../lib/gtag';
 
 const navLinks = [
   { name: 'Início', href: '/' },
@@ -64,14 +65,18 @@ export function Navbar() {
           <div className="hidden lg:flex items-center gap-8">
             {navLinks.map((link) => (
               link.href.startsWith('#') ? (
-                <button
+                <a
                   key={link.name}
-                  onClick={() => handleNavClick(link.href)}
+                  href={link.href.startsWith('#') ? '/' + link.href : link.href}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleNavClick(link.href);
+                  }}
                   className="relative text-sm font-medium text-gray-300 hover:text-white transition-colors duration-300 group"
                 >
                   {link.name}
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#c9a227] transition-all duration-300 group-hover:w-full" />
-                </button>
+                </a>
               ) : (
                 <Link
                   key={link.name}
@@ -97,6 +102,10 @@ export function Navbar() {
               href="https://wa.me/5521965140612"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={(e) => {
+                e.preventDefault();
+                handleGtagClick((e.currentTarget as HTMLAnchorElement).href);
+              }}
               className="btn-primary flex items-center gap-2 text-xs py-2 px-4"
             >
               <Phone className="w-4 h-4" />
@@ -124,13 +133,17 @@ export function Navbar() {
           <div className="flex flex-col gap-4">
             {navLinks.map((link) => (
               link.href.startsWith('#') ? (
-                <button
+                <a
                   key={link.name}
-                  onClick={() => handleNavClick(link.href)}
+                  href={link.href.startsWith('#') ? '/' + link.href : link.href}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleNavClick(link.href);
+                  }}
                   className="text-left text-lg font-medium text-gray-300 hover:text-[#c9a227] transition-colors py-2"
                 >
                   {link.name}
-                </button>
+                </a>
               ) : (
                 <Link
                   key={link.name}
@@ -153,6 +166,10 @@ export function Navbar() {
               href="https://wa.me/5521965140612"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={(e) => {
+                e.preventDefault();
+                handleGtagClick((e.currentTarget as HTMLAnchorElement).href);
+              }}
               className="btn-primary flex items-center justify-center gap-2 mt-4"
             >
               <Phone className="w-4 h-4" />

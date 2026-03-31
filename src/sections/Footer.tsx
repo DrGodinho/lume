@@ -131,13 +131,17 @@ export function Footer() {
               {quickLinks.map((link) => (
                 <li key={link.name}>
                   {link.href.startsWith('#') ? (
-                    <button
-                      onClick={() => handleNavClick(link.href)}
+                    <a
+                      href={link.href.startsWith('#') ? '/' + link.href : link.href}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleNavClick(link.href);
+                      }}
                       className="text-gray-400 hover:text-[#c9a227] transition-colors text-xs sm:text-sm inline-flex items-center gap-2 group"
                     >
                       <span className="w-0 h-px bg-[#c9a227] transition-all duration-300 group-hover:w-3" />
                       {link.name}
-                    </button>
+                    </a>
                   ) : (
                     <Link
                       to={link.href}
@@ -161,13 +165,17 @@ export function Footer() {
               {products.map((product) => (
                 <li key={product.name}>
                   {product.href.startsWith('#') ? (
-                    <button
-                      onClick={() => handleNavClick(product.href)}
+                    <a
+                      href={product.href.startsWith('#') ? '/' + product.href : product.href}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleNavClick(product.href);
+                      }}
                       className="text-gray-400 hover:text-[#c9a227] transition-colors text-xs sm:text-sm inline-flex items-center gap-2 group"
                     >
                       <span className="w-0 h-px bg-[#c9a227] transition-all duration-300 group-hover:w-3" />
                       {product.name}
-                    </button>
+                    </a>
                   ) : (
                     <Link
                       to={product.href}
