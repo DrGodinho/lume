@@ -546,9 +546,6 @@ self.onmessage = (e) => {
                 const targetItem = prev.find(v => v.id === dropTargetId);
                 if (!draggedItem || !targetItem) return prev;
 
-                const draggedOrder = draggedItem.sortOrder ?? 0;
-                const targetOrder = targetItem.sortOrder ?? 0;
-
                 // Shift all items between the two positions
                 const sorted = [...prev].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
                 const draggedIdx = sorted.findIndex(v => v.id === dragId);

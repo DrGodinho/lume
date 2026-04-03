@@ -3,14 +3,30 @@ import { Helmet } from 'react-helmet';
 import { Shield, Sun, Thermometer, CheckCircle, ArrowRight, Eye, SunDim } from 'lucide-react';
 import { WhatsAppButton } from '../components/WhatsAppButton';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 export function BanguPage() {
     useEffect(() => {
-        // Entrance Animation
-        gsap.fromTo('.page-entrance',
-            { opacity: 0, y: 20 },
-            { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out', stagger: 0.1 }
-        );
+        // Smooth Scroll Animations for all sections
+        const elements = gsap.utils.toArray('.page-entrance');
+        elements.forEach((el: any) => {
+            gsap.fromTo(el,
+                { opacity: 0, y: 30 },
+                { 
+                    opacity: 1, 
+                    y: 0, 
+                    duration: 0.8, 
+                    ease: 'power3.out', 
+                    scrollTrigger: {
+                        trigger: el,
+                        start: "top 85%",
+                        toggleActions: "play none none none"
+                    }
+                }
+            );
+        });
     }, []);
 
     return (
@@ -162,8 +178,8 @@ export function BanguPage() {
                                 desc: "A linha de maior performance do mercado. A película nano cerâmica rejeita até 79% do calor proveniente da radiação solar sem escurecer o ambiente, mantendo os vidros transparentes e a luminosidade natural preservada. Ideal para salas, varandas e escritórios que precisam de máximo controle térmico sem perder claridade. Bloqueia até 99% dos raios UV, protegendo móveis, pisos e a pele."
                             },
                             {
-                                selo: "Melhor Custo-Benefício", title: "2. Nano Carbono (G35/G20/G5)",
-                                desc: "Película fumê de alta tecnologia, fabricada a partir de nano carbono. Combina visual elegante e escurecido com excelente rejeição de calor — até 80% de bloqueio térmico e proteção UV de 99%. O G5 é o mais escolhido em Bangu para janelas e portas de residências que precisam de privacidade total durante o dia e boa visão de dentro para fora."
+                                selo: "Melhor Custo-Benefício", title: "2. Carbono",
+                                desc: "Película fumê de alta tecnologia, fabricada a partir de nano carbono. Combina visual elegante e escurecido com excelente rejeição de calor — até 80% de bloqueio térmico e proteção UV de 99%. Disponível nas tonalidades G20 e G5, ideais para janelas e portas de residências que precisam de privacidade durante o dia."
                             },
                             {
                                 selo: "Visual Profissional", title: "3. Espelhado / Refletivo",
@@ -176,10 +192,6 @@ export function BanguPage() {
                             {
                                 selo: "Segurança", title: "5. Antivandalismo",
                                 desc: "Película de alta resistência que mantém os cacos do vidro unidos em caso de impacto ou tentativa de arrombamento, dificultando a entrada de invasores e evitando ferimentos. Indicada para casas com grade de vidro, portas de entrada, comércios e condomínios."
-                            },
-                            {
-                                selo: "Invisível", title: "6. Controle Solar (Linha IR)",
-                                desc: "Tecnologia de ponta para quem precisa bloquear o calor sem alterar a aparência do vidro. A película IR transparente é praticamente invisível após a aplicação, mas rejeita a radiação infravermelha responsável pela maior parte do calor que penetra pelos vidros. Ideal para condomínios rígidos."
                             }
                         ].map((item, idx) => (
                             <div key={idx} className="glass-card p-8 rounded-2xl border border-white/5 hover:border-[#c9a227]/30 transition-colors flex flex-col h-full">
