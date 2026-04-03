@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef, useMemo, useReducer, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useReducer, useCallback } from 'react';
 import { Helmet } from 'react-helmet';
 import {
     Plus, Trash2, Smartphone, Save, FolderOpen, Scissors,
     Calculator, Camera, Layers, RotateCcw, AlignRight, AlignLeft, X,
-    History, Clock, ChevronRight, Undo2, Redo2, FileText, Settings
+    History, Clock, ChevronRight, Undo2, Redo2, FileText, Settings, RefreshCw, GripVertical
 } from 'lucide-react';
 import gsap from 'gsap';
 import html2canvas from 'html2canvas';
@@ -54,8 +54,9 @@ interface GlassItem {
     oh: number;
     cor: string;
     label?: string;
-    forceRotate?: boolean;
+    forceRotate?: boolean | undefined;
     alignRight?: boolean;
+    sortOrder?: number; // controls pack sequence — drag reorders this
 }
 
 interface Block {
@@ -71,6 +72,7 @@ interface Block {
     h_visual?: number;
     forceRotate?: boolean;
     alignRight?: boolean;
+    sortOrder?: number;
 }
 
 interface OrcamentoSalvo {
@@ -144,8 +146,8 @@ export function AdminCalculator() {
     const [desconto, setDesconto] = useState(0);
     const [modoOtimizacao, setModoOtimizacao] = useState<'densidade' | 'facilidade'>(cfg.modoOtimizacao);
     const [configAberto, setConfigAberto] = useState(false);
+    const [compensarPerdas, setCompensarPerdas] = useState(false);
 
-    // Estados editáveis do painel de config (antes de salvar)
     const [cfgRollW, setCfgRollW] = useState(cfg.rollW);
     const [cfgPrice, setCfgPrice] = useState(cfg.price);
     const [cfgMargin, setCfgMargin] = useState(cfg.margin);
@@ -172,7 +174,7 @@ export function AdminCalculator() {
         } else {
             dispatch({ type: 'SET', payload: updater });
         }
-    }, []); // ← sem dependências, nunca fica stale
+    }, []);
 
     const [blocosCalculados, setBlocosCalculados] = useState<Block[]>([]);
     const [maxY, setMaxY] = useState(0);
@@ -180,6 +182,14 @@ export function AdminCalculator() {
     const [isCalculating, setIsCalculating] = useState(false);
 
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+    // ─── DRAG / REORDER ────────────────────────────────────────────────────────
+    // Drag changes sortOrder of pieces → worker repacks → no overlaps ever
+    const [dragId, setDragId] = useState<string | null>(null);
+    const [dragVisualPos, setDragVisualPos] = useState<{ x: number; y: number } | null>(null);
+    const [dropTargetId, setDropTargetId] = useState<string | null>(null);
+    const dragOffsetRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+    const isDragging = dragId !== null;
 
     const containerRef = useRef<HTMLDivElement>(null);
     const [containerWidth, setContainerWidth] = useState(500);
@@ -249,9 +259,10 @@ self.onmessage = (e) => {
         const bh = v.forceRotate ? (v.ow + margin) : (v.oh + margin);
         const brw = v.forceRotate ? v.oh : v.ow;
         const brh = v.forceRotate ? v.ow : v.oh;
-        return { id: v.id, w: bw, h: bh, rw: brw, rh: brh, cor: v.cor, label: v.label, rotated: v.forceRotate ?? false, h_visual: bh, forceRotate: v.forceRotate, alignRight: v.alignRight };
+        return { id: v.id, w: bw, h: bh, rw: brw, rh: brh, cor: v.cor, label: v.label, rotated: v.forceRotate === true, h_visual: bh, forceRotate: v.forceRotate, alignRight: v.alignRight === true, sortOrder: v.sortOrder ?? 0 };
     });
-    let result;
+    // Always pack in explicit sortOrder so drag-reorder is respected
+    baseItems.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
     if (modoOtimizacao === 'densidade') {
         let items = cloneItems(baseItems);
         items.sort((a, b) => (b.w * b.h) - (a.w * a.h));
@@ -266,7 +277,7 @@ self.onmessage = (e) => {
                         bestY = r.y; bestScoreX = b.alignRight ? (r.x + r.w) : r.x; finalX = b.alignRight ? (r.x + r.w - b.w) : r.x; bestRectIdx = i; willRotate = false; 
                     } 
                 }
-                if (!b.forceRotate && b.h <= r.w && b.w <= r.h) { 
+                if (b.forceRotate !== true && b.h <= r.w && b.w <= r.h) { 
                     if (r.y < bestY || (r.y === bestY && (b.alignRight ? (r.x + r.w > bestScoreX) : (r.x < bestScoreX)))) { 
                         bestY = r.y; bestScoreX = b.alignRight ? (r.x + r.w) : r.x; finalX = b.alignRight ? (r.x + r.w - b.h) : r.x; bestRectIdx = i; willRotate = true; 
                     } 
@@ -304,8 +315,8 @@ self.onmessage = (e) => {
         let strategies = [];
         strategies.push(cloneItems(baseItems).sort((a, b) => (b.w * b.h) - (a.w * a.h)));
         strategies.push(cloneItems(baseItems).sort((a, b) => b.h - a.h || b.w - a.w));
-        strategies.push(cloneItems(baseItems).map(b => { if (!b.forceRotate && b.w > b.h && b.h <= rollW) { [b.w, b.h] = [b.h, b.w]; [b.rw, b.rh] = [b.rh, b.rw]; b.rotated = true; b.h_visual = b.h; } return b; }).sort((a, b) => (b.w * b.h) - (a.w * a.h)));
-        strategies.push(cloneItems(baseItems).map(b => { if (!b.forceRotate && b.h > b.w && b.h <= rollW) { [b.w, b.h] = [b.h, b.w]; [b.rw, b.rh] = [b.rh, b.rw]; b.rotated = true; b.h_visual = b.h; } return b; }).sort((a, b) => (b.w * b.h) - (a.w * a.h)));
+        strategies.push(cloneItems(baseItems).map(b => { if (b.forceRotate !== true && b.w > b.h && b.h <= rollW) { [b.w, b.h] = [b.h, b.w]; [b.rw, b.rh] = [b.rh, b.rw]; b.rotated = true; b.h_visual = b.h; } return b; }).sort((a, b) => (b.w * b.h) - (a.w * a.h)));
+        strategies.push(cloneItems(baseItems).map(b => { if (b.forceRotate !== true && b.h > b.w && b.h <= rollW) { [b.w, b.h] = [b.h, b.w]; [b.rw, b.rh] = [b.rh, b.rw]; b.rotated = true; b.h_visual = b.h; } return b; }).sort((a, b) => (b.w * b.h) - (a.w * a.h)));
         let bestResult = null, minTotalY = Infinity;
         strategies.forEach(testItems => {
             let shelves = [], totalY = 0, currentAreaV = 0;
@@ -352,7 +363,7 @@ self.onmessage = (e) => {
                     let currentRight = rollW;
                     for (let c = shelf.columns.length - 1; c >= 0; c--) {
                         let col = shelf.columns[c];
-                        if (col.blocks.some(b => b.alignRight)) {
+                        if (col.blocks.some(b => b.alignRight === true)) {
                             let nX = currentRight - col.width, sh = nX - col.x;
                             col.x = nX;
                             col.blocks.forEach(b => { if (b.fit) b.fit.x += sh; });
@@ -435,7 +446,16 @@ self.onmessage = (e) => {
         if (!h || !w || h <= 0 || w <= 0 || q <= 0) return;
         const novos: GlassItem[] = [];
         for (let i = 0; i < q; i++) {
-            novos.push({ id: Math.random().toString(36).substr(2, 9), h, w, oh: h, ow: w, label: labelIn, cor: `hsl(${(h * w + h + w) % 360}, 65%, 75%)` });
+            // FIX 2: sempre inicializar forceRotate e alignRight explicitamente
+            novos.push({
+                id: Math.random().toString(36).substr(2, 9),
+                h, w, oh: h, ow: w,
+                label: labelIn,
+                cor: `hsl(${(h * w + h + w) % 360}, 65%, 75%)`,
+                forceRotate: undefined,
+                alignRight: false,
+                sortOrder: vidros.length + i,
+            });
         }
         setVidros([...vidros, ...novos]);
         setHeightIn(''); setWidthIn(''); setQtyIn('1'); setLabelIn('');
@@ -455,13 +475,125 @@ self.onmessage = (e) => {
         setSelectedIds([]);
     };
 
+    // FIX 1: toggle entre undefined e true — evita que false quebre o worker
     const handleRotateSelected = () => {
-        setVidros(prev => prev.map(v => selectedIds.includes(v.id) ? { ...v, forceRotate: !v.forceRotate } : v));
+        setVidros(prev => prev.map(v =>
+            selectedIds.includes(v.id)
+                ? { ...v, forceRotate: v.forceRotate === true ? undefined : true }
+                : v
+        ));
     };
 
     const handleAlignSelected = (dir: 'left' | 'right') => {
-        setVidros(prev => prev.map(v => selectedIds.includes(v.id) ? { ...v, alignRight: dir === 'right' } : v));
+        setVidros(prev => prev.map(v =>
+            selectedIds.includes(v.id) ? { ...v, alignRight: dir === 'right' } : v
+        ));
     };
+
+    // ─── DRAG HANDLERS ─────────────────────────────────────────────────────────
+
+    const scale = containerWidth / rollW; // px per cm
+
+    const handleDragStart = (e: React.MouseEvent | React.TouchEvent, block: Block) => {
+        e.stopPropagation();
+        if (!containerRef.current || !block.fit) return;
+        const rect = containerRef.current.getBoundingClientRect();
+        const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+        const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+        dragOffsetRef.current = {
+            x: clientX - rect.left - block.fit.x * scale,
+            y: clientY - rect.top - block.fit.y * scale,
+        };
+        setDragId(block.id);
+        setDragVisualPos({ x: block.fit.x * scale, y: block.fit.y * scale });
+        setSelectedIds([]);
+    };
+
+    const handleDragMove = useCallback((e: MouseEvent | TouchEvent) => {
+        if (!dragId || !containerRef.current) return;
+        e.preventDefault();
+        const rect = containerRef.current.getBoundingClientRect();
+        const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+        const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+
+        const pxX = clientX - rect.left - dragOffsetRef.current.x;
+        const pxY = clientY - rect.top - dragOffsetRef.current.y;
+        setDragVisualPos({ x: pxX, y: pxY });
+
+        // Find which block center is closest to cursor to show drop target highlight
+        const cursorCmX = (clientX - rect.left) / scale;
+        const cursorCmY = (clientY - rect.top) / scale;
+        let closest: string | null = null;
+        let closestDist = Infinity;
+        blocosCalculados.forEach(b => {
+            if (b.id === dragId || !b.fit) return;
+            const cx = b.fit.x + (b.w - margin) / 2;
+            const cy = b.fit.y + ((b.h_visual || b.h) - margin) / 2;
+            const dist = Math.hypot(cursorCmX - cx, cursorCmY - cy);
+            if (dist < closestDist) { closestDist = dist; closest = b.id; }
+        });
+        setDropTargetId(closest);
+    }, [dragId, blocosCalculados, scale, margin]);
+
+    const handleDragEnd = useCallback(() => {
+        if (!dragId) return;
+
+        if (dropTargetId) {
+            // Reorder: swap sortOrders between dragged and drop target
+            // This tells the worker to pack them in the new sequence
+            setVidros(prev => {
+                const draggedItem = prev.find(v => v.id === dragId);
+                const targetItem = prev.find(v => v.id === dropTargetId);
+                if (!draggedItem || !targetItem) return prev;
+
+                const draggedOrder = draggedItem.sortOrder ?? 0;
+                const targetOrder = targetItem.sortOrder ?? 0;
+
+                // Shift all items between the two positions
+                const sorted = [...prev].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+                const draggedIdx = sorted.findIndex(v => v.id === dragId);
+                const targetIdx = sorted.findIndex(v => v.id === dropTargetId);
+
+                const reordered = [...sorted];
+                const [removed] = reordered.splice(draggedIdx, 1);
+                reordered.splice(targetIdx, 0, removed);
+
+                return reordered.map((v, i) => ({ ...v, sortOrder: i }));
+            });
+        }
+
+        setDragId(null);
+        setDragVisualPos(null);
+        setDropTargetId(null);
+    }, [dragId, dropTargetId, setVidros]);
+
+    useEffect(() => {
+        if (isDragging) {
+            window.addEventListener('mousemove', handleDragMove, { passive: false });
+            window.addEventListener('touchmove', handleDragMove, { passive: false });
+            window.addEventListener('mouseup', handleDragEnd);
+            window.addEventListener('touchend', handleDragEnd);
+        }
+        return () => {
+            window.removeEventListener('mousemove', handleDragMove);
+            window.removeEventListener('touchmove', handleDragMove);
+            window.removeEventListener('mouseup', handleDragEnd);
+            window.removeEventListener('touchend', handleDragEnd);
+        };
+    }, [isDragging, handleDragMove, handleDragEnd]);
+
+    const resetOrdem = () => {
+        // Reset sortOrder back to insertion order (sortOrder as originally set)
+        setVidros(prev => prev.map((v, i) => ({ ...v, sortOrder: i })));
+    };
+
+    const hasCustomOrder = useMemo(() => {
+        const sorted = [...vidros].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+        return sorted.some((v, i) => {
+            const natural = vidros.findIndex(x => x.id === v.id);
+            return natural !== i;
+        });
+    }, [vidros]);
 
     // ─── HISTÓRICO ─────────────────────────────────────────────────────────────
 
@@ -474,7 +606,16 @@ self.onmessage = (e) => {
         return totalAreaM2 * price;
     }, [totalAreaM2, price]);
 
-    const finalPrice = subtotalBruto - desconto;
+    const eficiencia = useMemo(() => {
+        return maxY > 0 ? Math.round((areaV / (maxY * rollW)) * 100) : 0;
+    }, [maxY, areaV, rollW]);
+
+    const compensacaoPerda = useMemo(() => {
+        if (!compensarPerdas || eficiencia >= 100 || eficiencia <= 0) return 0;
+        return subtotalBruto * ((100 - eficiencia) / 100);
+    }, [compensarPerdas, eficiencia, subtotalBruto]);
+
+    const finalPrice = subtotalBruto + compensacaoPerda - desconto;
 
     const salvarNoHistorico = useCallback(() => {
         if (vidros.length === 0) return;
@@ -518,7 +659,7 @@ self.onmessage = (e) => {
         try {
             const d = JSON.parse(atob(code));
             setCliente(`${d.n} (${d.b}) - ${d.f}`);
-            dispatch({ type: 'SET', payload: d.v.map((v: any) => ({ ...v, id: Math.random().toString(36).substr(2, 9), oh: v.oh ?? v.h, ow: v.ow ?? v.w })) });
+            dispatch({ type: 'SET', payload: d.v.map((v: any) => ({ ...v, id: Math.random().toString(36).substr(2, 9), oh: v.oh ?? v.h, ow: v.ow ?? v.w, forceRotate: undefined, alignRight: false })) });
         } catch (e) { alert("Erro ao importar."); }
     };
 
@@ -550,7 +691,7 @@ self.onmessage = (e) => {
         try {
             const canvas = await html2canvas(invoiceRef.current, { scale: 2, backgroundColor: "#0a0f1e" });
             const dataUrl = canvas.toDataURL("image/png");
-            
+
             if (Capacitor.isNativePlatform()) {
                 const fileName = `Orcamento_${cliente.replace(/\W+/g, '_') || 'LUME'}.png`;
                 const base64Data = dataUrl.split(',')[1];
@@ -584,10 +725,10 @@ self.onmessage = (e) => {
             const imgData = canvas.toDataURL('image/png');
             const imgWidth = 100;
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            
+
             const pdf = new jsPDF('p', 'mm', [imgWidth, imgHeight]);
             pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-            
+
             if (Capacitor.isNativePlatform()) {
                 const fileName = `Orcamento_${cliente.replace(/\W+/g, '_') || 'LUME'}.pdf`;
                 const pdfBase64 = pdf.output('datauristring').split(',')[1];
@@ -641,7 +782,6 @@ self.onmessage = (e) => {
     }, [vidros]);
 
     const m = maxY / 100;
-    const eficiencia = maxY > 0 ? Math.round((areaV / (maxY * rollW)) * 100) : 0;
     const valorPraticoM2 = areaV > 0 ? finalPrice / (areaV / 10000) : 0;
 
     // ─── RENDER ────────────────────────────────────────────────────────────────
@@ -785,6 +925,7 @@ self.onmessage = (e) => {
             )}
 
             {/* BARRA FLUTUANTE: SELEÇÃO */}
+            {/* FIX 3: onPointerDown + preventDefault em todos os botões de ação */}
             {selectedIds.length > 0 && (
                 <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-[#1e293b] border border-[#3b82f6]/50 shadow-[0_0_30px_rgba(59,130,246,0.2)] p-3 rounded-2xl z-50 flex items-center gap-3 xl:gap-4 transition-all animate-fade-in w-[95%] max-w-md">
                     <div className="flex flex-col min-w-[80px]">
@@ -793,10 +934,34 @@ self.onmessage = (e) => {
                     </div>
                     <div className="h-10 w-px bg-white/10 mx-1" />
                     <div className="flex gap-1.5 sm:gap-2">
-                        <button onClick={handleRotateSelected} className="p-2 sm:p-2.5 bg-white/5 hover:bg-white/10 hover:text-[#c9a227] rounded-xl transition-colors" title="Girar 90º"><RotateCcw size={18} /></button>
-                        <button onClick={() => handleAlignSelected('left')} className="p-2 sm:p-2.5 bg-white/5 hover:bg-white/10 hover:text-blue-400 rounded-xl transition-colors" title="Alinhar à Esquerda"><AlignLeft size={18} /></button>
-                        <button onClick={() => handleAlignSelected('right')} className="p-2 sm:p-2.5 bg-white/5 hover:bg-white/10 hover:text-blue-400 rounded-xl transition-colors" title="Alinhar à Direita"><AlignRight size={18} /></button>
-                        <button onClick={handleDeleteSelected} className="p-2 sm:p-2.5 bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300 rounded-xl transition-colors" title="Deletar Peças"><Trash2 size={18} /></button>
+                        <button
+                            onPointerDown={(e) => { e.preventDefault(); handleRotateSelected(); }}
+                            className="p-2 sm:p-2.5 bg-white/5 hover:bg-white/10 hover:text-[#c9a227] rounded-xl transition-colors"
+                            title="Girar 90º"
+                        >
+                            <RotateCcw size={18} />
+                        </button>
+                        <button
+                            onPointerDown={(e) => { e.preventDefault(); handleAlignSelected('left'); }}
+                            className="p-2 sm:p-2.5 bg-white/5 hover:bg-white/10 hover:text-blue-400 rounded-xl transition-colors"
+                            title="Alinhar à Esquerda"
+                        >
+                            <AlignLeft size={18} />
+                        </button>
+                        <button
+                            onPointerDown={(e) => { e.preventDefault(); handleAlignSelected('right'); }}
+                            className="p-2 sm:p-2.5 bg-white/5 hover:bg-white/10 hover:text-blue-400 rounded-xl transition-colors"
+                            title="Alinhar à Direita"
+                        >
+                            <AlignRight size={18} />
+                        </button>
+                        <button
+                            onPointerDown={(e) => { e.preventDefault(); handleDeleteSelected(); }}
+                            className="p-2 sm:p-2.5 bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300 rounded-xl transition-colors"
+                            title="Deletar Peças"
+                        >
+                            <Trash2 size={18} />
+                        </button>
                     </div>
                     <div className="h-10 w-px bg-white/10 mx-1" />
                     <button onClick={() => setSelectedIds([])} className="p-2 text-gray-400 hover:text-white transition-colors"><X size={18} /></button>
@@ -878,14 +1043,14 @@ self.onmessage = (e) => {
 
                     <div className="admin-entrance bg-[#0a1628] border border-white/10 rounded-2xl p-5 shadow-2xl">
                         <label className="block text-[10px] uppercase text-[#c9a227] mb-4 font-bold flex items-center gap-2"><Layers size={14} /> Medidas</label>
-                        
+
                         <div className="space-y-1 mb-4">
                             <span className="text-[9px] text-gray-500 font-bold uppercase">Ambiente / Identificação</span>
-                            <input 
-                                type="text" 
-                                value={labelIn} 
-                                onChange={(e) => setLabelIn(e.target.value)} 
-                                className="w-full bg-[#040811] border border-white/10 rounded-xl p-3 text-sm outline-none focus:border-[#c9a227]/50" 
+                            <input
+                                type="text"
+                                value={labelIn}
+                                onChange={(e) => setLabelIn(e.target.value)}
+                                className="w-full bg-[#040811] border border-white/10 rounded-xl p-3 text-sm outline-none focus:border-[#c9a227]/50"
                                 placeholder="Ex: Sala, Varanda..."
                             />
                         </div>
@@ -988,6 +1153,16 @@ self.onmessage = (e) => {
                                                 className="w-28 bg-[#040811] text-red-400 border border-red-500/30 rounded-lg pl-8 pr-2 py-1.5 text-sm text-right font-bold outline-none"
                                             />
                                         </div>
+                                        <button
+                                            onClick={() => setCompensarPerdas(!compensarPerdas)}
+                                            className={`p-2 rounded-lg border transition-all flex items-center gap-1.5 h-[34px] ${compensarPerdas ? 'bg-green-500/20 border-green-500/50 text-green-400' : 'bg-white/5 border-white/10 text-gray-500 hover:text-white'}`}
+                                            title="Compensar perdas (Adiciona o excedente até 100% de eficiência)"
+                                        >
+                                            <Scissors size={14} />
+                                            <span className="text-[9px] font-bold uppercase whitespace-nowrap">
+                                                {compensarPerdas ? `+${100 - eficiencia}%` : 'Perdas'}
+                                            </span>
+                                        </button>
                                     </div>
                                     <div className="flex gap-2 w-full sm:w-auto">
                                         <button onClick={salvarNoHistorico} className="flex-1 flex items-center justify-center gap-2 bg-[#c9a227]/10 border border-[#c9a227]/30 text-[#c9a227] px-3 py-2.5 rounded-xl font-bold uppercase text-[9px] hover:bg-[#c9a227]/20 transition-all">
@@ -1003,54 +1178,125 @@ self.onmessage = (e) => {
                                 </div>
                             </div>
 
-                            <div className="flex bg-[#0a1628] border border-white/10 p-1.5 rounded-xl shadow-2xl mb-4 w-full max-w-sm ml-auto mr-auto md:mr-0">
-                                <button onClick={() => setModoOtimizacao('densidade')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${modoOtimizacao === 'densidade' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}>Corte Densidade</button>
-                                <button onClick={() => setModoOtimizacao('facilidade')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${modoOtimizacao === 'facilidade' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}>Corte Fácil</button>
+                            <div className="flex items-center gap-2 mb-4 w-full">
+                                <div className="flex bg-[#0a1628] border border-white/10 p-1.5 rounded-xl shadow-2xl flex-1 max-w-sm ml-auto">
+                                    <button onClick={() => setModoOtimizacao('densidade')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${modoOtimizacao === 'densidade' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}>Corte Densidade</button>
+                                    <button onClick={() => setModoOtimizacao('facilidade')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${modoOtimizacao === 'facilidade' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}>Corte Fácil</button>
+                                </div>
+                                {hasCustomOrder && (
+                                    <button
+                                        onClick={resetOrdem}
+                                        className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-wider bg-orange-500/20 border border-orange-500/40 text-orange-400 hover:bg-orange-500/30 transition-all"
+                                        title="Resetar ordem para o padrão otimizado"
+                                    >
+                                        <RefreshCw size={13} /> Reset Ordem
+                                    </button>
+                                )}
                             </div>
 
                             <div className="admin-entrance bg-[#111827] border border-white/10 rounded-xl overflow-hidden shadow-2xl relative min-h-[500px]">
                                 <div className="absolute top-0 left-0 w-full bg-[#1f2937] text-gray-400 text-[10px] uppercase font-bold flex justify-between px-3 py-1.5 z-10 border-b border-gray-700">
-                                    <span>0cm</span>
+                                    <span className="flex items-center gap-2">
+                                        0cm
+                                        {isDragging && <span className="text-blue-400 text-[9px] normal-case">· arraste para reordenar</span>}
+                                    </span>
                                     <span className="flex items-center gap-2">
                                         {isCalculating && <span className="w-2 h-2 rounded-full bg-[#c9a227] animate-pulse inline-block" title="Calculando..." />}
                                         Rolo: {rollW}cm
                                     </span>
                                 </div>
                                 <div className="w-full h-full overflow-y-auto p-4 pt-10">
-                                    <div ref={containerRef} className="relative mx-auto bg-white/5 shadow-inner" style={{ width: '100%', maxWidth: '100%', height: `${(maxY / rollW) * containerWidth}px` }}>
-                                        <div className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: `${10 * (containerWidth / rollW)}px ${10 * (containerWidth / rollW)}px` }} />
+                                    <div
+                                        ref={containerRef}
+                                        className="relative mx-auto bg-white/5 shadow-inner"
+                                        style={{
+                                            width: '100%',
+                                            maxWidth: '100%',
+                                            height: `${(maxY / rollW) * containerWidth + 40}px`,
+                                            userSelect: 'none',
+                                        }}
+                                    >
+                                        <div className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: `${10 * scale}px ${10 * scale}px` }} />
                                         {blocosCalculados.map((b) => {
                                             if (!b.fit) return null;
                                             const isSelected = selectedIds.includes(b.id);
+                                            const isDraggingThis = dragId === b.id;
+                                            const isDropTarget = dropTargetId === b.id;
+
+                                            // The ghost stays at worker position; the floating clone follows cursor
+                                            const pos = b.fit;
+
                                             return (
-                                                <div
-                                                    key={b.id}
-                                                    onClick={() => toggleSelection(b.id)}
-                                                    className="absolute flex flex-col items-center justify-center text-black font-bold shadow-sm cursor-pointer transition-all duration-200"
-                                                    style={{
-                                                        left: b.fit.x * (containerWidth / rollW),
-                                                        top: b.fit.y * (containerWidth / rollW),
-                                                        width: (b.w - margin) * (containerWidth / rollW),
-                                                        height: ((b.h_visual || b.h) - margin) * (containerWidth / rollW),
-                                                        background: b.cor,
-                                                        fontSize: '8px',
-                                                        border: isSelected ? '2px solid #3b82f6' : '1px solid rgba(0,0,0,0.3)',
-                                                        boxShadow: isSelected ? '0 0 15px rgba(59,130,246,0.8)' : 'none',
-                                                        zIndex: isSelected ? 20 : 10,
-                                                        transform: isSelected ? 'scale(1.02)' : 'scale(1)'
-                                                    }}
-                                                >
-                                                    {/* Identificação do Ambiente */}
-                                                    {b.label && (
-                                                        <span className="text-[7px] font-black uppercase tracking-tighter mb-1 truncate w-full px-0.5 text-center opacity-70">
-                                                            {b.label}
-                                                        </span>
+                                                <React.Fragment key={b.id}>
+                                                    {/* Ghost placeholder — shown at original position while dragging */}
+                                                    <div
+                                                        onMouseDown={(e) => handleDragStart(e, b)}
+                                                        onTouchStart={(e) => handleDragStart(e, b)}
+                                                        onClick={() => { if (!isDragging) toggleSelection(b.id); }}
+                                                        className="absolute flex flex-col items-center justify-center text-black font-bold"
+                                                        style={{
+                                                            left: pos.x * scale,
+                                                            top: pos.y * scale,
+                                                            width: (b.w - margin) * scale,
+                                                            height: ((b.h_visual || b.h) - margin) * scale,
+                                                            background: isDraggingThis ? 'rgba(255,255,255,0.05)' : b.cor,
+                                                            fontSize: '8px',
+                                                            border: isDraggingThis
+                                                                ? '2px dashed rgba(255,255,255,0.2)'
+                                                                : isDropTarget
+                                                                    ? '2px solid #f97316'
+                                                                    : isSelected
+                                                                        ? '2px solid #3b82f6'
+                                                                        : '1px solid rgba(0,0,0,0.3)',
+                                                            boxShadow: isDropTarget
+                                                                ? '0 0 20px rgba(249,115,22,0.5)'
+                                                                : isSelected
+                                                                    ? '0 0 15px rgba(59,130,246,0.8)'
+                                                                    : 'none',
+                                                            zIndex: isDraggingThis ? 1 : isSelected ? 20 : 10,
+                                                            cursor: isDraggingThis ? 'grabbing' : 'grab',
+                                                            transition: isDraggingThis ? 'none' : 'all 0.25s cubic-bezier(0.34,1.56,0.64,1)',
+                                                            touchAction: 'none',
+                                                            opacity: isDraggingThis ? 0.3 : 1,
+                                                        }}
+                                                    >
+                                                        <GripVertical size={10} className="absolute top-0.5 right-0.5 opacity-20" />
+                                                        {!isDraggingThis && b.label && (
+                                                            <span className="text-[7px] font-black uppercase tracking-tighter mb-1 truncate w-full px-0.5 text-center opacity-70">{b.label}</span>
+                                                        )}
+                                                        {!isDraggingThis && <>
+                                                            <span className="text-[9px] font-black">{Math.round(b.rw)}</span>
+                                                            <div className="w-1/2 h-px bg-black/10 my-0.5" />
+                                                            <span className="text-[9px] font-black">{Math.round(b.rh)}</span>
+                                                        </>}
+                                                    </div>
+
+                                                    {/* Floating clone — follows cursor during drag */}
+                                                    {isDraggingThis && dragVisualPos && (
+                                                        <div
+                                                            className="absolute flex flex-col items-center justify-center text-black font-bold pointer-events-none"
+                                                            style={{
+                                                                left: dragVisualPos.x,
+                                                                top: dragVisualPos.y,
+                                                                width: (b.w - margin) * scale,
+                                                                height: ((b.h_visual || b.h) - margin) * scale,
+                                                                background: b.cor,
+                                                                fontSize: '8px',
+                                                                border: '2px solid rgba(0,0,0,0.4)',
+                                                                boxShadow: '0 16px 48px rgba(0,0,0,0.6)',
+                                                                zIndex: 50,
+                                                                transform: 'rotate(2deg) scale(1.06)',
+                                                                opacity: 0.95,
+                                                                borderRadius: '3px',
+                                                            }}
+                                                        >
+                                                            {b.label && <span className="text-[7px] font-black uppercase tracking-tighter mb-1 truncate w-full px-0.5 text-center opacity-70">{b.label}</span>}
+                                                            <span className="text-[9px] font-black">{Math.round(b.rw)}</span>
+                                                            <div className="w-1/2 h-px bg-black/10 my-0.5" />
+                                                            <span className="text-[9px] font-black">{Math.round(b.rh)}</span>
+                                                        </div>
                                                     )}
-                                                    
-                                                    <span className="text-[9px] font-black">{Math.round(b.rw)}</span>
-                                                    <div className="w-1/2 h-px bg-black/10 my-0.5" />
-                                                    <span className="text-[9px] font-black">{Math.round(b.rh)}</span>
-                                                </div>
+                                                </React.Fragment>
                                             );
                                         })}
                                     </div>
@@ -1061,10 +1307,7 @@ self.onmessage = (e) => {
                 </div>
             </div>
 
-            {/* ════════════════════════════════════════════════════════════════════
-                INVOICE OCULTO — Dark Premium · Largura 390px (1 tela de celular)
-                Hierarquia brutal: marca → cliente → peças → valor enorme
-            ════════════════════════════════════════════════════════════════════ */}
+            {/* INVOICE OCULTO */}
             <div className="fixed top-[-10000px] left-0 pointer-events-none">
                 <div
                     ref={invoiceRef}
@@ -1078,11 +1321,9 @@ self.onmessage = (e) => {
                         position: 'relative',
                     }}
                 >
-                    {/* Glows decorativos */}
                     <div style={{ position: 'absolute', top: '-80px', right: '-60px', width: '240px', height: '240px', background: 'radial-gradient(circle, rgba(201,162,39,0.15) 0%, transparent 65%)', borderRadius: '50%', pointerEvents: 'none' }} />
                     <div style={{ position: 'absolute', bottom: '-60px', left: '-40px', width: '180px', height: '180px', background: 'radial-gradient(circle, rgba(16,185,129,0.10) 0%, transparent 65%)', borderRadius: '50%', pointerEvents: 'none' }} />
 
-                    {/* ── MARCA ── */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '18px', width: '100%' }}>
                         <div style={{ flexShrink: 0 }}>
                             <div style={{ fontSize: '32px', fontWeight: '900', letterSpacing: '-2px', lineHeight: 1, color: '#ffffff' }}>LUME</div>
@@ -1094,19 +1335,11 @@ self.onmessage = (e) => {
                         </div>
                     </div>
 
-                    {/* ── FAIXA DOURADA ── */}
                     <div style={{ height: '2px', background: 'linear-gradient(90deg, #c9a227 0%, rgba(201,162,39,0.2) 60%, transparent 100%)', marginBottom: '18px', borderRadius: '2px' }} />
 
-                    {/* ── CLIENTE ── */}
                     <div style={{ marginBottom: '16px', width: '100%' }}>
                         <div style={{ fontSize: '7.5px', fontWeight: '800', color: '#374151', textTransform: 'uppercase', letterSpacing: '3px', marginBottom: '4px' }}>Para</div>
-                        <div style={{
-                            fontSize: '16px',
-                            fontWeight: '900',
-                            color: '#ffffff',
-                            letterSpacing: '-0.3px',
-                            lineHeight: 1.3,
-                        }}>
+                        <div style={{ fontSize: '16px', fontWeight: '900', color: '#ffffff', letterSpacing: '-0.3px', lineHeight: 1.3 }}>
                             {cliente || 'Consumidor Final'}
                         </div>
                         <div style={{ fontSize: '9px', fontWeight: '600', color: '#4b5563', marginTop: '2px' }}>
@@ -1114,7 +1347,6 @@ self.onmessage = (e) => {
                         </div>
                     </div>
 
-                    {/* ── PEÇAS ── */}
                     <div style={{ marginBottom: '18px', width: '100%' }}>
                         <div style={{ fontSize: '7.5px', fontWeight: '800', color: '#374151', textTransform: 'uppercase', letterSpacing: '3px', marginBottom: '8px' }}>
                             Itens · {vidros.length} peça{vidros.length !== 1 ? 's' : ''}
@@ -1132,7 +1364,6 @@ self.onmessage = (e) => {
                                     overflow: 'hidden',
                                     minWidth: 0,
                                 }}>
-                                    {/* Badge quantidade */}
                                     <div style={{
                                         background: '#c9a227',
                                         color: '#000000',
@@ -1144,7 +1375,6 @@ self.onmessage = (e) => {
                                         textAlign: 'center',
                                         flexShrink: 0,
                                     }}>{r.q}x</div>
-                                    {/* Medidas */}
                                     <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
                                         <div style={{ fontSize: '13px', fontWeight: '800', color: '#e2e8f0', letterSpacing: '-0.5px', lineHeight: 1, overflow: 'hidden' }}>
                                             {Math.round(r.h)}<span style={{ color: '#4b5563', fontSize: '11px', margin: '0 1px' }}>×</span>{Math.round(r.w)}
@@ -1161,10 +1391,8 @@ self.onmessage = (e) => {
                         </div>
                     </div>
 
-                    {/* ── SEPARADOR ── */}
                     <div style={{ height: '1px', background: 'rgba(255,255,255,0.06)', marginBottom: '18px' }} />
 
-                    {/* ── VALOR PRINCIPAL ── */}
                     <div style={{
                         background: 'linear-gradient(135deg, rgba(201,162,39,0.10) 0%, rgba(16,185,129,0.06) 100%)',
                         border: '1px solid rgba(201,162,39,0.22)',
@@ -1175,10 +1403,8 @@ self.onmessage = (e) => {
                         width: '100%',
                         boxSizing: 'border-box',
                     }}>
-                        {/* Detalhe de canto */}
                         <div style={{ position: 'absolute', top: 0, right: 0, width: '80px', height: '80px', background: 'radial-gradient(circle at top right, rgba(201,162,39,0.12), transparent 70%)', pointerEvents: 'none' }} />
 
-                        {/* Subtotal e desconto (só se houver desconto) */}
                         {desconto > 0 && (
                             <div style={{ marginBottom: '10px' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
@@ -1193,12 +1419,10 @@ self.onmessage = (e) => {
                             </div>
                         )}
 
-                        {/* Rótulo total */}
                         <div style={{ fontSize: '8px', fontWeight: '800', color: '#c9a227', textTransform: 'uppercase', letterSpacing: '3px', marginBottom: '5px', marginTop: desconto > 0 ? '8px' : '0' }}>
                             Total à Vista
                         </div>
 
-                        {/* Valor grande */}
                         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', width: '100%', gap: '8px' }}>
                             <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', flexShrink: 1, minWidth: 0 }}>
                                 <div style={{ fontSize: '30px', fontWeight: '900', color: '#10b981', letterSpacing: '-1.5px', lineHeight: 1.1 }}>
@@ -1223,7 +1447,6 @@ self.onmessage = (e) => {
                         </div>
                     </div>
 
-                    {/* ── RODAPÉ ── */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <span style={{ fontSize: '8px', color: '#1f2937', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
                             Válido por 7 dias
@@ -1239,7 +1462,6 @@ self.onmessage = (e) => {
                 2026 - lume controle solar - todos os direitos reservados
             </div>
 
-            {/* TOAST */}
             {showSaveToast && (
                 <div className="fixed top-20 left-1/2 transform -translate-x-1/2 bg-green-500 text-black font-black text-xs uppercase px-6 py-3 rounded-full shadow-[0_0_40px_rgba(34,197,94,0.4)] z-[100] animate-bounce">
                     Orçamento salvo no histórico!
