@@ -20,6 +20,8 @@ export function NanoCeramicaPage() {
             <Helmet>
                 <title>Insulfilm Nano Cerâmica Premium RJ | Redução de Calor em Bangu - LUME</title>
                 <meta name="description" content="Conheça o Insulfilm Nano Cerâmica Premium da LUME. Máxima redução de calor sem escurecer os vidros. Atendimento especializado em Bangu e Zona Oeste RJ." />
+                <link rel="canonical" href="https://lumecontrolesolar.com.br/nano-ceramica" />
+
                 
                 <script type="application/ld+json">
                     {`

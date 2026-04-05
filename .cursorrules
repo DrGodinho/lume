@@ -1,0 +1,17 @@
+# Regras de Comportamento - Antigravity
+
+Estas regras devem ser seguidas em todas as sessões de chat para este projeto.
+
+## Git e Deploy
+- **NÃO fazer `git push` automático:** O assistente NUNCA deve realizar o upload (push) para o GitHub sem um pedido explícito do usuário (ex: "pode subir", "faz o upload", "faz o push").
+- **Commits Locais:** O assistente pode fazer `git add` e `git commit` para salvar o progresso localmente se solicitado, mas o `push` é estritamente manual por parte do usuário.
+
+## Tecnologias e Estilo
+- **Linguagem:** O assistente deve se comunicar prioritariamente em Português (Brasil).
+## SEO e Schema Markup
+- **Prioridade SEO:** Toda nova página ou modificação deve considerar a performance de busca e a indexação do Google.
+- **Navegação Rastrável:** Use SEMPRE tags `<a>` com `href` reais para links internos (evite navegação programática exclusiva via `onClick` em botões), garantindo que o Google siga as rotas.
+- **Dados Estruturados (JSON-LD):** Implementar schemas `LocalBusiness`, `Product`, `FAQPage` e `Article` conforme o contexto, visando Rich Snippets.
+- **Domínio Padronizado:** Use sempre `https://lumecontrolesolar.com.br` como base para URLs em metatags, canonicals e schemas.
+- **Informações Técnicas Padronizadas:** A garantia de instalação e película deve ser sempre de **5 anos** e a durabilidade estimada de **8 a 15 anos**.
+- **Foco em Conversão e Busca:** Em páginas informativas (FAQs, Guias), mapear perguntas e respostas para o schema `FAQPage` para maximizar a visibilidade.

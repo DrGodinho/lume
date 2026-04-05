@@ -20,6 +20,8 @@ export function JateadoPage() {
             <Helmet>
                 <title>Película Jateada RJ | Privacidade com Elegância - LUME</title>
                 <meta name="description" content="Película Jateada (Fosca) no Rio de Janeiro. A solução perfeita para divisórias de escritório, portas e banheiros. Privacidade total mantendo 85% da luz." />
+                <link rel="canonical" href="https://lumecontrolesolar.com.br/jateado" />
+
                 
                 <script type="application/ld+json">
                     {`

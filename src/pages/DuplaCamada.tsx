@@ -20,6 +20,8 @@ export function DuplaCamadaPage() {
             <Helmet>
                 <title>Insulfilm Dupla Camada RJ (G5 e G20) | Fim do Calor em Bangu - LUME</title>
                 <meta name="description" content="Insulfilm Dupla Camada G5 e G20 no Rio de Janeiro. A solução definitiva com arquitetura metalizada para até 95% de bloqueio de calor. Especialistas em Bangu." />
+                <link rel="canonical" href="https://lumecontrolesolar.com.br/dupla-camada" />
+
                 
                 <script type="application/ld+json">
                     {`

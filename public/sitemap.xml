@@ -47,6 +47,20 @@
     <priority>0.8</priority>
   </url>
 
+  <url>
+    <loc>https://lumecontrolesolar.com.br/insulfilm-em-realengo</loc>
+    <lastmod>2026-04-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://lumecontrolesolar.com.br/insulfilm-em-campo-grande</loc>
+    <lastmod>2026-04-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- Conteúdo de Apoio -->
   <url>
     <loc>https://lumecontrolesolar.com.br/simulador</loc>

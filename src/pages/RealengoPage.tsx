@@ -8,7 +8,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-export function BanguPage() {
+export function RealengoPage() {
     useEffect(() => {
         // Smooth Scroll Animations for all sections
         const elements = gsap.utils.toArray('.page-entrance');
@@ -33,11 +33,10 @@ export function BanguPage() {
     return (
         <div className="bg-[#070f1a] text-white min-h-screen">
             <Helmet>
-                <title>Insulfilm em Bangu | Aplicação Residencial e Comercial - LUME</title>
-                <meta name="description" content="Instalação de insulfilm em Bangu e região com aplicação profissional. Películas residenciais e comerciais. Controle solar, privacidade e segurança. Orçamento gratuito pelo WhatsApp." />
-                <link rel="canonical" href="https://lumecontrolesolar.com.br/insulfilm-em-bangu" />
+                <title>Insulfilm em Realengo | Aplicação Residencial e Comercial - LUME</title>
+                <meta name="description" content="Instalação de insulfilm em Realengo e região com aplicação profissional em até 24 horas. Películas residenciais e comerciais. Orçamento gratuito pelo WhatsApp." />
+                <link rel="canonical" href="https://lumecontrolesolar.com.br/insulfilm-em-realengo" />
 
-                
                 <script type="application/ld+json">
                     {`
                         {
@@ -45,8 +44,8 @@ export function BanguPage() {
                             "@type": "LocalBusiness",
                             "name": "LUME Películas de Controle Solar",
                             "image": "https://lumecontrolesolar.com.br/novo-logo-lume.png",
-                            "@id": "https://lumecontrolesolar.com.br/insulfilm-em-bangu",
-                            "url": "https://lumecontrolesolar.com.br/insulfilm-em-bangu",
+                            "@id": "https://lumecontrolesolar.com.br/insulfilm-em-realengo",
+                            "url": "https://lumecontrolesolar.com.br/insulfilm-em-realengo",
                             "telephone": "+5521965140612",
                             "priceRange": "$$$",
                             "address": {
@@ -62,8 +61,8 @@ export function BanguPage() {
                                 "latitude": -22.8767,
                                 "longitude": -43.4651
                             },
-                            "areaServed": ["Bangu", "Campo Grande", "Santa Cruz", "Realengo", "Padre Miguel", "Senador Camará", "Zona Oeste RJ"],
-                            "description": "Instalação de insulfilm em Bangu e região com aplicação profissional. Películas residenciais e comerciais. Controle solar, privacidade e segurança."
+                            "areaServed": ["Realengo", "Bangu", "Campo Grande", "Santa Cruz", "Padre Miguel", "Senador Camará", "Zona Oeste RJ"],
+                            "description": "Instalação de insulfilm em Realengo e região com aplicação profissional e rápida (24h). Películas residenciais e comerciais. Controle solar, privacidade e segurança."
                         }
                     `}
                 </script>
@@ -75,18 +74,26 @@ export function BanguPage() {
                             "mainEntity": [
                                 {
                                     "@type": "Question",
-                                    "name": "Quanto custa instalar insulfilm residencial em Bangu?",
+                                    "name": "Quanto custa instalar insulfilm residencial em Realengo?",
                                     "acceptedAnswer": {
                                         "@type": "Answer",
-                                        "text": "O valor varia conforme o tipo de película e metragem. Oferecemos orçamento gratuito via WhatsApp com base nas medidas ou visita técnica no local."
+                                        "text": "O valor varia conforme o tipo de película e metragem. Oferecemos orçamento gratuito via WhatsApp com base nas medidas ou visita técnica em Realengo."
                                     }
                                 },
                                 {
                                     "@type": "Question",
-                                    "name": "Qual o melhor tipo de insulfilm para o calor de Bangu?",
+                                    "name": "Qual o melhor tipo de insulfilm para o calor de Realengo?",
                                     "acceptedAnswer": {
                                         "@type": "Answer",
                                         "text": "Para o calor intenso da Zona Oeste, recomendamos as películas de Nano Cerâmica ou Nano Carbono, que oferecem máxima rejeição de calor infravermelho."
+                                    }
+                                },
+                                {
+                                    "@type": "Question",
+                                    "name": "Qual a velocidade da instalação em Realengo?",
+                                    "acceptedAnswer": {
+                                        "@type": "Answer",
+                                        "text": "Nosso diferencial é a agilidade: realizamos a instalação em Realengo em até 24 horas após a aprovação do orçamento."
                                     }
                                 },
                                 {
@@ -95,14 +102,6 @@ export function BanguPage() {
                                     "acceptedAnswer": {
                                         "@type": "Answer",
                                         "text": "Nossas películas profissionais possuem durabilidade de 8 a 15 anos e oferecemos garantia certificada de 5 anos em todos os serviços."
-                                    }
-                                },
-                                {
-                                    "@type": "Question",
-                                    "name": "Atendem condomínios e empresas em Bangu?",
-                                    "acceptedAnswer": {
-                                        "@type": "Answer",
-                                        "text": "Sim. Atendemos residências em condomínios, lojas, clínicas e escritórios em toda a região de Bangu e Zona Oeste."
                                     }
                                 }
                             ]
@@ -122,25 +121,25 @@ export function BanguPage() {
 
                 <div className="container-lume relative z-10 page-entrance text-center md:text-left">
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#c9a227]/10 border border-[#c9a227]/30 mb-6">
-                        <span className="text-[#c9a227] text-sm font-bold uppercase tracking-wider">Zona Oeste do Rio de Janeiro</span>
+                        <span className="text-[#c9a227] text-sm font-bold uppercase tracking-wider">Zona Oeste / Realengo RJ</span>
                     </div>
 
                     <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-['Montserrat'] mb-6 leading-tight">
-                        Insulfilm em <span className="text-gradient-gold">Bangu</span>
+                        Insulfilm em <span className="text-gradient-gold">Realengo</span>
                     </h1>
 
                     <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto md:mx-0 mb-10 leading-relaxed font-light">
-                        Aplicação profissional de películas de controle solar para residências e empresas em Bangu e toda a região da Zona Oeste. Proteção contra o calor intenso e privacidade garantida.
+                        Aplicação profissional de películas de controle solar em Realengo. Proteção contra o calor extremo, privacidade absoluta e <strong>instalação rápida em até 24 horas</strong>.
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
                         <a
-                            href="https://wa.me/5521965140612?text=Olá! Quero um orçamento de insulfilm em Bangu."
+                            href="https://wa.me/5521965140612?text=Olá! Quero um orçamento gratuito de insulfilm em Realengo."
                             target="_blank"
                             rel="noopener noreferrer"
                             className="btn-primary inline-flex items-center justify-center gap-3 text-lg py-4 px-8"
                         >
-                            Pedir Orçamento pelo WhatsApp <ArrowRight size={20} />
+                            Orçamento Gratuito no WhatsApp <ArrowRight size={20} />
                         </a>
                         <a
                             href="#tipos"
@@ -160,7 +159,7 @@ export function BanguPage() {
                         <span className="hidden lg:inline opacity-30">•</span>
                         <span className="flex items-center gap-2"><Sun size={18} /> 99% bloqueio de raios UV</span>
                         <span className="hidden lg:inline opacity-30">•</span>
-                        <span className="flex items-center gap-2"><Shield size={18} /> 8 a 15 anos de durabilidade</span>
+                        <span className="flex items-center gap-2"><Shield size={18} /> Durabilidade de 8 a 15 anos</span>
                         <span className="hidden lg:inline opacity-30">•</span>
                         <span className="flex items-center gap-2"><CheckCircle size={18} /> Garantia de 5 anos Lume</span>
                     </div>
@@ -172,36 +171,36 @@ export function BanguPage() {
                 <div className="container-lume page-entrance">
                     <div className="flex flex-wrap justify-center gap-8 text-sm text-gray-400 font-medium">
                         <div className="flex items-center gap-2"><CheckCircle size={16} className="text-[#c9a227]" /> Orçamento gratuito e sem compromisso</div>
-                        <div className="flex items-center gap-2"><CheckCircle size={16} className="text-[#c9a227]" /> Atendimento em todos os bairros da Zona Oeste</div>
+                        <div className="flex items-center gap-2"><CheckCircle size={16} className="text-[#c9a227]" /> Atendimento local em Realengo</div>
                         <div className="flex items-center gap-2"><CheckCircle size={16} className="text-[#c9a227]" /> Películas de procedência certificada</div>
-                        <div className="flex items-center gap-2"><CheckCircle size={16} className="text-[#c9a227]" /> Sem sujeira ou danos ao vidro</div>
+                        <div className="flex items-center gap-2"><CheckCircle size={16} className="text-[#c9a227]" /> Rapidez total: Instalado em 24h</div>
                     </div>
                 </div>
             </section>
 
-            {/* O problema do Calor em Bangu - Texto Completo */}
+            {/* O problema do Calor em Realengo - Texto Completo */}
             <section className="py-24 bg-[#070f1a] relative px-4">
                 <div className="container-lume page-entrance">
                     <div className="max-w-4xl mx-auto text-center mb-16">
-                        <h2 className="text-3xl lg:text-5xl font-bold font-['Montserrat'] mb-10">O calor da Zona Oeste é diferente</h2>
+                        <h2 className="text-3xl lg:text-5xl font-bold font-['Montserrat'] mb-10">Realengo merece conforto térmico</h2>
                         <div className="space-y-6 text-gray-400 leading-relaxed text-lg font-light text-left md:text-justify px-4">
                             <p>
-                                Quem mora em Bangu sabe: o verão carioca é especialmente implacável na Zona Oeste. Enquanto a Zona Sul conta com a brisa do mar, bairros como Bangu, Campo Grande e Realengo acumulam calor ao longo do dia, transformando casas e apartamentos em verdadeiros fornos — mesmo com as janelas fechadas.
+                                Quem frequenta ou reside em <strong>Realengo</strong> conhece o desafio: as temperaturas da Zona Oeste atingem patamares críticos durante o verão. Sem a proteção correta, as superfícies de vidro da sua casa ou loja atuam como condutores, aprisionando o calor e tornando o ambiente exaustivo.
                             </p>
                             <p>
-                                A radiação solar penetra pelos vidros das janelas, portas e varandas, elevando a temperatura interna em vários graus. O resultado é o uso excessivo de ar-condicionado, contas de luz cada vez mais altas e um desconforto constante para toda a família. O insulfilm residencial atua diretamente nesse ponto: ele cria uma barreira técnica sobre o vidro que rejeita o calor antes mesmo que ele entre no seu ambiente.
+                                A radiação solar que entra pelas janelas e fachadas em Realengo não apenas aumenta a temperatura, como também causa o desbotamento acelerado de pisos e móveis. Na <strong>Lume Controle Solar</strong>, oferecemos um diferencial exclusivo para a região: o <strong>orçamento gratuito via WhatsApp</strong> e a <strong>instalação rápida em 24 horas</strong>, garantindo que você não precise esperar para ter o frescor que merece.
                             </p>
                             <p>
-                                Na <strong className="text-white">Lume Controle Solar</strong>, atendemos Bangu e toda a região da Zona Oeste com instalação local. Avaliamos pessoalmente o ambiente, indicamos a película ideal para cada situação (varandas, janelas, portas de entrada) e realizamos a aplicação com acabamento impecável, garantindo que você recupere o conforto térmico da sua residência sem perder a beleza estética.
+                                Trabalhamos com tecnologias avançadas que criam um escudo invisível contra o calor. Seja em residências próximas à Castelo Branco ou comércios no centro de Realengo, nossa equipe está pronta para realizar uma aplicação profissional, limpa e duradoura, restabelecendo o conforto térmico e a privacidade da sua família imediatamente.
                             </p>
                         </div>
                     </div>
 
                     <div className="glass-card p-10 rounded-3xl border border-white/10 relative overflow-hidden max-w-4xl mx-auto">
                         <div className="absolute top-0 left-0 w-32 h-32 bg-[#c9a227] blur-[100px] opacity-10" />
-                        <h3 className="text-2xl font-bold font-['Montserrat'] text-center mb-8">Atendimento Residencial ou Comercial?</h3>
+                        <h3 className="text-2xl font-bold font-['Montserrat'] text-center mb-8">Especialistas em Realengo e Região</h3>
                         <p className="text-gray-400 leading-relaxed text-center max-w-3xl mx-auto font-light text-lg">
-                            Focamos exclusivamente no atendimento a imóveis (Arquitetônico). Para casas e apartamentos, as películas de controle solar são a solução mais econômica e eficaz para enfrentar o clima do Rio. No setor comercial — lojas, escritórios, clínicas e salões — as películas trazem conforto imediato para clientes e funcionários, além de valorizar significativamente a fachada e proteger seus produtos e mobiliário da exposição direta ao sol.
+                            Focamos no atendimento personalizado para casas, apartamentos e comércios em Realengo. Ao contrário de empresas de grande escala, valorizamos o atendimento local, a agilidade na instalação (em até 24h) e o compromisso com películas que realmente suportam a radiação UV intensa do nosso bairro sem desbotar.
                         </p>
                     </div>
                 </div>
@@ -215,7 +214,7 @@ export function BanguPage() {
                             Películas de <span className="text-gradient-gold">Alta Performance</span>
                         </h2>
                         <p className="text-gray-400 max-w-2xl mx-auto font-light text-lg">
-                            Conheça as principais opções tecnológicas que trabalhamos e descubra qual resolve o seu problema de calor ou privacidade.
+                            Soluções rápidas e eficazes para o seu problema de calor ou privacidade em Realengo.
                         </p>
                     </div>
 
@@ -223,23 +222,23 @@ export function BanguPage() {
                         {[
                             {
                                 title: "Nano Cerâmica", selo: "Top de Linha", icon: Star, image: "/product-nano-ceramica.jpg", path: "/nano-ceramica",
-                                desc: "A linha de maior performance do mercado. A película nano cerâmica rejeita até 95% do calor infravermelho sem precisar escurecer o ambiente, mantendo os vidros transparentes e a luminosidade natural preservada. Ideal para salas, varandas gourmet e escritórios que precisam de máximo controle térmico sem perder a claridade."
+                                desc: "Rejeição térmica de até 95% do infravermelho sem escurecer o vidro. Ideal para varandas e salas em Realengo que precisam de frescor mantendo a claridade total."
                             },
                             {
-                                title: "Carbono Premium", selo: "Best-Seller", icon: SunDim, image: "/product-carbono.jpg", path: "/carbono",
-                                desc: "Película fumê fabricada a partir de nano carbono. Combina um visual elegante e escurecido com excelente rejeição térmica (até 80%). Disponível nas tonalidades G20 e G5, o Carbono é o mais escolhido em Bangu para janelas e portas que precisam de privacidade total durante o dia sem desbotar como as películas baratas."
+                                title: "Carbono Premium", selo: "Privacidade", icon: SunDim, image: "/product-carbono.jpg", path: "/carbono",
+                                desc: "O tom grafite perfeito que não desbota. Oferece privacidade absoluta e excelente redução de calor para as janelas da sua residência ou escritório."
                             },
                             {
-                                title: "Espelhado / Refletivo", selo: "Privacidade", icon: Sun, image: "/product-refletiva.jpg", path: "/refletiva",
-                                desc: "A escolha certa para quem quer privacidade total durante o dia com um visual moderno na fachada. Reflete a luz solar externamente, reduzindo drasticamente a temperatura e bloqueando a visão de fora para dentro enquanto houver mais iluminação externa. Muito utilizada em clínicas, lojas e fachadas comerciais."
+                                title: "Espelhado / Refletivo", selo: "Proteção Solar", icon: Sun, image: "/product-refletiva.jpg", path: "/refletiva",
+                                desc: "A tecnologia clássica de rejeição solar agressiva. O efeito espelhado atua como um escudo, devolvendo o calor para fora antes que ele aqueça sua sala."
                             },
                             {
-                                title: "Jateado / Fosco", selo: "Decoração", icon: Eye, image: "/product-jateado-v2.png", path: "/jateado",
-                                desc: "Solução ideal para banheiros, portas de vidro, divisórias e cozinhas que precisam de privacidade total sem perder luminosidade. O efeito fosco simula o vidro jateado com um custo muito menor, permitindo um acabamento sofisticado e fácil limpeza para ambientes internos."
+                                title: "Jateado / Fosco", selo: "Estética", icon: Eye, image: "/product-jateado-v2.png", path: "/jateado",
+                                desc: "Privacidade bidirecional com acabamento fosco elegante. Perfeito para banheiros, divisórias e portas de entrada em Realengo."
                             },
                             {
                                 title: "Dupla Camada", selo: "Favorito", icon: Droplets, image: "/product-smoke.jpg", path: "/dupla-camada",
-                                desc: "Alta redução de calor com uma tecnologia especial: camada refletiva externa para máxima redução de calor e camada fumê interna para uma visão relaxante. Diferente das películas comuns, reduz o reflexo interno à noite. Excelente custo-benefício para enfrentar o sol de Bangu."
+                                desc: "Alta redução de calor com uma tecnologia especial: camada refletiva externa para máxima redução de calor e camada fumê interna para uma visão relaxante. Diferente das películas comuns, reduz o reflexo interno à noite. Perfeito para casas e apartamentos em Realengo."
                             }
                         ].map((product, idx) => (
                             <div key={idx} className="group relative bg-gradient-to-b from-[#1a3a5c]/60 to-[#0a1628]/90 rounded-2xl overflow-hidden border border-[#1a3a5c]/50 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 flex flex-col h-full">
@@ -271,12 +270,12 @@ export function BanguPage() {
 
                                 <div className="p-6 pt-0">
                                     <a
-                                        href={`https://wa.me/5521965140612?text=Olá! Quero saber sobre a película ${product.title} em Bangu.`}
+                                        href={`https://wa.me/5521965140612?text=Olá! Quero um orçamento gratuito da película ${product.title} em Realengo.`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="w-full py-3.5 rounded-xl bg-[#111e33] hover:bg-[#c9a227] text-gray-300 hover:text-[#0a1628] text-xs font-bold uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-3 border border-white/5"
                                     >
-                                        Quero Orçamento <ArrowRight size={14} />
+                                        Orçamento Grátis <ArrowRight size={14} />
                                     </a>
                                 </div>
                             </div>
@@ -289,27 +288,27 @@ export function BanguPage() {
             <section className="py-24 relative px-4 bg-[#070f1a] overflow-hidden">
                 <div className="container-lume page-entrance">
                     <div className="text-center mb-20">
-                        <h2 className="text-3xl lg:text-5xl font-black font-['Montserrat'] mb-6 tracking-tight">Vantagens que Valorizam seu Ambiente</h2>
-                        <p className="text-gray-400 max-w-3xl mx-auto text-lg font-light">Investir em películas de controle solar é garantir conforto imediato e economia a longo prazo para seu patrimônio.</p>
+                        <h2 className="text-3xl lg:text-5xl font-black font-['Montserrat'] mb-6 tracking-tight">O Diferencial LUME em Realengo</h2>
+                        <p className="text-gray-400 max-w-3xl mx-auto text-lg font-light">Mais que estética, entregamos performance térmica e rapidez real no atendimento.</p>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                         {[
                             {
-                                icon: Thermometer, title: "Redução de Calor", stat: "-8°C", label: "Na Temperatura",
-                                desc: "Películas premium rejeitam até 80% do calor solar direto, mantendo o ambiente muito mais fresco inclusive em Bangu."
+                                icon: Thermometer, title: "Fim do Calor", stat: "-8°C", label: "Na Temperatura",
+                                desc: "Rejeição brutal do calor solar, poupando seu ar-condicionado mesmo nos dias mais quentes de Realengo."
                             },
                             {
-                                icon: SunDim, title: "Proteção UV 99%", stat: "99%", label: "De Bloqueio",
-                                desc: "Proteja sua pele da radiação e evite o desbotamento rápido de pisos, móveis, cortinas e eletrônicos."
+                                icon: SunDim, title: "Zero Desbotamento", stat: "99%", label: "Bloqueio UV",
+                                desc: "Proteção total para seus pisos de madeira, sofás e cortinas contra a radiação solar destruidora."
                             },
                             {
-                                icon: PiggyBank, title: "Economia de Energia", stat: "30%", label: "Menos Luz",
-                                desc: "Menos uso de ar-condicionado significa contas mensais menores e menos desgaste do seu sistema de climatização."
+                                icon: PiggyBank, title: "Economia Real", stat: "30%", label: "Menos Energia",
+                                desc: "Ambientes mais frescos exigem menos potência do ar-condicionado, reduzindo sua conta de luz mensalmente."
                             },
                             {
-                                icon: Lock, title: "Segurança e Garantia", stat: "15", label: "Anos Durabilidade",
-                                desc: "Filmes de alta resistência com durabilidade entre 8 a 15 anos e garantia certificada de 5 anos pela Lume."
+                                icon: Lock, title: "Instalação 24h", stat: "24", label: "Horas p/ Instalar",
+                                desc: "Orçamento gratuito e instalação express em até 24 horas em qualquer endereço de Realengo."
                             }
                         ].map((benefit, idx) => (
                             <div key={idx} className="group relative p-10 rounded-2xl bg-gradient-to-b from-[#1a3a5c]/40 to-[#0d1f3c]/60 border border-[#1a3a5c]/30 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 text-center lg:text-left flex flex-col">
@@ -345,25 +344,25 @@ export function BanguPage() {
                         
                         <div className="space-y-6 text-gray-400 leading-relaxed text-lg font-light text-center lg:text-justify mb-16 px-4 md:px-0">
                             <p>
-                                A Zona Oeste do Rio de Janeiro — que inclui Bangu, Campo Grande, Santa Cruz e Realengo — é uma das regiões que mais crescem na capital. Com esse crescimento, surge também a demanda por soluções inteligentes que melhorem a qualidade de vida nos imóveis residenciais e locais de trabalho.
+                                Nossa atuação em Realengo e adjacências foca em resolver problemas reais de insolação. Com a expansão imobiliária na região, muitas novas casas e apartamentos são entregues com grandes vãos de vidro que, embora bonitos, tornam-se o principal vilão do conforto térmico.
                             </p>
                             <p>
-                                O insulfilm em Bangu tornou-se popular não apenas como medida de conforto térmico, mas também de segurança e economia. Moradores de condomínios fechados e donos de comércios na Estrada do Mendanha, Rua Fonseca e Largo do Bangu buscam películas profissionais que suportem a exposição solar contínua típica da região, sem bolhas ou desbotamento.
+                                O insulfilm em Realengo é a solução de melhor custo-benefício para quem busca privacidade e segurança sem precisar de obras complexas. Atendemos desde o entorno da Vila Militar até áreas como Sulacap e Magalhães Bastos, sempre com o mesmo padrão LUME de excelência técnica e prazo de entrega recorde (instalação em até 24h).
                             </p>
                         </div>
                         
                         <div className="grid lg:grid-cols-2 gap-12 items-stretch mt-12 text-left">
                             <div className="glass-card p-10 rounded-3xl border border-white/10 flex flex-col h-full bg-white/[0.01]">
                                 <h3 className="text-2xl font-bold font-['Montserrat'] mb-8 text-white flex items-center gap-3">
-                                    <MapPin size={24} className="text-[#c9a227]" /> Atendimento em Bangu
+                                    <MapPin size={24} className="text-[#c9a227]" /> Atendimento Local Express
                                 </h3>
                                 <p className="text-gray-400 leading-relaxed mb-8 text-base font-light">
-                                    Oferecemos atendimento personalizado: vamos até o seu endereço em Bangu e adjacências, realizamos a medição técnica e apresentamos as amostras físicas. O processo é rápido, limpo e não gera transtornos à sua estrutura.
+                                    Não perca tempo com orçamentos demorados. Nossa equipe em Realengo é treinada para medição técnica rápida e apresentação de amostras de acordo com o padrão do seu condomínio.
                                 </p>
                                 <ul className="space-y-4 mb-4">
-                                    <li className="flex gap-3 text-base text-gray-300 font-bold"><CheckCircle size={20} className="text-[#c9a227] shrink-0" /> Visita técnica gratuita no seu imóvel</li>
-                                    <li className="flex gap-3 text-base text-gray-300 font-bold"><CheckCircle size={20} className="text-[#c9a227] shrink-0" /> Instalação com acabamento Elite</li>
-                                    <li className="flex gap-3 text-base text-gray-300 font-bold"><CheckCircle size={20} className="text-[#c9a227] shrink-0" /> Garantia Lume de 5 anos no serviço</li>
+                                    <li className="flex gap-3 text-base text-gray-300 font-bold"><CheckCircle size={20} className="text-[#c9a227] shrink-0" /> Orçamento Gratuito via Fotos ou Visita</li>
+                                    <li className="flex gap-3 text-base text-gray-300 font-bold"><CheckCircle size={20} className="text-[#c9a227] shrink-0" /> Instalação Profissional em 24 Horas</li>
+                                    <li className="flex gap-3 text-base text-gray-300 font-bold"><CheckCircle size={20} className="text-[#c9a227] shrink-0" /> Garantia Lume de 5 anos (8 a 15 anos de vida útil)</li>
                                 </ul>
                             </div>
 
@@ -372,23 +371,23 @@ export function BanguPage() {
                                     <MapPin size={120} className="text-white" />
                                 </div>
                                 <h4 className="text-[#c9a227] font-black uppercase tracking-[0.2em] text-sm mb-8 flex items-center gap-3">
-                                    <Zap size={18} className="animate-pulse" /> Região de Atendimento
+                                    <Zap size={18} className="animate-pulse" /> Atendimento em Realengo
                                 </h4>
                                 <div className="space-y-6 relative z-10">
-                                    <p className="text-gray-300 font-bold text-lg mb-4">Atendemos plenamente os bairros:</p>
+                                    <p className="text-gray-300 font-bold text-lg mb-4">Regiões que Atendemos Hoje:</p>
                                     <div className="grid grid-cols-2 gap-4 text-sm font-medium text-gray-400 uppercase tracking-wider">
-                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Bangu</div>
-                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Realengo</div>
+                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Realengo (Centro)</div>
+                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Jardim Sulacap</div>
+                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Magalhães Bastos</div>
+                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Vila Militar</div>
                                         <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Padre Miguel</div>
-                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Campo Grande</div>
-                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Santíssimo</div>
-                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Cosmos</div>
-                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Inhoiba</div>
-                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Santa Cruz</div>
+                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Bangu</div>
                                         <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Senador Camará</div>
-                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Sulacap</div>
+                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Deodoro</div>
+                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Vila Valqueire</div>
+                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Marechal Hermes</div>
                                     </div>
-                                    <p className="text-xs text-gray-500 mt-6 pt-6 border-t border-white/5">Levamos a estrutura completa da Lume Controle Solar até o seu local com agendamento flexível.</p>
+                                    <p className="text-xs text-gray-500 mt-6 pt-6 border-t border-white/5">Equipe dedicada para instalação rápida e profissional em toda a Zona Oeste.</p>
                                 </div>
                             </div>
                         </div>
@@ -396,47 +395,35 @@ export function BanguPage() {
                 </div>
             </section>
 
-            {/* Perguntas Frequentes (FAQ) - Restauradas TODAS */}
+            {/* Perguntas Frequentes (FAQ) */}
             <section className="py-24 relative px-4 overflow-hidden bg-[#070f1a]">
                 <div className="container-lume page-entrance max-w-4xl mx-auto">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl lg:text-5xl font-black font-['Montserrat'] mb-6 tracking-tight">Perguntas Frequentes (FAQ)</h2>
-                        <p className="text-gray-500 font-medium">Esclareça suas principais dúvidas sobre aplicação e durabilidade.</p>
+                        <h2 className="text-3xl lg:text-5xl font-black font-['Montserrat'] mb-6 tracking-tight">FAQ - Insulfilm em Realengo</h2>
+                        <p className="text-gray-500 font-medium">Esclareça suas principais dúvidas sobre custos e prazos.</p>
                     </div>
 
                     <div className="space-y-4">
                         {[
                             {
-                                q: "1. Quanto custa instalar insulfilm residencial em Bangu?",
-                                a: "O valor varia conforme o tipo de película escolhida e a quantidade de metros quadrados de vidro. Películas básicas custam menos do que as linhas nano cerâmica ou de segurança. Ofereço orçamento gratuito e sem compromisso pelo WhatsApp — basta enviar uma mensagem com as medidas ou agendar uma visita para medição no local."
+                                q: "1. Quanto custa instalar insulfilm residencial em Realengo?",
+                                a: "O valor é calculado por metro quadrado e depende da tecnologia da película (Nano Cerâmica, Carbono ou Refletiva). Oferecemos orçamento gratuito via WhatsApp: basta nos enviar as medidas aproximadas dos vidros para receber o valor na hora."
                             },
                             {
-                                q: "2. Qual o melhor tipo de insulfilm para casas em Bangu?",
-                                a: "Para o clima quente da Zona Oeste, recomendo as películas nano cerâmica ou nano carbono para máxima rejeição de calor. Se privacidade for a prioridade, o G5 fumê é o mais indicado. Para quem não quer alterar a aparência do vidro, a linha IR transparente é a melhor opção."
+                                q: "2. Qual a velocidade do atendimento em Realengo?",
+                                a: "Nosso grande diferencial é a agilidade. Temos equipes prontas para atuar na Zona Oeste e conseguimos realizar a instalação em Realengo em até 24 horas após a aprovação do orçamento."
                             },
                             {
-                                q: "3. O insulfilm residencial danifica o vidro?",
-                                a: "Não. A aplicação é feita com produtos específicos para limpeza e adesão, sem riscos ao vidro. A instalação profissional garante que não fiquem arranhados ou manchas residuais."
+                                q: "3. Qual o melhor insulfilm para reduzir o calor forte de Realengo?",
+                                a: "Para residências que sofrem com o sol da tarde, indicamos as películas de Nano Cerâmica ou Refletivas. Elas barram até 80% do calor infravermelho, permitindo uma redução térmica real e economia no uso de ar-condicionado."
                             },
                             {
-                                q: "4. Quanto tempo dura o insulfilm residencial?",
-                                a: "Nossas películas profissionais têm durabilidade estimada entre 8 a 15 anos. Elas mantêm as propriedades térmicas e de cor por muito mais tempo. Trabalhamos com materiais de procedência que não criam bolhas nem ficam roxos."
+                                q: "4. Quanto tempo dura o insulfilm e qual a garantia?",
+                                a: "Trabalhamos apenas com películas profissionais que têm vida útil estimada entre 8 a 15 anos. Oferecemos garantia certificada de 5 anos cobrindo qualquer defeito de material ou instalação."
                             },
                             {
-                                q: "5. Qual o tempo de garantia do serviço?",
-                                a: "Oferecemos garantia contratual de 5 anos em todos os nossos serviços de aplicação. Isso cobre bolhas, delaminação e defeitos de instalação, garantindo sua total tranquilidade."
-                            },
-                            {
-                                q: "6. Posso instalar insulfilm em vidro temperado?",
-                                a: "Sim, desde que seja usada a película correta. Vidros temperados requerem películas com taxa de absorção de calor adequada para evitar estresse térmico. Avaliamos o tipo de vidro antes da recomendação."
-                            },
-                            {
-                                q: "7. O insulfilm escurece muito o ambiente?",
-                                a: "Depende da sua escolha. Películas como o Carbono G5 reduzem bastante a luminosidade (ideal para quartos). Já a Nano Cerâmica rejeita o calor mantendo a transparência quase total do vidro."
-                            },
-                            {
-                                q: "8. Atendem condomínios e empresas em Bangu?",
-                                a: "Sim. Atendemos residências em condomínios, lojas de rua, centros comerciais, clínicas, escritórios e qualquer ambiente comercial arquitetônico na região."
+                                q: "5. Atendem condomínios e comércios em Realengo?",
+                                a: "Sim. Atendemos casas de rua, condomínios fechados, lojas, clínicas e escritórios em todo o bairro de Realengo e bairros vizinhos como Vila Militar e Sulacap."
                             }
                         ].map((faq, idx) => (
                             <details key={idx} className="group glass-card border border-white/5 rounded-2xl overflow-hidden cursor-pointer transition-all hover:bg-white/[0.03]">
@@ -464,16 +451,16 @@ export function BanguPage() {
                         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#c9a227] to-transparent opacity-30" />
                         
                         <h2 className="text-4xl md:text-6xl lg:text-7xl font-black mb-8 font-['Montserrat'] tracking-tighter leading-tight">
-                            Proteja sua Casa do <span className="text-gradient-gold">Calor do Rio</span>
+                            Proteja sua Casa em <span className="text-gradient-gold">Realengo</span>
                         </h2>
                         
                         <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mb-12 font-light leading-relaxed">
-                            Agende uma visita técnica gratuita em <strong className="text-white">Bangu</strong> e receba um orçamento sob medida com a melhor durabilidade do mercado.
+                            Agende uma visita técnica <strong className="text-white">gratuita em 24h</strong> e descubra como o insulfilm profissional transforma seu conforto térmico.
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
                             <a
-                                href="https://wa.me/5521965140612?text=Olá! Gostaria de um orçamento de insulfilm residencial em Bangu."
+                                href="https://wa.me/5521965140612?text=Olá! Quero um orçamento gratuito de insulfilm em Realengo."
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="w-full sm:w-auto bg-[#25d366] hover:bg-[#20bd5a] text-white px-12 py-6 rounded-2xl font-black uppercase tracking-widest transition-all duration-300 transform hover:scale-[1.05] shadow-[0_15px_45px_rgba(37,211,102,0.3)] flex items-center justify-center gap-4 text-sm group"
@@ -486,21 +473,21 @@ export function BanguPage() {
                                 to="/"
                                 className="w-full sm:w-auto bg-white/5 hover:bg-white/10 text-white border border-white/10 px-10 py-6 rounded-2xl font-bold uppercase tracking-widest transition-all text-sm backdrop-blur-sm"
                             >
-                                Ver Outros Exemplos
+                                Conhecer a LUME
                             </Link>
                         </div>
 
                         <div className="mt-12 flex flex-wrap justify-center gap-8 text-[11px] text-gray-500 font-bold uppercase tracking-[0.2em]">
-                            <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> 5 Anos de Garantia</span>
-                            <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> 8-15 Anos de Durabilidade</span>
-                            <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> Instalação Express</span>
+                            <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> Garantia de 5 Anos</span>
+                            <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> Durabilidade 8-15 Anos</span>
+                            <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> Atendimento Rápido</span>
                         </div>
                     </div>
                 </div>
             </section>
 
             <footer className="py-12 bg-[#070f1a] border-t border-white/5 text-center text-[10px] text-gray-500 font-bold uppercase tracking-[0.4em] px-4">
-                 © 2026 Lume Controle Solar · Especialista em Bangu e Zona Oeste
+                 © 2026 Lume Controle Solar · Especialista em Realengo e Zona Oeste
             </footer>
         </div>
     );

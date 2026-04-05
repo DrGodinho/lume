@@ -161,6 +161,8 @@ export function QuotePage() {
             <Helmet>
                 <title>Orçamento Online | LUME Películas de Controle Solar</title>
                 <meta name="description" content="Solicite um orçamento personalizado para instalação de insulfilm residencial ou comercial no Rio de Janeiro. Escolha entre Nano Cerâmica, Carbono, Refletiva e muito mais." />
+                <link rel="canonical" href="https://lumecontrolesolar.com.br/orcamento" />
+
             </Helmet>
             <div className="max-w-xl mx-auto">
 

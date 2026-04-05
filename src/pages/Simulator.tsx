@@ -189,6 +189,8 @@ export function SimulatorPage() {
             <Helmet>
                 <title>Simulador LUME | Descubra a Película Ideal para seu Ambiente</title>
                 <meta name="description" content="Utilize o Simulador da LUME e descubra gratuitamente a melhor película de controle solar (insulfilm) para sua casa ou apartamento no Rio de Janeiro." />
+                <link rel="canonical" href="https://lumecontrolesolar.com.br/simulador" />
+
             </Helmet>
             {/* Background Decor */}
             <div className="fixed top-0 left-0 w-full h-full pointer-events-none -z-10 overflow-hidden">

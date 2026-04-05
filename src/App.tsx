@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import { Capacitor } from '@capacitor/core';
 import { Navbar } from './sections/Navbar';
 import { Hero } from './sections/Hero';
@@ -21,6 +22,8 @@ import { RefletivaPage } from './pages/Refletiva';
 import { JateadoPage } from './pages/Jateado';
 import { GuiaInsulfilm } from './pages/GuiaInsulfilm';
 import { BanguPage } from './pages/BanguPage';
+import { RealengoPage } from './pages/RealengoPage';
+import { CampoGrandePage } from './pages/CampoGrandePage';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -47,6 +50,9 @@ function ScrollToTop() {
 function LandingPage() {
   return (
     <>
+      <Helmet>
+        <link rel="canonical" href="https://lumecontrolesolar.com.br/" />
+      </Helmet>
       <Hero />
       <Products />
       <Benefits />
@@ -102,6 +108,8 @@ function App() {
           <Route path="/jateado" element={<JateadoPage />} />
           <Route path="/guia-insulfilm" element={<GuiaInsulfilm />} />
           <Route path="/insulfilm-em-bangu" element={<BanguPage />} />
+          <Route path="/insulfilm-em-realengo" element={<RealengoPage />} />
+          <Route path="/insulfilm-em-campo-grande" element={<CampoGrandePage />} />
         </Routes>
       </main>
 

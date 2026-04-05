@@ -20,6 +20,8 @@ export function RefletivaPage() {
             <Helmet>
                 <title>Insulfilm Refletivo Prata RJ | Privacidade e Fim do Calor - LUME</title>
                 <meta name="description" content="Película Refletiva (Espelhada) no Rio de Janeiro. Efeito One-Way Mirror para privacidade diurna absoluta e redução drástica de calor. Excelente para Bangu." />
+                <link rel="canonical" href="https://lumecontrolesolar.com.br/refletiva" />
+
                 
                 <script type="application/ld+json">
                     {`

@@ -20,6 +20,8 @@ export function CarbonoPage() {
             <Helmet>
                 <title>Insulfilm Carbono Premium RJ (G5 e G20) | Privacidade em Bangu - LUME</title>
                 <meta name="description" content="Insulfilm Carbono Premium G5 e G20. Privacidade máxima, preto intenso que não desbota e rejeição de calor de até 90%. Instalação em Bangu e Zona Oeste RJ." />
+                <link rel="canonical" href="https://lumecontrolesolar.com.br/carbono" />
+
                 
                 <script type="application/ld+json">
                     {`

@@ -8,7 +8,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-export function BanguPage() {
+export function CampoGrandePage() {
     useEffect(() => {
         // Smooth Scroll Animations for all sections
         const elements = gsap.utils.toArray('.page-entrance');
@@ -33,11 +33,10 @@ export function BanguPage() {
     return (
         <div className="bg-[#070f1a] text-white min-h-screen">
             <Helmet>
-                <title>Insulfilm em Bangu | Aplicação Residencial e Comercial - LUME</title>
-                <meta name="description" content="Instalação de insulfilm em Bangu e região com aplicação profissional. Películas residenciais e comerciais. Controle solar, privacidade e segurança. Orçamento gratuito pelo WhatsApp." />
-                <link rel="canonical" href="https://lumecontrolesolar.com.br/insulfilm-em-bangu" />
+                <title>Insulfilm em Campo Grande RJ | Aplicação Residencial e Comercial - LUME</title>
+                <meta name="description" content="Instalação profissional de insulfilm em Campo Grande RJ com aplicação express em 24h. Películas para redução de calor, privacidade e segurança. Orçamento gratuito." />
+                <link rel="canonical" href="https://lumecontrolesolar.com.br/insulfilm-em-campo-grande" />
 
-                
                 <script type="application/ld+json">
                     {`
                         {
@@ -45,8 +44,8 @@ export function BanguPage() {
                             "@type": "LocalBusiness",
                             "name": "LUME Películas de Controle Solar",
                             "image": "https://lumecontrolesolar.com.br/novo-logo-lume.png",
-                            "@id": "https://lumecontrolesolar.com.br/insulfilm-em-bangu",
-                            "url": "https://lumecontrolesolar.com.br/insulfilm-em-bangu",
+                            "@id": "https://lumecontrolesolar.com.br/insulfilm-em-campo-grande",
+                            "url": "https://lumecontrolesolar.com.br/insulfilm-em-campo-grande",
                             "telephone": "+5521965140612",
                             "priceRange": "$$$",
                             "address": {
@@ -59,11 +58,11 @@ export function BanguPage() {
                             },
                             "geo": {
                                 "@type": "GeoCoordinates",
-                                "latitude": -22.8767,
-                                "longitude": -43.4651
+                                "latitude": -22.903,
+                                "longitude": -43.559
                             },
-                            "areaServed": ["Bangu", "Campo Grande", "Santa Cruz", "Realengo", "Padre Miguel", "Senador Camará", "Zona Oeste RJ"],
-                            "description": "Instalação de insulfilm em Bangu e região com aplicação profissional. Películas residenciais e comerciais. Controle solar, privacidade e segurança."
+                            "areaServed": ["Campo Grande", "Guaratiba", "Paciência", "Cosmos", "Inhoaíba", "Santíssimo", "Zona Oeste RJ"],
+                            "description": "Instalação de insulfilm em Campo Grande RJ com aplicação profissional e rápida (24h). Películas residenciais e comerciais. Controle solar, privacidade e segurança."
                         }
                     `}
                 </script>
@@ -75,34 +74,34 @@ export function BanguPage() {
                             "mainEntity": [
                                 {
                                     "@type": "Question",
-                                    "name": "Quanto custa instalar insulfilm residencial em Bangu?",
+                                    "name": "Quanto custa o insulfilm residencial em Campo Grande?",
                                     "acceptedAnswer": {
                                         "@type": "Answer",
-                                        "text": "O valor varia conforme o tipo de película e metragem. Oferecemos orçamento gratuito via WhatsApp com base nas medidas ou visita técnica no local."
+                                        "text": "O valor é calculado por m² e depende da tecnologia escolhida. Oferecemos orçamento gratuito e imediato via WhatsApp para toda Campo Grande."
                                     }
                                 },
                                 {
                                     "@type": "Question",
-                                    "name": "Qual o melhor tipo de insulfilm para o calor de Bangu?",
+                                    "name": "Qual o melhor insulfilm para o sol de Campo Grande?",
                                     "acceptedAnswer": {
                                         "@type": "Answer",
-                                        "text": "Para o calor intenso da Zona Oeste, recomendamos as películas de Nano Cerâmica ou Nano Carbono, que oferecem máxima rejeição de calor infravermelho."
+                                        "text": "Recomendamos as películas de Nano Cerâmica ou Carbono, que bloqueiam até 95% do calor infravermelho, sendo ideais para o clima da Zona Oeste."
                                     }
                                 },
                                 {
                                     "@type": "Question",
-                                    "name": "Quanto tempo dura o insulfilm residencial da Lume?",
+                                    "name": "Vocês atendem condomínios em Campo Grande?",
                                     "acceptedAnswer": {
                                         "@type": "Answer",
-                                        "text": "Nossas películas profissionais possuem durabilidade de 8 a 15 anos e oferecemos garantia certificada de 5 anos em todos os serviços."
+                                        "text": "Sim, atendemos todos os grandes condomínios de Campo Grande, como os da Estrada do Monteiro e Estrada da Posse, com instalação em até 24h."
                                     }
                                 },
                                 {
                                     "@type": "Question",
-                                    "name": "Atendem condomínios e empresas em Bangu?",
+                                    "name": "Qual o tempo de garantia?",
                                     "acceptedAnswer": {
                                         "@type": "Answer",
-                                        "text": "Sim. Atendemos residências em condomínios, lojas, clínicas e escritórios em toda a região de Bangu e Zona Oeste."
+                                        "text": "Trabalhamos com garantia certificada de 5 anos em todos os serviços, com películas que possuem durabilidade estimada entre 8 a 15 anos."
                                     }
                                 }
                             ]
@@ -122,25 +121,25 @@ export function BanguPage() {
 
                 <div className="container-lume relative z-10 page-entrance text-center md:text-left">
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#c9a227]/10 border border-[#c9a227]/30 mb-6">
-                        <span className="text-[#c9a227] text-sm font-bold uppercase tracking-wider">Zona Oeste do Rio de Janeiro</span>
+                        <span className="text-[#c9a227] text-sm font-bold uppercase tracking-wider">Coração da Zona Oeste / Campo Grande RJ</span>
                     </div>
 
                     <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-['Montserrat'] mb-6 leading-tight">
-                        Insulfilm em <span className="text-gradient-gold">Bangu</span>
+                        Insulfilm em <br className="hidden md:block" /> <span className="text-gradient-gold">Campo Grande</span>
                     </h1>
 
                     <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto md:mx-0 mb-10 leading-relaxed font-light">
-                        Aplicação profissional de películas de controle solar para residências e empresas em Bangu e toda a região da Zona Oeste. Proteção contra o calor intenso e privacidade garantida.
+                        Aplicação profissional de películas de controle solar em Campo Grande. Redução drástica de calor, proteção UV e <strong>instalação express em 24h</strong>.
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
                         <a
-                            href="https://wa.me/5521965140612?text=Olá! Quero um orçamento de insulfilm em Bangu."
+                            href="https://wa.me/5521965140612?text=Olá! Quero um orçamento gratuito de insulfilm em Campo Grande."
                             target="_blank"
                             rel="noopener noreferrer"
                             className="btn-primary inline-flex items-center justify-center gap-3 text-lg py-4 px-8"
                         >
-                            Pedir Orçamento pelo WhatsApp <ArrowRight size={20} />
+                            Orçamento Gratuito via WhatsApp <ArrowRight size={20} />
                         </a>
                         <a
                             href="#tipos"
@@ -156,13 +155,13 @@ export function BanguPage() {
             <section className="bg-[#c9a227] py-6 overflow-hidden relative z-20">
                 <div className="container-lume">
                     <div className="flex flex-wrap lg:flex-nowrap justify-center lg:justify-between items-center gap-6 lg:gap-4 text-black font-extrabold uppercase tracking-widest text-xs lg:text-sm text-center">
-                        <span className="flex items-center gap-2"><Thermometer size={18} /> Até 80% de rejeição de calor</span>
+                        <span className="flex items-center gap-2 text-black"><Thermometer size={18} /> Rejeição Térmica de até 95%</span>
                         <span className="hidden lg:inline opacity-30">•</span>
-                        <span className="flex items-center gap-2"><Sun size={18} /> 99% bloqueio de raios UV</span>
+                        <span className="flex items-center gap-2 text-black"><Sun size={18} /> Orçamento On-line Imediato</span>
                         <span className="hidden lg:inline opacity-30">•</span>
-                        <span className="flex items-center gap-2"><Shield size={18} /> 8 a 15 anos de durabilidade</span>
+                        <span className="flex items-center gap-2 text-black"><Shield size={18} /> Durabilidade de 8 a 15 anos</span>
                         <span className="hidden lg:inline opacity-30">•</span>
-                        <span className="flex items-center gap-2"><CheckCircle size={18} /> Garantia de 5 anos Lume</span>
+                        <span className="flex items-center gap-2 text-black"><CheckCircle size={18} /> Garantia de 5 anos Lume</span>
                     </div>
                 </div>
             </section>
@@ -171,37 +170,37 @@ export function BanguPage() {
             <section className="py-8 bg-[#0a1628] border-b border-white/5 relative z-10">
                 <div className="container-lume page-entrance">
                     <div className="flex flex-wrap justify-center gap-8 text-sm text-gray-400 font-medium">
-                        <div className="flex items-center gap-2"><CheckCircle size={16} className="text-[#c9a227]" /> Orçamento gratuito e sem compromisso</div>
-                        <div className="flex items-center gap-2"><CheckCircle size={16} className="text-[#c9a227]" /> Atendimento em todos os bairros da Zona Oeste</div>
-                        <div className="flex items-center gap-2"><CheckCircle size={16} className="text-[#c9a227]" /> Películas de procedência certificada</div>
-                        <div className="flex items-center gap-2"><CheckCircle size={16} className="text-[#c9a227]" /> Sem sujeira ou danos ao vidro</div>
+                        <div className="flex items-center gap-2"><CheckCircle size={16} className="text-[#c9a227]" /> Orçamento gratuito e especializado</div>
+                        <div className="flex items-center gap-2"><CheckCircle size={16} className="text-[#c9a227]" /> Atendimento em condomínios de CG</div>
+                        <div className="flex items-center gap-2"><CheckCircle size={16} className="text-[#c9a227]" /> Películas premium que não desbotam</div>
+                        <div className="flex items-center gap-2"><CheckCircle size={16} className="text-[#c9a227]" /> Agilidade: Instalamos em 24h</div>
                     </div>
                 </div>
             </section>
 
-            {/* O problema do Calor em Bangu - Texto Completo */}
+            {/* O problema do Calor em Campo Grande - Texto Completo */}
             <section className="py-24 bg-[#070f1a] relative px-4">
                 <div className="container-lume page-entrance">
                     <div className="max-w-4xl mx-auto text-center mb-16">
-                        <h2 className="text-3xl lg:text-5xl font-bold font-['Montserrat'] mb-10">O calor da Zona Oeste é diferente</h2>
+                        <h2 className="text-3xl lg:text-5xl font-bold font-['Montserrat'] mb-10">Conforto Térmico em Campo Grande</h2>
                         <div className="space-y-6 text-gray-400 leading-relaxed text-lg font-light text-left md:text-justify px-4">
                             <p>
-                                Quem mora em Bangu sabe: o verão carioca é especialmente implacável na Zona Oeste. Enquanto a Zona Sul conta com a brisa do mar, bairros como Bangu, Campo Grande e Realengo acumulam calor ao longo do dia, transformando casas e apartamentos em verdadeiros fornos — mesmo com as janelas fechadas.
+                                <strong>Campo Grande</strong> é o centro comercial e residencial da Zona Oeste, e seu microclima exige soluções de alto padrão. Com as temperaturas batendo recordes anualmente, as janelas de vidro tornam-se o principal radiador de calor para dentro da sua residência.
                             </p>
                             <p>
-                                A radiação solar penetra pelos vidros das janelas, portas e varandas, elevando a temperatura interna em vários graus. O resultado é o uso excessivo de ar-condicionado, contas de luz cada vez mais altas e um desconforto constante para toda a família. O insulfilm residencial atua diretamente nesse ponto: ele cria uma barreira técnica sobre o vidro que rejeita o calor antes mesmo que ele entre no seu ambiente.
+                                Na <strong>Lume Controle Solar</strong>, entendemos que o morador de Campo Grande busca rapidez e eficiência. Por isso, nosso diferencial é o <strong>orçamento gratuito pelo WhatsApp</strong> e a capacidade técnica de realizar a <strong>instalação profissional em até 24 horas</strong>. 
                             </p>
                             <p>
-                                Na <strong className="text-white">Lume Controle Solar</strong>, atendemos Bangu e toda a região da Zona Oeste com instalação local. Avaliamos pessoalmente o ambiente, indicamos a película ideal para cada situação (varandas, janelas, portas de entrada) e realizamos a aplicação com acabamento impecável, garantindo que você recupere o conforto térmico da sua residência sem perder a beleza estética.
+                                Atendemos desde os grandes condomínios na Estrada do Monteiro até residências na Estrada da Posse e arredores do West Shopping. Nossas películas de Nano Cerâmica e Carbono são projetadas para suportar a radiação UV sem sofrer desbotamento ou criar aquelas bolhas comuns em películas baratas, garantindo um investimento duradouro e estético para seu imóvel.
                             </p>
                         </div>
                     </div>
 
                     <div className="glass-card p-10 rounded-3xl border border-white/10 relative overflow-hidden max-w-4xl mx-auto">
                         <div className="absolute top-0 left-0 w-32 h-32 bg-[#c9a227] blur-[100px] opacity-10" />
-                        <h3 className="text-2xl font-bold font-['Montserrat'] text-center mb-8">Atendimento Residencial ou Comercial?</h3>
+                        <h3 className="text-2xl font-bold font-['Montserrat'] text-center mb-8">Especialista em Condomínios e Comércios</h3>
                         <p className="text-gray-400 leading-relaxed text-center max-w-3xl mx-auto font-light text-lg">
-                            Focamos exclusivamente no atendimento a imóveis (Arquitetônico). Para casas e apartamentos, as películas de controle solar são a solução mais econômica e eficaz para enfrentar o clima do Rio. No setor comercial — lojas, escritórios, clínicas e salões — as películas trazem conforto imediato para clientes e funcionários, além de valorizar significativamente a fachada e proteger seus produtos e mobiliário da exposição direta ao sol.
+                            Seja para garantir a privacidade total de um apartamento ou reduzir o calor em fachadas comerciais de lojas e clínicas, a LUME oferece a consultoria ideal. Visitamos seu local em Campo Grande com amostras físicas para que você escolha a tonalidade perfeita para seu projeto, sempre com garantia certificada de 5 anos (8 a 15 anos de durabilidade).
                         </p>
                     </div>
                 </div>
@@ -215,7 +214,7 @@ export function BanguPage() {
                             Películas de <span className="text-gradient-gold">Alta Performance</span>
                         </h2>
                         <p className="text-gray-400 max-w-2xl mx-auto font-light text-lg">
-                            Conheça as principais opções tecnológicas que trabalhamos e descubra qual resolve o seu problema de calor ou privacidade.
+                            Tecnologia de ponta com instalação express para quem não quer perder tempo em Campo Grande.
                         </p>
                     </div>
 
@@ -223,23 +222,23 @@ export function BanguPage() {
                         {[
                             {
                                 title: "Nano Cerâmica", selo: "Top de Linha", icon: Star, image: "/product-nano-ceramica.jpg", path: "/nano-ceramica",
-                                desc: "A linha de maior performance do mercado. A película nano cerâmica rejeita até 95% do calor infravermelho sem precisar escurecer o ambiente, mantendo os vidros transparentes e a luminosidade natural preservada. Ideal para salas, varandas gourmet e escritórios que precisam de máximo controle térmico sem perder a claridade."
+                                desc: "Privacidade e frescor total. Rejeita o calor invisível (IR) sem alterar a fachada original. A escolha nº 1 para varandas em Campo Grande."
                             },
                             {
-                                title: "Carbono Premium", selo: "Best-Seller", icon: SunDim, image: "/product-carbono.jpg", path: "/carbono",
-                                desc: "Película fumê fabricada a partir de nano carbono. Combina um visual elegante e escurecido com excelente rejeição térmica (até 80%). Disponível nas tonalidades G20 e G5, o Carbono é o mais escolhido em Bangu para janelas e portas que precisam de privacidade total durante o dia sem desbotar como as películas baratas."
+                                title: "Carbono Premium", selo: "Privacidade", icon: SunDim, image: "/product-carbono.jpg", path: "/carbono",
+                                desc: "O preto intenso que nunca fica roxo. Oferece elegância e bloqueio térmico de 80% para janelas residenciais."
                             },
                             {
-                                title: "Espelhado / Refletivo", selo: "Privacidade", icon: Sun, image: "/product-refletiva.jpg", path: "/refletiva",
-                                desc: "A escolha certa para quem quer privacidade total durante o dia com um visual moderno na fachada. Reflete a luz solar externamente, reduzindo drasticamente a temperatura e bloqueando a visão de fora para dentro enquanto houver mais iluminação externa. Muito utilizada em clínicas, lojas e fachadas comerciais."
+                                title: "Refletiva / Silver", selo: "Alta Rejeição", icon: Sun, image: "/product-refletiva.jpg", path: "/refletiva",
+                                desc: "Efeito espelhado clássico. Máxima rejeição de calor para ambientes que recebem sol direto o dia todo."
                             },
                             {
-                                title: "Jateado / Fosco", selo: "Decoração", icon: Eye, image: "/product-jateado-v2.png", path: "/jateado",
-                                desc: "Solução ideal para banheiros, portas de vidro, divisórias e cozinhas que precisam de privacidade total sem perder luminosidade. O efeito fosco simula o vidro jateado com um custo muito menor, permitindo um acabamento sofisticado e fácil limpeza para ambientes internos."
+                                title: "Jateado Design", selo: "Decoração", icon: Eye, image: "/product-jateado-v2.png", path: "/jateado",
+                                desc: "Estética fosca para privacidade em banheiros e divisórias de escritórios. Mantém a luminosidade natural difusa."
                             },
                             {
                                 title: "Dupla Camada", selo: "Favorito", icon: Droplets, image: "/product-smoke.jpg", path: "/dupla-camada",
-                                desc: "Alta redução de calor com uma tecnologia especial: camada refletiva externa para máxima redução de calor e camada fumê interna para uma visão relaxante. Diferente das películas comuns, reduz o reflexo interno à noite. Excelente custo-benefício para enfrentar o sol de Bangu."
+                                desc: "Alta redução de calor com uma tecnologia especial: camada refletiva externa para máxima redução de calor e camada fumê interna para uma visão relaxante. Diferente das películas comuns, reduz o reflexo interno à noite. Ideal para grandes áreas envidraçadas em Campo Grande."
                             }
                         ].map((product, idx) => (
                             <div key={idx} className="group relative bg-gradient-to-b from-[#1a3a5c]/60 to-[#0a1628]/90 rounded-2xl overflow-hidden border border-[#1a3a5c]/50 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 flex flex-col h-full">
@@ -271,12 +270,12 @@ export function BanguPage() {
 
                                 <div className="p-6 pt-0">
                                     <a
-                                        href={`https://wa.me/5521965140612?text=Olá! Quero saber sobre a película ${product.title} em Bangu.`}
+                                        href={`https://wa.me/5521965140612?text=Olá! Quero um orçamento gratuito da película ${product.title} em Campo Grande.`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="w-full py-3.5 rounded-xl bg-[#111e33] hover:bg-[#c9a227] text-gray-300 hover:text-[#0a1628] text-xs font-bold uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-3 border border-white/5"
                                     >
-                                        Quero Orçamento <ArrowRight size={14} />
+                                        Orçamento Grátis <ArrowRight size={14} />
                                     </a>
                                 </div>
                             </div>
@@ -289,27 +288,27 @@ export function BanguPage() {
             <section className="py-24 relative px-4 bg-[#070f1a] overflow-hidden">
                 <div className="container-lume page-entrance">
                     <div className="text-center mb-20">
-                        <h2 className="text-3xl lg:text-5xl font-black font-['Montserrat'] mb-6 tracking-tight">Vantagens que Valorizam seu Ambiente</h2>
-                        <p className="text-gray-400 max-w-3xl mx-auto text-lg font-light">Investir em películas de controle solar é garantir conforto imediato e economia a longo prazo para seu patrimônio.</p>
+                        <h2 className="text-3xl lg:text-5xl font-black font-['Montserrat'] mb-6 tracking-tight">O Diferencial LUME em Campo Grande</h2>
+                        <p className="text-gray-400 max-w-3xl mx-auto text-lg font-light">Compromisso com o prazo e performance térmica real para seus vidros.</p>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                         {[
                             {
-                                icon: Thermometer, title: "Redução de Calor", stat: "-8°C", label: "Na Temperatura",
-                                desc: "Películas premium rejeitam até 80% do calor solar direto, mantendo o ambiente muito mais fresco inclusive em Bangu."
+                                icon: Thermometer, title: "Fim do Calor", stat: "-8°C", label: "Na Temperatura",
+                                desc: "Rejeição térmica imediata, garantindo ambientes mais frescos mesmo no auge do verão da Zona Oeste."
                             },
                             {
-                                icon: SunDim, title: "Proteção UV 99%", stat: "99%", label: "De Bloqueio",
-                                desc: "Proteja sua pele da radiação e evite o desbotamento rápido de pisos, móveis, cortinas e eletrônicos."
+                                icon: SunDim, title: "Proteção UV", stat: "99%", label: "Bloqueio",
+                                desc: "Proteja seus eletrônicos e móveis do desbotamento solar com películas certificadas."
                             },
                             {
-                                icon: PiggyBank, title: "Economia de Energia", stat: "30%", label: "Menos Luz",
-                                desc: "Menos uso de ar-condicionado significa contas mensais menores e menos desgaste do seu sistema de climatização."
+                                icon: PiggyBank, title: "Menos Energia", stat: "30%", label: "Economia Real",
+                                desc: "Com menos calor entrando, seu ar-condicionado trabalha com menos esforço, reduzindo a conta de luz."
                             },
                             {
-                                icon: Lock, title: "Segurança e Garantia", stat: "15", label: "Anos Durabilidade",
-                                desc: "Filmes de alta resistência com durabilidade entre 8 a 15 anos e garantia certificada de 5 anos pela Lume."
+                                icon: Lock, title: "Entrega em 24h", stat: "24", label: "Horas p/ Instalar",
+                                desc: "Diferencial LUME: orçamento rápido e instalação realizada em até 24 horas em Campo Grande."
                             }
                         ].map((benefit, idx) => (
                             <div key={idx} className="group relative p-10 rounded-2xl bg-gradient-to-b from-[#1a3a5c]/40 to-[#0d1f3c]/60 border border-[#1a3a5c]/30 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 text-center lg:text-left flex flex-col">
@@ -341,29 +340,29 @@ export function BanguPage() {
                 <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-blue-500/5 to-transparent pointer-events-none" />
                 <div className="container-lume page-entrance relative z-10">
                     <div className="max-w-4xl mx-auto text-center lg:text-left">
-                        <h2 className="text-3xl lg:text-5xl font-black font-['Montserrat'] mb-10 text-center text-[#c9a227] tracking-tight underline decoration-[#c9a227]/20 underline-offset-8">Insulfilm na Zona Oeste</h2>
+                        <h2 className="text-3xl lg:text-5xl font-black font-['Montserrat'] mb-10 text-center text-[#c9a227] tracking-tight underline decoration-[#c9a227]/20 underline-offset-8">Insulfilm em Campo Grande</h2>
                         
                         <div className="space-y-6 text-gray-400 leading-relaxed text-lg font-light text-center lg:text-justify mb-16 px-4 md:px-0">
                             <p>
-                                A Zona Oeste do Rio de Janeiro — que inclui Bangu, Campo Grande, Santa Cruz e Realengo — é uma das regiões que mais crescem na capital. Com esse crescimento, surge também a demanda por soluções inteligentes que melhorem a qualidade de vida nos imóveis residenciais e locais de trabalho.
+                                Campo Grande é a região que mais cresce tecnologicamente na Zona Oeste, e a infraestrutura dos novos condomínios e lojas exige películas que acompanhem esse padrão. Se você está na Estrada do Monteiro, na Estrada da Posse ou próximo ao West Shopping, a LUME é a sua parceira local para controle solar.
                             </p>
                             <p>
-                                O insulfilm em Bangu tornou-se popular não apenas como medida de conforto térmico, mas também de segurança e economia. Moradores de condomínios fechados e donos de comércios na Estrada do Mendanha, Rua Fonseca e Largo do Bangu buscam películas profissionais que suportem a exposição solar contínua típica da região, sem bolhas ou desbotamento.
+                                Nosso atendimento em Campo Grande foca na agilidade. Sabemos que você não quer esperar semanas por um orçamento. Com nosso sistema de **orçamento gratuito pelo WhatsApp**, você resolve tudo em minutos e tem sua película instalada profissionalmente em até 24 horas.
                             </p>
                         </div>
                         
                         <div className="grid lg:grid-cols-2 gap-12 items-stretch mt-12 text-left">
                             <div className="glass-card p-10 rounded-3xl border border-white/10 flex flex-col h-full bg-white/[0.01]">
                                 <h3 className="text-2xl font-bold font-['Montserrat'] mb-8 text-white flex items-center gap-3">
-                                    <MapPin size={24} className="text-[#c9a227]" /> Atendimento em Bangu
+                                    <MapPin size={24} className="text-[#c9a227]" /> Atendimento Especializado CG
                                 </h3>
                                 <p className="text-gray-400 leading-relaxed mb-8 text-base font-light">
-                                    Oferecemos atendimento personalizado: vamos até o seu endereço em Bangu e adjacências, realizamos a medição técnica e apresentamos as amostras físicas. O processo é rápido, limpo e não gera transtornos à sua estrutura.
+                                    Realizamos medições técnicas precisas e levamos amostras das películas top de linha até o seu endereço. Instalação rápida, limpa e com acabamento elite.
                                 </p>
                                 <ul className="space-y-4 mb-4">
-                                    <li className="flex gap-3 text-base text-gray-300 font-bold"><CheckCircle size={20} className="text-[#c9a227] shrink-0" /> Visita técnica gratuita no seu imóvel</li>
-                                    <li className="flex gap-3 text-base text-gray-300 font-bold"><CheckCircle size={20} className="text-[#c9a227] shrink-0" /> Instalação com acabamento Elite</li>
-                                    <li className="flex gap-3 text-base text-gray-300 font-bold"><CheckCircle size={20} className="text-[#c9a227] shrink-0" /> Garantia Lume de 5 anos no serviço</li>
+                                    <li className="flex gap-3 text-base text-gray-300 font-bold"><CheckCircle size={20} className="text-[#c9a227] shrink-0" /> Orçamento Sem Compromisso via Zap</li>
+                                    <li className="flex gap-3 text-base text-gray-300 font-bold"><CheckCircle size={20} className="text-[#c9a227] shrink-0" /> Instalação Express em até 24 Horas</li>
+                                    <li className="flex gap-3 text-base text-gray-300 font-bold"><CheckCircle size={20} className="text-[#c9a227] shrink-0" /> Garantia Lume de 5 anos (Durabilidade 8-15 anos)</li>
                                 </ul>
                             </div>
 
@@ -372,23 +371,23 @@ export function BanguPage() {
                                     <MapPin size={120} className="text-white" />
                                 </div>
                                 <h4 className="text-[#c9a227] font-black uppercase tracking-[0.2em] text-sm mb-8 flex items-center gap-3">
-                                    <Zap size={18} className="animate-pulse" /> Região de Atendimento
+                                    <Zap size={18} className="animate-pulse" /> Atendimento Imediato
                                 </h4>
                                 <div className="space-y-6 relative z-10">
-                                    <p className="text-gray-300 font-bold text-lg mb-4">Atendemos plenamente os bairros:</p>
+                                    <p className="text-gray-300 font-bold text-lg mb-4">Regiões Atendidas em CG:</p>
                                     <div className="grid grid-cols-2 gap-4 text-sm font-medium text-gray-400 uppercase tracking-wider">
-                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Bangu</div>
-                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Realengo</div>
-                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Padre Miguel</div>
-                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Campo Grande</div>
-                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Santíssimo</div>
+                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Estrada do Monteiro</div>
+                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Estrada da Posse</div>
+                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Centro de CG</div>
+                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Inhoaíba</div>
                                         <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Cosmos</div>
-                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Inhoiba</div>
+                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Santíssimo</div>
+                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Mendanha</div>
+                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Guaratiba</div>
+                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Paciência</div>
                                         <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Santa Cruz</div>
-                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Senador Camará</div>
-                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Sulacap</div>
                                     </div>
-                                    <p className="text-xs text-gray-500 mt-6 pt-6 border-t border-white/5">Levamos a estrutura completa da Lume Controle Solar até o seu local com agendamento flexível.</p>
+                                    <p className="text-xs text-gray-500 mt-6 pt-6 border-t border-white/5">Levamos a estrutura completa LUME até seu imóvel com preço justo e rapidez.</p>
                                 </div>
                             </div>
                         </div>
@@ -396,47 +395,35 @@ export function BanguPage() {
                 </div>
             </section>
 
-            {/* Perguntas Frequentes (FAQ) - Restauradas TODAS */}
+            {/* Perguntas Frequentes (FAQ) */}
             <section className="py-24 relative px-4 overflow-hidden bg-[#070f1a]">
                 <div className="container-lume page-entrance max-w-4xl mx-auto">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl lg:text-5xl font-black font-['Montserrat'] mb-6 tracking-tight">Perguntas Frequentes (FAQ)</h2>
-                        <p className="text-gray-500 font-medium">Esclareça suas principais dúvidas sobre aplicação e durabilidade.</p>
+                        <h2 className="text-3xl lg:text-5xl font-black font-['Montserrat'] mb-6 tracking-tight">FAQ - Insulfilm em Campo Grande</h2>
+                        <p className="text-gray-500 font-medium">Principais dúvidas sobre preço, prazos e qualidade.</p>
                     </div>
 
                     <div className="space-y-4">
                         {[
                             {
-                                q: "1. Quanto custa instalar insulfilm residencial em Bangu?",
-                                a: "O valor varia conforme o tipo de película escolhida e a quantidade de metros quadrados de vidro. Películas básicas custam menos do que as linhas nano cerâmica ou de segurança. Ofereço orçamento gratuito e sem compromisso pelo WhatsApp — basta enviar uma mensagem com as medidas ou agendar uma visita para medição no local."
+                                q: "1. Qual o valor da instalação de insulfilm em Campo Grande?",
+                                a: "Os valores variam de acordo com o tamanho dos vidros e o tipo de material (Nano Cerâmica, Carbono, etc.). Oferecemos orçamento gratuito via WhatsApp agora mesmo — basta enviar as medidas."
                             },
                             {
-                                q: "2. Qual o melhor tipo de insulfilm para casas em Bangu?",
-                                a: "Para o clima quente da Zona Oeste, recomendo as películas nano cerâmica ou nano carbono para máxima rejeição de calor. Se privacidade for a prioridade, o G5 fumê é o mais indicado. Para quem não quer alterar a aparência do vidro, a linha IR transparente é a melhor opção."
+                                q: "2. Qual o prazo para instalação em Campo Grande?",
+                                a: "Nosso diferencial é o prazo: realizamos a aplicação em até 24 horas após a confirmação do orçamento, sem esperas intermináveis."
                             },
                             {
-                                q: "3. O insulfilm residencial danifica o vidro?",
-                                a: "Não. A aplicação é feita com produtos específicos para limpeza e adesão, sem riscos ao vidro. A instalação profissional garante que não fiquem arranhados ou manchas residuais."
+                                q: "3. O insulfilm realmente tira o calor em Campo Grande?",
+                                a: "Sim, nossas películas de Nano Cerâmica rejeitam até 80% do calor infravermelho. Isso resulta numa redução térmica real dentro do seu ambiente, dependendo da exposição solar."
                             },
                             {
-                                q: "4. Quanto tempo dura o insulfilm residencial?",
-                                a: "Nossas películas profissionais têm durabilidade estimada entre 8 a 15 anos. Elas mantêm as propriedades térmicas e de cor por muito mais tempo. Trabalhamos com materiais de procedência que não criam bolhas nem ficam roxos."
+                                q: "4. Qual a garantia do serviço da LUME?",
+                                a: "Oferecemos garantia contratual de 5 anos. Nossas películas profissionais têm durabilidade estimada entre 8 a 15 anos e não desbotam nem ficam roxas com o tempo."
                             },
                             {
-                                q: "5. Qual o tempo de garantia do serviço?",
-                                a: "Oferecemos garantia contratual de 5 anos em todos os nossos serviços de aplicação. Isso cobre bolhas, delaminação e defeitos de instalação, garantindo sua total tranquilidade."
-                            },
-                            {
-                                q: "6. Posso instalar insulfilm em vidro temperado?",
-                                a: "Sim, desde que seja usada a película correta. Vidros temperados requerem películas com taxa de absorção de calor adequada para evitar estresse térmico. Avaliamos o tipo de vidro antes da recomendação."
-                            },
-                            {
-                                q: "7. O insulfilm escurece muito o ambiente?",
-                                a: "Depende da sua escolha. Películas como o Carbono G5 reduzem bastante a luminosidade (ideal para quartos). Já a Nano Cerâmica rejeita o calor mantendo a transparência quase total do vidro."
-                            },
-                            {
-                                q: "8. Atendem condomínios e empresas em Bangu?",
-                                a: "Sim. Atendemos residências em condomínios, lojas de rua, centros comerciais, clínicas, escritórios e qualquer ambiente comercial arquitetônico na região."
+                                q: "5. Atendem condomínios residenciais e empresas?",
+                                a: "Sim, somos especialistas em atendimento arquitetônico (imóveis). Atendemos casas, apartamentos e comércios em toda a região de Campo Grande."
                             }
                         ].map((faq, idx) => (
                             <details key={idx} className="group glass-card border border-white/5 rounded-2xl overflow-hidden cursor-pointer transition-all hover:bg-white/[0.03]">
@@ -464,16 +451,16 @@ export function BanguPage() {
                         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#c9a227] to-transparent opacity-30" />
                         
                         <h2 className="text-4xl md:text-6xl lg:text-7xl font-black mb-8 font-['Montserrat'] tracking-tighter leading-tight">
-                            Proteja sua Casa do <span className="text-gradient-gold">Calor do Rio</span>
+                            Seu Imóvel Protegido em <span className="text-gradient-gold">Campo Grande</span>
                         </h2>
                         
                         <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mb-12 font-light leading-relaxed">
-                            Agende uma visita técnica gratuita em <strong className="text-white">Bangu</strong> e receba um orçamento sob medida com a melhor durabilidade do mercado.
+                            Aproveite nossa <strong className="text-white">instalação express em 24h</strong>. Qualidade premium com o melhor custo-benefício da Zona Oeste.
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
                             <a
-                                href="https://wa.me/5521965140612?text=Olá! Gostaria de um orçamento de insulfilm residencial em Bangu."
+                                href="https://wa.me/5521965140612?text=Olá! Quero um orçamento gratuito de insulfilm em Campo Grande."
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="w-full sm:w-auto bg-[#25d366] hover:bg-[#20bd5a] text-white px-12 py-6 rounded-2xl font-black uppercase tracking-widest transition-all duration-300 transform hover:scale-[1.05] shadow-[0_15px_45px_rgba(37,211,102,0.3)] flex items-center justify-center gap-4 text-sm group"
@@ -486,21 +473,21 @@ export function BanguPage() {
                                 to="/"
                                 className="w-full sm:w-auto bg-white/5 hover:bg-white/10 text-white border border-white/10 px-10 py-6 rounded-2xl font-bold uppercase tracking-widest transition-all text-sm backdrop-blur-sm"
                             >
-                                Ver Outros Exemplos
+                                Ver Todos os Produtos
                             </Link>
                         </div>
 
                         <div className="mt-12 flex flex-wrap justify-center gap-8 text-[11px] text-gray-500 font-bold uppercase tracking-[0.2em]">
                             <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> 5 Anos de Garantia</span>
-                            <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> 8-15 Anos de Durabilidade</span>
-                            <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> Instalação Express</span>
+                            <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> Durabilidade 8-15 Anos</span>
+                            <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> Orçamento Grátis</span>
                         </div>
                     </div>
                 </div>
             </section>
 
             <footer className="py-12 bg-[#070f1a] border-t border-white/5 text-center text-[10px] text-gray-500 font-bold uppercase tracking-[0.4em] px-4">
-                 © 2026 Lume Controle Solar · Especialista em Bangu e Zona Oeste
+                 © 2026 Lume Controle Solar · Especialista em Campo Grande e Zona Oeste
             </footer>
         </div>
     );

@@ -36,6 +36,8 @@ export function GuiaInsulfilm() {
             <Helmet>
                 <title>Guia Completo: Tudo sobre Insulfilm Residencial no RJ | LUME</title>
                 <meta name="description" content="Descubra qual a película de controle solar perfeita para sua necessidade. Privacidade, Redução de Calor e Proteção UV no Rio de Janeiro." />
+                <link rel="canonical" href="https://lumecontrolesolar.com.br/guia-insulfilm" />
+
                 
                 <script type="application/ld+json">
                     {`
@@ -43,7 +45,7 @@ export function GuiaInsulfilm() {
                             "@context": "https://schema.org",
                             "@type": "Article",
                             "headline": "Absolutamente tudo o que você precisa saber sobre insulfilm antes de comprar",
-                            "image": "https://lumecontrolesolar.netlify.app/novo-logo-lume.png",
+                            "image": "https://lumecontrolesolar.com.br/novo-logo-lume.png",
                             "author": {
                                 "@type": "Organization",
                                 "name": "LUME Controle Solar"
@@ -53,13 +55,71 @@ export function GuiaInsulfilm() {
                                 "name": "LUME Controle Solar",
                                 "logo": {
                                     "@type": "ImageObject",
-                                    "url": "https://lumecontrolesolar.netlify.app/novo-logo-lume.png"
+                                    "url": "https://lumecontrolesolar.com.br/novo-logo-lume.png"
                                 }
                             },
                             "mainEntityOfPage": {
                                 "@type": "WebPage",
-                                "@id": "https://lumecontrolesolar.netlify.app/guia-insulfilm"
+                                "@id": "https://lumecontrolesolar.com.br/guia-insulfilm"
                             }
+                        }
+                    `}
+                </script>
+                <script type="application/ld+json">
+                    {`
+                        {
+                            "@context": "https://schema.org",
+                            "@type": "FAQPage",
+                            "mainEntity": [
+                                {
+                                    "@type": "Question",
+                                    "name": "No inverno, minha casa vai ficar gelada?",
+                                    "acceptedAnswer": {
+                                        "@type": "Answer",
+                                        "text": "Não. Películas de alto padrão possuem propriedades de isolamento que ajudam a reter o calor gerado dentro de casa, impedindo que ele escape pelo vidro frio."
+                                    }
+                                },
+                                {
+                                    "@type": "Question",
+                                    "name": "As películas de insulfilm realmente economizam energia?",
+                                    "acceptedAnswer": {
+                                        "@type": "Answer",
+                                        "text": "Sim. Ao bloquear até 80% do calor solar, o ambiente resfria mais rápido e o ar-condicionado trabalha menos, gerando economia real na conta de luz."
+                                    }
+                                },
+                                {
+                                    "@type": "Question",
+                                    "name": "As minhas plantas vão morrer por falta de luz?",
+                                    "acceptedAnswer": {
+                                        "@type": "Answer",
+                                        "text": "Não. Películas de qualidade bloqueiam raios UV e infravermelho, mas permitem a passagem da luz visível necessária para a fotossíntese."
+                                    }
+                                },
+                                {
+                                    "@type": "Question",
+                                    "name": "O filme protege contra o desbotamento de móveis?",
+                                    "acceptedAnswer": {
+                                        "@type": "Answer",
+                                        "text": "Protege muito. O filme bloqueia 99% do UV e a maior parte do calor, principais causas do desbotamento, retardando o processo significativamente."
+                                    }
+                                },
+                                {
+                                    "@type": "Question",
+                                    "name": "À noite, quem está fora conseguirá ver dentro de casa?",
+                                    "acceptedAnswer": {
+                                        "@type": "Answer",
+                                        "text": "Sim. O efeito de privacidade baseia-se na reflexão da luz: o lado mais iluminado reflete. À noite, com luzes internas acesas, o efeito se inverte."
+                                    }
+                                },
+                                {
+                                    "@type": "Question",
+                                    "name": "O insulfilm atrapalha o sinal de Wi-Fi e celular?",
+                                    "acceptedAnswer": {
+                                        "@type": "Answer",
+                                        "text": "Películas modernas de Nano Carbono ou Nano Cerâmica não possuem metais e são totalmente inertes, não causando interferência em sinais de celular ou Wi-Fi."
+                                    }
+                                }
+                            ]
                         }
                     `}
                 </script>
@@ -123,14 +183,15 @@ export function GuiaInsulfilm() {
                         </p>
                         <h3 className="text-xl font-bold text-white mt-8 mb-4">Alta Tecnologia: Nanocerâmica e Películas Claras</h3>
                         <p>
-                            Muitas pessoas acreditam que, para tirar o calor, é preciso "escuridão total". Isso é coisa do passado. Graças à <Link to="/nano-ceramica" className="text-[#c9a227] hover:underline font-bold">Tecnologia de Nanocerâmica</Link>, hoje é possível ter películas quase transparentes com uma performance térmica superior às películas escuras comuns.
+                            Muitas pessoas acreditam que, para tirar o calor, é preciso "escuridão total". Isso é coisa do passado. Graças à <Link to="/nano-ceramica" className="text-[#c9a227] hover:underline font-bold">Tecnologia de Nanocerâmica</Link>, hoje é possível ter películas quase transparentes with a performance térmica superior às películas escuras comuns.
                         </p>
                     </div>
 
                     <FAQAccordion items={[
-                        { q: "O insulfilm ajuda no inverno carioca?", a: "Sim! Ele ajuda a manter a temperatura interna mais estável, funcionando como um isolante térmico nas janelas." },
-                        { q: "O insulfilm substitui o ar-condicionado?", a: "Não, mas ele mantém o frescor por muito mais tempo e faz o aparelho resfriar o ambiente muito mais rápido." },
-                        { q: "Películas claras também tiram o calor?", a: "Sim! Através da rejeição de infravermelho. Existem tecnologias de nanocerâmica que são quase transparentes e bloqueiam mais calor que muitas películas escuras comuns." }
+                        { q: "No inverno, minha casa vai ficar gelada?", a: "Você tocou num ponto físico real! Como o filme barra o calor do sol, no inverno ele também vai reduzir o ganho térmico solar. A boa notícia é que películas de alto padrão também possuem propriedades de isolamento que ajudam a reter o calor gerado dentro de casa, impedindo que ele escape pelo vidro frio." },
+                        { q: "Realmente economiza energia elétrica?", a: "Sim, e é um investimento que se paga. Quando o sol bate no vidro sem proteção, ele transforma o ambiente em uma estufa. O ar-condicionado precisa trabalhar no talo para vencer essa carga térmica. Ao bloquear até 80% desse calor na janela, o ambiente resfria mais rápido e o motor do ar-condicionado trabalha menos, reduzindo o consumo de energia." },
+                        { q: "O filme vai deixar minha casa escura?", a: "De jeito nenhum, a menos que você queira! Antigamente, para barrar o calor, era preciso escurecer o vidro. Hoje a física evoluiu. O sol emite luz visível (que ilumina) e infravermelho (que gera calor). Películas de alta tecnologia, como as de Nano Cerâmica, conseguem filtrar seletivamente a radiação infravermelha, retendo o calor enquanto deixam a luz natural passar quase que totalmente." },
+                        { q: "As minhas plantas vão morrer por falta de luz?", a: "Não. Para fazer a fotossíntese, as plantas utilizam principalmente a luz visível (espectros azul e vermelho). As películas de qualidade bloqueiam os raios UV (que causam queimaduras nas folhas) e o infravermelho (calor excessivo que desidrata a planta). A luz que as plantas precisam para \"se alimentar\" continua passando perfeitamente." }
                     ]} />
                 </section>
 
@@ -162,9 +223,10 @@ export function GuiaInsulfilm() {
                     </div>
 
                     <FAQAccordion items={[
-                        { q: "Mesmo em dias nublados o UV é perigoso?", a: "Sim, o raio UV atravessa nuvens e vidros comuns sem dificuldade. A proteção da película é constante." },
-                        { q: "A película perde o filtro UV com o tempo?", a: "Películas de baixa qualidade (tingidas) perdem. Películas premium mantêm a proteção por muitos anos." },
-                        { q: "Por que o jateado também protege contra o UV?", a: "Porque o bloqueio UV não depende da cor ou da transparência, mas sim dos inibidores químicos presentes nas camadas internas do poliéster da película." }
+                        { q: "O filme protege mesmo contra o desbotamento de móveis e pisos?", a: "Protege muito, mas a proteção não é 100% vitalícia, e qualquer profissional honesto vai te dizer isso. O desbotamento é causado por três fatores principais: Raios UV (40%), Calor (25%) e Luz Visível (25%). O filme bloqueia 99% do UV e a maior parte do calor, o que significa que ele retarda o desbotamento em muitas vezes. Mas como a luz visível ainda passa (afinal, você quer claridade), o processo continua ocorrendo, só que em passos de tartaruga!" },
+                        { q: "Mesmo em dias nublados o UV é perigoso?", a: "Sim, com certeza. Diferente da luz visível, que é barrada pelas nuvens, a radiação ultravioleta possui um comprimento de onda que atravessa facilmente a camada de nuvens e o vidro comum sem qualquer dificuldade. Na verdade, em dias nublados, podemos ser enganados pela sensação de frescor, mas a carga de UV que incide sobre sua pele e seus móveis continua sendo perigosamente alta." },
+                        { q: "A película perde o filtro UV com o tempo?", a: "Depende da qualidade da fabricação. Películas tingidas de baixo custo (aquelas que ficam roxas) possuem inibidores de UV instáveis que são destruídos rapidamente pela própria radiação solar. Já as películas de alto padrão LUME possuem estabilizadores de UV integrados na massa do poliéster durante a fabricação, garantindo 99% de bloqueio UV eficaz por muitos anos." },
+                        { q: "Por que o jateado também protege contra o UV?", a: "É um mito comum achar que o bloqueio UV depende da cor ou da transparência. Na realidade, o filtro UV é um componente químico incolor e invisível que é adicionado às camadas internas do poliéster. O efeito 'jateado' é apenas visual (uma distorção da luz), mas o material base da película LUME já contém a tecnologia de absorção ultravioleta máxima para proteger seu patrimônio." }
                     ]} />
                 </section>
 
@@ -196,8 +258,10 @@ export function GuiaInsulfilm() {
                     </div>
 
                     <FAQAccordion items={[
-                        { q: "À noite, com as luzes acesas, o efeito de privacidade continua?", a: "Não. A física da luz dita que o lado mais iluminado é o que reflete. À noite, se a luz interna estiver forte, a privacidade diminui. Cortinas ainda são recomendadas para a noite." },
-                        { q: "Qual a diferença da G5 para a G20?", a: "A G5 é mais escura (permite 5% de entrada de luz), oferecendo máxima privacidade diurna. A G20 é média, equilibrando privacidade leve e mais claridade natural." }
+                        { q: "À noite, quem está fora conseguirá ver dentro de casa?", a: "Sim, e é importante ser honesto sobre isso. O efeito de privacidade (seja fumê ou espelhado) baseia-se na física da reflexão da luz: o lado que estiver mais iluminado reflete e não vê através do vidro. Durante o dia, o sol faz esse papel e ninguém te vê. À noite, se você acender a luz interna, o interior da casa fica mais claro que o exterior, e o efeito se inverte. Para a noite, o uso de cortinas ou persianas continua sendo necessário." },
+                        { q: "Qual a diferença da G5 para a G20?", a: "É uma questão de luminosidade e privacidade. A letra 'G' vem de 'Grade' (grau de transparência). Uma película G5 permite que apenas 5% da luz visível atravesse o vidro, sendo a escolha ideal para quem busca privacidade total em quartos ou salas que recebem muito brilho. Já a G20 permite a passagem de 20% da luz, sendo considerada uma película de transparência média. Ela equilibra bem a visão externa clara durante o dia com uma redução moderada do calor e um nível de privacidade satisfatório." },
+                        { q: "O filme de segurança deixa o vidro inquebrável?", a: "Não, he não impede que o vidro quebre. A função da película de segurança (antivandalismo) é a retenção. Se alguém der uma marretada ou uma pedra bater no vidro, ele vai quebrar, mas os estilhaços ficarão colados na película. Isso evita que cacos firam pessoas e cria uma barreira física resistente que atrasa a invasão de criminosos." },
+                        { q: "O filme é resistente a arranhões? E se meu gato arranhar?", a: "Películas profissionais possuem uma camada de proteção contra riscos chamada Hard Coat, feita exatamente para resistir à limpeza do dia a dia. Mas vamos ser realistas: as garras de um gato ou cachorro empolgado aplicando força pontual podem, sim, rasgar o poliéster. Se o arranhão for profundo e incomodar visualmente, infelizmente não há 'retoque'; será necessário trocar a película daquela peça de vidro específica." }
                     ]} />
                 </section>
 
@@ -248,8 +312,12 @@ export function GuiaInsulfilm() {
                     </div>
 
                     <FAQAccordion items={[
-                        { q: "Moro em condomínio e não posso usar película refletiva, o que fazer?", a: "Nestes casos, recomendamos fortemente a Linha Nanocerâmica. Como ela é praticamente invisível por fora, ela não altera a fachada do prédio e entrega um conforto térmico superior a qualquer película escura." },
-                        { q: "Qual a diferença entre Carbono e Tintada?", a: "Películas tintadas são apenas 'adesivos pintados' que desbotam e ficam roxos rapidamente. A Carbono tem a cor na própria massa e estrutura, garantindo que nunca mude de cor." }
+                        { q: "Moro em condomínio e não posso usar película refletiva, o que fazer?", a: "Essa é uma situação muito comum. Prédios com fachadas padronizadas proíbem o efeito espelhado ou o escurecimento excessivo. Nesses casos, a solução ideal é a Linha Nano Cerâmica. Como ela é tecnologicamente projetada para ser quase invisível por fora, ela não altera a estética do edifício, permitindo que você desfrute de um conforto térmico superior sem infringir as regras do condomínio." },
+                        { q: "Qual a diferença entre Carbono e Tintada?", a: "A diferença é brutal em termos de durabilidade. Películas tintadas são o que chamamos de 'adesivos de balcão': a cor é apenas um pigmento na superfície que desbota e fica roxo sob o sol do Rio em poucos meses. O filme de Carbono, por outro lado, possui a pigmentação fundida na própria massa do poliéster. Isso garante que a película nunca perca a cor original, mantendo o visual grafite profundo por toda a vida útil do produto." },
+                        { q: "O filme atrapalha o sinal de Wi-Fi e celular?", a: "As películas antigas ou espelhadas baratas usavam metais em sua composição, o que criava uma barreira (Gaiola de Faraday) e atenuava sinais eletromagnéticos. Já as películas modernas de Nano Carbono ou Nano Cerâmica são feitas de materiais não condutivos. Elas são totalmente inertes e não causam nenhuma interferência no seu Wi-Fi, sinal de celular ou GPS." },
+                        { q: "Posso aplicar em vidros duplos (insulados) ou apenas nos simples?", a: "Pode ser aplicado, mas exige cuidado redobrado. Em vidros duplos (termoacústicos), o calor pode ficar aprisionado na câmara de ar entre os vidros. Por isso, nunca devemos usar películas muito escuras ou altamente absorventes na face interna de um vidro duplo. É necessário usar películas específicas de alta reflexão ou de baixa absorção térmica." },
+                        { q: "Qual a diferença entre o filme fumê e o nano cerâmico?", a: "O filme fumê tradicional bloqueia o calor 'no peito', barrando o excesso de luz (escurecendo o ambiente). Já o filme de Nano Cerâmica usa nanotecnologia para absorver e rejeitar a radiação infravermelha (calor) sem precisar bloquear a luz. Em resumo: o fumê escurece e protege um pouco; a nano cerâmica protege muito e pode ser completamente transparente." },
+                        { q: "Meu vidro já é verde (fábrica). Posso colocar película por cima?", a: "Claro que pode! Vidros coloridos de fábrica (como o verde ou bronze) já oferecem uma pequena redução de calor porque absorvem parte da radiação. Quando aplicamos o filme por cima, o efeito térmico se soma. Esteticamente, a cor original do vidro vai se fundir com a tonalidade da película escolhida. Só é preciso cuidado na escolha para não precisar gerar uma absorção térmica excessiva que cause estresse no vidro." }
                     ]} />
                 </section>
 
@@ -394,7 +462,7 @@ export function GuiaInsulfilm() {
                             Você já viu aqueles carros com o vidro cheio de bolhas e com uma cor roxa estranha? Isso é o resultado de películas tintadas de baixa qualidade. Elas duram poucos meses sob o sol do Rio.
                         </p>
                         <p>
-                            Um insulfilm residencial premium aplicado por um profissional experiente deve durar de <strong>5 a 10 anos</strong>. E para garantir essa longevidade:
+                            Um insulfilm residencial premium aplicado por um profissional experiente deve ter vida útil estimada de <strong>8 a 15 anos</strong>. Na LUME, oferecemos <strong>garantia certificada de 5 anos</strong> em nossos serviços, assegurando:
                         </p>
                         <ul className="list-disc pl-6 space-y-2 text-white/80">
                             <li><strong>Tempo de Cura:</strong> Não limpe os vidros nos primeiros 5 dias após a instalação.</li>
@@ -404,9 +472,10 @@ export function GuiaInsulfilm() {
                     </div>
 
                     <FAQAccordion items={[
-                        { q: "Por que as películas baratas criam bolhas horríveis?", a: "Geralmente é má aplicação combinada ao uso de adesivos de baixa qualidade que fervem e reagem com o calor do sol gerando gases." },
-                        { q: "O cloro da piscina perto da janela estraga o filme?", a: "O vapor de cloro pode afetar películas metalizadas com o passar dos anos. Para áreas de lazer, recomendamos uso de Carbono ou Nanocerâmica." },
-                        { q: "A remoção de filme velho estraga o vidro?", a: "A remoção é técnica. Se feita sozinho com lâminas erradas, sim. Mas feita por nossos profissionais com removedores corretos, o vidro volta a ser novo." }
+                        { q: "Vai ficar bolha ou marcado nas bordas?", a: "Não fica com bolhas de ar ou borrões se o instalador for bom! Geralmente é má aplicação combinada ao uso de adesivos de baixa qualidade que fervem e reagem com o calor do sol gerando gases. Sobre as bordas, a física e a técnica exigem um corte com uma folga milimétrica (cerca de 1 a 2 mm) em relação à borracha ou esquadria. Isso é necessário para que a água usada na aplicação seja totalmente drenada e para que a dilatação térmica do vidro não faça a película levantar nas pontas com o tempo. De longe, essa bordinha é imperceptível." },
+                        { q: "O cloro da piscina perto da janela estraga o filme?", a: "O vapor de cloro é um agente químico corrosivo que pode afetar negativamente as películas metalizadas (espelhadas comuns) com o passar dos anos, causando oxidação. No entanto, para áreas de lazer, piscinas ou academias, recomendamos as películas de Nano Carbono ou Nano Cerâmica. Como esses materiais não possuem metais em sua composição, eles são quimicamente inertes ao cloro, garantindo uma vida útil muito maior mesmo em ambientes com alta umidade e agentes químicos." },
+                        { q: "Posso aplicar no box do banheiro? O vapor não estraga o filme?", a: "Pode, e fica ótimo para dar privacidade ou um efeito jateado! O segredo aqui é o lado da aplicação. O ideal é aplicar a película pelo lado de fora do box, onde não há contato direto com a água corrente e produtos químicos de banho. O vapor do banheiro em si não descola o filme depois que a cola passa pelo período de cura, mas a água constante batendo na borda poderia reduzir a vida útil do material." },
+                        { q: "Como é feita a instalação? Suja muito a casa?", a: "O processo envolve o uso de água e detergente neutro para posicionar e ativar a cola da película. É um trabalho muito limpo em comparação com obras civis. Um instalador profissional protege o chão e os móveis próximos com lonas ou toalhas, faz a raspagem e limpeza profunda do vidro e recolhe todo o descarte. A casa fica exatamente como estava, só que muito mais fresca." }
                     ]} />
                 </section>
 
@@ -434,8 +503,8 @@ export function GuiaInsulfilm() {
                     </div>
 
                     <FAQAccordion items={[
-                        { q: "A remoção estraga o vidro?", a: "Se feita corretamente por um profissional, o vidro volta a ser exatamente o que era antes." },
-                        { q: "Quanto tempo leva para remover?", a: "Depende do estado da película. Uma janela muito queimada pelo sol pode levar o dobro do tempo de uma instalação nova." }
+                        { q: "A remoção estraga o vidro?", a: "Se feita por um profissional qualificado usando as ferramentas corretas, o vidro volta a ser exatamente o que era antes, sem um único arranhão. O segredo está no uso de vaporetos industriais para amolecer a cola e solventes cítricos específicos que dissolvem o adesivo residual sem a necessidade de força bruta ou estiletes inadequados. Se você tentar remover em casa 'no seco', o risco de riscar o vidro ou deixar manchas permanentes de cola é altíssimo." },
+                        { q: "Quanto tempo leva para remover?", a: "Depende inteiramente do 'estado de saúde' da película antiga. Um filme que ficou exposto ao sol direto por 10 anos e começou a ressecar (craquelar) pode levar o triplo do tempo para ser removido em comparação a uma instalação nova. Em média, a remoção pode levar de 30 minutos a 1 hora por peça de vidro, dependendo da dificuldade de extração da cola. É um processo que exige paciência e técnica para preservar a integridade do seu vidro." }
                     ]} />
                 </section>
 
