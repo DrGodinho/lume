@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { Shield, Sun, Thermometer, CheckCircle, ArrowRight, Eye, SunDim, Star, PiggyBank, Lock, MapPin, Zap, MessageCircle, Droplets } from 'lucide-react';
 import { WhatsAppButton } from '../components/WhatsAppButton';
+import { GoogleReviews } from '../components/GoogleReviews';
 import { Particles } from '../components/Particles';
 import { Link } from 'react-router-dom';
 import gsap from 'gsap';
@@ -412,6 +413,8 @@ export function RecreioPage() {
                     </div>
                 </div>
             </section>
+
+            <GoogleReviews />
 
             {/* CTA Final */}
             <section className="py-24 relative overflow-hidden bg-[#070f1a]">
