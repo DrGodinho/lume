@@ -24,6 +24,9 @@ import { GuiaInsulfilm } from './pages/GuiaInsulfilm';
 import { BanguPage } from './pages/BanguPage';
 import { RealengoPage } from './pages/RealengoPage';
 import { CampoGrandePage } from './pages/CampoGrandePage';
+import { JacarepaguaPage } from './pages/JacarepaguaPage';
+import { BarraPage } from './pages/BarraPage';
+import { RecreioPage } from './pages/RecreioPage';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -110,6 +113,9 @@ function App() {
           <Route path="/insulfilm-em-bangu" element={<BanguPage />} />
           <Route path="/insulfilm-em-realengo" element={<RealengoPage />} />
           <Route path="/insulfilm-em-campo-grande" element={<CampoGrandePage />} />
+          <Route path="/insulfilm-em-jacarepagua" element={<JacarepaguaPage />} />
+          <Route path="/insulfilm-na-barra-da-tijuca" element={<BarraPage />} />
+          <Route path="/insulfilm-no-recreio" element={<RecreioPage />} />
         </Routes>
       </main>
 

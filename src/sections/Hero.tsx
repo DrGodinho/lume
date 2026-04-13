@@ -72,8 +72,9 @@ export function Hero() {
       <div className="absolute inset-0 z-0">
         <img
           src="/hero-bg.jpg"
-          alt="Sala de estar moderna"
+          alt="Sala de estar protegida com insulfilm residencial Lume na Zona Oeste do Rio"
           className="w-full h-full object-cover"
+          fetchPriority="high"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#0a1628]/95 via-[#0a1628]/80 to-[#0a1628]/60" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-transparent to-[#0a1628]/50" />

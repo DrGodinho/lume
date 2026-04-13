@@ -59,12 +59,12 @@ export function JateadoPage() {
                             "@context": "https://schema.org",
                             "@type": "Product",
                             "name": "Película Jateada (Acabamento Fosco)",
-                            "image": "https://lumecontrolesolar.com.br/logo.png",
+                            "image": "https://lumecontrolesolar.com.br/product-jateado-v2.png",
                             "description": "Filme com efeito fosco/jateado para vidros. Garante privacidade visual bi-direcional preservando até 85% da luminosidade natural do ambiente.",
                             "brand": {
                                 "@type": "Brand",
                                 "name": "LUME Películas"
-            },
+                            },
                             "offers": {
                                 "@type": "Offer",
                                 "url": "https://lumecontrolesolar.com.br/jateado",
@@ -77,41 +77,6 @@ export function JateadoPage() {
                                     "name": "LUME Controle Solar"
                                 }
                             }
-                        }
-                    `}
-                </script>
-
-                <script type="application/ld+json">
-                    {`
-                        {
-                            "@context": "https://schema.org",
-                            "@type": "FAQPage",
-                            "mainEntity": [
-                                {
-                                    "@type": "Question",
-                                    "name": "A película jateada escurece o ambiente interno?",
-                                    "acceptedAnswer": {
-                                        "@type": "Answer",
-                                        "text": "De forma alguma! Essa é a maior vantagem do material jateado. Ele possui uma Transmissão de Luz Visível (VLT) altíssima, variando entre 50% a 85%. Isso significa que ele apenas difunde (espalha) a luz, bloqueando a visão detalhada, mas mantendo a sua sala, clínica ou escritório totalmente iluminados com a luz do dia."
-                                    }
-                                },
-                                {
-                                    "@type": "Question",
-                                    "name": "Pode ser instalada dentro do box do banheiro?",
-                                    "acceptedAnswer": {
-                                        "@type": "Answer",
-                                        "text": "Sim, a película jateada é extremamente popular para box de banheiros e janelas de lavanderias. O material é feito de poliéster de alta resistência e possui um adesivo projetado para suportar ambientes com variações de umidade e vapor diárias, garantindo extrema privacidade para a hora do banho sem deixar o banheiro escuro."
-                                    }
-                                },
-                                {
-                                    "@type": "Question",
-                                    "name": "O Jateado deixa marcas de dedo com facilidade?",
-                                    "acceptedAnswer": {
-                                        "@type": "Answer",
-                                        "text": "As linhas premium de películas jateadas que utilizamos na LUME recebem um tratamento superficial específico anti-marcas. Ao contrário de vidros jateados na areia (que encardem profundamente com a gordura das mãos), a película possui um acabamento liso e lavável que dificulta a marcação digital e facilita muito a limpeza no dia a dia."
-                                    }
-                                }
-                            ]
                         }
                     `}
                 </script>

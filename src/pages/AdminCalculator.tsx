@@ -56,7 +56,8 @@ interface GlassItem {
     label?: string;
     forceRotate?: boolean | undefined;
     alignRight?: boolean;
-    sortOrder?: number; // controls pack sequence — drag reorders this
+    sortOrder?: number;
+    _manualPos?: { x: number; y: number }; // Posição manual após drag
 }
 
 interface Block {
@@ -183,12 +184,12 @@ export function AdminCalculator() {
 
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-    // ─── DRAG / REORDER ────────────────────────────────────────────────────────
-    // Drag changes sortOrder of pieces → worker repacks → no overlaps ever
+    // ─── DRAG / MAGNETIC SNAP ─────────────────────────────────────────────────
     const [dragId, setDragId] = useState<string | null>(null);
     const [dragVisualPos, setDragVisualPos] = useState<{ x: number; y: number } | null>(null);
-    const [dropTargetId, setDropTargetId] = useState<string | null>(null);
+    const [dragOverId, setDragOverId] = useState<string | null>(null);
     const dragOffsetRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+    const didDragRef = useRef(false);
     const isDragging = dragId !== null;
 
     const containerRef = useRef<HTMLDivElement>(null);
@@ -259,13 +260,12 @@ self.onmessage = (e) => {
         const bh = v.forceRotate ? (v.ow + margin) : (v.oh + margin);
         const brw = v.forceRotate ? v.oh : v.ow;
         const brh = v.forceRotate ? v.ow : v.oh;
-        return { id: v.id, w: bw, h: bh, rw: brw, rh: brh, cor: v.cor, label: v.label, rotated: v.forceRotate === true, h_visual: bh, forceRotate: v.forceRotate, alignRight: v.alignRight === true, sortOrder: v.sortOrder ?? 0 };
+        return { id: v.id, w: bw, h: bh, rw: brw, rh: brh, cor: v.cor, label: v.label, rotated: v.forceRotate === true, h_visual: bh, forceRotate: v.forceRotate, alignRight: v.alignRight === true, sortOrder: v.sortOrder ?? 0, _manualPos: v._manualPos };
     });
     // Always pack in explicit sortOrder so drag-reorder is respected
     baseItems.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
     if (modoOtimizacao === 'densidade') {
         let items = cloneItems(baseItems);
-        items.sort((a, b) => (b.w * b.h) - (a.w * a.h));
         let freeRects = [{ x: 0, y: 0, w: rollW, h: 999999 }];
         let currentMaxY = 0, currentAreaV = 0;
         items.forEach(b => {
@@ -313,10 +313,10 @@ self.onmessage = (e) => {
         result = { blocos: items, maxY: currentMaxY, areaV: currentAreaV };
     } else {
         let strategies = [];
-        strategies.push(cloneItems(baseItems).sort((a, b) => (b.w * b.h) - (a.w * a.h)));
-        strategies.push(cloneItems(baseItems).sort((a, b) => b.h - a.h || b.w - a.w));
-        strategies.push(cloneItems(baseItems).map(b => { if (b.forceRotate !== true && b.w > b.h && b.h <= rollW) { [b.w, b.h] = [b.h, b.w]; [b.rw, b.rh] = [b.rh, b.rw]; b.rotated = true; b.h_visual = b.h; } return b; }).sort((a, b) => (b.w * b.h) - (a.w * a.h)));
-        strategies.push(cloneItems(baseItems).map(b => { if (b.forceRotate !== true && b.h > b.w && b.h <= rollW) { [b.w, b.h] = [b.h, b.w]; [b.rw, b.rh] = [b.rh, b.rw]; b.rotated = true; b.h_visual = b.h; } return b; }).sort((a, b) => (b.w * b.h) - (a.w * a.h)));
+        strategies.push(cloneItems(baseItems));
+        strategies.push(cloneItems(baseItems));
+        strategies.push(cloneItems(baseItems).map(b => { if (b.forceRotate !== true && b.w > b.h && b.h <= rollW) { [b.w, b.h] = [b.h, b.w]; [b.rw, b.rh] = [b.rh, b.rw]; b.rotated = true; b.h_visual = b.h; } return b; }));
+        strategies.push(cloneItems(baseItems).map(b => { if (b.forceRotate !== true && b.h > b.w && b.h <= rollW) { [b.w, b.h] = [b.h, b.w]; [b.rw, b.rh] = [b.rh, b.rw]; b.rotated = true; b.h_visual = b.h; } return b; }));
         let bestResult = null, minTotalY = Infinity;
         strategies.forEach(testItems => {
             let shelves = [], totalY = 0, currentAreaV = 0;
@@ -446,7 +446,6 @@ self.onmessage = (e) => {
         if (!h || !w || h <= 0 || w <= 0 || q <= 0) return;
         const novos: GlassItem[] = [];
         for (let i = 0; i < q; i++) {
-            // FIX 2: sempre inicializar forceRotate e alignRight explicitamente
             novos.push({
                 id: Math.random().toString(36).substr(2, 9),
                 h, w, oh: h, ow: w,
@@ -475,7 +474,6 @@ self.onmessage = (e) => {
         setSelectedIds([]);
     };
 
-    // FIX 1: toggle entre undefined e true — evita que false quebre o worker
     const handleRotateSelected = () => {
         setVidros(prev => prev.map(v =>
             selectedIds.includes(v.id)
@@ -490,7 +488,7 @@ self.onmessage = (e) => {
         ));
     };
 
-    // ─── DRAG HANDLERS ─────────────────────────────────────────────────────────
+    // ─── DRAG HANDLERS COM MAGNETIC SNAP ────────────────────────────────────────
 
     const scale = containerWidth / rollW; // px per cm
 
@@ -506,7 +504,8 @@ self.onmessage = (e) => {
         };
         setDragId(block.id);
         setDragVisualPos({ x: block.fit.x * scale, y: block.fit.y * scale });
-        setSelectedIds([]);
+        setDragOverId(null);
+        didDragRef.current = false;
     };
 
     const handleDragMove = useCallback((e: MouseEvent | TouchEvent) => {
@@ -516,44 +515,38 @@ self.onmessage = (e) => {
         const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
         const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
 
-        const pxX = clientX - rect.left - dragOffsetRef.current.x;
-        const pxY = clientY - rect.top - dragOffsetRef.current.y;
-        setDragVisualPos({ x: pxX, y: pxY });
+        const pxX = clientX - rect.left;
+        const pxY = clientY - rect.top;
+        setDragVisualPos({ x: pxX - dragOffsetRef.current.x, y: pxY - dragOffsetRef.current.y });
+        didDragRef.current = true;
 
-        // Find which block center is closest to cursor to show drop target highlight
-        const cursorCmX = (clientX - rect.left) / scale;
-        const cursorCmY = (clientY - rect.top) / scale;
-        let closest: string | null = null;
-        let closestDist = Infinity;
-        blocosCalculados.forEach(b => {
-            if (b.id === dragId || !b.fit) return;
-            const cx = b.fit.x + (b.w - margin) / 2;
-            const cy = b.fit.y + ((b.h_visual || b.h) - margin) / 2;
-            const dist = Math.hypot(cursorCmX - cx, cursorCmY - cy);
-            if (dist < closestDist) { closestDist = dist; closest = b.id; }
+        // Detecta sobre qual peça o cursor está (apenas visual highlight)
+        const hoveredBlock = blocosCalculados.find(b => {
+            if (b.id === dragId || !b.fit) return false;
+            const bLeft = b.fit.x * scale;
+            const bTop = b.fit.y * scale;
+            const bRight = bLeft + (b.w - margin) * scale;
+            const bBottom = bTop + ((b.h_visual || b.h) - margin) * scale;
+            return pxX >= bLeft && pxX <= bRight && pxY >= bTop && pxY <= bBottom;
         });
-        setDropTargetId(closest);
+
+        setDragOverId(hoveredBlock ? hoveredBlock.id : null);
     }, [dragId, blocosCalculados, scale, margin]);
 
     const handleDragEnd = useCallback(() => {
         if (!dragId) return;
 
-        if (dropTargetId) {
-            // Reorder: swap sortOrders between dragged and drop target
-            // This tells the worker to pack them in the new sequence
+        // Reordena no drop: estilo iOS — move o item arrastado para a posição do drop target
+        if (dragOverId) {
             setVidros(prev => {
-                const draggedItem = prev.find(v => v.id === dragId);
-                const targetItem = prev.find(v => v.id === dropTargetId);
-                if (!draggedItem || !targetItem) return prev;
-
-                // Shift all items between the two positions
                 const sorted = [...prev].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
                 const draggedIdx = sorted.findIndex(v => v.id === dragId);
-                const targetIdx = sorted.findIndex(v => v.id === dropTargetId);
+                const targetIdx = sorted.findIndex(v => v.id === dragOverId);
+                if (draggedIdx === -1 || targetIdx === -1) return prev;
 
                 const reordered = [...sorted];
-                const [removed] = reordered.splice(draggedIdx, 1);
-                reordered.splice(targetIdx, 0, removed);
+                const [moved] = reordered.splice(draggedIdx, 1);
+                reordered.splice(targetIdx, 0, moved);
 
                 return reordered.map((v, i) => ({ ...v, sortOrder: i }));
             });
@@ -561,8 +554,8 @@ self.onmessage = (e) => {
 
         setDragId(null);
         setDragVisualPos(null);
-        setDropTargetId(null);
-    }, [dragId, dropTargetId, setVidros]);
+        setDragOverId(null);
+    }, [dragId, dragOverId, setVidros]);
 
     useEffect(() => {
         if (isDragging) {
@@ -580,17 +573,8 @@ self.onmessage = (e) => {
     }, [isDragging, handleDragMove, handleDragEnd]);
 
     const resetOrdem = () => {
-        // Reset sortOrder back to insertion order (sortOrder as originally set)
-        setVidros(prev => prev.map((v, i) => ({ ...v, sortOrder: i })));
+        setVidros(prev => prev.map((v, i) => ({ ...v, sortOrder: i, _manualPos: undefined })));
     };
-
-    const hasCustomOrder = useMemo(() => {
-        const sorted = [...vidros].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
-        return sorted.some((v, i) => {
-            const natural = vidros.findIndex(x => x.id === v.id);
-            return natural !== i;
-        });
-    }, [vidros]);
 
     // ─── HISTÓRICO ─────────────────────────────────────────────────────────────
 
@@ -622,7 +606,10 @@ self.onmessage = (e) => {
             data: new Date().toLocaleDateString('pt-BR'),
             valor: finalPrice,
             qtd: vidros.length,
-            vidros,
+            vidros: vidros.map(v => {
+                const { _manualPos, ...rest } = v;
+                return rest;
+            }),
             config: { rollW, price, margin }
         };
         const atualizado = [novo, ...historico].slice(0, 20);
@@ -661,7 +648,12 @@ self.onmessage = (e) => {
     };
 
     const salvarProjeto = () => {
-        const dados = { config: { cliente, rolo: rollW, preco: price }, vidros };
+        const dados = {
+            config: { cliente, rolo: rollW, preco: price }, vidros: vidros.map(v => {
+                const { _manualPos, ...rest } = v;
+                return rest;
+            })
+        };
         const blob = new Blob([JSON.stringify(dados)], { type: 'application/json' });
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
         a.download = (cliente || 'projeto') + ".insul"; a.click();
@@ -922,7 +914,6 @@ self.onmessage = (e) => {
             )}
 
             {/* BARRA FLUTUANTE: SELEÇÃO */}
-            {/* FIX 3: onPointerDown + preventDefault em todos os botões de ação */}
             {selectedIds.length > 0 && (
                 <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-[#1e293b] border border-[#3b82f6]/50 shadow-[0_0_30px_rgba(59,130,246,0.2)] p-3 rounded-2xl z-50 flex items-center gap-3 xl:gap-4 transition-all animate-fade-in w-[95%] max-w-md">
                     <div className="flex flex-col min-w-[80px]">
@@ -1180,7 +1171,7 @@ self.onmessage = (e) => {
                                     <button onClick={() => setModoOtimizacao('densidade')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${modoOtimizacao === 'densidade' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}>Corte Densidade</button>
                                     <button onClick={() => setModoOtimizacao('facilidade')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${modoOtimizacao === 'facilidade' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}>Corte Fácil</button>
                                 </div>
-                                {hasCustomOrder && (
+                                {false && (
                                     <button
                                         onClick={resetOrdem}
                                         className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-wider bg-orange-500/20 border border-orange-500/40 text-orange-400 hover:bg-orange-500/30 transition-all"
@@ -1195,7 +1186,7 @@ self.onmessage = (e) => {
                                 <div className="absolute top-0 left-0 w-full bg-[#1f2937] text-gray-400 text-[10px] uppercase font-bold flex justify-between px-3 py-1.5 z-10 border-b border-gray-700">
                                     <span className="flex items-center gap-2">
                                         0cm
-                                        {isDragging && <span className="text-blue-400 text-[9px] normal-case">· arraste para reordenar</span>}
+                                        {isDragging && <span className="text-blue-400 text-[9px] normal-case">· arraste livremente, snap automático</span>}
                                     </span>
                                     <span className="flex items-center gap-2">
                                         {isCalculating && <span className="w-2 h-2 rounded-full bg-[#c9a227] animate-pulse inline-block" title="Calculando..." />}
@@ -1218,18 +1209,17 @@ self.onmessage = (e) => {
                                             if (!b.fit) return null;
                                             const isSelected = selectedIds.includes(b.id);
                                             const isDraggingThis = dragId === b.id;
-                                            const isDropTarget = dropTargetId === b.id;
+                                            const isDropTarget = dragOverId === b.id;
 
-                                            // The ghost stays at worker position; the floating clone follows cursor
                                             const pos = b.fit;
 
                                             return (
                                                 <React.Fragment key={b.id}>
-                                                    {/* Ghost placeholder — shown at original position while dragging */}
+                                                    {/* Ghost/Current position */}
                                                     <div
                                                         onMouseDown={(e) => handleDragStart(e, b)}
                                                         onTouchStart={(e) => handleDragStart(e, b)}
-                                                        onClick={() => { if (!isDragging) toggleSelection(b.id); }}
+                                                        onClick={() => { if (!didDragRef.current) toggleSelection(b.id); }}
                                                         className="absolute flex flex-col items-center justify-center text-black font-bold"
                                                         style={{
                                                             left: pos.x * scale,
@@ -1268,7 +1258,7 @@ self.onmessage = (e) => {
                                                         </>}
                                                     </div>
 
-                                                    {/* Floating clone — follows cursor during drag */}
+                                                    {/* Floating clone during drag */}
                                                     {isDraggingThis && dragVisualPos && (
                                                         <div
                                                             className="absolute flex flex-col items-center justify-center text-black font-bold pointer-events-none"

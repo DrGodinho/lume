@@ -40,23 +40,40 @@
     <priority>0.8</priority>
   </url>
 
+  <!-- Páginas de Bairro -->
   <url>
     <loc>https://lumecontrolesolar.com.br/insulfilm-em-bangu</loc>
-    <lastmod>2026-04-03</lastmod>
+    <lastmod>2026-04-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
-
   <url>
     <loc>https://lumecontrolesolar.com.br/insulfilm-em-realengo</loc>
-    <lastmod>2026-04-04</lastmod>
+    <lastmod>2026-04-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
-
   <url>
     <loc>https://lumecontrolesolar.com.br/insulfilm-em-campo-grande</loc>
-    <lastmod>2026-04-04</lastmod>
+    <lastmod>2026-04-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://lumecontrolesolar.com.br/insulfilm-em-jacarepagua</loc>
+    <lastmod>2026-04-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://lumecontrolesolar.com.br/insulfilm-na-barra-da-tijuca</loc>
+    <lastmod>2026-04-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://lumecontrolesolar.com.br/insulfilm-no-recreio</loc>
+    <lastmod>2026-04-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

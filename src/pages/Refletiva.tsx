@@ -59,7 +59,7 @@ export function RefletivaPage() {
                             "@context": "https://schema.org",
                             "@type": "Product",
                             "name": "Insulfilm Refletivo Clássico (Prata)",
-                            "image": "https://lumecontrolesolar.com.br/logo.png",
+                            "image": "https://lumecontrolesolar.com.br/product-refletiva.jpg",
                             "description": "Película espelhada prata com altíssima rejeição térmica (até 85% IRR). Garante privacidade diurna total com o efeito One-Way Mirror.",
                             "brand": {
                                 "@type": "Brand",
@@ -77,41 +77,6 @@ export function RefletivaPage() {
                                     "name": "LUME Controle Solar"
                                 }
                             }
-                        }
-                    `}
-                </script>
-
-                <script type="application/ld+json">
-                    {`
-                        {
-                            "@context": "https://schema.org",
-                            "@type": "FAQPage",
-                            "mainEntity": [
-                                {
-                                    "@type": "Question",
-                                    "name": "Como funciona o efeito espelhado do Insulfilm Refletivo?",
-                                    "acceptedAnswer": {
-                                        "@type": "Answer",
-                                        "text": "O 'One-Way Mirror' (espelho de mão única) funciona pela diferença de iluminação. Durante o dia, com o sol batendo na janela, quem está do lado de fora na rua vê as janelas da sua casa parecendo verdadeiros espelhos de prata, impedindo qualquer visão do seu interior. Quem está dentro de casa, consegue ver a rua normalmente. Lembre-se: à noite, com as luzes acesas dentro de casa, o efeito se inverte."
-                                    }
-                                },
-                                {
-                                    "@type": "Question",
-                                    "name": "O filme prata/espelhado pode ser instalado em qualquer tipo de vidro?",
-                                    "acceptedAnswer": {
-                                        "@type": "Answer",
-                                        "text": "Como as películas refletivas rejeitam uma massa monstruosa de calor do sol espelhando-o de volta, vidros muito antigos, aramados ou vidros duplos que não sejam temperados podem sofrer estresse térmico. A equipe da LUME sempre faz uma avaliação técnica antes da instalação para garantir que o vidro do seu condomínio ou residência é 100% compatível."
-                                    }
-                                },
-                                {
-                                    "@type": "Question",
-                                    "name": "Qual a durabilidade desta película diante do sol do Rio de Janeiro?",
-                                    "acceptedAnswer": {
-                                        "@type": "Answer",
-                                        "text": "Extremamente alta. Formada por uma matriz de poliéster e uma camada densa de deposição metálica que reflete em torno de 70% de todo calor (TSER), ela é muito mais resistente e fria do que filmes tingidos comuns, aguentando tranquilamente não apenas o calor do Rio, como anos de maresia."
-                                    }
-                                }
-                            ]
                         }
                     `}
                 </script>

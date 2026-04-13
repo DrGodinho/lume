@@ -65,64 +65,6 @@ export function GuiaInsulfilm() {
                         }
                     `}
                 </script>
-                <script type="application/ld+json">
-                    {`
-                        {
-                            "@context": "https://schema.org",
-                            "@type": "FAQPage",
-                            "mainEntity": [
-                                {
-                                    "@type": "Question",
-                                    "name": "No inverno, minha casa vai ficar gelada?",
-                                    "acceptedAnswer": {
-                                        "@type": "Answer",
-                                        "text": "Não. Películas de alto padrão possuem propriedades de isolamento que ajudam a reter o calor gerado dentro de casa, impedindo que ele escape pelo vidro frio."
-                                    }
-                                },
-                                {
-                                    "@type": "Question",
-                                    "name": "As películas de insulfilm realmente economizam energia?",
-                                    "acceptedAnswer": {
-                                        "@type": "Answer",
-                                        "text": "Sim. Ao bloquear até 80% do calor solar, o ambiente resfria mais rápido e o ar-condicionado trabalha menos, gerando economia real na conta de luz."
-                                    }
-                                },
-                                {
-                                    "@type": "Question",
-                                    "name": "As minhas plantas vão morrer por falta de luz?",
-                                    "acceptedAnswer": {
-                                        "@type": "Answer",
-                                        "text": "Não. Películas de qualidade bloqueiam raios UV e infravermelho, mas permitem a passagem da luz visível necessária para a fotossíntese."
-                                    }
-                                },
-                                {
-                                    "@type": "Question",
-                                    "name": "O filme protege contra o desbotamento de móveis?",
-                                    "acceptedAnswer": {
-                                        "@type": "Answer",
-                                        "text": "Protege muito. O filme bloqueia 99% do UV e a maior parte do calor, principais causas do desbotamento, retardando o processo significativamente."
-                                    }
-                                },
-                                {
-                                    "@type": "Question",
-                                    "name": "À noite, quem está fora conseguirá ver dentro de casa?",
-                                    "acceptedAnswer": {
-                                        "@type": "Answer",
-                                        "text": "Sim. O efeito de privacidade baseia-se na reflexão da luz: o lado mais iluminado reflete. À noite, com luzes internas acesas, o efeito se inverte."
-                                    }
-                                },
-                                {
-                                    "@type": "Question",
-                                    "name": "O insulfilm atrapalha o sinal de Wi-Fi e celular?",
-                                    "acceptedAnswer": {
-                                        "@type": "Answer",
-                                        "text": "Películas modernas de Nano Carbono ou Nano Cerâmica não possuem metais e são totalmente inertes, não causando interferência em sinais de celular ou Wi-Fi."
-                                    }
-                                }
-                            ]
-                        }
-                    `}
-                </script>
             </Helmet>
 
             {/* Hero Section */}
@@ -462,7 +404,7 @@ export function GuiaInsulfilm() {
                             Você já viu aqueles carros com o vidro cheio de bolhas e com uma cor roxa estranha? Isso é o resultado de películas tintadas de baixa qualidade. Elas duram poucos meses sob o sol do Rio.
                         </p>
                         <p>
-                            Um insulfilm residencial premium aplicado por um profissional experiente deve ter vida útil estimada de <strong>8 a 15 anos</strong>. Na LUME, oferecemos <strong>garantia certificada de 5 anos</strong> em nossos serviços, assegurando:
+                            Um insulfilm residencial premium aplicado por um profissional experiente deve ter longevidade de performance superior e estabilidade de cor por muitos anos. Na LUME, oferecemos <strong>garantia oficial certificada de 5 anos</strong> em nossos serviços, assegurando:
                         </p>
                         <ul className="list-disc pl-6 space-y-2 text-white/80">
                             <li><strong>Tempo de Cura:</strong> Não limpe os vidros nos primeiros 5 dias após a instalação.</li>

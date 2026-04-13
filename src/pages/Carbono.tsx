@@ -57,44 +57,9 @@ export function CarbonoPage() {
                     {`
                         {
                             "@context": "https://schema.org",
-                            "@type": "FAQPage",
-                            "mainEntity": [
-                                {
-                                    "@type": "Question",
-                                    "name": "A película Carbono G5 tira a visão de dentro para fora à noite?",
-                                    "acceptedAnswer": {
-                                        "@type": "Answer",
-                                        "text": "A linha Carbono Premium possui excelente nitidez ótica de dentro para fora durante o dia. À noite, por ser um grau muito escuro (G5 com VLT de 5%), a visibilidade noturna para fora é reduzida. Para quem prioriza visão noturna perfeita mantendo o tom escuro por fora, a nossa recomendação costuma ser o Carbono G20."
-                                    }
-                                },
-                                {
-                                    "@type": "Question",
-                                    "name": "Qual a diferença entre o Insulfilm Carbono Premium e o filme comum tingido?",
-                                    "acceptedAnswer": {
-                                        "@type": "Answer",
-                                        "text": "A diferença é brutal. O filme comum tingido perde a cor, desbota, fica roxo em poucos meses sob o forte sol do Rio de Janeiro e retém baixíssimo calor. A película Carbono Premium possui nano-partículas de carbono em sua estrutura, garantindo uma proteção térmica massiva (até 90% IRR) e uma estabilidade de cor permanente (nunca ficará roxo)."
-                                    }
-                                },
-                                {
-                                    "@type": "Question",
-                                    "name": "O filme Carbono interfere no sinal de celular ou GPS em casa?",
-                                    "acceptedAnswer": {
-                                        "@type": "Answer",
-                                        "text": "Não! Totalmente zero interferência. Por ser uma tecnologia não-metálica (ao contrário das antigas películas refletivas ou espelhadas), a linha Carbono permite a passagem livre de todos os sinais de rádio, Wi-Fi, 5G e GPS."
-                                    }
-                                }
-                            ]
-                        }
-                    `}
-                </script>
-
-                <script type="application/ld+json">
-                    {`
-                        {
-                            "@context": "https://schema.org",
                             "@type": "Product",
                             "name": "Insulfilm Carbono Premium G5 e G20",
-                            "image": "https://lumecontrolesolar.com.br/product-carbono.jpg",
+                            "image": "https://lumecontrolesolar.com.br/carbono-hero.png",
                             "description": "Cor preto profundo que não desbota. Privacidade máxima com rejeição de calor de até 90%.",
                             "brand": {
                                 "@type": "Brand",
@@ -122,7 +87,12 @@ export function CarbonoPage() {
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden px-4">
                 <div className="absolute inset-0 z-0">
-                    <div className="w-full h-full bg-gradient-to-br from-[#050B14] to-[#0A1628]" />
+                    <img
+                        src="/carbono-hero.png"
+                        alt="Ambiente privativo com Insulfilm Carbono Premium LUME - Rio de Janeiro"
+                        className="w-full h-full object-cover"
+                        fetchPriority="high"
+                    />
                     <div className="absolute inset-0 bg-black/60" />
                 </div>
 

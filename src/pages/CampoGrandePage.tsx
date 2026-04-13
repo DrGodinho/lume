@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { Shield, Sun, Thermometer, CheckCircle, ArrowRight, Eye, SunDim, Star, PiggyBank, Lock, MapPin, Zap, MessageCircle, Droplets } from 'lucide-react';
 import { WhatsAppButton } from '../components/WhatsAppButton';
+import { Particles } from '../components/Particles';
 import { Link } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -66,62 +67,35 @@ export function CampoGrandePage() {
                         }
                     `}
                 </script>
-                <script type="application/ld+json">
-                    {`
-                        {
-                            "@context": "https://schema.org",
-                            "@type": "FAQPage",
-                            "mainEntity": [
-                                {
-                                    "@type": "Question",
-                                    "name": "Quanto custa o insulfilm residencial em Campo Grande?",
-                                    "acceptedAnswer": {
-                                        "@type": "Answer",
-                                        "text": "O valor é calculado por m² e depende da tecnologia escolhida. Oferecemos orçamento gratuito e imediato via WhatsApp para toda Campo Grande."
-                                    }
-                                },
-                                {
-                                    "@type": "Question",
-                                    "name": "Qual o melhor insulfilm para o sol de Campo Grande?",
-                                    "acceptedAnswer": {
-                                        "@type": "Answer",
-                                        "text": "Recomendamos as películas de Nano Cerâmica ou Carbono, que bloqueiam até 95% do calor infravermelho, sendo ideais para o clima da Zona Oeste."
-                                    }
-                                },
-                                {
-                                    "@type": "Question",
-                                    "name": "Vocês atendem condomínios em Campo Grande?",
-                                    "acceptedAnswer": {
-                                        "@type": "Answer",
-                                        "text": "Sim, atendemos todos os grandes condomínios de Campo Grande, como os da Estrada do Monteiro e Estrada da Posse, com instalação em até 24h."
-                                    }
-                                },
-                                {
-                                    "@type": "Question",
-                                    "name": "Qual o tempo de garantia?",
-                                    "acceptedAnswer": {
-                                        "@type": "Answer",
-                                        "text": "Trabalhamos com garantia certificada de 5 anos em todos os serviços, com películas que possuem durabilidade estimada entre 8 a 15 anos."
-                                    }
-                                }
-                            ]
-                        }
-                    `}
-                </script>
             </Helmet>
 
             <WhatsAppButton />
 
             {/* Hero Section */}
-            <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden px-4">
+            <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden px-4">
+                {/* Background Image */}
                 <div className="absolute inset-0 z-0">
-                    <div className="w-full h-full bg-gradient-to-br from-[#122338] to-[#0a1628]" />
-                    <div className="absolute inset-0 bg-black/40" />
+                    <img
+                        src="/campogrande_hero_bg.png"
+                        alt="Instalação de insulfilm residencial em Campo Grande RJ - LUME Controle Solar"
+                        className="w-full h-full object-cover"
+                        fetchPriority="high"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#0a1628]/95 via-[#0a1628]/80 to-[#0a1628]/60" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-transparent to-[#0a1628]/50" />
                 </div>
 
-                <div className="container-lume relative z-10 page-entrance text-center md:text-left">
+                {/* Particles & Effects */}
+                <Particles />
+                
+                <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0a1628] to-transparent z-10" />
+                <div className="absolute top-1/4 right-10 w-32 h-32 rounded-full bg-[#c9a227]/5 blur-3xl animate-float z-10" />
+                <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-[#1a3a5c]/30 blur-3xl animate-float z-10" style={{ animationDelay: '2s' }} />
+
+                <div className="container-lume relative z-20 page-entrance text-center md:text-left pt-24 pb-12">
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#c9a227]/10 border border-[#c9a227]/30 mb-6">
-                        <span className="text-[#c9a227] text-sm font-bold uppercase tracking-wider">Coração da Zona Oeste / Campo Grande RJ</span>
+                        <span className="w-2 h-2 rounded-full bg-[#c9a227] animate-pulse flex-shrink-0" />
+                        <span className="text-[#c9a227] text-sm font-bold uppercase tracking-wider">Zona Oeste do Rio de Janeiro</span>
                     </div>
 
                     <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-['Montserrat'] mb-6 leading-tight">
@@ -137,7 +111,7 @@ export function CampoGrandePage() {
                             href="https://wa.me/5521965140612?text=Olá! Quero um orçamento gratuito de insulfilm em Campo Grande."
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="btn-primary inline-flex items-center justify-center gap-3 text-lg py-4 px-8"
+                            className="btn-primary inline-flex items-center justify-center gap-3 text-lg py-4 px-8 transform transition hover:scale-105"
                         >
                             Orçamento Gratuito via WhatsApp <ArrowRight size={20} />
                         </a>
@@ -159,7 +133,7 @@ export function CampoGrandePage() {
                         <span className="hidden lg:inline opacity-30">•</span>
                         <span className="flex items-center gap-2 text-black"><Sun size={18} /> Orçamento On-line Imediato</span>
                         <span className="hidden lg:inline opacity-30">•</span>
-                        <span className="flex items-center gap-2 text-black"><Shield size={18} /> Durabilidade de 8 a 15 anos</span>
+                        <span className="flex items-center gap-2 text-black"><Shield size={18} /> Proteção Solar de Elite</span>
                         <span className="hidden lg:inline opacity-30">•</span>
                         <span className="flex items-center gap-2 text-black"><CheckCircle size={18} /> Garantia de 5 anos Lume</span>
                     </div>
@@ -200,7 +174,7 @@ export function CampoGrandePage() {
                         <div className="absolute top-0 left-0 w-32 h-32 bg-[#c9a227] blur-[100px] opacity-10" />
                         <h3 className="text-2xl font-bold font-['Montserrat'] text-center mb-8">Especialista em Condomínios e Comércios</h3>
                         <p className="text-gray-400 leading-relaxed text-center max-w-3xl mx-auto font-light text-lg">
-                            Seja para garantir a privacidade total de um apartamento ou reduzir o calor em fachadas comerciais de lojas e clínicas, a LUME oferece a consultoria ideal. Visitamos seu local em Campo Grande com amostras físicas para que você escolha a tonalidade perfeita para seu projeto, sempre com garantia certificada de 5 anos (8 a 15 anos de durabilidade).
+                            Seja para garantir a privacidade total de um apartamento ou reduzir o calor em fachadas comerciais de lojas e clínicas, a LUME oferece a consultoria ideal. Visitamos seu local em Campo Grande com amostras físicas para que você escolha a tonalidade perfeita para seu projeto, sempre com garantia oficial certificada de 5 anos (Acabamento Arquitetônico).
                         </p>
                     </div>
                 </div>
@@ -265,6 +239,22 @@ export function CampoGrandePage() {
                                         <p className="text-sm text-gray-400 mb-6 leading-relaxed font-light flex-grow">
                                             {product.desc}
                                         </p>
+                                        
+                                        {/* Specs */}
+                                        <div className="grid grid-cols-2 gap-2 mt-auto pt-4 border-t border-white/5">
+                                            <div className="text-[10px] sm:text-xs">
+                                                <span className="text-gray-500 block">{product.path === '/nano-ceramica' ? 'Visibilidade' : 'Bloqueio UV'}</span>
+                                                <span className="text-[#c9a227] font-semibold">
+                                                    {product.path === '/nano-ceramica' ? 'Alta' : product.path === '/jateado' ? '99%' : product.path === '/refletiva' ? '100%' : '99%'}
+                                                </span>
+                                            </div>
+                                            <div className="text-[10px] sm:text-xs">
+                                                <span className="text-gray-500 block">{product.path === '/jateado' ? 'Privacidade' : 'Rejeição de Calor'}</span>
+                                                <span className="text-[#c9a227] font-semibold">
+                                                    {product.path === '/nano-ceramica' ? 'Até 95%' : product.path === '/jateado' ? 'Total' : product.path === '/carbono' ? 'Até 70%' : product.path === '/refletiva' ? '87%' : '80%'}
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </Link>
 
@@ -362,7 +352,7 @@ export function CampoGrandePage() {
                                 <ul className="space-y-4 mb-4">
                                     <li className="flex gap-3 text-base text-gray-300 font-bold"><CheckCircle size={20} className="text-[#c9a227] shrink-0" /> Orçamento Sem Compromisso via Zap</li>
                                     <li className="flex gap-3 text-base text-gray-300 font-bold"><CheckCircle size={20} className="text-[#c9a227] shrink-0" /> Instalação Express em até 24 Horas</li>
-                                    <li className="flex gap-3 text-base text-gray-300 font-bold"><CheckCircle size={20} className="text-[#c9a227] shrink-0" /> Garantia Lume de 5 anos (Durabilidade 8-15 anos)</li>
+                                    <li className="flex gap-3 text-base text-gray-300 font-bold"><CheckCircle size={20} className="text-[#c9a227] shrink-0" /> Garantia Lume de 5 anos (Redução Real de Calor)</li>
                                 </ul>
                             </div>
 
@@ -419,7 +409,7 @@ export function CampoGrandePage() {
                             },
                             {
                                 q: "4. Qual a garantia do serviço da LUME?",
-                                a: "Oferecemos garantia contratual de 5 anos. Nossas películas profissionais têm durabilidade estimada entre 8 a 15 anos e não desbotam nem ficam roxas com o tempo."
+                                a: "Oferecemos garantia contratual de 5 anos. Nossas películas profissionais mantêm suas propriedades térmicas e estabilidade de cor por muito mais tempo que versões comuns, sem desbotar ou criar bolhas."
                             },
                             {
                                 q: "5. Atendem condomínios residenciais e empresas?",
@@ -479,7 +469,7 @@ export function CampoGrandePage() {
 
                         <div className="mt-12 flex flex-wrap justify-center gap-8 text-[11px] text-gray-500 font-bold uppercase tracking-[0.2em]">
                             <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> 5 Anos de Garantia</span>
-                            <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> Durabilidade 8-15 Anos</span>
+                            <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> Foco em Performance</span>
                             <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> Orçamento Grátis</span>
                         </div>
                     </div>

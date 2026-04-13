@@ -78,7 +78,7 @@ const products = [
     description: 'Perfeito para áreas que exigem privacidade total sem perder a luminosidade. Muito utilizado em boxes de banheiro, cozinhas e divisórias de vidro em escritórios. Fácil limpeza e acabamento sofisticado.',
     image: '/product-jateado-v2.png',
     specs: [
-      { label: 'Bloqueio UV', value: '5%' },
+      { label: 'Bloqueio UV', value: '99%' },
       { label: 'Rejeição de Calor', value: 'Baixa' },
       { label: 'Transmissão de Luz', value: 'Alta' },
     ],

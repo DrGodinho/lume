@@ -29,9 +29,9 @@ export function NanoCeramicaPage() {
                             "@context": "https://schema.org",
                             "@type": "LocalBusiness",
                             "name": "LUME Películas de Controle Solar",
-                            "image": "https://lumecontrolesolar.netlify.app/novo-logo-lume.png",
-                            "@id": "https://lumecontrolesolar.netlify.app/nano-ceramica",
-                            "url": "https://lumecontrolesolar.netlify.app/nano-ceramica",
+                            "image": "https://lumecontrolesolar.com.br/novo-logo-lume.png",
+                            "@id": "https://lumecontrolesolar.com.br/nano-ceramica",
+                            "url": "https://lumecontrolesolar.com.br/nano-ceramica",
                             "telephone": "+5521965140612",
                             "priceRange": "$$$",
                             "address": {
@@ -57,44 +57,9 @@ export function NanoCeramicaPage() {
                     {`
                         {
                             "@context": "https://schema.org",
-                            "@type": "FAQPage",
-                            "mainEntity": [
-                                {
-                                    "@type": "Question",
-                                    "name": "O Insulfilm Nano Cerâmica pode ser instalado em apartamentos e condomínios?",
-                                    "acceptedAnswer": {
-                                        "@type": "Answer",
-                                        "text": "Sim! Como a película de Nano Cerâmica possui baixíssima refletividade (não é espelhada) e mantém a transparência do vidro, ela é a opção número um para apartamentos e condomínios com regras rígidas de fachada no Rio de Janeiro."
-                                    }
-                                },
-                                {
-                                    "@type": "Question",
-                                    "name": "A película Nano Cerâmica desbota com o forte calor do Rio de Janeiro?",
-                                    "acceptedAnswer": {
-                                        "@type": "Answer",
-                                        "text": "Não. Diferente das películas tintadas comuns que ficam roxas com o tempo, a Nano Cerâmica Premium da LUME possui estabilidade de cor permanente. Sua tecnologia não baseada em tintas garante a estética original por muitos anos."
-                                    }
-                                },
-                                {
-                                    "@type": "Question",
-                                    "name": "É possível economizar luz na conta usando película térmica?",
-                                    "acceptedAnswer": {
-                                        "@type": "Answer",
-                                        "text": "Absolutamente. Com uma rejeição de calor (IRR) de até 95%, o ambiente interno esfria muito mais rápido, reduzindo drasticamente o esforço e o tempo de uso do seu ar-condicionado. Em locais muito quentes como Bangu e Zona Oeste, nossos clientes relatam melhorias extremas no consumo de energia."
-                                    }
-                                }
-                            ]
-                        }
-                    `}
-                </script>
-
-                <script type="application/ld+json">
-                    {`
-                        {
-                            "@context": "https://schema.org",
                             "@type": "Product",
                             "name": "Insulfilm Nano Cerâmica Premium",
-                            "image": "https://lumecontrolesolar.netlify.app/novo-logo-lume.png",
+                            "image": "https://lumecontrolesolar.com.br/nano-ceramica-hero.png",
                             "description": "Máxima redução de calor sem escurecer os vidros. Ideal para varandas gourmet e vitrines.",
                             "brand": {
                                 "@type": "Brand",
@@ -102,7 +67,7 @@ export function NanoCeramicaPage() {
                             },
                             "offers": {
                                 "@type": "Offer",
-                                "url": "https://lumecontrolesolar.netlify.app/nano-ceramica",
+                                "url": "https://lumecontrolesolar.com.br/nano-ceramica",
                                 "priceCurrency": "BRL",
                                 "price": "220.00",
                                 "unitText": "m²",
@@ -122,9 +87,13 @@ export function NanoCeramicaPage() {
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden px-4">
                 <div className="absolute inset-0 z-0">
-                    {/* Placeholder image for hero -> Replace with real asset when available */}
-                    <div className="w-full h-full bg-gradient-to-br from-[#122338] to-[#0a1628]" />
-                    <div className="absolute inset-0 bg-black/40" />
+                    <img
+                        src="/nano-ceramica-hero.png"
+                        alt="Varanda gourmet com Insulfilm Nano Cerâmica Premium LUME - Rio de Janeiro"
+                        className="w-full h-full object-cover"
+                        fetchPriority="high"
+                    />
+                    <div className="absolute inset-0 bg-black/50" />
                 </div>
 
                 <div className="container-lume relative z-10 page-entrance text-center md:text-left">
