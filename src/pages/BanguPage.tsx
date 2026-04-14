@@ -65,6 +65,11 @@ export function BanguPage() {
                                 "longitude": -43.4651
                             },
                             "areaServed": ["Bangu", "Campo Grande", "Santa Cruz", "Realengo", "Padre Miguel", "Senador Camará", "Zona Oeste RJ"],
+                            "aggregateRating": {
+                                "@type": "AggregateRating",
+                                "ratingValue": "5.0",
+                                "reviewCount": "52"
+                            },
                             "description": "Instalação de insulfilm em Bangu e região com aplicação profissional. Películas residenciais e comerciais. Controle solar, privacidade e segurança."
                         }
                     `}
@@ -78,7 +83,7 @@ export function BanguPage() {
                 {/* Background Image */}
                 <div className="absolute inset-0 z-0">
                     <img
-                        src="/bangu_hero_bg.png"
+                        src="/bangu_hero_bg.webp"
                         alt="Instalação de insulfilm profissional em Bangu - LUME Controle Solar"
                         className="w-full h-full object-cover"
                         fetchPriority="high"
@@ -197,23 +202,23 @@ export function BanguPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
                         {[
                             {
-                                title: "Nano Cerâmica", selo: "Top de Linha", icon: Star, image: "/product-nano-ceramica.jpg", path: "/nano-ceramica",
+                                title: "Nano Cerâmica", selo: "Top de Linha", icon: Star, image: "/product-nano-ceramica.webp", path: "/nano-ceramica",
                                 desc: "A linha de maior performance do mercado. A película nano cerâmica rejeita até 95% do calor infravermelho sem precisar escurecer o ambiente, mantendo os vidros transparentes e a luminosidade natural preservada. Ideal para salas, varandas gourmet e escritórios que precisam de máximo controle térmico sem perder a claridade."
                             },
                             {
-                                title: "Carbono Premium", selo: "Best-Seller", icon: SunDim, image: "/product-carbono.jpg", path: "/carbono",
+                                title: "Carbono Premium", selo: "Best-Seller", icon: SunDim, image: "/product-carbono.webp", path: "/carbono",
                                 desc: "Película fumê fabricada a partir de nano carbono. Combina um visual elegante e escurecido com excelente rejeição térmica (até 80%). Disponível nas tonalidades G20 e G5, o Carbono é o mais escolhido em Bangu para janelas e portas que precisam de privacidade total durante o dia sem desbotar como as películas baratas."
                             },
                             {
-                                title: "Espelhado / Refletivo", selo: "Privacidade", icon: Sun, image: "/product-refletiva.jpg", path: "/refletiva",
+                                title: "Espelhado / Refletivo", selo: "Privacidade", icon: Sun, image: "/product-refletiva.webp", path: "/refletiva",
                                 desc: "A escolha certa para quem quer privacidade total durante o dia com um visual moderno na fachada. Reflete a luz solar externamente, reduzindo drasticamente a temperatura e bloqueando a visão de fora para dentro enquanto houver mais iluminação externa. Muito utilizada em clínicas, lojas e fachadas comerciais."
                             },
                             {
-                                title: "Jateado / Fosco", selo: "Decoração", icon: Eye, image: "/product-jateado-v2.png", path: "/jateado",
+                                title: "Jateado / Fosco", selo: "Decoração", icon: Eye, image: "/product-jateado-v2.webp", path: "/jateado",
                                 desc: "Solução ideal para banheiros, portas de vidro, divisórias e cozinhas que precisam de privacidade total sem perder luminosidade. O efeito fosco simula o vidro jateado com um custo muito menor, permitindo um acabamento sofisticado e fácil limpeza para ambientes internos."
                             },
                             {
-                                title: "Dupla Camada", selo: "Favorito", icon: Droplets, image: "/product-smoke.jpg", path: "/dupla-camada",
+                                title: "Dupla Camada", selo: "Favorito", icon: Droplets, image: "/product-smoke.webp", path: "/dupla-camada",
                                 desc: "Alta redução de calor com uma tecnologia especial: camada refletiva externa para máxima redução de calor e camada fumê interna para uma visão relaxante. Diferente das películas comuns, reduz o reflexo interno à noite. Excelente custo-benefício para enfrentar o sol de Bangu."
                             }
                         ].map((product, idx) => (

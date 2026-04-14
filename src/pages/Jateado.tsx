@@ -59,7 +59,7 @@ export function JateadoPage() {
                             "@context": "https://schema.org",
                             "@type": "Product",
                             "name": "Película Jateada (Acabamento Fosco)",
-                            "image": "https://lumecontrolesolar.com.br/product-jateado-v2.png",
+                            "image": "https://lumecontrolesolar.com.br/product-jateado-v2.webp",
                             "description": "Filme com efeito fosco/jateado para vidros. Garante privacidade visual bi-direcional preservando até 85% da luminosidade natural do ambiente.",
                             "brand": {
                                 "@type": "Brand",

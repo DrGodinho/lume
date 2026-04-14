@@ -64,6 +64,11 @@ export function JacarepaguaPage() {
                                 "longitude": -43.3400
                             },
                             "areaServed": ["Freguesia", "Taquara", "Pechincha", "Anil", "Curicica", "Tanque", "Gardenia Azul", "Cidade de Deus", "Praça Seca", "Vila Valqueire", "Jacarepaguá"],
+                            "aggregateRating": {
+                                "@type": "AggregateRating",
+                                "ratingValue": "5.0",
+                                "reviewCount": "52"
+                            },
                             "description": "Especialistas em instalação de insulfilm residencial e comercial em Jacarepaguá. Películas de alta performance com 5 anos de garantia."
                         }
                     `}
@@ -77,12 +82,12 @@ export function JacarepaguaPage() {
                 {/* Background Image */}
                 <div className="absolute inset-0 z-0">
                     <img
-                        src="/jacarepagua_hero_bg.png"
+                        src="/jacarepagua_hero_bg.webp"
                         alt="Instalação de insulfilm profissional em Jacarepaguá - LUME Controle Solar"
                         className="w-full h-full object-cover"
                         fetchPriority="high"
                         onError={(e) => {
-                            e.currentTarget.src = "/bangu_hero_bg.png"; // Fallback temporary
+                            e.currentTarget.src = "/bangu_hero_bg.webp"; // Fallback temporary
                         }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-r from-[#0a1628]/95 via-[#0a1628]/80 to-[#0a1628]/60" />
@@ -186,23 +191,23 @@ export function JacarepaguaPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
                         {[
                             {
-                                title: "Nano Cerâmica", selo: "Top de Linha", icon: Star, image: "/product-nano-ceramica.jpg", path: "/nano-ceramica",
+                                title: "Nano Cerâmica", selo: "Top de Linha", icon: Star, image: "/product-nano-ceramica.webp", path: "/nano-ceramica",
                                 desc: "A linha de maior performance do mercado. A película nano cerâmica rejeita até 95% do calor infravermelho sem precisar escurecer o ambiente, mantendo os vidros transparentes e a luminosidade natural preservada. Ideal para quem quer manter a vista em JPA."
                             },
                             {
-                                title: "Carbono Premium", selo: "Best-Seller", icon: SunDim, image: "/product-carbono.jpg", path: "/carbono",
+                                title: "Carbono Premium", selo: "Best-Seller", icon: SunDim, image: "/product-carbono.webp", path: "/carbono",
                                 desc: "Película fumê fabricada a partir de nano carbono. Combina um visual elegante e escurecido com excelente rejeição térmica (até 80%). Disponível nas tonalidades G20 e G5, o Carbono é o mais escolhido na Freguesia para janelas e portas que precisam de privacidade total."
                             },
                             {
-                                title: "Espelhado / Refletivo", selo: "Privacidade", icon: Sun, image: "/product-refletiva.jpg", path: "/refletiva",
+                                title: "Espelhado / Refletivo", selo: "Privacidade", icon: Sun, image: "/product-refletiva.webp", path: "/refletiva",
                                 desc: "A escolha certa para quem quer privacidade total durante o dia com um visual moderno na fachada. Reflete a luz solar externamente, reduzindo drasticamente a temperatura e bloqueando a visão de fora para dentro."
                             },
                             {
-                                title: "Jateado / Fosco", selo: "Decoração", icon: Eye, image: "/product-jateado-v2.png", path: "/jateado",
+                                title: "Jateado / Fosco", selo: "Decoração", icon: Eye, image: "/product-jateado-v2.webp", path: "/jateado",
                                 desc: "Solução ideal para banheiros, portas de vidro, divisórias e cozinhas que precisam de privacidade total sem perder luminosidade. O efeito fosco simula o vidro jateado com um custo muito menor."
                             },
                             {
-                                title: "Dupla Camada", selo: "Favorito", icon: Droplets, image: "/product-smoke.jpg", path: "/dupla-camada",
+                                title: "Dupla Camada", selo: "Favorito", icon: Droplets, image: "/product-smoke.webp", path: "/dupla-camada",
                                 desc: "Alta redução de calor com uma tecnologia especial: camada refletiva externa e camada fumê interna. Diferente das películas comuns, reduz o reflexo interno à noite. Excelente para o sol de JPA."
                             }
                         ].map((product, idx) => (

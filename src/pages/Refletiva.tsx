@@ -59,7 +59,7 @@ export function RefletivaPage() {
                             "@context": "https://schema.org",
                             "@type": "Product",
                             "name": "Insulfilm Refletivo Clássico (Prata)",
-                            "image": "https://lumecontrolesolar.com.br/product-refletiva.jpg",
+                            "image": "https://lumecontrolesolar.com.br/product-refletiva.webp",
                             "description": "Película espelhada prata com altíssima rejeição térmica (até 85% IRR). Garante privacidade diurna total com o efeito One-Way Mirror.",
                             "brand": {
                                 "@type": "Brand",

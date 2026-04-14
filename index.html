@@ -36,25 +36,7 @@
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-RKVB0YQTJY"></script>
   <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-
-    gtag('config', 'G-RKVB0YQTJY');
-
-    // Google tag (gtag.js) event - delayed navigation helper
-    function gtagSendEvent(url) {
-      var callback = function () {
-        if (typeof url === 'string') {
-          window.location = url;
-        }
-      };
-      gtag('event', 'conversion_event_contact', {
-        'event_callback': callback,
-        'event_timeout': 2000,
-      });
-      return false;
-    }
+    window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date);gtag("config","G-RKVB0YQTJY");function gtagSendEvent(e){var n=function(){"string"==typeof e&&(window.location=e)};return gtag("event","conversion_event_contact",{event_callback:n,event_timeout:2e3}),!1}
   </script>
 
   <!-- Global Business Data (SEO) -->
@@ -126,6 +108,11 @@
             }
           }
         ]
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "5.0",
+        "reviewCount": "52"
       },
       "description": "Especialistas em instalação de insulfilm residencial e comercial no Rio de Janeiro. Proteção solar, redução de calor e privacidade com películas de alta tecnologia."
     }

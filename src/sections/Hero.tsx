@@ -71,7 +71,7 @@ export function Hero() {
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <img
-          src="/hero-bg.jpg"
+          src="/hero-bg.webp"
           alt="Sala de estar protegida com insulfilm residencial Lume na Zona Oeste do Rio"
           className="w-full h-full object-cover"
           fetchPriority="high"

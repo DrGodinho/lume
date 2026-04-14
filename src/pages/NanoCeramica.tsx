@@ -59,7 +59,7 @@ export function NanoCeramicaPage() {
                             "@context": "https://schema.org",
                             "@type": "Product",
                             "name": "Insulfilm Nano Cerâmica Premium",
-                            "image": "https://lumecontrolesolar.com.br/nano-ceramica-hero.png",
+                            "image": "https://lumecontrolesolar.com.br/nano-ceramica-hero.webp",
                             "description": "Máxima redução de calor sem escurecer os vidros. Ideal para varandas gourmet e vitrines.",
                             "brand": {
                                 "@type": "Brand",
@@ -88,7 +88,7 @@ export function NanoCeramicaPage() {
             <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden px-4">
                 <div className="absolute inset-0 z-0">
                     <img
-                        src="/nano-ceramica-hero.png"
+                        src="/nano-ceramica-hero.webp"
                         alt="Varanda gourmet com Insulfilm Nano Cerâmica Premium LUME - Rio de Janeiro"
                         className="w-full h-full object-cover"
                         fetchPriority="high"

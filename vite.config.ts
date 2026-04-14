@@ -6,13 +6,13 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: './',
+  base: '/',
   plugins: [
     inspectAttr(), 
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['novo-logo-lume.png', 'hero-bg.jpg'],
+      includeAssets: ['novo-logo-lume.png', 'hero-bg.webp'],
       manifest: {
         name: 'LUME Controle Solar',
         short_name: 'LUME',

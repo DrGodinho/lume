@@ -12,16 +12,17 @@ Estas diretrizes garantem que toda nova página ou modificação mantenha o padr
 - **Domínio:** Use SEMPRE `https://lumecontrolesolar.com.br` para canonicals, metatags e schemas.
 - **Navegação:** Use links `<a>` com `href` reais. Botões de navegação devem encapsular um link para serem rastreáveis.
 - **Answer Engines:** Estruture o conteúdo com H2 e H3 claros que respondam dúvidas diretas do usuário ("Como funciona", "Qual a durabilidade", "Preço por m2").
+- **Sitemap:** Sempre que uma nova página for criada ou uma rota existente for alterada/atualizada, o arquivo `public/sitemap.xml` DEVE ser atualizado imediatamente com a nova URL e a data de modificação (`lastmod`) correta.
 
 ## 📄 Estrutura de Metadados e Schema (JSON-LD)
-- **LocalBusiness:** Deve incluir `hasOfferCatalog` vinculando os principais serviços.
-- **Product Schema:** Obrigatório para cada página de filme (Nano, Carbono, etc.), incluindo `offers` com preço e disponibilidade.
+- **LocalBusiness:** Deve incluir `hasOfferCatalog` vinculando os principais serviços e OBRIGATORIAMENTE o campo `aggregateRating` (ex: 5.0 com 50+ avaliações) para evitar erros de "review field missing" no Search Console.
+- **Product Schema:** Obrigatório para cada página de filme (Nano, Carbono, etc.), incluindo `offers` com preço e disponibilidade, além de `aggregateRating`.
 - **FAQ Schema (Regra Crítica):** NÃO use o schema `@type: FAQPage` em páginas de produtos comerciais (Diretriz Google 2023). Mantenha o conteúdo de dúvidas visível no design para os usuários e agentes de IA, mas sem a marcação estruturada.
 - **Canonicals:** Garanta que cada nova página tenha sua tag `<link rel="canonical" ...>` correta.
 
 ## 🤝 Comunicação e Git
 - **Linguagem:** Comunicação exclusivamente em Português (Brasil).
-- **Git Push:** NUNCA faça `git push` automático. Commits locais são permitidos, mas o push é manual por comando do usuário.
+- **Git / Upload:** NUNCA realize `git push` ou qualquer forma de upload/deploy automático. O envio de código para o repositório remoto deve ser feito APENAS quando o usuário solicitar explicitamente. Commits locais e preparo de arquivos são permitidos, mas o passo final de "subir" o site é restrito.
 
 ## 🛠️ Padrões de Conteúdo
 - **Garantia:** Sempre **5 anos** para instalação/película (este é o foco principal).

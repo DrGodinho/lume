@@ -12,7 +12,7 @@ const products = [
     name: 'NANO CERÂMICA',
     tag: 'TEC DE PONTA',
     description: 'A escolha definitiva para quem busca conforto térmico sem alterar a fachada. Bloqueia o calor infravermelho sem precisar escurecer o vidro. Ideal para varandas gourmet e vitrines. Protege seus móveis e sua pele contra os raios UV.',
-    image: '/product-nano-ceramica.jpg',
+    image: '/product-nano-ceramica.webp',
     specs: [
       { label: 'Bloqueio UV', value: '99,9%' },
       { label: 'Rejeição de Calor', value: 'Até 95%' },
@@ -28,7 +28,7 @@ const products = [
     name: 'DUPLA CAMADA',
     tag: 'FAVORITO',
     description: 'Alta redução de calor com uma tecnologia especial: camada refletiva externa para máxima redução de calor e camada fumê interna para uma visão relaxante. Diferente das películas comuns, reduz o reflexo interno à noite.',
-    image: '/product-smoke.jpg',
+    image: '/product-smoke.webp',
     specs: [
       { label: 'Bloqueio UV', value: '99%' },
       { label: 'Rejeição de Calor', value: '80%' },
@@ -44,7 +44,7 @@ const products = [
     name: 'CARBONO PREMIUM',
     tag: null,
     description: 'Diferente das películas baratas que ficam roxas, a nossa linha Carbono mantém o tom grafite profundo por anos. Oferece excelente privacidade e um visual moderno para sua casa ou escritório, com alta proteção contra o sol.',
-    image: '/product-carbono.jpg',
+    image: '/product-carbono.webp',
     specs: [
       { label: 'Bloqueio UV', value: '99%' },
       { label: 'Rejeição de Calor', value: 'Até 70%' },
@@ -60,7 +60,7 @@ const products = [
     name: 'REFLETIVA CLÁSSICA',
     tag: null,
     description: 'A solução mais eficiente para fachadas que recebem sol direto o dia todo. Transforma sua janela em um espelho por fora, garantindo privacidade diurna e uma redução drástica na temperatura interna.',
-    image: '/product-refletiva.jpg',
+    image: '/product-refletiva.webp',
     specs: [
       { label: 'Bloqueio UV', value: '100%' },
       { label: 'Rejeição de Calor', value: '87%' },
@@ -76,7 +76,7 @@ const products = [
     name: 'JATEADO',
     tag: null,
     description: 'Perfeito para áreas que exigem privacidade total sem perder a luminosidade. Muito utilizado em boxes de banheiro, cozinhas e divisórias de vidro em escritórios. Fácil limpeza e acabamento sofisticado.',
-    image: '/product-jateado-v2.png',
+    image: '/product-jateado-v2.webp',
     specs: [
       { label: 'Bloqueio UV', value: '99%' },
       { label: 'Rejeição de Calor', value: 'Baixa' },

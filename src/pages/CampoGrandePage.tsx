@@ -64,6 +64,11 @@ export function CampoGrandePage() {
                                 "longitude": -43.559
                             },
                             "areaServed": ["Campo Grande", "Guaratiba", "Paciência", "Cosmos", "Inhoaíba", "Santíssimo", "Zona Oeste RJ"],
+                            "aggregateRating": {
+                                "@type": "AggregateRating",
+                                "ratingValue": "5.0",
+                                "reviewCount": "52"
+                            },
                             "description": "Instalação de insulfilm em Campo Grande RJ com aplicação profissional e rápida (24h). Películas residenciais e comerciais. Controle solar, privacidade e segurança."
                         }
                     `}
@@ -77,7 +82,7 @@ export function CampoGrandePage() {
                 {/* Background Image */}
                 <div className="absolute inset-0 z-0">
                     <img
-                        src="/campogrande_hero_bg.png"
+                        src="/campogrande_hero_bg.webp"
                         alt="Instalação de insulfilm residencial em Campo Grande RJ - LUME Controle Solar"
                         className="w-full h-full object-cover"
                         fetchPriority="high"
@@ -196,23 +201,23 @@ export function CampoGrandePage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
                         {[
                             {
-                                title: "Nano Cerâmica", selo: "Top de Linha", icon: Star, image: "/product-nano-ceramica.jpg", path: "/nano-ceramica",
+                                title: "Nano Cerâmica", selo: "Top de Linha", icon: Star, image: "/product-nano-ceramica.webp", path: "/nano-ceramica",
                                 desc: "Privacidade e frescor total. Rejeita o calor invisível (IR) sem alterar a fachada original. A escolha nº 1 para varandas em Campo Grande."
                             },
                             {
-                                title: "Carbono Premium", selo: "Privacidade", icon: SunDim, image: "/product-carbono.jpg", path: "/carbono",
+                                title: "Carbono Premium", selo: "Privacidade", icon: SunDim, image: "/product-carbono.webp", path: "/carbono",
                                 desc: "O preto intenso que nunca fica roxo. Oferece elegância e bloqueio térmico de 80% para janelas residenciais."
                             },
                             {
-                                title: "Refletiva / Silver", selo: "Alta Rejeição", icon: Sun, image: "/product-refletiva.jpg", path: "/refletiva",
+                                title: "Refletiva / Silver", selo: "Alta Rejeição", icon: Sun, image: "/product-refletiva.webp", path: "/refletiva",
                                 desc: "Efeito espelhado clássico. Máxima rejeição de calor para ambientes que recebem sol direto o dia todo."
                             },
                             {
-                                title: "Jateado Design", selo: "Decoração", icon: Eye, image: "/product-jateado-v2.png", path: "/jateado",
+                                title: "Jateado Design", selo: "Decoração", icon: Eye, image: "/product-jateado-v2.webp", path: "/jateado",
                                 desc: "Estética fosca para privacidade em banheiros e divisórias de escritórios. Mantém a luminosidade natural difusa."
                             },
                             {
-                                title: "Dupla Camada", selo: "Favorito", icon: Droplets, image: "/product-smoke.jpg", path: "/dupla-camada",
+                                title: "Dupla Camada", selo: "Favorito", icon: Droplets, image: "/product-smoke.webp", path: "/dupla-camada",
                                 desc: "Alta redução de calor com uma tecnologia especial: camada refletiva externa para máxima redução de calor e camada fumê interna para uma visão relaxante. Diferente das películas comuns, reduz o reflexo interno à noite. Ideal para grandes áreas envidraçadas em Campo Grande."
                             }
                         ].map((product, idx) => (

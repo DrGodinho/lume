@@ -113,7 +113,7 @@ export function DuplaCamadaPage() {
                             "@context": "https://schema.org",
                             "@type": "Product",
                             "name": "Insulfilm Dupla Camada G5 e G20",
-                            "image": "https://lumecontrolesolar.com.br/product-smoke.jpg",
+                            "image": "https://lumecontrolesolar.com.br/product-smoke.webp",
                             "description": "Alta redução de calor com tecnologia de dupla camada. Rejeição de até 95% do infravermelho.",
                             "brand": {
                                 "@type": "Brand",

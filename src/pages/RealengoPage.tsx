@@ -64,6 +64,11 @@ export function RealengoPage() {
                                 "longitude": -43.4651
                             },
                             "areaServed": ["Realengo", "Bangu", "Campo Grande", "Santa Cruz", "Padre Miguel", "Senador Camará", "Zona Oeste RJ"],
+                            "aggregateRating": {
+                                "@type": "AggregateRating",
+                                "ratingValue": "5.0",
+                                "reviewCount": "52"
+                            },
                             "description": "Instalação de insulfilm em Realengo e região com aplicação profissional e rápida (24h). Películas residenciais e comerciais. Controle solar, privacidade e segurança."
                         }
                     `}
@@ -77,7 +82,7 @@ export function RealengoPage() {
                 {/* Background Image */}
                 <div className="absolute inset-0 z-0">
                     <img
-                        src="/realengo_hero_bg.png"
+                        src="/realengo_hero_bg.webp"
                         alt="Instalação de insulfilm profissional em Realengo RJ - LUME Controle Solar"
                         className="w-full h-full object-cover"
                         fetchPriority="high"
@@ -196,23 +201,23 @@ export function RealengoPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
                         {[
                             {
-                                title: "Nano Cerâmica", selo: "Top de Linha", icon: Star, image: "/product-nano-ceramica.jpg", path: "/nano-ceramica",
+                                title: "Nano Cerâmica", selo: "Top de Linha", icon: Star, image: "/product-nano-ceramica.webp", path: "/nano-ceramica",
                                 desc: "Rejeição térmica de até 95% do infravermelho sem escurecer o vidro. Ideal para varandas e salas em Realengo que precisam de frescor mantendo a claridade total."
                             },
                             {
-                                title: "Carbono Premium", selo: "Privacidade", icon: SunDim, image: "/product-carbono.jpg", path: "/carbono",
+                                title: "Carbono Premium", selo: "Privacidade", icon: SunDim, image: "/product-carbono.webp", path: "/carbono",
                                 desc: "O tom grafite perfeito que não desbota. Oferece privacidade absoluta e excelente redução de calor para as janelas da sua residência ou escritório."
                             },
                             {
-                                title: "Espelhado / Refletivo", selo: "Proteção Solar", icon: Sun, image: "/product-refletiva.jpg", path: "/refletiva",
+                                title: "Espelhado / Refletivo", selo: "Proteção Solar", icon: Sun, image: "/product-refletiva.webp", path: "/refletiva",
                                 desc: "A tecnologia clássica de rejeição solar agressiva. O efeito espelhado atua como um escudo, devolvendo o calor para fora antes que ele aqueça sua sala."
                             },
                             {
-                                title: "Jateado / Fosco", selo: "Estética", icon: Eye, image: "/product-jateado-v2.png", path: "/jateado",
+                                title: "Jateado / Fosco", selo: "Estética", icon: Eye, image: "/product-jateado-v2.webp", path: "/jateado",
                                 desc: "Privacidade bidirecional com acabamento fosco elegante. Perfeito para banheiros, divisórias e portas de entrada em Realengo."
                             },
                             {
-                                title: "Dupla Camada", selo: "Favorito", icon: Droplets, image: "/product-smoke.jpg", path: "/dupla-camada",
+                                title: "Dupla Camada", selo: "Favorito", icon: Droplets, image: "/product-smoke.webp", path: "/dupla-camada",
                                 desc: "Alta redução de calor com uma tecnologia especial: camada refletiva externa para máxima redução de calor e camada fumê interna para uma visão relaxante. Diferente das películas comuns, reduz o reflexo interno à noite. Perfeito para casas e apartamentos em Realengo."
                             }
                         ].map((product, idx) => (

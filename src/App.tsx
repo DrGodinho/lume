@@ -28,6 +28,7 @@ import { CampoGrandePage } from './pages/CampoGrandePage';
 import { JacarepaguaPage } from './pages/JacarepaguaPage';
 import { BarraPage } from './pages/BarraPage';
 import { RecreioPage } from './pages/RecreioPage';
+import { NotFound } from './pages/NotFound';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -117,6 +118,7 @@ function App() {
           <Route path="/insulfilm-em-jacarepagua" element={<JacarepaguaPage />} />
           <Route path="/insulfilm-na-barra-da-tijuca" element={<BarraPage />} />
           <Route path="/insulfilm-no-recreio" element={<RecreioPage />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
 

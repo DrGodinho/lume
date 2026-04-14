@@ -59,7 +59,7 @@ export function CarbonoPage() {
                             "@context": "https://schema.org",
                             "@type": "Product",
                             "name": "Insulfilm Carbono Premium G5 e G20",
-                            "image": "https://lumecontrolesolar.com.br/carbono-hero.png",
+                            "image": "https://lumecontrolesolar.com.br/carbono-hero.webp",
                             "description": "Cor preto profundo que não desbota. Privacidade máxima com rejeição de calor de até 90%.",
                             "brand": {
                                 "@type": "Brand",
@@ -88,7 +88,7 @@ export function CarbonoPage() {
             <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden px-4">
                 <div className="absolute inset-0 z-0">
                     <img
-                        src="/carbono-hero.png"
+                        src="/carbono-hero.webp"
                         alt="Ambiente privativo com Insulfilm Carbono Premium LUME - Rio de Janeiro"
                         className="w-full h-full object-cover"
                         fetchPriority="high"

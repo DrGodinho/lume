@@ -64,6 +64,11 @@ export function BarraPage() {
                                 "longitude": -43.3659
                             },
                             "areaServed": ["Barra da Tijuca", "Jardim Oceânico", "Península", "ABM", "Parque Olímpico", "Rio 2", "Marapendi", "Vila do Pan", "Joá", "Itanhangá"],
+                            "aggregateRating": {
+                                "@type": "AggregateRating",
+                                "ratingValue": "5.0",
+                                "reviewCount": "52"
+                            },
                             "description": "Especialistas em instalação de insulfilm residencial de luxo na Barra da Tijuca. Proteção térmica, privacidade e segurança com padrão de elite."
                         }
                     `}
@@ -77,12 +82,12 @@ export function BarraPage() {
                 {/* Background Image */}
                 <div className="absolute inset-0 z-0">
                     <img
-                        src="/barra_hero_bg.png"
+                        src="/barra_hero_bg.webp"
                         alt="Instalação de insulfilm profissional na Barra da Tijuca - LUME Controle Solar"
                         className="w-full h-full object-cover"
                         fetchPriority="high"
                         onError={(e) => {
-                            e.currentTarget.src = "/bangu_hero_bg.png"; // Fallback temporary
+                            e.currentTarget.src = "/bangu_hero_bg.webp"; // Fallback temporary
                         }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-r from-[#0a1628]/95 via-[#0a1628]/80 to-[#0a1628]/60" />
@@ -186,23 +191,23 @@ export function BarraPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
                         {[
                             {
-                                title: "Nano Cerâmica", selo: "Top de Linha", icon: Star, image: "/product-nano-ceramica.jpg", path: "/nano-ceramica",
+                                title: "Nano Cerâmica", selo: "Top de Linha", icon: Star, image: "/product-nano-ceramica.webp", path: "/nano-ceramica",
                                 desc: "A elite tecnológica. Rejeita até 95% do calor mantendo a transparência quase total. Ideal para quem quer proteger o ambiente sem perder a vista privilegiada da Barra."
                             },
                             {
-                                title: "Carbono Premium", selo: "Best-Seller", icon: SunDim, image: "/product-carbono.jpg", path: "/carbono",
+                                title: "Carbono Premium", selo: "Best-Seller", icon: SunDim, image: "/product-carbono.webp", path: "/carbono",
                                 desc: "Visual grafite sofisticado com durabilidade certificada. Não desbota nem cria bolhas, garantindo um visual sempre impecável para suas janelas."
                             },
                             {
-                                title: "Espelhado / Refletivo", selo: "Privacidade", icon: Sun, image: "/product-refletiva.jpg", path: "/refletiva",
+                                title: "Espelhado / Refletivo", selo: "Privacidade", icon: Sun, image: "/product-refletiva.webp", path: "/refletiva",
                                 desc: "Máxima privacidade diurna para casas e escritórios na Barra. Reflete o calor de forma bruta, tornando o ambiente interno muito mais produtivo e fresco."
                             },
                             {
-                                title: "Jateado / Fosco", selo: "Decoração", icon: Eye, image: "/product-jateado-v2.png", path: "/jateado",
+                                title: "Jateado / Fosco", selo: "Decoração", icon: Eye, image: "/product-jateado-v2.webp", path: "/jateado",
                                 desc: "Elegância decorativa para banheiros e divisórias de vidro. Transforma o visual do ambiente mantendo a luminosidade natural passar de forma suave."
                             },
                             {
-                                title: "Dupla Camada", selo: "Favorito", icon: Droplets, image: "/product-smoke.jpg", path: "/dupla-camada",
+                                title: "Dupla Camada", selo: "Favorito", icon: Droplets, image: "/product-smoke.webp", path: "/dupla-camada",
                                 desc: "A tecnologia híbrida definitiva. Rejeição de calor massiva com visão relaxada e baixa reflexão interna noturna. Perfeita para o sol da tarde carioca."
                             }
                         ].map((product, idx) => (

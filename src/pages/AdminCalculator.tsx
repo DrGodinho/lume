@@ -777,7 +777,11 @@ self.onmessage = (e) => {
 
     return (
         <div className="min-h-screen bg-[#040811] text-white py-6 px-2 sm:px-4 relative">
-            <Helmet><title>Admin - Otimizador de Corte | LUME</title></Helmet>
+            <Helmet>
+                <title>Admin - Otimizador de Corte | LUME</title>
+                <meta name="robots" content="noindex, nofollow" />
+                <link rel="canonical" href="https://lumecontrolesolar.com.br/admin" />
+            </Helmet>
 
             {/* PAINEL LATERAL: CONFIGURAÇÕES */}
             <div className={`fixed inset-y-0 left-0 z-50 w-80 bg-[#070f1f] border-r border-white/10 shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col ${configAberto ? 'translate-x-0' : '-translate-x-full'}`}>
