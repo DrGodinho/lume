@@ -74,13 +74,13 @@ export function Coverage() {
 
       {/* Decorative map pins */}
       <div className="absolute top-20 left-10 opacity-10">
-        <MapPin className="w-16 h-16 text-[#c9a227] animate-bounce" style={{ animationDuration: '3s' }} />
+        <MapPin aria-hidden="true" className="w-16 h-16 text-[#c9a227] animate-bounce" style={{ animationDuration: '3s' }} />
       </div>
       <div className="absolute bottom-20 right-20 opacity-10">
-        <MapPin className="w-20 h-20 text-[#c9a227] animate-bounce" style={{ animationDuration: '4s', animationDelay: '1s' }} />
+        <MapPin aria-hidden="true" className="w-20 h-20 text-[#c9a227] animate-bounce" style={{ animationDuration: '4s', animationDelay: '1s' }} />
       </div>
       <div className="absolute top-1/2 left-1/4 opacity-5">
-        <MapPin className="w-24 h-24 text-[#c9a227] animate-bounce" style={{ animationDuration: '5s', animationDelay: '0.5s' }} />
+        <MapPin aria-hidden="true" className="w-24 h-24 text-[#c9a227] animate-bounce" style={{ animationDuration: '5s', animationDelay: '0.5s' }} />
       </div>
 
       <div className="container-lume relative z-10">

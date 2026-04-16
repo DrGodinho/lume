@@ -210,17 +210,33 @@ export function Footer() {
         <div className="h-px bg-gradient-to-r from-transparent via-[#1a3a5c] to-transparent mb-6 sm:mb-8" />
 
         {/* Bottom Bar */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-6 border-t border-white/5 pt-8">
           <p className="text-gray-500 text-xs sm:text-sm text-center md:text-left">
             © {new Date().getFullYear()} Lume Controle Solar. Todos os direitos reservados.
           </p>
 
-          {/* SEO Text */}
-          <p className="text-gray-600 text-[10px] sm:text-xs text-center md:text-right max-w-xl">
-            Insulfilm residencial em Bangu e Zona Oeste do Rio de Janeiro.
-            Atendemos Bangu, Campo Grande, Realengo, Barra da Tijuca,
-            Recreio dos Bandeirantes e Jacarepaguá.
-          </p>
+          {/* SEO Neighborhood Links */}
+          <div className="text-gray-600 text-[10px] sm:text-xs text-center md:text-right max-w-2xl">
+            <p className="mb-2 uppercase tracking-widest text-[9px] text-gray-500">Regiões Atendidas na Zona Oeste:</p>
+            <div className="flex flex-wrap justify-center md:justify-end gap-x-3 gap-y-1">
+              {[
+                { name: 'Bangu', href: '/insulfilm-em-bangu' },
+                { name: 'Campo Grande', href: '/insulfilm-em-campo-grande' },
+                { name: 'Realengo', href: '/insulfilm-em-realengo' },
+                { name: 'Barra da Tijuca', href: '/insulfilm-na-barra-da-tijuca' },
+                { name: 'Recreio', href: '/insulfilm-no-recreio' },
+                { name: 'Jacarepaguá', href: '/insulfilm-em-jacarepagua' }
+              ].map((loc, i) => (
+                <Link 
+                  key={i} 
+                  to={loc.href} 
+                  className="hover:text-[#c9a227] transition-colors duration-300 underline underline-offset-4 decoration-white/5 hover:decoration-[#c9a227]/50"
+                >
+                  {loc.name}
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </footer>

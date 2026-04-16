@@ -4,6 +4,7 @@ import { Shield, Sun, Thermometer, CheckCircle, ArrowRight, Eye, SunDim, Star, P
 import { WhatsAppButton } from '../components/WhatsAppButton';
 import { GoogleReviews } from '../components/GoogleReviews';
 import { Particles } from '../components/Particles';
+import { AnimatedCounter } from '../components/AnimatedCounter';
 import { Link } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -30,6 +31,50 @@ export function BanguPage() {
                 }
             );
         });
+        
+        // Benefits Cards animation (like landing page)
+        const cards = document.querySelectorAll('.benefit-card');
+        if (cards.length > 0) {
+            gsap.fromTo(
+                cards,
+                { opacity: 0, scale: 0.8, rotate: -10 },
+                {
+                    opacity: 1,
+                    scale: 1,
+                    rotate: 0,
+                    duration: 0.6,
+                    stagger: 0.15,
+                    ease: 'elastic.out(1, 0.5)',
+                    scrollTrigger: {
+                        trigger: '#vantagens',
+                        start: 'top 75%',
+                        toggleActions: 'play none none reverse',
+                    },
+                }
+            );
+        }
+
+        // Product Cards animation (like landing page)
+        const productCards = document.querySelectorAll('.product-card');
+        if (productCards.length > 0) {
+            gsap.fromTo(
+                productCards,
+                { opacity: 0, rotateY: -30, x: -50 },
+                {
+                    opacity: 1,
+                    rotateY: 0,
+                    x: 0,
+                    duration: 0.7,
+                    stagger: 0.12,
+                    ease: 'expo.out',
+                    scrollTrigger: {
+                        trigger: '#tipos',
+                        start: 'top 75%',
+                        toggleActions: 'play none none reverse',
+                    },
+                }
+            );
+        }
     }, []);
 
     return (
@@ -45,16 +90,16 @@ export function BanguPage() {
                         {
                             "@context": "https://schema.org",
                             "@type": "LocalBusiness",
-                            "name": "LUME Películas de Controle Solar",
+                            "name": "LUME Películas de Controle Solar - Bangu",
                             "image": "https://lumecontrolesolar.com.br/novo-logo-lume.png",
                             "@id": "https://lumecontrolesolar.com.br/insulfilm-em-bangu",
                             "url": "https://lumecontrolesolar.com.br/insulfilm-em-bangu",
                             "telephone": "+5521965140612",
-                            "priceRange": "$$$",
+                            "priceRange": "$$",
                             "address": {
                                 "@type": "PostalAddress",
-                                "streetAddress": "estrada do realengo 973",
-                                "addressLocality": "Rio de Janeiro",
+                                "streetAddress": "Estrada do Realengo, 973",
+                                "addressLocality": "Bangu",
                                 "addressRegion": "RJ",
                                 "postalCode": "21715-331",
                                 "addressCountry": "BR"
@@ -64,7 +109,10 @@ export function BanguPage() {
                                 "latitude": -22.8767,
                                 "longitude": -43.4651
                             },
-                            "areaServed": ["Bangu", "Campo Grande", "Santa Cruz", "Realengo", "Padre Miguel", "Senador Camará", "Zona Oeste RJ"],
+                            "areaServed": {
+                                "@type": "AdministrativeArea",
+                                "name": "Bangu, Rio de Janeiro"
+                            },
                             "aggregateRating": {
                                 "@type": "AggregateRating",
                                 "ratingValue": "5.0",
@@ -189,7 +237,7 @@ export function BanguPage() {
 
             {/* Tipos de Insulfilm - Cards com Imagens e Texto Completo */}
             <section id="tipos" className="py-24 bg-[#0a1628] border-y border-white/5 px-4 overflow-hidden relative">
-                <div className="container-lume page-entrance relative z-10">
+                <div className="container-lume relative z-10">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl lg:text-5xl font-bold font-['Montserrat'] mb-6 text-white">
                             Películas de <span className="text-gradient-gold">Alta Performance</span>
@@ -222,7 +270,7 @@ export function BanguPage() {
                                 desc: "Alta redução de calor com uma tecnologia especial: camada refletiva externa para máxima redução de calor e camada fumê interna para uma visão relaxante. Diferente das películas comuns, reduz o reflexo interno à noite. Excelente custo-benefício para enfrentar o sol de Bangu."
                             }
                         ].map((product, idx) => (
-                            <div key={idx} className="group relative bg-gradient-to-b from-[#1a3a5c]/60 to-[#0a1628]/90 rounded-2xl overflow-hidden border border-[#1a3a5c]/50 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 flex flex-col h-full">
+                            <div key={idx} className="product-card group relative bg-gradient-to-b from-[#1a3a5c]/60 to-[#0a1628]/90 rounded-2xl overflow-hidden border border-[#1a3a5c]/50 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 flex flex-col h-full">
                                 <div className="absolute top-4 left-4 z-10 px-3 py-1 bg-[#c9a227] text-[#0a1628] text-[10px] font-bold uppercase tracking-wider rounded-full shadow-lg pointer-events-none">
                                     {product.selo}
                                 </div>
@@ -282,8 +330,8 @@ export function BanguPage() {
             </section>
 
             {/* Benefícios - Boxes com Texto e Estatísticas */}
-            <section className="py-24 relative px-4 bg-[#070f1a] overflow-hidden">
-                <div className="container-lume page-entrance">
+            <section id="vantagens" className="py-24 relative px-4 bg-[#070f1a] overflow-hidden">
+                <div className="container-lume">
                     <div className="text-center mb-20">
                         <h2 className="text-3xl lg:text-5xl font-black font-['Montserrat'] mb-6 tracking-tight">Vantagens que Valorizam seu Ambiente</h2>
                         <p className="text-gray-400 max-w-3xl mx-auto text-lg font-light">Investir em películas de controle solar é garantir conforto imediato e economia a longo prazo para seu patrimônio.</p>
@@ -308,14 +356,17 @@ export function BanguPage() {
                                 desc: "Trabalhamos com películas de procedência que não criam bolhas nem ficam roxas, com garantia oficial de 5 anos pela Lume."
                             }
                         ].map((benefit, idx) => (
-                            <div key={idx} className="group relative p-10 rounded-2xl bg-gradient-to-b from-[#1a3a5c]/40 to-[#0d1f3c]/60 border border-[#1a3a5c]/30 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 text-center lg:text-left flex flex-col">
+                            <div key={idx} className="benefit-card group relative p-10 rounded-2xl bg-gradient-to-b from-[#1a3a5c]/40 to-[#0d1f3c]/60 border border-[#1a3a5c]/30 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 text-center lg:text-left flex flex-col">
                                 <div className="w-16 h-16 rounded-2xl bg-[#c9a227]/10 flex items-center justify-center mx-auto lg:mx-0 mb-8 group-hover:bg-[#c9a227]/20 transition-colors shadow-inner">
                                     <benefit.icon className="w-8 h-8 text-[#c9a227] group-hover:scale-110 transition-transform" />
                                 </div>
                                 
                                 <div className="mb-6">
                                     <span className="text-5xl font-black text-gradient-gold font-['Montserrat'] leading-none">
-                                        {benefit.stat}
+                                        <AnimatedCounter 
+                                            target={benefit.stat.replace(/[^0-9-]/g, '')} 
+                                            suffix={benefit.stat.replace(/[0-9-]/g, '')} 
+                                        />
                                     </span>
                                     <p className="text-[11px] uppercase text-gray-500 font-black tracking-widest mt-2">{benefit.label}</p>
                                 </div>

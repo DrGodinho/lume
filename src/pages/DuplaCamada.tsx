@@ -187,7 +187,37 @@ export function DuplaCamadaPage() {
             <section className="py-20 relative px-4">
                 <div className="container-lume page-entrance text-center mb-16">
                     <h2 className="text-3xl lg:text-4xl font-bold font-['Montserrat'] mb-4 text-[#c9a227]">A Ciência da Super Rejeição Térmica</h2>
-                    <p className="text-gray-400 max-w-2xl mx-auto text-lg">Por que ela é muito superior a filmes básicos do mercado?</p>
+                    <p className="text-gray-400 max-w-2xl mx-auto text-lg mb-12">Por que ela é muito superior a filmes básicos do mercado?</p>
+
+                    <div className="max-w-4xl mx-auto text-left">
+                        <div className="glass-card p-8 md:p-10 rounded-3xl border border-white/5 bg-white/[0.02] relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-[#c9a227]/5 blur-3xl rounded-full"></div>
+                            
+                            <h3 className="text-2xl font-bold mb-6 text-white font-['Montserrat']">O que é a Tecnologia de Dupla Camada?</h3>
+                            <p className="text-gray-300 leading-relaxed mb-10 text-lg">
+                                Tecnicamente, trata-se de um processo de fabricação onde uma camada de <strong>Sputtering de Alumínio</strong> (altamente refletiva) é fundida a uma camada de <strong>Poliéster Pigmentado ou Carbono</strong> (fumê).
+                            </p>
+
+                            <div className="grid md:grid-cols-2 gap-10">
+                                <div className="relative pl-6 border-l-2 border-[#c9a227]/30 hover:border-[#c9a227] transition-colors">
+                                    <h4 className="text-white font-bold mb-3 flex items-center gap-2">
+                                        <span className="text-[#c9a227]">01.</span> A Camada Externa (Prata)
+                                    </h4>
+                                    <p className="text-gray-400 leading-relaxed">
+                                        Fica voltada para o vidro e tem a função de agir como um escudo, refletindo a radiação infravermelha antes mesmo de ela atravessar o vidro.
+                                    </p>
+                                </div>
+                                <div className="relative pl-6 border-l-2 border-[#c9a227]/30 hover:border-[#c9a227] transition-colors">
+                                    <h4 className="text-white font-bold mb-3 flex items-center gap-2">
+                                        <span className="text-[#c9a227]">02.</span> A Camada Interna (Fumê)
+                                    </h4>
+                                    <p className="text-gray-400 leading-relaxed">
+                                        Fica voltada para o ambiente interno. Sua função é neutralizar o brilho metálico e garantir que, quem está dentro de casa, tenha uma visão natural, nítida e sem o incômodo "efeito espelho" durante a noite.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div className="container-lume grid md:grid-cols-2 lg:grid-cols-4 gap-6">
