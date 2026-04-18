@@ -19,9 +19,20 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
     window.scrollTo(0, 0);
   }, [pathname]);
 
-  // GSAP setup
+  // GSAP setup and Service Worker cleanup
   useEffect(() => {
     document.documentElement.style.scrollBehavior = 'smooth';
+    
+    // Kill old Service Workers from previous Vite setup to clear cache
+    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(registrations => {
+        for (let registration of registrations) {
+          registration.unregister();
+          console.log('Old Service Worker unregistered');
+        }
+      });
+    }
+
     ScrollTrigger.refresh();
 
     return () => {
