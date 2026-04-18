@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useRef } from 'react';
 import { ArrowRight, Check, MessageCircle } from 'lucide-react';
 import { Particles } from '../components/Particles';

@@ -1,6 +1,9 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { Menu, X, Phone } from 'lucide-react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { handleGtagClick } from '../lib/gtag';
 
 const navLinks = [
@@ -13,8 +16,8 @@ const navLinks = [
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { pathname } = useLocation();
-  const navigate = useNavigate();
+  const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -28,7 +31,7 @@ export function Navbar() {
   const handleNavClick = (href: string) => {
     if (href.startsWith('#')) {
       if (pathname !== '/') {
-        navigate('/' + href);
+        router.push('/' + href);
       } else {
         const element = document.querySelector(href);
         if (element) {
@@ -50,7 +53,7 @@ export function Navbar() {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link
-            to="/"
+            href="/"
             className="flex items-center gap-2 group"
           >
             <span className="text-2xl md:text-3xl font-bold tracking-tight text-white font-['Montserrat']">
@@ -80,7 +83,7 @@ export function Navbar() {
               ) : (
                 <Link
                   key={link.name}
-                  to={link.href}
+                  href={link.href}
                   className="relative text-sm font-medium text-gray-300 hover:text-white transition-colors duration-300 group"
                 >
                   {link.name}
@@ -93,7 +96,7 @@ export function Navbar() {
           {/* CTA Button */}
           <div className="hidden lg:flex items-center gap-4">
             <Link
-              to="/simulador"
+              href="/simulador"
               className="btn-secondary flex items-center gap-2 text-xs py-2 px-4"
             >
               Qual película escolher?
@@ -147,7 +150,7 @@ export function Navbar() {
               ) : (
                 <Link
                   key={link.name}
-                  to={link.href}
+                  href={link.href}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="text-lg font-medium text-gray-300 hover:text-[#c9a227] transition-colors py-2"
                 >
@@ -156,7 +159,7 @@ export function Navbar() {
               )
             ))}
             <Link
-              to="/simulador"
+              href="/simulador"
               className="btn-secondary flex items-center justify-center gap-2 mt-2"
               onClick={() => setIsMobileMenuOpen(false)}
             >

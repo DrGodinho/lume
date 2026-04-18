@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useRef } from 'react';
 import { Check, Award, Users, Calendar, Shield } from 'lucide-react';
 import gsap from 'gsap';

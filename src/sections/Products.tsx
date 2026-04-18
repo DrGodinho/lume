@@ -1,7 +1,9 @@
+'use client';
+
 import { useEffect, useRef } from 'react';
 import { ArrowRight, Star, Thermometer, Sun, Eye, Droplets, Sparkles } from 'lucide-react';
 import gsap from 'gsap';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -186,7 +188,7 @@ export function Products() {
                 </div>
               )}
 
-              <Link to={product.path} className="block cursor-pointer">
+              <Link href={product.path} className="block cursor-pointer">
                 {/* Image */}
                 <div className="relative h-40 sm:h-48 overflow-hidden">
                   <img
@@ -253,7 +255,7 @@ export function Products() {
                 Dúvida na escolha? <span className="text-white">Veja na prática</span> como cada película transforma seu ambiente.
               </p>
               <Link
-                to="/simulador"
+                href="/simulador"
                 className="btn-primary inline-flex items-center gap-3 py-4 px-8 text-lg group relative overflow-hidden"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />

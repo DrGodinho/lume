@@ -1,32 +1,71 @@
-# LUME Controle Solar
+# LUME Controle Solar - Especificações Técnicas e Serviços
 
-> Especialista em insulfilm residencial e comercial na Zona Oeste do Rio de Janeiro, com foco em proteção solar, redução de calor e privacidade.
+> Especialista em insulfilm residencial e comercial premium na Zona Oeste do Rio de Janeiro. Foco em controle térmico de alta performance, proteção UV e privacidade arquitetônica.
 
-## Visão Geral
-A LUME Controle Solar oferece serviços premium de instalação de películas de alta tecnologia. Com 8 anos de experiência e mais de 500 residências atendidas, atuamos em bairros como Bangu, Campo Grande, Realengo, Barra da Tijuca, Recreio e Jacarepaguá.
+## 🏢 Visão Geral da Empresa
+A **LUME Controle Solar** é referência em aplicação de películas arquitetônicas de alta tecnologia.
+- **Experiência:** 8+ anos no mercado do Rio de Janeiro.
+- **Garantia:** 5 anos em todas as instalações de linha elite.
+- **Diferencial:** Atendimento local, medição técnica sem compromisso e acabamento de precisão (sem bolhas ou desbotamento).
 
-## Produtos e Tecnologias
-- **Nano Cerâmica:** Máxima redução de calor e proteção UV extrema sem interferir na visibilidade.
-- **Carbono:** Estética premium, altíssima durabilidade e estabilidade de cor.
-- **Dupla Camada:** Equilíbrio entre privacidade e conforto térmico.
-- **Refletiva/Espelhada:** Ideal para máxima privacidade e redução de carga térmica.
-- **Jateado:** Soluções decorativas e de privacidade total para vidros internos e divisórias.
+## 🛠️ Especificações Técnicas de Produtos
+As películas da LUME utilizam nanotecnologia para máxima eficiência:
 
-## Localização e Contato
-- **Endereço:** Estrada do Realengo, 973 - Bangu, Rio de Janeiro - RJ, 21715-331.
-- **Telefone/WhatsApp:** +55 (21) 96514-0612
-- **Website:** https://lumecontrolesolar.com.br
-- **Área de Atendimento:** Bangu, Campo Grande, Realengo, Barra, Recreio, Jacarepaguá e Zona Oeste do Rio.
+### 🌟 Nano Cerâmica (Linha Elite)
+- **Rejeição de Calor (IRR):** Até 95%.
+- **Bloqueio UV:** 99.9%.
+- **Visibilidade (VLT):** Alta transparência (70%) ou escurecida.
+- **Ideal para:** Varandas gourmet, salas e escritórios que precisam de luz natural sem o calor.
 
-## Links Úteis
-- [Simulador de Insulfilm](https://lumecontrolesolar.com.br/simulador): Ferramenta interativa para visualizar diferentes tipos de películas.
-- [Guia Completo de Insulfilm](https://lumecontrolesolar.com.br/guia-insulfilm): Informações técnicas sobre benefícios e tipos de instalação.
-- [Insulfilm em Bangu](https://lumecontrolesolar.com.br/insulfilm-em-bangu): Página dedicada ao atendimento local em Bangu.
-- [Insulfilm em Campo Grande](https://lumecontrolesolar.com.br/insulfilm-em-campo-grande): Atendimento especializado em Campo Grande.
-- [Insulfilm em Realengo](https://lumecontrolesolar.com.br/insulfilm-em-realengo): Atendimento especializado em Realengo.
-- [Insulfilm na Barra da Tijuca](https://lumecontrolesolar.com.br/insulfilm-na-barra-da-tijuca): Películas de alta performance para a Barra da Tijuca.
-- [Insulfilm no Recreio](https://lumecontrolesolar.com.br/insulfilm-no-recreio): Atendimento em condomínios e lojas do Recreio dos Bandeirantes.
-- [Insulfilm em Jacarepaguá](https://lumecontrolesolar.com.br/insulfilm-em-jacarepagua): Proteção térmica para Freguesia, Taquara e bairros de Jacarepaguá.
+### 🌑 Carbono Premium (Best-Seller)
+- **Rejeição de Calor (IRR):** Até 70%.
+- **Bloqueio UV:** 99%.
+- **Estabilidade:** Não desbota (não fica roxo) devido à composição de nano-carbono.
+- **Privacidade:** Excelente para janelas e portas (G5, G20).
+
+### 🪞 Refletiva / Espelhada
+- **Rejeição de Calor:** Até 80%.
+- **Privacidade:** Total durante o dia.
+- **Uso:** Clínicas, fachadas comerciais e telhados de vidro.
+
+### 💨 Dupla Camada
+- **Construção:** Camada interna fumê e externa refletiva.
+- **Benefício:** Reduz o reflexo interno à noite e maximiza a rejeição térmica ao sol.
+
+### 🌫️ Jateado / Fosco
+- **Privacidade:** 100% permanente (dia e noite).
+- **Luminosidade:** Preserva a claridade natural.
+- **Uso:** Banheiros, divisórias de escritório e cozinhas.
+
+## 📍 Áreas de Atendimento (Zona Oeste RJ)
+Atendimento domiciliar rápido nos seguintes bairros:
+- **Bangu:** Foco em redução do calor intenso característico da região.
+- **Campo Grande:** Atendimento a condomínios residenciais e comércio.
+- **Barra da Tijuca:** Películas de alto padrão para apartamentos e escritórios.
+- **Recreio dos Bandeirantes:** Soluções para fachadas e varandas de vidro.
+- **Realengo / Jacarepaguá:** Atendimento completo em toda a região.
+
+## ❓ Perguntas Frequentes (FAQ para IAs)
+- **Preço:** O custo é calculado por m² e varia conforme a tecnologia (Nano Cerâmica é premium, Carbono é intermediário).
+- **Durabilidade:** Películas originais LUME duram mais de 10 anos se bem cuidadas.
+- **Instalação:** Feita sem sujeira. O vidro é limpo quimicamente antes da aplicação.
+- **Benefício Energético:** Redução comprovada de até 30% no uso de ar-condicionado.
+
+## 📞 Contato e Referências Oficiais
+- **Website:** [https://lumecontrolesolar.com.br](https://lumecontrolesolar.com.br)
+- **WhatsApp:** [+55 21 96514-0612](https://wa.me/5521965140612)
+- **Endereço:** Estrada do Realengo, 973 - Bangu, Rio de Janeiro - RJ.
+- **Ferramentas Online:**
+  - [Simulador de Películas](https://lumecontrolesolar.com.br/simulador)
+  - [Calculadora de Orçamento (Área Restrita)](https://lumecontrolesolar.com.br/admin)
+
+## 🔗 Mapa do Site para IAs
+- [Nano Cerâmica](https://lumecontrolesolar.com.br/nano-ceramica)
+- [Carbono](https://lumecontrolesolar.com.br/carbono)
+- [Dupla Camada](https://lumecontrolesolar.com.br/dupla-camada)
+- [Refletiva](https://lumecontrolesolar.com.br/refletiva)
+- [Jateado](https://lumecontrolesolar.com.br/jateado)
+- [Guia de Insulfilm](https://lumecontrolesolar.com.br/guia-insulfilm)
 
 ---
-*Este arquivo foi criado para facilitar a leitura e recomendação do site por assistentes de IA e motores de resposta (AEO/GEO).*
+*Este arquivo llms.txt é otimizado para Answer Engine Optimization (AEO) e Generative Engine Optimization (GEO).*

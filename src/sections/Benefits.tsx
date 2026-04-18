@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useRef, useState } from 'react';
 import { Shield, Thermometer, PiggyBank, Lock } from 'lucide-react';
 import gsap from 'gsap';

@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 import { MessageCircle, X } from 'lucide-react';
 import { handleGtagClick } from '../lib/gtag';

@@ -1,6 +1,9 @@
+'use client';
+
 import { useRef } from 'react';
 import { MapPin, Phone, Mail, Clock, Facebook, Instagram, ExternalLink } from 'lucide-react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -33,8 +36,8 @@ const contactInfo = [
 export function Footer() {
   const footerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const { pathname } = useLocation();
-  const navigate = useNavigate();
+  const pathname = usePathname();
+  const router = useRouter();
 
 
 
@@ -42,7 +45,7 @@ export function Footer() {
     if (href.startsWith('#')) {
       if (pathname !== '/') {
         // Se não estiver na home, navega para a home com o hash
-        navigate('/' + href);
+        router.push('/' + href);
       } else {
         // Se já estiver na home, apenas faz o scroll
         const id = href.substring(1);
@@ -78,7 +81,7 @@ export function Footer() {
         >
           {/* Column 1: Logo & About */}
           <div className="footer-col sm:col-span-2 lg:col-span-1">
-            <Link to="/" className="inline-block mb-3 sm:mb-4">
+            <Link href="/" className="inline-block mb-3 sm:mb-4">
               <span className="text-2xl sm:text-3xl font-bold text-white font-['Montserrat']">
                 LU<span className="text-gradient-gold">ME</span>
               </span>
@@ -144,7 +147,7 @@ export function Footer() {
                     </a>
                   ) : (
                     <Link
-                      to={link.href}
+                      href={link.href}
                       className="text-gray-400 hover:text-[#c9a227] transition-colors text-xs sm:text-sm inline-flex items-center gap-2 group"
                     >
                       <span className="w-0 h-px bg-[#c9a227] transition-all duration-300 group-hover:w-3" />
@@ -178,7 +181,7 @@ export function Footer() {
                     </a>
                   ) : (
                     <Link
-                      to={product.href}
+                      href={product.href}
                       className="text-gray-400 hover:text-[#c9a227] transition-colors text-xs sm:text-sm inline-flex items-center gap-2 group"
                     >
                       <span className="w-0 h-px bg-[#c9a227] transition-all duration-300 group-hover:w-3" />
@@ -229,7 +232,7 @@ export function Footer() {
               ].map((loc, i) => (
                 <Link 
                   key={i} 
-                  to={loc.href} 
+                  href={loc.href} 
                   className="hover:text-[#c9a227] transition-colors duration-300 underline underline-offset-4 decoration-white/5 hover:decoration-[#c9a227]/50"
                 >
                   {loc.name}

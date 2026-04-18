@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useRef } from 'react';
 import { MapPin, Navigation } from 'lucide-react';
 import gsap from 'gsap';
