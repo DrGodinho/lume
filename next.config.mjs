@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Output standalone for easier deployment
-  output: 'standalone',
+  // Output export for static hosting (cPanel/Hostinger/etc)
+  output: 'export',
+  trailingSlash: true,
 
   // Disable React strict mode to avoid double-rendering GSAP animations
   reactStrictMode: false,
@@ -14,7 +15,7 @@ const nextConfig = {
         hostname: 'lumecontrolesolar.com.br',
       },
     ],
-    unoptimized: false,
+    unoptimized: true,
   },
 
   // Webpack and Turbopack customization
