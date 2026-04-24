@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react';
 import { Shield, Sun, Thermometer, CheckCircle, ArrowRight, Eye, SunDim, Star, PiggyBank, Lock, MapPin, Zap, MessageCircle, Droplets } from 'lucide-react';
-import { WhatsAppButton } from '../components/WhatsAppButton';
 import { GoogleReviews } from '../components/GoogleReviews';
 import { Particles } from '../components/Particles';
 import { AnimatedCounter } from '../components/AnimatedCounter';
@@ -80,23 +79,22 @@ export function RealengoPage() {
     }, []);
 
     return (
-        <div className="bg-[#070f1a] text-white min-h-screen">
+        <div className="bg-[#04080f] text-white min-h-screen">
 
-            <WhatsAppButton />
 
             {/* Hero Section */}
             <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden px-4">
                 {/* Background Image */}
                 <div className="absolute inset-0 z-0">
                     <Image src="/realengo_hero_bg.webp" alt="Instalação de insulfilm profissional em Realengo RJ - LUME Controle Solar" fill sizes="(max-width: 768px) 100vw, 100vw" priority className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#0a1628]/95 via-[#0a1628]/80 to-[#0a1628]/60" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-transparent to-[#0a1628]/50" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#04080f]/95 via-[#04080f]/80 to-[#04080f]/60" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#04080f] via-transparent to-[#04080f]/50" />
                 </div>
 
                 {/* Particles & Effects */}
                 <Particles />
                 
-                <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0a1628] to-transparent z-10" />
+                <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#04080f] to-transparent z-10" />
                 <div className="absolute top-1/4 right-10 w-32 h-32 rounded-full bg-[#c9a227]/5 blur-3xl animate-float z-10" />
                 <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-[#1a3a5c]/30 blur-3xl animate-float z-10" style={{ animationDelay: '2s' }} />
 
@@ -149,7 +147,7 @@ export function RealengoPage() {
             </section>
 
             {/* Faixa de Garantias (Intro Strip) */}
-            <section className="py-8 bg-[#0a1628] border-b border-white/5 relative z-10">
+            <section className="py-8 bg-[#04080f] border-b border-white/5 relative z-10">
                 <div className="container-lume page-entrance">
                     <div className="flex flex-wrap justify-center gap-8 text-sm text-gray-400 font-medium">
                         <div className="flex items-center gap-2"><CheckCircle size={16} className="text-[#c9a227]" /> Orçamento gratuito e sem compromisso</div>
@@ -161,7 +159,7 @@ export function RealengoPage() {
             </section>
 
             {/* O problema do Calor em Realengo - Texto Completo */}
-            <section className="py-24 bg-[#070f1a] relative px-4">
+            <section className="py-24 bg-[#04080f] relative px-4">
                 <div className="container-lume page-entrance">
                     <div className="max-w-4xl mx-auto text-center mb-16">
                         <h2 className="text-3xl lg:text-5xl font-bold font-montserrat mb-10">Realengo merece conforto térmico</h2>
@@ -189,7 +187,7 @@ export function RealengoPage() {
             </section>
 
             {/* Tipos de Insulfilm - Cards com Imagens e Texto Completo */}
-            <section id="tipos" className="py-24 bg-[#0a1628] border-y border-white/5 px-4 overflow-hidden relative">
+            <section id="tipos" className="py-24 bg-[#04080f] border-y border-white/5 px-4 overflow-hidden relative">
                 <div className="container-lume relative z-10">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl lg:text-5xl font-bold font-montserrat mb-6 text-white">
@@ -223,14 +221,14 @@ export function RealengoPage() {
                                 desc: "Alta redução de calor com uma tecnologia especial: camada refletiva externa para máxima redução de calor e camada fumê interna para uma visão relaxante. Diferente das películas comuns, reduz o reflexo interno à noite. Perfeito para casas e apartamentos em Realengo."
                             }
                         ].map((product, idx) => (
-                            <div key={idx} className="product-card group relative bg-gradient-to-b from-[#1a3a5c]/60 to-[#0a1628]/90 rounded-2xl overflow-hidden border border-[#1a3a5c]/50 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 flex flex-col h-full">
-                                <div className="absolute top-4 left-4 z-10 px-3 py-1 bg-[#c9a227] text-[#0a1628] text-[10px] font-bold uppercase tracking-wider rounded-full shadow-lg pointer-events-none">
+                            <div key={idx} className="product-card group relative bg-gradient-to-b from-[#1a3a5c]/60 to-[#04080f]/90 rounded-2xl overflow-hidden border border-[#1a3a5c]/50 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 flex flex-col h-full">
+                                <div className="absolute top-4 left-4 z-10 px-3 py-1 bg-[#c9a227] text-[#04080f] text-[10px] font-bold uppercase tracking-wider rounded-full shadow-lg pointer-events-none">
                                     {product.selo}
                                 </div>
                                 <Link href={product.path} className="flex flex-col flex-grow">
                                     <div className="relative h-44 overflow-hidden">
-                                        <Image src={product.image} alt={product.title} fill sizes="(max-width: 768px) 100vw, 100vw"  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-transparent to-transparent opacity-80" />
+                                        <Image src={product.image} alt={product.title} fill sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-[#04080f] via-transparent to-transparent opacity-80" />
                                     </div>
 
                                     <div className="p-6 flex flex-col flex-grow">
@@ -267,7 +265,7 @@ export function RealengoPage() {
                                         href={`https://wa.me/5521965140612?text=Olá! Quero um orçamento gratuito da película ${product.title} em Realengo.`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="w-full py-3.5 rounded-xl bg-[#111e33] hover:bg-[#c9a227] text-gray-300 hover:text-[#0a1628] text-xs font-bold uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-3 border border-white/5"
+                                        className="w-full py-3.5 rounded-xl bg-[#111e33] hover:bg-[#c9a227] text-gray-300 hover:text-[#04080f] text-xs font-bold uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-3 border border-white/5"
                                     >
                                         Orçamento Grátis <ArrowRight size={14} />
                                     </a>
@@ -279,7 +277,7 @@ export function RealengoPage() {
             </section>
 
             {/* Benefícios - Boxes com Texto e Estatísticas */}
-            <section id="vantagens" className="py-24 relative px-4 bg-[#070f1a] overflow-hidden">
+            <section id="vantagens" className="py-24 relative px-4 bg-[#04080f] overflow-hidden">
                 <div className="container-lume">
                     <div className="text-center mb-20">
                         <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-6 tracking-tight">O Diferencial LUME em Realengo</h2>
@@ -305,7 +303,7 @@ export function RealengoPage() {
                                 desc: "Orçamento gratuito e instalação express em até 24 horas em qualquer endereço de Realengo."
                             }
                         ].map((benefit, idx) => (
-                            <div key={idx} className="benefit-card group relative p-10 rounded-2xl bg-gradient-to-b from-[#1a3a5c]/40 to-[#0d1f3c]/60 border border-[#1a3a5c]/30 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 text-center lg:text-left flex flex-col">
+                            <div key={idx} className="benefit-card group relative p-10 rounded-2xl bg-gradient-to-b from-[#1a3a5c]/40 to-[#04080f]/60 border border-[#1a3a5c]/30 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 text-center lg:text-left flex flex-col">
                                 <div className="w-16 h-16 rounded-2xl bg-[#c9a227]/10 flex items-center justify-center mx-auto lg:mx-0 mb-8 group-hover:bg-[#c9a227]/20 transition-colors shadow-inner">
                                     <benefit.icon className="w-8 h-8 text-[#c9a227] group-hover:scale-110 transition-transform" />
                                 </div>
@@ -333,7 +331,7 @@ export function RealengoPage() {
             </section>
 
             {/* Contexto Local e Bairros - Importante para SEO */}
-            <section className="py-24 bg-[#0a1628] border-y border-white/5 relative px-4 overflow-hidden">
+            <section className="py-24 bg-[#04080f] border-y border-white/5 relative px-4 overflow-hidden">
                 <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-blue-500/5 to-transparent pointer-events-none" />
                 <div className="container-lume page-entrance relative z-10">
                     <div className="max-w-4xl mx-auto text-center lg:text-left">
@@ -393,7 +391,7 @@ export function RealengoPage() {
             </section>
 
             {/* Perguntas Frequentes (FAQ) */}
-            <section className="py-24 relative px-4 overflow-hidden bg-[#070f1a]">
+            <section className="py-24 relative px-4 overflow-hidden bg-[#04080f]">
                 <div className="container-lume page-entrance max-w-4xl mx-auto">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-6 tracking-tight">FAQ - Insulfilm em Realengo</h2>
@@ -440,8 +438,8 @@ export function RealengoPage() {
             <GoogleReviews />
 
             {/* Chamada para Ação (CTA Final) - Elegant Redesign */}
-            <section className="py-24 relative overflow-hidden bg-[#070f1a]">
-                <div className="absolute inset-0 bg-gradient-to-b from-[#0a1628] to-[#070f1a]" />
+            <section className="py-24 relative overflow-hidden bg-[#04080f]">
+                <div className="absolute inset-0 bg-gradient-to-b from-[#04080f] to-[#04080f]" />
                 <div className="absolute top-0 right-0 w-96 h-96 bg-[#c9a227]/5 blur-[120px] rounded-full" />
                 <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#25d366]/5 blur-[120px] rounded-full" />
 
@@ -485,9 +483,10 @@ export function RealengoPage() {
                 </div>
             </section>
 
-            <footer className="py-12 bg-[#070f1a] border-t border-white/5 text-center text-[10px] text-gray-500 font-bold uppercase tracking-[0.4em] px-4">
+            <footer className="py-12 bg-[#04080f] border-t border-white/5 text-center text-[10px] text-gray-500 font-bold uppercase tracking-[0.4em] px-4">
                  © 2026 Lume Controle Solar · Especialista em Realengo e Zona Oeste
             </footer>
         </div>
     );
 }
+

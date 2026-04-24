@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react';
 import { Shield, CheckCircle, EyeOff, Wifi, ArrowRight } from 'lucide-react';
-import { WhatsAppButton } from '../components/WhatsAppButton';
 import { ContactCTA } from '../sections/ContactCTA';
 import { SpecTooltip } from '../components/SpecTooltip';
 import gsap from 'gsap';
@@ -18,9 +17,8 @@ export function CarbonoPage() {
     }, []);
 
     return (
-        <div className="bg-[#070f1a] text-white min-h-screen">
+        <div className="bg-[#04080f] text-white min-h-screen">
             {/* WhatsApp Floating Button */}
-            <WhatsAppButton />
 
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden px-4">
@@ -54,7 +52,7 @@ export function CarbonoPage() {
             </section>
 
             {/* Introduction - SEO FOCUS Bangu/RJ */}
-            <section className="py-20 bg-[#0a1628] border-b border-white/5">
+            <section className="py-20 bg-[#070f1a] border-b border-white/5">
                 <div className="container-lume page-entrance">
                     <div className="max-w-4xl mx-auto text-center">
                         <h2 className="text-3xl font-bold font-montserrat mb-8 text-white">Por que o Insulfilm Carbono é o queridinho da Zona Oeste?</h2>
@@ -70,7 +68,7 @@ export function CarbonoPage() {
 
 
             {/* Matriz Comparativa G5 vs G20 */}
-            <section className="py-24 relative px-4 bg-[#050A11]">
+            <section className="py-24 relative px-4 bg-[#070f1a]">
                 <div className="container-lume page-entrance text-center mb-16">
                     <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-4 text-[#c9a227]">Escolha seu Grau de Privacidade</h2>
                     <p className="text-gray-400 max-w-2xl mx-auto text-lg">A exata transparência ideal para a necessidade da sua residência ou empresa (Apenas R$ 80/m² instalado).</p>
@@ -195,7 +193,7 @@ export function CarbonoPage() {
             </section>
 
             {/* FAQ Section */}
-            <section className="py-20 relative px-4 bg-[#0a1628] border-t border-white/5">
+            <section className="py-20 relative px-4 bg-[#070f1a] border-t border-white/5">
                 <div className="container-lume page-entrance max-w-4xl mx-auto">
                     <div className="text-center mb-12">
                         <h2 className="text-3xl font-bold font-montserrat mb-4">Dúvidas Frequentes da Linha Carbono</h2>

@@ -148,7 +148,7 @@ export function Products() {
     <section
       id="produtos"
       ref={sectionRef}
-      className="relative section-padding bg-[#0d1f3c] overflow-hidden"
+      className="relative section-padding bg-[#070f1a] overflow-hidden"
     >
       {/* Background decorations */}
       <div className="absolute top-20 left-10 w-64 h-64 rounded-full bg-[#c9a227]/5 blur-3xl" />
@@ -180,13 +180,13 @@ export function Products() {
           {products.map((product, index) => (
             <div
               key={product.id}
-              className={`product-card group relative bg-gradient-to-b from-[#1a3a5c]/60 to-[#0a1628]/90 rounded-xl sm:rounded-2xl overflow-hidden border border-[#1a3a5c]/50 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 sm:hover:-translate-y-3 hover:shadow-2xl hover:shadow-[#c9a227]/10 ${index % 2 === 1 ? 'lg:mt-8' : ''
+              className={`product-card group relative bg-gradient-to-b from-[#0a1628]/80 to-[#070f1a]/95 rounded-xl sm:rounded-2xl overflow-hidden border border-white/5 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 sm:hover:-translate-y-3 hover:shadow-2xl hover:shadow-[#c9a227]/10 ${index % 2 === 1 ? 'lg:mt-8' : ''
                 }`}
               style={{ perspective: '1000px' }}
             >
               {/* Tag */}
               {product.tag && (
-                <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-10 px-2 py-0.5 sm:px-3 sm:py-1 bg-[#c9a227] text-[#0a1628] text-[10px] sm:text-xs font-bold uppercase tracking-wider rounded-full">
+                <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-10 px-2 py-0.5 sm:px-3 sm:py-1 bg-[#c9a227] text-[#04080f] text-[10px] sm:text-xs font-bold uppercase tracking-wider rounded-full">
                   {product.tag}
                 </div>
               )}
@@ -199,8 +199,14 @@ export function Products() {
               >
                 {/* Image */}
                 <div className="relative h-40 sm:h-48 overflow-hidden">
-                  <Image src={product.image} alt={product.name} fill sizes="(max-width: 768px) 100vw, 100vw"  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-transparent to-transparent" />
+                  <Image 
+                    src={product.image} 
+                    alt={product.name} 
+                    fill 
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw" 
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#04080f] via-transparent to-transparent" />
                 </div>
 
                 {/* Content */}
@@ -241,7 +247,7 @@ export function Products() {
                   href={`https://wa.me/5521965140612?text=Olá! Tenho interesse na ${product.name}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg bg-[#1a3a5c] hover:bg-[#c9a227] text-white hover:text-[#0a1628] text-xs sm:text-sm font-semibold uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-2 group/btn"
+                  className="w-full py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg bg-[#070f1a] hover:bg-[#c9a227] text-white hover:text-[#04080f] text-xs sm:text-sm font-semibold uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-2 group/btn border border-white/5"
                 >
                   <span className="whitespace-nowrap">{product.cta}</span>
                   <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 transition-transform group-hover/btn:translate-x-1" />
@@ -254,7 +260,7 @@ export function Products() {
         {/* Bottom CTA - Simulator Highlight */}
         <div className="text-center mt-12 sm:mt-20">
           <div className="inline-block p-[1px] rounded-xl bg-gradient-to-r from-transparent via-[#c9a227]/50 to-transparent mb-6">
-            <div className="bg-[#0a1628] rounded-xl px-6 py-4 border border-white/5">
+            <div className="bg-[#04080f] rounded-xl px-6 py-4 border border-white/5">
               <p className="text-gray-300 text-sm sm:text-base mb-6 font-medium">
                 Dúvida na escolha? <span className="text-white">Veja na prática</span> como cada película transforma seu ambiente.
               </p>

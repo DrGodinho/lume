@@ -42,7 +42,7 @@ export function NotFound() {
     }, []);
 
     return (
-        <div className="bg-[#070f1a] text-white min-h-screen flex items-center justify-center relative overflow-hidden px-4 py-20">
+        <div className="bg-[#04080f] text-white min-h-screen flex items-center justify-center relative overflow-hidden px-4 py-20">
 
             {/* Background Elements */}
             <div className="absolute inset-0 z-0 pointer-events-none">

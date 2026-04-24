@@ -159,7 +159,7 @@ export function QuotePage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#070f1a] text-white py-12 px-4 sm:px-6">
+        <div className="min-h-screen bg-[#04080f] text-white py-12 px-4 sm:px-6">
             <div className="max-w-xl mx-auto">
 
                 {/* Header */}
@@ -193,7 +193,7 @@ export function QuotePage() {
                                 value={nome}
                                 onChange={(e) => setNome(e.target.value)}
                                 placeholder="Seu nome completo"
-                                className="w-full bg-[#0a1628] border border-white/10 rounded-xl px-4 py-3.5 focus:border-[#c9a227] focus:ring-1 focus:ring-[#c9a227] transition-all outline-none"
+                                className="w-full bg-[#04080f] border border-white/10 rounded-xl px-4 py-3.5 focus:border-[#c9a227] focus:ring-1 focus:ring-[#c9a227] transition-all outline-none"
                             />
                         </div>
                         <div>
@@ -205,7 +205,7 @@ export function QuotePage() {
                                     value={bairro}
                                     onChange={(e) => setBairro(e.target.value)}
                                     placeholder="Ex: Bangu, Zona Oeste"
-                                    className="w-full bg-[#0a1628] border border-white/10 rounded-xl pl-11 pr-4 py-3.5 focus:border-[#c9a227] focus:ring-1 focus:ring-[#c9a227] transition-all outline-none"
+                                    className="w-full bg-[#04080f] border border-white/10 rounded-xl pl-11 pr-4 py-3.5 focus:border-[#c9a227] focus:ring-1 focus:ring-[#c9a227] transition-all outline-none"
                                 />
                             </div>
                         </div>
@@ -228,7 +228,7 @@ export function QuotePage() {
                                 onClick={() => setSelectedFilm(film.name)}
                                 className={`w-full text-left p-4 rounded-xl border transition-all duration-300 relative overflow-hidden group ${selectedFilm === film.name
                                     ? 'bg-[#c9a227]/10 border-[#c9a227] shadow-[0_0_20px_rgba(201,162,39,0.1)]'
-                                    : 'bg-[#0a1628] border-white/5 hover:border-white/20'
+                                    : 'bg-[#04080f] border-white/5 hover:border-white/20'
                                     }`}
                             >
                                 <div className="flex items-start justify-between relative z-10">
@@ -273,7 +273,7 @@ export function QuotePage() {
                                 value={height}
                                 onChange={(e) => setHeight(e.target.value)}
                                 placeholder="0"
-                                className="w-full bg-[#0a1628] border border-white/10 rounded-xl px-4 py-3 focus:border-[#c9a227] transition-all outline-none"
+                                className="w-full bg-[#04080f] border border-white/10 rounded-xl px-4 py-3 focus:border-[#c9a227] transition-all outline-none"
                             />
                         </div>
                         <div className="col-span-1">
@@ -283,7 +283,7 @@ export function QuotePage() {
                                 value={width}
                                 onChange={(e) => setWidth(e.target.value)}
                                 placeholder="0"
-                                className="w-full bg-[#0a1628] border border-white/10 rounded-xl px-4 py-3 focus:border-[#c9a227] transition-all outline-none"
+                                className="w-full bg-[#04080f] border border-white/10 rounded-xl px-4 py-3 focus:border-[#c9a227] transition-all outline-none"
                             />
                         </div>
                         <div className="col-span-2 sm:col-span-1">
@@ -293,7 +293,7 @@ export function QuotePage() {
                                 value={qty}
                                 onChange={(e) => setQty(e.target.value)}
                                 placeholder="1"
-                                className="w-full bg-[#0a1628] border border-white/10 rounded-xl px-4 py-3 focus:border-[#c9a227] transition-all outline-none"
+                                className="w-full bg-[#04080f] border border-white/10 rounded-xl px-4 py-3 focus:border-[#c9a227] transition-all outline-none"
                             />
                         </div>
                     </div>

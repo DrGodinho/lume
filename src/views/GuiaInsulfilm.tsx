@@ -33,12 +33,12 @@ export function GuiaInsulfilm() {
     }, []);
 
     return (
-        <div className="bg-[#070f1a] text-white min-h-screen">
+        <div className="bg-[#04080f] text-white min-h-screen">
 
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden px-4">
                 <div className="absolute inset-0 z-0">
-                    <div className="w-full h-full bg-gradient-to-br from-[#0a1628] to-[#040811]" />
+                    <div className="w-full h-full bg-gradient-to-br from-[#04080f] to-[#040811]" />
                     <div className="absolute inset-0 bg-black/50" />
                 </div>
 
@@ -414,7 +414,8 @@ export function GuiaInsulfilm() {
 
                     <FAQAccordion items={[
                         { q: "A remoção estraga o vidro?", a: "Se feita por um profissional qualificado usando as ferramentas corretas, o vidro volta a ser exatamente o que era antes, sem um único arranhão. O segredo está no uso de vaporetos industriais para amolecer a cola e solventes cítricos específicos que dissolvem o adesivo residual sem a necessidade de força bruta ou estiletes inadequados. Se você tentar remover em casa 'no seco', o risco de riscar o vidro ou deixar manchas permanentes de cola é altíssimo." },
-                        { q: "Quanto tempo leva para remover?", a: "Depende inteiramente do 'estado de saúde' da película antiga. Um filme que ficou exposto ao sol direto por 10 anos e começou a ressecar (craquelar) pode levar o triplo do tempo para ser removido em comparação a uma instalação nova. Em média, a remoção pode levar de 30 minutos a 1 hora por peça de vidro, dependendo da dificuldade de extração da cola. É um processo que exige paciência e técnica para preservar a integridade do seu vidro." }
+                        { q: "Quanto tempo leva para remover?", a: "Depende inteiramente do 'estado de saúde' da película antiga. Um filme que ficou exposto ao sol direto por 10 anos e começou a ressecar (craquelar) pode levar o triplo do tempo para ser removido em comparação a uma instalação nova. Em média, a remoção pode levar de 30 minutos a 1 hora por peça de vidro, dependendo da dificuldade de extração da cola. É um processo que exige paciência e técnica para preservar a integridade do seu vidro." },
+                        { q: "Posso trocar o insulfilm de apenas um vidro em uma janela com várias folhas?", a: "Sim, é perfeitamente possível trocar a película de apenas uma folha de vidro. No entanto, é importante considerar que o insulfilm novo terá um brilho e uma integridade de cor ligeiramente diferentes do filme antigo que já sofreu exposição solar. Por isso, para garantir um visual 100% uniforme e harmonioso em toda a janela, nossa recomendação técnica é sempre realizar a troca de todos os vidros daquela mesma esquadria simultaneamente." }
                     ]} />
                 </section>
 

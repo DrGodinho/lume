@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react';
 import { Sun, Droplets, Zap, ShieldCheck, Layers, ArrowRight } from 'lucide-react';
-import { WhatsAppButton } from '../components/WhatsAppButton';
 import { ContactCTA } from '../sections/ContactCTA';
 import { SpecTooltip } from '../components/SpecTooltip';
 import gsap from 'gsap';
@@ -17,8 +16,7 @@ export function DuplaCamadaPage() {
     }, []);
 
     return (
-        <div className="bg-[#070f1a] text-white min-h-screen">
-            <WhatsAppButton />
+        <div className="bg-[#04080f] text-white min-h-screen">
 
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden px-4">
@@ -52,7 +50,7 @@ export function DuplaCamadaPage() {
             </section>
 
             {/* Como reduz a conta de luz? (SEO focado em RJ/Bangu) */}
-            <section className="py-20 bg-[#0a1628] border-b border-white/5 px-4">
+            <section className="py-20 bg-[#04080f] border-b border-white/5 px-4">
                 <div className="container-lume page-entrance">
                     <div className="max-w-4xl mx-auto text-center">
                         <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-8 text-white">O Fim da Conta de Luz nas Alturas na Zona Oeste</h2>
@@ -229,7 +227,7 @@ export function DuplaCamadaPage() {
             </section>
 
             {/* FAQ Section */}
-            <section className="py-20 relative px-4 bg-[#0a1628] border-t border-white/5">
+            <section className="py-20 relative px-4 bg-[#04080f] border-t border-white/5">
                 <div className="container-lume page-entrance max-w-4xl mx-auto">
                     <div className="text-center mb-12">
                         <h2 className="text-3xl font-bold font-montserrat mb-4 text-[#c9a227]">Respostas Rápidas e Claras</h2>

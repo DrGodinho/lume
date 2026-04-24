@@ -1,12 +1,7 @@
-'use client';
-
-import { useEffect, useRef } from 'react';
 import { MessageCircle, Phone, Check } from 'lucide-react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { handleGtagClick } from '../lib/gtag';
-
-gsap.registerPlugin(ScrollTrigger);
+import { RadiatingLines } from '../components/RadiatingLines';
+import { ScrollReveal } from '../components/ScrollReveal';
+import { GtagLink } from '../components/GtagLink';
 
 const trustIndicators = [
   'Resposta em até 2h',
@@ -15,75 +10,22 @@ const trustIndicators = [
 ];
 
 export function ContactCTA() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-  const radiatingRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Content animation
-      gsap.fromTo(
-        contentRef.current?.querySelectorAll('.animate-item') || [],
-        { opacity: 0, y: 30 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.6,
-          stagger: 0.1,
-          ease: 'expo.out',
-          scrollTrigger: {
-            trigger: contentRef.current,
-            start: 'top 80%',
-            toggleActions: 'play none none reverse',
-          },
-        }
-      );
-
-      // Radiating lines animation
-      const lines = radiatingRef.current?.querySelectorAll('.radiating-line');
-      if (lines) {
-        gsap.to(lines, {
-          scaleY: 1,
-          opacity: 0,
-          duration: 2,
-          stagger: 0.3,
-          repeat: -1,
-          ease: 'power2.out',
-        });
-      }
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
-
   return (
     <section
       id="contato"
-      ref={sectionRef}
       className="relative section-padding overflow-hidden"
       style={{
-        background: 'linear-gradient(180deg, #0d1f3c 0%, #0a1628 100%)',
+        background: 'linear-gradient(180deg, #070f1a 0%, #04080f 100%)',
       }}
     >
       {/* Radiating lines */}
-      <div ref={radiatingRef} className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        {[...Array(8)].map((_, i) => (
-          <div
-            key={i}
-            className="radiating-line absolute w-px h-32 bg-gradient-to-b from-[#c9a227]/50 to-transparent origin-bottom"
-            style={{
-              transform: `rotate(${i * 45}deg) translateY(-150px)`,
-              transformOrigin: 'center bottom',
-            }}
-          />
-        ))}
-      </div>
+      <RadiatingLines />
 
       {/* Glow effect */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[#c9a227]/5 blur-3xl" />
 
       <div className="container-lume relative z-10">
-        <div ref={contentRef} className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center px-2 sm:px-0">
+        <ScrollReveal animation="slide-up" className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center px-2 sm:px-0">
 
           {/* Left Column: CTA Content */}
           <div className="text-center lg:text-left">
@@ -110,21 +52,17 @@ export function ContactCTA() {
               </a>
             </div>
 
-            {/* CTA Buttons */}
             <div className="animate-item flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start mb-8 sm:mb-10">
-              <a
+              <GtagLink
                 href="https://wa.me/5521965140612"
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleGtagClick((e.currentTarget as HTMLAnchorElement).href);
-                }}
+                eventName="conversion_event_contact"
                 className="btn-primary flex items-center justify-center gap-2 text-sm sm:text-base animate-pulse-glow w-full sm:w-auto"
               >
                 <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
                 Falar no WhatsApp
-              </a>
+              </GtagLink>
               <a
                 href="tel:+5521965140612"
                 className="btn-secondary flex items-center justify-center gap-2 text-sm sm:text-base w-full sm:w-auto"
@@ -160,7 +98,7 @@ export function ContactCTA() {
             />
           </div>
 
-        </div>
+        </ScrollReveal>
       </div>
     </section>
   );

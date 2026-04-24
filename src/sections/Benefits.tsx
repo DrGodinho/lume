@@ -1,11 +1,6 @@
-'use client';
-
-import { useEffect, useRef, useState } from 'react';
 import { Shield, Thermometer, PiggyBank, Lock } from 'lucide-react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
+import { ScrollReveal } from '../components/ScrollReveal';
+import { AnimatedCounter } from '../components/AnimatedCounter';
 
 const benefits = [
   {
@@ -42,115 +37,11 @@ const benefits = [
   },
 ];
 
-function AnimatedCounter({ target, suffix = '' }: { target: string; suffix?: string }) {
-  const [count, setCount] = useState(0);
-  const counterRef = useRef<HTMLSpanElement>(null);
-  const hasAnimated = useRef(false);
-
-  useEffect(() => {
-    const numTarget = parseInt(target.replace(/\D/g, ''));
-    if (!numTarget) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !hasAnimated.current) {
-          hasAnimated.current = true;
-
-          const duration = 2000;
-          const startTime = Date.now();
-
-          const animate = () => {
-            const elapsed = Date.now() - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-
-            // Ease out expo
-            const easeOut = 1 - Math.pow(1 - progress, 3);
-            setCount(Math.floor(easeOut * numTarget));
-
-            if (progress < 1) {
-              requestAnimationFrame(animate);
-            } else {
-              setCount(numTarget);
-            }
-          };
-
-          requestAnimationFrame(animate);
-        }
-      },
-      { threshold: 0.5 }
-    );
-
-    if (counterRef.current) {
-      observer.observe(counterRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, [target]);
-
-  const displayValue = target.startsWith('-') ? `-${count}` : `${count}`;
-
-  return (
-    <span ref={counterRef}>
-      {displayValue}{suffix}
-    </span>
-  );
-}
-
 export function Benefits() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLDivElement>(null);
-  const cardsRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Title animation
-      gsap.fromTo(
-        titleRef.current,
-        { opacity: 0, y: 50 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          ease: 'expo.out',
-          scrollTrigger: {
-            trigger: titleRef.current,
-            start: 'top 80%',
-            toggleActions: 'play none none reverse',
-          },
-        }
-      );
-
-      // Cards animation
-      const cards = cardsRef.current?.querySelectorAll('.benefit-card');
-      if (cards) {
-        gsap.fromTo(
-          cards,
-          { opacity: 0, scale: 0.8, rotate: -10 },
-          {
-            opacity: 1,
-            scale: 1,
-            rotate: 0,
-            duration: 0.6,
-            stagger: 0.15,
-            ease: 'elastic.out(1, 0.5)',
-            scrollTrigger: {
-              trigger: cardsRef.current,
-              start: 'top 75%',
-              toggleActions: 'play none none reverse',
-            },
-          }
-        );
-      }
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
-
   return (
     <section
       id="beneficios"
-      ref={sectionRef}
-      className="relative section-padding bg-[#0a1628] overflow-hidden"
+      className="relative section-padding bg-[#04080f] overflow-hidden"
     >
       {/* Wave background */}
       <div className="absolute inset-0 opacity-30">
@@ -172,7 +63,7 @@ export function Benefits() {
 
       <div className="container-lume relative z-10">
         {/* Section Header */}
-        <div ref={titleRef} className="text-center mb-8 sm:mb-12">
+        <ScrollReveal animation="slide-up" className="text-center mb-8 sm:mb-12">
           <div className="flex items-center justify-center gap-2 sm:gap-4 mb-3 sm:mb-4">
             <div className="h-px w-10 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
             <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
@@ -186,17 +77,17 @@ export function Benefits() {
           <p className="text-gray-400 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto px-2 sm:px-0">
             Benefícios que fazem a diferença no seu dia a dia e na qualidade de vida da sua família.
           </p>
-        </div>
+        </ScrollReveal>
 
         {/* Benefits Grid */}
-        <div
-          ref={cardsRef}
+        <ScrollReveal
+          animation="stagger-stats"
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
         >
           {benefits.map((benefit) => (
             <div
               key={benefit.id}
-              className="benefit-card group relative p-5 sm:p-8 rounded-xl sm:rounded-2xl bg-gradient-to-b from-[#1a3a5c]/40 to-[#0d1f3c]/60 border border-[#1a3a5c]/30 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2"
+              className="stat-card benefit-card group relative p-5 sm:p-8 rounded-xl sm:rounded-2xl bg-gradient-to-b from-[#1a3a5c]/40 to-[#04080f]/60 border border-[#1a3a5c]/30 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2"
             >
               {/* Glow effect */}
               <div className="absolute inset-0 rounded-xl sm:rounded-2xl bg-[#c9a227]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -230,7 +121,7 @@ export function Benefits() {
               </p>
             </div>
           ))}
-        </div>
+        </ScrollReveal>
 
         {/* Trust indicators */}
         <div className="mt-10 sm:mt-16 flex flex-wrap justify-center gap-6 sm:gap-8">

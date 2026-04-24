@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { SimulatorPage } from '../../views/Simulator';
+import { SimulatorWrapper } from './SimulatorWrapper';
 
 export const metadata: Metadata = {
   title: 'Simulador de Películas | Descubra a Película Ideal - LUME',
@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <SimulatorPage />;
+  return <SimulatorWrapper />;
 }

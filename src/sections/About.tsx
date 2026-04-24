@@ -1,11 +1,5 @@
-'use client';
-
-import { useEffect, useRef } from 'react';
 import { Check, Award, Users, Calendar, Shield } from 'lucide-react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
+import { ScrollReveal } from '../components/ScrollReveal';
 
 const differentiators = [
   'Trabalhamos apenas com películas de alta qualidade',
@@ -22,60 +16,9 @@ const stats = [
 ];
 
 export function About() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-  const statsRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Content animation
-      gsap.fromTo(
-        contentRef.current?.querySelectorAll('.animate-item') || [],
-        { opacity: 0, x: -30 },
-        {
-          opacity: 1,
-          x: 0,
-          duration: 0.6,
-          stagger: 0.1,
-          ease: 'expo.out',
-          scrollTrigger: {
-            trigger: contentRef.current,
-            start: 'top 75%',
-            toggleActions: 'play none none reverse',
-          },
-        }
-      );
-
-      // Stats animation
-      const statCards = statsRef.current?.querySelectorAll('.stat-card');
-      if (statCards) {
-        gsap.fromTo(
-          statCards,
-          { opacity: 0, scale: 0.8, y: 30 },
-          {
-            opacity: 1,
-            scale: 1,
-            y: 0,
-            duration: 0.6,
-            stagger: 0.15,
-            ease: 'expo.out',
-            scrollTrigger: {
-              trigger: statsRef.current,
-              start: 'top 80%',
-              toggleActions: 'play none none reverse',
-            },
-          }
-        );
-      }
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
-
   return (
     <section
-      ref={sectionRef}
-      className="relative section-padding bg-[#0d1f3c] overflow-hidden"
+      className="relative section-padding bg-[#070f1a] overflow-hidden"
     >
       {/* Background decorations */}
       <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#1a3a5c]/10 to-transparent" />
@@ -95,7 +38,7 @@ export function About() {
       <div className="container-lume relative z-10">
         <div className="grid lg:grid-cols-2 gap-10 sm:gap-16 items-center">
           {/* Content */}
-          <div ref={contentRef}>
+          <ScrollReveal animation="slide-left">
             {/* Border accent */}
             <div className="animate-item relative pl-4 sm:pl-6 border-l-2 border-[#c9a227]">
               <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
@@ -128,15 +71,14 @@ export function About() {
                 </div>
               ))}
             </div>
-
-          </div>
+          </ScrollReveal>
 
           {/* Stats Grid */}
-          <div ref={statsRef} className="grid grid-cols-2 gap-3 sm:gap-6">
+          <ScrollReveal animation="stagger-stats" className="grid grid-cols-2 gap-3 sm:gap-6">
             {stats.map((stat, index) => (
               <div
                 key={index}
-                className={`stat-card group relative p-5 sm:p-8 rounded-xl sm:rounded-2xl bg-gradient-to-b from-[#1a3a5c]/50 to-[#0a1628]/70 border border-[#1a3a5c]/30 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 ${index % 2 === 1 ? 'sm:mt-8' : ''
+                className={`stat-card group relative p-5 sm:p-8 rounded-xl sm:rounded-2xl bg-gradient-to-b from-[#1a3a5c]/50 to-[#04080f]/70 border border-[#1a3a5c]/30 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 ${index % 2 === 1 ? 'sm:mt-8' : ''
                   }`}
               >
                 {/* Glow */}
@@ -158,7 +100,7 @@ export function About() {
                 </div>
               </div>
             ))}
-          </div>
+          </ScrollReveal>
         </div>
       </div>
     </section>

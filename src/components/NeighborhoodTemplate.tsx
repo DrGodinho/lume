@@ -86,7 +86,7 @@ export function NeighborhoodTemplate({ data }: Props) {
   };
 
   return (
-    <div className="bg-[#070f1a] text-white min-h-screen">
+    <div className="bg-[#04080f] text-white min-h-screen">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -98,16 +98,16 @@ export function NeighborhoodTemplate({ data }: Props) {
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden px-4">
         <div className="absolute inset-0 z-0">
-          <Image src={data.heroBg} alt={`Instalação de insulfilm profissional em ${data.neighborName}`} fill sizes="(max-width: 768px) 100vw, 100vw" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0a1628]/95 via-[#0a1628]/80 to-[#0a1628]/60" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-transparent to-[#0a1628]/50" />
+          <Image src={data.heroBg} alt={`Instalação de insulfilm profissional em ${data.neighborName}`} fill sizes="100vw" priority className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#04080f]/95 via-[#04080f]/80 to-[#04080f]/60" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#04080f] via-transparent to-[#04080f]/50" />
         </div>
 
         <Particles />
         
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0a1628] to-transparent z-10" />
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#04080f] to-transparent z-10" />
         <div className="absolute top-1/4 right-10 w-32 h-32 rounded-full bg-[#c9a227]/5 blur-3xl animate-float z-10" />
-        <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-[#1a3a5c]/30 blur-3xl animate-float z-10" style={{ animationDelay: '2s' }} />
+        <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-[#04080f]/30 blur-3xl animate-float z-10" style={{ animationDelay: '2s' }} />
 
         <div className="container-lume relative z-20 page-entrance text-center md:text-left pt-24 pb-12">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#c9a227]/10 border border-[#c9a227]/30 mb-6">
@@ -147,16 +147,16 @@ export function NeighborhoodTemplate({ data }: Props) {
         <div className="flex animate-scroll-slow gap-12 items-center">
           {[1, 2, 3].map((i) => (
             <div key={i} className="flex gap-12 items-center">
-              <span className="flex items-center gap-3 text-[#0a1628] font-black uppercase text-sm tracking-tighter">
+              <span className="flex items-center gap-3 text-[#04080f] font-black uppercase text-sm tracking-tighter">
                 <CheckCircle size={18} /> Orçamento Gratuito em {data.neighborName}
               </span>
-              <span className="flex items-center gap-3 text-[#0a1628] font-black uppercase text-sm tracking-tighter">
+              <span className="flex items-center gap-3 text-[#04080f] font-black uppercase text-sm tracking-tighter">
                 <Zap size={18} /> Instalação Express 24h
               </span>
-              <span className="flex items-center gap-3 text-[#0a1628] font-black uppercase text-sm tracking-tighter">
+              <span className="flex items-center gap-3 text-[#04080f] font-black uppercase text-sm tracking-tighter">
                 <Shield size={18} /> 5 Anos de Garantia
               </span>
-              <span className="flex items-center gap-3 text-[#0a1628] font-black uppercase text-sm tracking-tighter">
+              <span className="flex items-center gap-3 text-[#04080f] font-black uppercase text-sm tracking-tighter">
                 <Star size={18} /> Qualidade Premium LUME
               </span>
             </div>
@@ -201,12 +201,12 @@ export function NeighborhoodTemplate({ data }: Props) {
             </div>
             <div className="relative page-entrance">
               <div className="absolute inset-0 bg-gradient-to-tr from-[#c9a227]/20 to-transparent rounded-3xl blur-2xl" />
-              <Image src="/about_residential.webp" alt={`Insulfilm em ${data.neighborName}`} fill sizes="(max-width: 768px) 100vw, 100vw" className="rounded-3xl border border-white/10 shadow-2xl relative z-10 w-full" />
+              <Image src="/about_residential.webp" alt={`Insulfilm em ${data.neighborName}`} fill sizes="(max-width: 1024px) 100vw, 50vw" className="rounded-3xl border border-white/10 shadow-2xl relative z-10 w-full" />
               <div className="absolute -bottom-6 -right-6 bg-[#c9a227] p-8 rounded-2xl z-20 shadow-xl hidden md:block">
-                <p className="text-[#0a1628] font-black text-4xl leading-none">
+                <p className="text-[#04080f] font-black text-4xl leading-none">
                   <AnimatedCounter target="1000" suffix="+" />
                 </p>
-                <p className="text-[#0a1628] font-bold text-xs uppercase tracking-widest mt-2">Instalações em 2024</p>
+                <p className="text-[#04080f] font-bold text-xs uppercase tracking-widest mt-2">Instalações em 2024</p>
               </div>
             </div>
           </div>
@@ -214,7 +214,7 @@ export function NeighborhoodTemplate({ data }: Props) {
       </section>
 
       {/* Tipos de Película - Condensed from main sections but customized */}
-      <section id="tipos" className="py-24 bg-[#0a1628]/50 px-4">
+      <section id="tipos" className="py-24 bg-[#04080f] px-4">
         <div className="container-lume">
           <div className="text-center mb-16 page-entrance">
             <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-6 tracking-tight">PELÍCULAS DE ALTA PERFORMANCE</h2>
@@ -229,12 +229,12 @@ export function NeighborhoodTemplate({ data }: Props) {
               { title: "Jateado Design", selo: "Decoração", icon: Eye, path: "/jateado", desc: "Estética fosca para privacidade em banheiros e divisórias de escritórios." },
               { title: "Dupla Camada", selo: "Favorito", icon: Droplets, path: "/dupla-camada", desc: "Alta redução de calor com tecnologia especial: refletiva fora, fumê dentro." }
             ].map((product, idx) => (
-              <div key={idx} className="product-card group relative bg-[#1a3a5c]/40 rounded-2xl p-8 border border-[#1a3a5c]/50 hover:border-[#c9a227]/50 transition-all duration-500 flex flex-col h-full">
-                <div className="absolute top-4 left-4 px-3 py-1 bg-[#c9a227] text-[#0a1628] text-[10px] font-bold uppercase rounded-full">{product.selo}</div>
+              <div key={idx} className="product-card group relative bg-[#04080f]/60 rounded-2xl p-8 border border-white/5 hover:border-[#c9a227]/50 transition-all duration-500 flex flex-col h-full">
+                <div className="absolute top-4 left-4 px-3 py-1 bg-[#c9a227] text-[#04080f] text-[10px] font-bold uppercase rounded-full">{product.selo}</div>
                 <product.icon size={48} className="text-[#c9a227] mb-6" />
                 <h3 className="text-2xl font-bold mb-4">{product.title}</h3>
                 <p className="text-gray-400 mb-8 flex-grow leading-relaxed">{product.desc}</p>
-                <Link href={product.path} className="btn-outline py-3 text-center text-xs tracking-widest font-bold uppercase border border-white/10 hover:bg-[#c9a227] hover:text-[#0a1628] transition-all rounded-xl">Detalhes Técnicos</Link>
+                <Link href={product.path} className="btn-outline py-3 text-center text-xs tracking-widest font-bold uppercase border border-white/10 hover:bg-[#c9a227] hover:text-[#04080f] transition-all rounded-xl">Detalhes Técnicos</Link>
               </div>
             ))}
           </div>
@@ -246,7 +246,7 @@ export function NeighborhoodTemplate({ data }: Props) {
         <div className="container-lume">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="page-entrance order-2 lg:order-1">
-              <div className="bg-[#1a3a5c]/30 p-8 md:p-12 rounded-3xl border border-[#1a3a5c]/50">
+              <div className="bg-[#04080f]/30 p-8 md:p-12 rounded-3xl border border-[#04080f]/50">
                 <h2 className="text-3xl font-black mb-8 flex items-center gap-4">
                   <MapPin className="text-[#c9a227]" size={32} /> ATENDIMENTO EM {data.neighborName.toUpperCase()}
                 </h2>
@@ -300,7 +300,7 @@ export function NeighborhoodTemplate({ data }: Props) {
       <GoogleReviews />
 
       {/* FAQ Section */}
-      <section className="py-24 bg-[#070f1a] px-4">
+      <section className="py-24 bg-[#04080f] px-4">
         <div className="container-lume max-w-4xl mx-auto page-entrance">
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-6 tracking-tight text-white">FAQ</h2>
@@ -321,7 +321,7 @@ export function NeighborhoodTemplate({ data }: Props) {
       {/* Final CTA */}
       <section className="py-24 relative overflow-hidden">
         <div className="container-lume text-center px-4">
-          <div className="bg-gradient-to-br from-[#1a3a5c]/80 to-[#0a1628]/95 p-12 md:p-20 rounded-[3rem] border border-[#c9a227]/20 relative overflow-hidden page-entrance">
+          <div className="bg-gradient-to-br from-[#1a3a5c]/80 to-[#04080f]/95 p-12 md:p-20 rounded-[3rem] border border-[#c9a227]/20 relative overflow-hidden page-entrance">
             <div className="absolute top-0 right-0 w-96 h-96 bg-[#c9a227]/5 blur-3xl rounded-full -mr-48 -mt-48" />
             <div className="relative z-10">
               <h2 className="text-4xl md:text-6xl font-black mb-8 leading-tight tracking-tight uppercase">

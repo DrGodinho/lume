@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     icon: '/novo-logo-lume.png',
   },
   other: {
-    'theme-color': '#0a1628',
+    'theme-color': '#04080f',
   },
 };
 

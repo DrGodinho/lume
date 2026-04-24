@@ -1,13 +1,6 @@
-'use client';
-
-import { useEffect, useRef } from 'react';
 import { MapPin, Navigation } from 'lucide-react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ScrollReveal } from '../components/ScrollReveal';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-
-gsap.registerPlugin(ScrollTrigger);
 
 const locations = [
   { name: 'Bangu', active: true },
@@ -18,64 +11,22 @@ const locations = [
   { name: 'Recreio', active: true },
 ];
 
+const urlMap: Record<string, string> = {
+  'Bangu': '/insulfilm-em-bangu',
+  'Realengo': '/insulfilm-em-realengo',
+  'Campo Grande': '/insulfilm-em-campo-grande',
+  'Jacarepaguá': '/insulfilm-em-jacarepagua',
+  'Barra da Tijuca': '/insulfilm-na-barra-da-tijuca',
+  'Recreio': '/insulfilm-no-recreio'
+};
+
 export function Coverage() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-  const tagsRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Content animation
-      gsap.fromTo(
-        contentRef.current?.querySelectorAll('.animate-item') || [],
-        { opacity: 0, y: 40 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.7,
-          stagger: 0.1,
-          ease: 'expo.out',
-          scrollTrigger: {
-            trigger: contentRef.current,
-            start: 'top 80%',
-            toggleActions: 'play none none reverse',
-          },
-        }
-      );
-
-      // Tags animation
-      const tags = tagsRef.current?.querySelectorAll('.location-tag');
-      if (tags) {
-        gsap.fromTo(
-          tags,
-          { opacity: 0, scale: 0 },
-          {
-            opacity: 1,
-            scale: 1,
-            duration: 0.4,
-            stagger: 0.08,
-            ease: 'elastic.out(1, 0.5)',
-            scrollTrigger: {
-              trigger: tagsRef.current,
-              start: 'top 85%',
-              toggleActions: 'play none none reverse',
-            },
-          }
-        );
-      }
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
-
   return (
     <section
-      ref={sectionRef}
-      className="relative section-padding bg-[#0a1628] overflow-hidden"
+      className="relative section-padding bg-[#04080f] overflow-hidden"
     >
       {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0d1f3c]/50 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#04080f]/50 to-transparent" />
 
       {/* Decorative map pins */}
       <div className="absolute top-20 left-10 opacity-10">
@@ -91,7 +42,7 @@ export function Coverage() {
       <div className="container-lume relative z-10">
         <div className="max-w-4xl mx-auto text-center">
           {/* Content */}
-          <div ref={contentRef}>
+          <ScrollReveal animation="slide-up">
             <div className="animate-item flex items-center justify-center gap-2 sm:gap-4 mb-3 sm:mb-4">
               <div className="h-px w-10 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
               <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
@@ -104,8 +55,6 @@ export function Coverage() {
               Atendimento em Toda a{' '}
               <Link 
                 href="/insulfilm-em-bangu" 
-                prefetch={true}
-                onMouseEnter={() => router.prefetch('/insulfilm-em-bangu')}
                 className="text-gradient-gold hover:opacity-80 transition-opacity"
               >
                 Zona Oeste
@@ -120,42 +69,33 @@ export function Coverage() {
               <div className="text-left">
                 <p className="text-white text-sm sm:text-base font-medium">Nossa Sede</p>
                 <p className="text-gray-400 text-xs sm:text-sm">
-                  Estrada do Realengo, 973 - <Link href="/insulfilm-em-bangu" prefetch={true} onMouseEnter={() => router.prefetch('/insulfilm-em-bangu')} className="text-[#c9a227] hover:underline">Bangu</Link>, Rio de Janeiro
+                  Estrada do Realengo, 973 - <Link href="/insulfilm-em-bangu" className="text-[#c9a227] hover:underline">Bangu</Link>, Rio de Janeiro
                 </p>
               </div>
             </div>
-          </div>
+          </ScrollReveal>
 
-          <div ref={tagsRef} className="flex flex-wrap justify-center gap-2 sm:gap-3">
+          <ScrollReveal animation="stagger-stats" className="flex flex-wrap justify-center gap-2 sm:gap-3">
             {locations.map((location, index) => {
-              const urlMap: Record<string, string> = {
-                'Bangu': '/insulfilm-em-bangu',
-                'Realengo': '/insulfilm-em-realengo',
-                'Campo Grande': '/insulfilm-em-campo-grande',
-                'Jacarepaguá': '/insulfilm-em-jacarepagua',
-                'Barra da Tijuca': '/insulfilm-na-barra-da-tijuca',
-                'Recreio': '/insulfilm-no-recreio'
-              };
-
               const url = urlMap[location.name];
 
               if (url) {
                 return (
-                  <a
+                  <Link
                     key={index}
                     href={url}
-                    className="location-tag group px-3 sm:px-5 py-2 sm:py-3 rounded-full border transition-all duration-300 hover:-translate-y-1 text-xs sm:text-base flex items-center gap-1.5 sm:gap-2 shadow-[0_10px_30px_rgba(201,162,39,0.1)] bg-[#1a3a5c]/30 border-[#1a3a5c]/50 text-gray-300 hover:bg-[#c9a227] hover:border-[#c9a227] hover:text-[#0a1628]"
+                    className="stat-card location-tag group px-3 sm:px-5 py-2 sm:py-3 rounded-full border transition-all duration-300 hover:-translate-y-1 text-xs sm:text-base flex items-center gap-1.5 sm:gap-2 shadow-[0_10px_30px_rgba(201,162,39,0.1)] bg-[#1a3a5c]/30 border-[#1a3a5c]/50 text-gray-300 hover:bg-[#c9a227] hover:border-[#c9a227] hover:text-[#04080f]"
                   >
                     <MapPin className="w-3 h-3 sm:w-4 sm:h-4" />
                     {location.name}
-                  </a>
+                  </Link>
                 );
               }
 
               return (
                 <div
                   key={index}
-                  className="location-tag group px-3 sm:px-5 py-2 sm:py-3 rounded-full border transition-all duration-300 cursor-default hover:-translate-y-1 text-xs sm:text-base bg-[#1a3a5c]/30 border-[#1a3a5c]/50 text-gray-300"
+                  className="stat-card location-tag group px-3 sm:px-5 py-2 sm:py-3 rounded-full border transition-all duration-300 cursor-default hover:-translate-y-1 text-xs sm:text-base bg-[#1a3a5c]/30 border-[#1a3a5c]/50 text-gray-300"
                 >
                   <span className="flex items-center gap-1.5 sm:gap-2">
                     <MapPin className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -164,9 +104,7 @@ export function Coverage() {
                 </div>
               );
             })}
-          </div>
-
-
+          </ScrollReveal>
         </div>
       </div>
     </section>

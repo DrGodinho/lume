@@ -33,10 +33,7 @@ export function Navbar() {
       if (pathname !== '/') {
         router.push('/' + href);
       } else {
-        const element = document.querySelector(href);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }
+        router.push(href);
       }
     }
     setIsMobileMenuOpen(false);
@@ -110,9 +107,10 @@ export function Navbar() {
               target="_blank"
               rel="noopener noreferrer"
               onMouseEnter={() => router.prefetch('/simulador')} // Prefetch alternate route while idle
-              onClick={(e) => {
-                e.preventDefault();
-                handleGtagClick((e.currentTarget as HTMLAnchorElement).href);
+              onClick={() => {
+                if (typeof (window as any).gtag === 'function') {
+                  (window as any).gtag('event', 'conversion_event_contact');
+                }
               }}
               className="btn-primary flex items-center gap-2 text-xs py-2 px-4 transition-transform hover:scale-105 active:scale-95"
             >
@@ -174,9 +172,10 @@ export function Navbar() {
               href="https://wa.me/5521965140612"
               target="_blank"
               rel="noopener noreferrer"
-              onClick={(e) => {
-                e.preventDefault();
-                handleGtagClick((e.currentTarget as HTMLAnchorElement).href);
+              onClick={() => {
+                if (typeof (window as any).gtag === 'function') {
+                  (window as any).gtag('event', 'conversion_event_contact');
+                }
               }}
               className="btn-primary flex items-center justify-center gap-2 mt-4"
             >

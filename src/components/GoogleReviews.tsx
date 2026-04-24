@@ -2,7 +2,7 @@ import Script from 'next/script';
 
 export function GoogleReviews() {
   return (
-    <section className="py-20 bg-[#070f1a] overflow-hidden">
+    <section className="py-20 bg-[#04080f] overflow-hidden">
       <Script 
         id="google-reviews-loader"
         src="https://featurable.com/assets/v2/carousel_default.min.js"

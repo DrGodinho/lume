@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { AdminCalculator } from '../../views/AdminCalculator';
+import { AdminWrapper } from './AdminWrapper';
 
 export const metadata: Metadata = {
   title: 'Calculadora Admin | LUME Controle Solar',
@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <AdminCalculator />;
+  return <AdminWrapper />;
 }

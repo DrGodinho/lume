@@ -136,6 +136,75 @@ function historyReducer(state: HistoryState, action: HistoryAction): HistoryStat
     }
 }
 
+// ─── COMPONENTES AUXILIARES MEMOIZADOS ────────────────────────────────────────
+
+const MemoBlock = React.memo(({ 
+    b, 
+    scale, 
+    margin, 
+    isSelected, 
+    isDraggingThis, 
+    isDropTarget, 
+    handleDragStart, 
+    toggleSelection,
+    didDragRef 
+}: { 
+    b: Block, 
+    scale: number, 
+    margin: number, 
+    isSelected: boolean, 
+    isDraggingThis: boolean, 
+    isDropTarget: boolean, 
+    handleDragStart: (e: any, b: Block) => void, 
+    toggleSelection: (id: string) => void,
+    didDragRef: React.RefObject<boolean>
+}) => {
+    const pos = b.fit!;
+    return (
+        <div
+            onMouseDown={(e) => handleDragStart(e, b)}
+            onTouchStart={(e) => handleDragStart(e, b)}
+            onClick={() => { if (!didDragRef.current) toggleSelection(b.id); }}
+            className="absolute flex flex-col items-center justify-center text-black font-bold"
+            style={{
+                left: pos.x * scale,
+                top: pos.y * scale,
+                width: (b.w - margin) * scale,
+                height: ((b.h_visual || b.h) - margin) * scale,
+                background: isDraggingThis ? 'rgba(255,255,255,0.05)' : b.cor,
+                fontSize: '8px',
+                border: isDraggingThis
+                    ? '2px dashed rgba(255,255,255,0.2)'
+                    : isDropTarget
+                        ? '2px solid #f97316'
+                        : isSelected
+                            ? '2px solid #3b82f6'
+                            : '1px solid rgba(0,0,0,0.3)',
+                boxShadow: isDropTarget
+                    ? '0 0 20px rgba(249,115,22,0.5)'
+                    : isSelected
+                        ? '0 0 15px rgba(59,130,246,0.8)'
+                        : 'none',
+                zIndex: isDraggingThis ? 1 : isSelected ? 20 : 10,
+                cursor: isDraggingThis ? 'grabbing' : 'grab',
+                transition: isDraggingThis ? 'none' : 'all 0.25s cubic-bezier(0.34,1.56,0.64,1)',
+                touchAction: 'none',
+                opacity: isDraggingThis ? 0.3 : 1,
+            }}
+        >
+            <GripVertical size={10} className="absolute top-0.5 right-0.5 opacity-20" />
+            {!isDraggingThis && b.label && (
+                <span className="text-[7px] font-black uppercase tracking-tighter mb-1 truncate w-full px-0.5 text-center opacity-70">{b.label}</span>
+            )}
+            {!isDraggingThis && <>
+                <span className="text-[9px] font-black">{Math.round(b.rw)}</span>
+                <div className="w-1/2 h-px bg-black/10 my-0.5" />
+                <span className="text-[9px] font-black">{Math.round(b.rh)}</span>
+            </>}
+        </div>
+    );
+});
+
 // ─── COMPONENTE PRINCIPAL ─────────────────────────────────────────────────────
 
 export function AdminCalculator() {
@@ -466,9 +535,9 @@ self.onmessage = (e) => {
         setVidros(current => current.filter(v => !(v.oh === h && v.ow === w && (v.label || '') === (label || ''))));
     };
 
-    const toggleSelection = (id: string) => {
+    const toggleSelection = useCallback((id: string) => {
         setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
-    };
+    }, []);
 
     const toggleAmbienteSelection = (ambiente: string) => {
         const targetLabel = ambiente === 'Sem Ambiente' ? '' : ambiente;
@@ -511,8 +580,8 @@ self.onmessage = (e) => {
 
     const scale = containerWidth / rollW; // px per cm
 
-    const handleDragStart = (e: React.MouseEvent | React.TouchEvent, block: Block) => {
-        e.stopPropagation();
+    const handleDragStart = useCallback((e: React.MouseEvent | React.TouchEvent | any, block: Block) => {
+        if (typeof e.stopPropagation === 'function') e.stopPropagation();
         if (!containerRef.current || !block.fit) return;
         const rect = containerRef.current.getBoundingClientRect();
         const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
@@ -525,7 +594,7 @@ self.onmessage = (e) => {
         setDragVisualPos({ x: block.fit.x * scale, y: block.fit.y * scale });
         setDragOverId(null);
         didDragRef.current = false;
-    };
+    }, [scale]);
 
     const handleDragMove = useCallback((e: MouseEvent | TouchEvent) => {
         if (!dragId || !containerRef.current) return;
@@ -907,7 +976,7 @@ self.onmessage = (e) => {
                         </div>
                     ) : (
                         historico.map(orc => (
-                            <div key={orc.id} className="bg-[#0a1628] border border-white/5 rounded-xl p-3 hover:border-[#c9a227]/30 transition-colors">
+                            <div key={orc.id} className="bg-[#04080f] border border-white/5 rounded-xl p-3 hover:border-[#c9a227]/30 transition-colors">
                                 <div className="flex items-start justify-between mb-1">
                                     <p className="font-bold text-sm text-white leading-tight truncate max-w-[160px]">{orc.cliente}</p>
                                     <span className="text-[10px] text-gray-500 shrink-0 ml-2">{orc.data}</span>
@@ -1024,7 +1093,7 @@ self.onmessage = (e) => {
 
                 {/* COLUNA ESQUERDA */}
                 <div className="col-span-1 xl:col-span-4 space-y-6">
-                    <div className="admin-entrance bg-[#0a1628] border border-white/10 rounded-2xl p-5 shadow-2xl">
+                    <div className="admin-entrance bg-[#04080f] border border-white/10 rounded-2xl p-5 shadow-2xl">
                         <label className="block text-[10px] uppercase text-[#c9a227] mb-2 font-bold">Cliente</label>
                         <input type="text" value={cliente} onChange={(e) => setCliente(e.target.value)} className="w-full bg-[#040811] border border-white/10 rounded-xl px-4 py-3 outline-none text-sm mb-4" />
                         <div className="grid grid-cols-1 gap-2">
@@ -1039,7 +1108,7 @@ self.onmessage = (e) => {
                         </div>
                     </div>
 
-                    <div className="admin-entrance bg-[#0a1628] border border-white/10 rounded-2xl p-5 shadow-2xl">
+                    <div className="admin-entrance bg-[#04080f] border border-white/10 rounded-2xl p-5 shadow-2xl">
                         <div className="grid grid-cols-3 gap-2">
                             <div><label className="block text-[10px] text-gray-400 mb-1 text-center font-bold uppercase">Rolo</label><input type="number" value={rollW} onChange={(e) => setRollW(parseFloat(e.target.value))} onFocus={(e) => e.target.select()} className="w-full bg-[#040811] border border-white/10 rounded-lg p-3 text-sm text-center font-bold" /></div>
                             <div><label className="block text-[10px] text-gray-400 mb-1 text-center font-bold uppercase">R$/m²</label><input type="number" value={price} onChange={(e) => setPrice(parseFloat(e.target.value))} onFocus={(e) => e.target.select()} className="w-full bg-[#040811] border border-white/10 rounded-lg p-3 text-sm text-center font-bold" /></div>
@@ -1047,7 +1116,7 @@ self.onmessage = (e) => {
                         </div>
                     </div>
 
-                    <div className="admin-entrance bg-[#0a1628] border border-white/10 rounded-2xl p-5 shadow-2xl">
+                    <div className="admin-entrance bg-[#04080f] border border-white/10 rounded-2xl p-5 shadow-2xl">
                         <label className="block text-[10px] uppercase text-[#c9a227] mb-4 font-bold flex items-center gap-2"><Layers size={14} /> Medidas</label>
 
                         <div className="space-y-1 mb-4">
@@ -1083,7 +1152,7 @@ self.onmessage = (e) => {
                     </div>
 
                     {resumo.length > 0 && (
-                        <div className="admin-entrance bg-[#0a1628] border border-white/10 rounded-2xl p-3 max-h-60 overflow-y-auto space-y-4">
+                        <div className="admin-entrance bg-[#04080f] border border-white/10 rounded-2xl p-3 max-h-60 overflow-y-auto space-y-4">
                             {Object.entries(
                                 resumo.reduce((acc, item) => {
                                     const lbl = item.label || 'Sem Ambiente';
@@ -1129,7 +1198,7 @@ self.onmessage = (e) => {
                         </div>
                     ) : (
                         <>
-                            <div className="admin-entrance bg-gradient-to-br from-[#111e33] to-[#0a1628] border border-blue-500/30 rounded-2xl p-5 shadow-2xl relative overflow-hidden">
+                            <div className="admin-entrance bg-gradient-to-br from-[#111e33] to-[#04080f] border border-blue-500/30 rounded-2xl p-5 shadow-2xl relative overflow-hidden">
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/5 blur-3xl rounded-full" />
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                                     <div>
@@ -1208,7 +1277,7 @@ self.onmessage = (e) => {
                             </div>
 
                             <div className="flex items-center gap-2 mb-4 w-full">
-                                <div className="flex bg-[#0a1628] border border-white/10 p-1.5 rounded-xl shadow-2xl flex-1 max-w-sm ml-auto">
+                                <div className="flex bg-[#04080f] border border-white/10 p-1.5 rounded-xl shadow-2xl flex-1 max-w-sm ml-auto">
                                     <button onClick={() => setModoOtimizacao('densidade')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${modoOtimizacao === 'densidade' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}>Corte Densidade</button>
                                     <button onClick={() => setModoOtimizacao('facilidade')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${modoOtimizacao === 'facilidade' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}>Corte Fácil</button>
                                 </div>
@@ -1246,61 +1315,23 @@ self.onmessage = (e) => {
                                         }}
                                     >
                                         <div className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: `${10 * scale}px ${10 * scale}px` }} />
-                                        {blocosCalculados.map((b) => {
-                                            if (!b.fit) return null;
-                                            const isSelected = selectedIds.includes(b.id);
-                                            const isDraggingThis = dragId === b.id;
-                                            const isDropTarget = dragOverId === b.id;
-
-                                            const pos = b.fit;
-
-                                            return (
+                                        {blocosCalculados.map((b) => (
+                                            b.fit && (
                                                 <React.Fragment key={b.id}>
-                                                    {/* Ghost/Current position */}
-                                                    <div
-                                                        onMouseDown={(e) => handleDragStart(e, b)}
-                                                        onTouchStart={(e) => handleDragStart(e, b)}
-                                                        onClick={() => { if (!didDragRef.current) toggleSelection(b.id); }}
-                                                        className="absolute flex flex-col items-center justify-center text-black font-bold"
-                                                        style={{
-                                                            left: pos.x * scale,
-                                                            top: pos.y * scale,
-                                                            width: (b.w - margin) * scale,
-                                                            height: ((b.h_visual || b.h) - margin) * scale,
-                                                            background: isDraggingThis ? 'rgba(255,255,255,0.05)' : b.cor,
-                                                            fontSize: '8px',
-                                                            border: isDraggingThis
-                                                                ? '2px dashed rgba(255,255,255,0.2)'
-                                                                : isDropTarget
-                                                                    ? '2px solid #f97316'
-                                                                    : isSelected
-                                                                        ? '2px solid #3b82f6'
-                                                                        : '1px solid rgba(0,0,0,0.3)',
-                                                            boxShadow: isDropTarget
-                                                                ? '0 0 20px rgba(249,115,22,0.5)'
-                                                                : isSelected
-                                                                    ? '0 0 15px rgba(59,130,246,0.8)'
-                                                                    : 'none',
-                                                            zIndex: isDraggingThis ? 1 : isSelected ? 20 : 10,
-                                                            cursor: isDraggingThis ? 'grabbing' : 'grab',
-                                                            transition: isDraggingThis ? 'none' : 'all 0.25s cubic-bezier(0.34,1.56,0.64,1)',
-                                                            touchAction: 'none',
-                                                            opacity: isDraggingThis ? 0.3 : 1,
-                                                        }}
-                                                    >
-                                                        <GripVertical size={10} className="absolute top-0.5 right-0.5 opacity-20" />
-                                                        {!isDraggingThis && b.label && (
-                                                            <span className="text-[7px] font-black uppercase tracking-tighter mb-1 truncate w-full px-0.5 text-center opacity-70">{b.label}</span>
-                                                        )}
-                                                        {!isDraggingThis && <>
-                                                            <span className="text-[9px] font-black">{Math.round(b.rw)}</span>
-                                                            <div className="w-1/2 h-px bg-black/10 my-0.5" />
-                                                            <span className="text-[9px] font-black">{Math.round(b.rh)}</span>
-                                                        </>}
-                                                    </div>
+                                                    <MemoBlock
+                                                        b={b}
+                                                        scale={scale}
+                                                        margin={margin}
+                                                        isSelected={selectedIds.includes(b.id)}
+                                                        isDraggingThis={dragId === b.id}
+                                                        isDropTarget={dragOverId === b.id}
+                                                        handleDragStart={handleDragStart}
+                                                        toggleSelection={toggleSelection}
+                                                        didDragRef={didDragRef}
+                                                    />
 
                                                     {/* Floating clone during drag */}
-                                                    {isDraggingThis && dragVisualPos && (
+                                                    {dragId === b.id && dragVisualPos && (
                                                         <div
                                                             className="absolute flex flex-col items-center justify-center text-black font-bold pointer-events-none"
                                                             style={{
@@ -1325,8 +1356,8 @@ self.onmessage = (e) => {
                                                         </div>
                                                     )}
                                                 </React.Fragment>
-                                            );
-                                        })}
+                                            )
+                                        ))}
                                     </div>
                                 </div>
                             </div>

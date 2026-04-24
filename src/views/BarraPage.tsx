@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react';
 import { Shield, Sun, Thermometer, CheckCircle, ArrowRight, Eye, SunDim, Star, PiggyBank, Lock, MapPin, Zap, MessageCircle, Droplets } from 'lucide-react';
-import { WhatsAppButton } from '../components/WhatsAppButton';
 import { GoogleReviews } from '../components/GoogleReviews';
 import { Particles } from '../components/Particles';
 import { AnimatedCounter } from '../components/AnimatedCounter';
@@ -80,9 +79,8 @@ export function BarraPage() {
     }, []);
 
     return (
-        <div className="bg-[#070f1a] text-white min-h-screen">
+        <div className="bg-[#04080f] text-white min-h-screen">
 
-            <WhatsAppButton />
 
             {/* Hero Section */}
             <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden px-4">
@@ -96,14 +94,14 @@ export function BarraPage() {
                         priority 
                         className="w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#0a1628]/95 via-[#0a1628]/80 to-[#0a1628]/60" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-transparent to-[#0a1628]/50" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#04080f]/95 via-[#04080f]/80 to-[#04080f]/60" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#04080f] via-transparent to-[#04080f]/50" />
                 </div>
 
                 {/* Particles & Effects */}
                 <Particles />
                 
-                <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0a1628] to-transparent z-10" />
+                <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#04080f] to-transparent z-10" />
                 <div className="absolute top-1/4 right-10 w-32 h-32 rounded-full bg-[#c9a227]/5 blur-3xl animate-float z-10" />
                 <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-[#1a3a5c]/30 blur-3xl animate-float z-10" style={{ animationDelay: '2s' }} />
 
@@ -156,7 +154,7 @@ export function BarraPage() {
             </section>
 
             {/* Contexto Local Barra */}
-            <section className="py-24 bg-[#070f1a] relative px-4">
+            <section className="py-24 bg-[#04080f] relative px-4">
                 <div className="container-lume page-entrance">
                     <div className="max-w-4xl mx-auto text-center mb-16">
                         <h2 className="text-3xl lg:text-5xl font-bold font-montserrat mb-10 text-white">Tecnologia de ponta para a arquitetura da Barra</h2>
@@ -183,7 +181,7 @@ export function BarraPage() {
             </section>
 
             {/* Tipos de Película - Paridade Total com Bangu */}
-            <section id="tipos" className="py-24 bg-[#0a1628] border-y border-white/5 px-4 overflow-hidden relative">
+            <section id="tipos" className="py-24 bg-[#04080f] border-y border-white/5 px-4 overflow-hidden relative">
                 <div className="container-lume relative z-10">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl lg:text-5xl font-bold font-montserrat mb-6 text-white">
@@ -217,14 +215,20 @@ export function BarraPage() {
                                 desc: "A tecnologia híbrida definitiva. Rejeição de calor massiva com visão relaxada e baixa reflexão interna noturna. Perfeita para o sol da tarde carioca."
                             }
                         ].map((product, idx) => (
-                            <div key={idx} className="product-card group relative bg-gradient-to-b from-[#1a3a5c]/60 to-[#0a1628]/90 rounded-2xl overflow-hidden border border-[#1a3a5c]/50 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 flex flex-col h-full">
-                                <div className="absolute top-4 left-4 z-10 px-3 py-1 bg-[#c9a227] text-[#0a1628] text-[10px] font-bold uppercase tracking-wider rounded-full shadow-lg pointer-events-none">
+                            <div key={idx} className="product-card group relative bg-gradient-to-b from-[#1a3a5c]/60 to-[#04080f]/90 rounded-2xl overflow-hidden border border-[#1a3a5c]/50 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 flex flex-col h-full">
+                                <div className="absolute top-4 left-4 z-10 px-3 py-1 bg-[#c9a227] text-[#04080f] text-[10px] font-bold uppercase tracking-wider rounded-full shadow-lg pointer-events-none">
                                     {product.selo}
                                 </div>
                                 <Link href={product.path} className="flex flex-col flex-grow">
                                     <div className="relative h-44 overflow-hidden">
-                                        <Image src={product.image} alt={product.title} fill sizes="(max-width: 768px) 100vw, 100vw"  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-transparent to-transparent opacity-80" />
+                                        <Image 
+                                            src={product.image} 
+                                            alt={product.title} 
+                                            fill 
+                                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw" 
+                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-[#04080f] via-transparent to-transparent opacity-80" />
                                     </div>
 
                                     <div className="p-6 flex flex-col flex-grow">
@@ -261,7 +265,7 @@ export function BarraPage() {
                                         href={`https://wa.me/5521965140612?text=Olá! Quero saber sobre a película ${product.title} na Barra da Tijuca.`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="w-full py-3.5 rounded-xl bg-[#111e33] hover:bg-[#c9a227] text-gray-300 hover:text-[#0a1628] text-xs font-bold uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-3 border border-white/5"
+                                        className="w-full py-3.5 rounded-xl bg-[#111e33] hover:bg-[#c9a227] text-gray-300 hover:text-[#04080f] text-xs font-bold uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-3 border border-white/5"
                                     >
                                         Quero Orçamento <ArrowRight size={14} />
                                     </a>
@@ -273,7 +277,7 @@ export function BarraPage() {
             </section>
 
             {/* Vantagens que Valorizam seu Ambiente */}
-            <section id="vantagens" className="py-24 relative px-4 bg-[#070f1a] overflow-hidden">
+            <section id="vantagens" className="py-24 relative px-4 bg-[#04080f] overflow-hidden">
                 <div className="container-lume">
                     <div className="text-center mb-20">
                         <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-6 tracking-tight">Vantagens de Padrão Elite</h2>
@@ -299,7 +303,7 @@ export function BarraPage() {
                                 desc: "Materiais de procedência mundial que não criam bolhas nem perdem a cor sob o sol do Rio de Janeiro."
                             }
                         ].map((benefit, idx) => (
-                            <div key={idx} className="benefit-card group relative p-10 rounded-2xl bg-gradient-to-b from-[#1a3a5c]/40 to-[#0d1f3c]/60 border border-[#1a3a5c]/30 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 text-center lg:text-left flex flex-col">
+                            <div key={idx} className="benefit-card group relative p-10 rounded-2xl bg-gradient-to-b from-[#1a3a5c]/40 to-[#04080f]/60 border border-[#1a3a5c]/30 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 text-center lg:text-left flex flex-col">
                                 <div className="w-16 h-16 rounded-2xl bg-[#c9a227]/10 flex items-center justify-center mx-auto lg:mx-0 mb-8 group-hover:bg-[#c9a227]/20 transition-colors shadow-inner">
                                     <benefit.icon className="w-8 h-8 text-[#c9a227] group-hover:scale-110 transition-transform" />
                                 </div>
@@ -327,7 +331,7 @@ export function BarraPage() {
             </section>
 
             {/* Região de Atendimento - Barra */}
-            <section className="py-24 bg-[#0a1628] border-y border-white/5 relative px-4 overflow-hidden">
+            <section className="py-24 bg-[#04080f] border-y border-white/5 relative px-4 overflow-hidden">
                 <div className="container-lume page-entrance relative z-10 text-center lg:text-left">
                     <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-10 text-center text-[#c9a227] tracking-tight underline decoration-[#c9a227]/20 underline-offset-8">Conheça nossa área de atuação na Barra</h2>
                     
@@ -368,7 +372,7 @@ export function BarraPage() {
             </section>
 
             {/* Perguntas Frequentes (FAQ) - Adaptado para Barra */}
-            <section className="py-24 relative px-4 overflow-hidden bg-[#070f1a]">
+            <section className="py-24 relative px-4 overflow-hidden bg-[#04080f]">
                 <div className="container-lume page-entrance max-w-4xl mx-auto">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-6 tracking-tight">Perguntas Frequentes (FAQ)</h2>
@@ -427,8 +431,8 @@ export function BarraPage() {
             <GoogleReviews />
 
             {/* CTA Final */}
-            <section className="py-24 relative overflow-hidden bg-[#070f1a]">
-                <div className="absolute inset-0 bg-gradient-to-b from-[#0a1628] to-[#070f1a]" />
+            <section className="py-24 relative overflow-hidden bg-[#04080f]">
+                <div className="absolute inset-0 bg-gradient-to-b from-[#04080f] to-[#04080f]" />
                 <div className="container-lume relative z-10 px-4">
                     <div className="max-w-5xl mx-auto glass-card border border-white/10 rounded-[2.5rem] p-12 md:p-20 text-center animate-fade-in relative overflow-hidden">
                         <h2 className="text-4xl md:text-6xl font-black mb-8 font-montserrat tracking-tighter">
@@ -449,7 +453,7 @@ export function BarraPage() {
                 </div>
             </section>
 
-             <footer className="py-12 bg-[#070f1a] border-t border-white/5 text-center text-[10px] text-gray-500 font-bold uppercase tracking-[0.4em] px-4">
+             <footer className="py-12 bg-[#04080f] border-t border-white/5 text-center text-[10px] text-gray-500 font-bold uppercase tracking-[0.4em] px-4">
                  © 2026 Lume Controle Solar · Especialista na Barra da Tijuca e Zona Oeste
             </footer>
         </div>

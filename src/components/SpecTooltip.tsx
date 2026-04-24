@@ -43,7 +43,7 @@ export function SpecTooltip({ term, children }: SpecTooltipProps) {
                 </TooltipTrigger>
                 <TooltipContent
                     side="top"
-                    className="max-w-[300px] p-4 bg-[#0d1f3c] border border-[#c9a227]/30 text-white rounded-xl shadow-2xl"
+                    className="max-w-[300px] p-4 bg-[#04080f] border border-[#c9a227]/30 text-white rounded-xl shadow-2xl"
                 >
                     <div className="space-y-2">
                         <h4 className="font-bold text-[#c9a227] text-sm font-montserrat">{descriptions[term].title}</h4>

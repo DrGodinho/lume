@@ -187,7 +187,7 @@ export function SimulatorPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#070f1a] text-white py-12 px-4 sm:px-6 relative flex flex-col items-center">
+        <div className="min-h-screen bg-[#04080f] text-white py-12 px-4 sm:px-6 relative flex flex-col items-center">
             {/* Background Decor */}
             <div className="fixed top-0 left-0 w-full h-full pointer-events-none -z-10 overflow-hidden">
                 <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#c9a227]/5 rounded-full blur-[120px]" />
@@ -388,7 +388,7 @@ export function SimulatorPage() {
                                     </p>
                                 </div>
 
-                                <div className="bg-[#0a1628]/50 rounded-xl p-5 border border-white/5 space-y-3 mb-6">
+                                <div className="bg-[#04080f]/50 rounded-xl p-5 border border-white/5 space-y-3 mb-6">
                                     <h4 className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-2">Ficha Técnica</h4>
                                     <div className="flex justify-between items-center pb-2 border-b border-white/5">
                                         <span className="text-gray-400 text-sm">Redução de Calor</span>
@@ -414,7 +414,7 @@ export function SimulatorPage() {
                             </div>
 
                             {alternativeMatch && !directMatch && (
-                                <div className="glass-card p-5 sm:p-6 rounded-2xl border border-white/5 bg-[#0a1628]/80 text-left">
+                                <div className="glass-card p-5 sm:p-6 rounded-2xl border border-white/5 bg-[#04080f]/80 text-left">
                                     <span className="text-[10px] uppercase tracking-widest font-bold text-gray-500 block mb-1">🥈 Opção Alternativa</span>
                                     <h4 className="text-lg font-bold font-montserrat text-white mb-2">{alternativeMatch.name}</h4>
                                     <p className="text-sm text-gray-400 mb-3">{alternativeMatch.description}</p>

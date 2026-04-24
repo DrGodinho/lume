@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react';
 import { EyeOff, Sun, Layers, Droplets, Gem, ArrowRight, Building2, ShieldCheck, Thermometer, Zap } from 'lucide-react';
-import { WhatsAppButton } from '../components/WhatsAppButton';
 import { ContactCTA } from '../sections/ContactCTA';
 import { SpecTooltip } from '../components/SpecTooltip';
 import gsap from 'gsap';
@@ -18,14 +17,13 @@ export function JateadoPage() {
     }, []);
 
     return (
-        <div className="bg-[#070f1a] text-white min-h-screen">
-            <WhatsAppButton />
+        <div className="bg-[#04080f] text-white min-h-screen">
 
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden px-4">
                 <div className="absolute inset-0 z-0">
                     <Image src="/jateado-hero.png" alt="Escritório moderno com divisórias de vidro jateado LUME - Rio de Janeiro" fill sizes="(max-width: 768px) 100vw, 100vw" priority className="w-full h-full object-cover opacity-40" />
-                    <div className="absolute inset-0 bg-gradient-to-b from-[#070f1a] via-transparent to-[#070f1a]" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-[#04080f] via-transparent to-[#04080f]" />
                 </div>
 
                 <div className="container-lume relative z-10 page-entrance text-center md:text-left">
@@ -53,7 +51,7 @@ export function JateadoPage() {
             </section>
 
             {/* Introdução Focada em Luz e Privacidade */}
-            <section className="py-20 bg-[#0a1628] border-b border-white/5 px-4">
+            <section className="py-20 bg-[#04080f] border-b border-white/5 px-4">
                 <div className="container-lume page-entrance">
                     <div className="max-w-4xl mx-auto text-center">
                         <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-8 text-white">Privacidade Sem Escuridão</h2>
@@ -218,7 +216,7 @@ export function JateadoPage() {
             </section>
 
             {/* Dica Técnica: Por que filmes claros protegem? */}
-            <section className="py-12 relative px-4 bg-[#0a1628]">
+            <section className="py-12 relative px-4 bg-[#04080f]">
                 <div className="container-lume max-w-4xl mx-auto">
                     <div className="glass-card p-8 md:p-12 rounded-3xl border border-[#c9a227]/30 bg-gradient-to-br from-[#c9a227]/5 to-transparent relative overflow-hidden">
                         <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-[#c9a227]/10 rounded-full blur-3xl"></div>
@@ -246,7 +244,7 @@ export function JateadoPage() {
             </section>
 
             {/* FAQ Section */}
-            <section className="py-20 relative px-4 bg-[#0a1628] border-t border-white/5">
+            <section className="py-20 relative px-4 bg-[#04080f] border-t border-white/5">
                 <div className="container-lume page-entrance max-w-4xl mx-auto">
                     <div className="text-center mb-12">
                         <h2 className="text-3xl font-bold font-montserrat mb-4 text-white">Dúvidas Frequentes</h2>

@@ -60,7 +60,7 @@ export function Footer() {
   return (
     <footer
       ref={footerRef}
-      className="relative bg-[#070f1a] pt-12 pb-6 overflow-hidden"
+      className="relative bg-[#04080f] pt-12 pb-6 overflow-hidden"
     >
       {/* Grid pattern overlay */}
       <div
@@ -99,7 +99,7 @@ export function Footer() {
                 href="https://facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-[#1a3a5c]/50 flex items-center justify-center text-gray-400 hover:bg-[#c9a227] hover:text-[#0a1628] transition-all duration-300 hover:-translate-y-1"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-[#1a3a5c]/50 flex items-center justify-center text-gray-400 hover:bg-[#c9a227] hover:text-[#04080f] transition-all duration-300 hover:-translate-y-1"
                 aria-label="Facebook"
               >
                 <Facebook className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -108,7 +108,7 @@ export function Footer() {
                 href="https://www.instagram.com/lumecontrolesolar"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-[#1a3a5c]/50 flex items-center justify-center text-gray-400 hover:bg-[#c9a227] hover:text-[#0a1628] transition-all duration-300 hover:-translate-y-1"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-[#1a3a5c]/50 flex items-center justify-center text-gray-400 hover:bg-[#c9a227] hover:text-[#04080f] transition-all duration-300 hover:-translate-y-1"
                 aria-label="Instagram"
               >
                 <Instagram className="w-4 h-4 sm:w-5 sm:h-5" />

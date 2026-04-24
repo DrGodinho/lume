@@ -19,7 +19,7 @@ export function Reviews() {
     return (
         <section
             id="avaliacoes"
-            className="section-padding bg-[#0a1628] relative"
+            className="section-padding bg-[#04080f] relative"
         >
             <div className="container-lume">
                 <div className="text-center mb-12 sm:mb-16">
