@@ -82,7 +82,7 @@ export function Footer() {
           {/* Column 1: Logo & About */}
           <div className="footer-col sm:col-span-2 lg:col-span-1">
             <Link href="/" className="inline-block mb-3 sm:mb-4">
-              <span className="text-2xl sm:text-3xl font-bold text-white font-['Montserrat']">
+              <span className="text-2xl sm:text-3xl font-bold text-white font-montserrat">
                 LU<span className="text-gradient-gold">ME</span>
               </span>
             </Link>
@@ -127,7 +127,7 @@ export function Footer() {
 
           {/* Column 2: Quick Links */}
           <div className="footer-col">
-            <h4 className="text-white font-semibold mb-4 sm:mb-6 text-sm sm:text-base font-['Montserrat']">
+            <h4 className="text-white font-semibold mb-4 sm:mb-6 text-sm sm:text-base font-montserrat">
               Links Rápidos
             </h4>
             <ul className="space-y-2 sm:space-y-3">
@@ -148,6 +148,8 @@ export function Footer() {
                   ) : (
                     <Link
                       href={link.href}
+                      prefetch={true}
+                      onMouseEnter={() => router.prefetch(link.href)}
                       className="text-gray-400 hover:text-[#c9a227] transition-colors text-xs sm:text-sm inline-flex items-center gap-2 group"
                     >
                       <span className="w-0 h-px bg-[#c9a227] transition-all duration-300 group-hover:w-3" />
@@ -161,7 +163,7 @@ export function Footer() {
 
           {/* Column 3: Products */}
           <div className="footer-col">
-            <h4 className="text-white font-semibold mb-4 sm:mb-6 text-sm sm:text-base font-['Montserrat']">
+            <h4 className="text-white font-semibold mb-4 sm:mb-6 text-sm sm:text-base font-montserrat">
               Nossos Produtos
             </h4>
             <ul className="space-y-2 sm:space-y-3">
@@ -182,6 +184,8 @@ export function Footer() {
                   ) : (
                     <Link
                       href={product.href}
+                      prefetch={true}
+                      onMouseEnter={() => router.prefetch(product.href)}
                       className="text-gray-400 hover:text-[#c9a227] transition-colors text-xs sm:text-sm inline-flex items-center gap-2 group"
                     >
                       <span className="w-0 h-px bg-[#c9a227] transition-all duration-300 group-hover:w-3" />
@@ -195,7 +199,7 @@ export function Footer() {
 
           {/* Column 4: Contact */}
           <div className="footer-col">
-            <h4 className="text-white font-semibold mb-4 sm:mb-6 text-sm sm:text-base font-['Montserrat']">
+            <h4 className="text-white font-semibold mb-4 sm:mb-6 text-sm sm:text-base font-montserrat">
               Entre em Contato
             </h4>
             <ul className="space-y-3 sm:space-y-4">

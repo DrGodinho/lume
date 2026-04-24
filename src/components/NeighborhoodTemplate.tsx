@@ -6,41 +6,82 @@ import { AnimatedCounter } from './AnimatedCounter';
 import Link from 'next/link';
 import { NeighborhoodData } from '../data/neighborhoods';
 import { NeighborhoodAnimations } from './NeighborhoodAnimations';
+import Image from 'next/image';
 
 interface Props {
   data: NeighborhoodData;
 }
 
 export function NeighborhoodTemplate({ data }: Props) {
+  const healthFaqs = [
+    {
+      q: "O insulfilm ajuda a prevenir o câncer de pele em ambientes internos?",
+      a: "Sim, nossas películas bloqueiam 99% dos raios UVA e UVB, principais responsáveis por danos à pele, proporcionando proteção essencial para quem passa muito tempo próximo a janelas com incidência solar."
+    },
+    {
+      q: "A película de controle solar reduz a fadiga ocular?",
+      a: "Sim, ao reduzir o brilho excessivo e equilibrar a luminosidade, as películas diminuem o esforço visual, prevenindo dores de cabeça e cansaço ocular em ambientes de trabalho e descanso."
+    },
+    {
+      q: "Como o insulfilm contribui para o bem-estar térmico?",
+      a: "Ao manter a temperatura interna estável e evitar picos de calor, as películas promovem um ambiente mais relaxante, reduzindo o estresse térmico e aumentando o conforto dos moradores."
+    }
+  ];
+
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "LocalBusiness",
-    "name": `LUME Controle Solar - ${data.neighborName}`,
-    "image": "https://lumecontrolesolar.com.br/og-image.jpg",
-    "description": data.metaDescription,
-    "@id": `https://lumecontrolesolar.com.br/${data.slug}`,
-    "url": `https://lumecontrolesolar.com.br/${data.slug}`,
-    "telephone": "+5521965140612",
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": data.location.address,
-      "addressLocality": data.neighborName,
-      "addressRegion": "RJ",
-      "addressCountry": "BR"
-    },
-    "geo": {
-      "@type": "GeoCoordinates",
-      "latitude": data.location.lat,
-      "longitude": data.location.lng
-    },
-    "openingHoursSpecification": {
-      "@type": "OpeningHoursSpecification",
-      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-      "opens": "08:00",
-      "closes": "18:00"
-    },
-    "sameAs": [
-      "https://www.instagram.com/lumecontrolesolar"
+    "@graph": [
+      {
+        "@type": "LocalBusiness",
+        "name": `LUME Controle Solar - ${data.neighborName}`,
+        "image": "https://lumecontrolesolar.com.br/og-image.jpg",
+        "description": data.metaDescription,
+        "@id": `https://lumecontrolesolar.com.br/${data.slug}`,
+        "url": `https://lumecontrolesolar.com.br/${data.slug}`,
+        "telephone": "+5521965140612",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": data.location.address,
+          "addressLocality": data.neighborName,
+          "addressRegion": "RJ",
+          "addressCountry": "BR"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": data.location.lat,
+          "longitude": data.location.lng
+        },
+        "openingHoursSpecification": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+          "opens": "08:00",
+          "closes": "18:00"
+        },
+        "sameAs": [
+          "https://www.instagram.com/lumecontrolesolar"
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          ...data.faq.map(item => ({
+            "@type": "Question",
+            "name": item.q,
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": item.a
+            }
+          })),
+          ...healthFaqs.map(item => ({
+            "@type": "Question",
+            "name": item.q,
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": item.a
+            }
+          }))
+        ]
+      }
     ]
   };
 
@@ -57,11 +98,7 @@ export function NeighborhoodTemplate({ data }: Props) {
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden px-4">
         <div className="absolute inset-0 z-0">
-          <img
-            src={data.heroBg}
-            alt={`Instalação de insulfilm profissional em ${data.neighborName} - LUME Controle Solar`}
-            className="w-full h-full object-cover"
-          />
+          <Image src={data.heroBg} alt={`Instalação de insulfilm profissional em ${data.neighborName}`} fill sizes="(max-width: 768px) 100vw, 100vw" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-r from-[#0a1628]/95 via-[#0a1628]/80 to-[#0a1628]/60" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-transparent to-[#0a1628]/50" />
         </div>
@@ -78,7 +115,7 @@ export function NeighborhoodTemplate({ data }: Props) {
             <span className="text-[#c9a227] text-sm font-bold uppercase tracking-wider">{data.region}</span>
           </div>
 
-          <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-['Montserrat'] mb-6 leading-tight">
+          <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-montserrat mb-6 leading-tight">
             {data.heroTitle} <span className="text-gradient-gold">{data.heroHighlight}</span>
           </h1>
 
@@ -132,7 +169,7 @@ export function NeighborhoodTemplate({ data }: Props) {
         <div className="container-lume">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="page-entrance">
-              <h2 className="text-3xl lg:text-5xl font-black font-['Montserrat'] mb-8 leading-tight tracking-tight uppercase">
+              <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-8 leading-tight tracking-tight uppercase">
                 A melhor solução de <span className="text-[#c9a227]">Insulfilm Residencial</span> para sua casa em {data.neighborName}
               </h2>
               <div className="space-y-6 text-gray-400 text-lg leading-relaxed font-light">
@@ -164,11 +201,7 @@ export function NeighborhoodTemplate({ data }: Props) {
             </div>
             <div className="relative page-entrance">
               <div className="absolute inset-0 bg-gradient-to-tr from-[#c9a227]/20 to-transparent rounded-3xl blur-2xl" />
-              <img
-                src="/about_residential.webp"
-                alt={`Insulfilm em ${data.neighborName} - LUME`}
-                className="rounded-3xl border border-white/10 shadow-2xl relative z-10 w-full"
-              />
+              <Image src="/about_residential.webp" alt={`Insulfilm em ${data.neighborName}`} fill sizes="(max-width: 768px) 100vw, 100vw" className="rounded-3xl border border-white/10 shadow-2xl relative z-10 w-full" />
               <div className="absolute -bottom-6 -right-6 bg-[#c9a227] p-8 rounded-2xl z-20 shadow-xl hidden md:block">
                 <p className="text-[#0a1628] font-black text-4xl leading-none">
                   <AnimatedCounter target="1000" suffix="+" />
@@ -184,7 +217,7 @@ export function NeighborhoodTemplate({ data }: Props) {
       <section id="tipos" className="py-24 bg-[#0a1628]/50 px-4">
         <div className="container-lume">
           <div className="text-center mb-16 page-entrance">
-            <h2 className="text-3xl lg:text-5xl font-black font-['Montserrat'] mb-6 tracking-tight">PELÍCULAS DE ALTA PERFORMANCE</h2>
+            <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-6 tracking-tight">PELÍCULAS DE ALTA PERFORMANCE</h2>
             <p className="text-gray-400 max-w-2xl mx-auto">Conheça as tecnologias mais procuradas em {data.neighborName} para controle térmico e privacidade.</p>
           </div>
 
@@ -270,7 +303,7 @@ export function NeighborhoodTemplate({ data }: Props) {
       <section className="py-24 bg-[#070f1a] px-4">
         <div className="container-lume max-w-4xl mx-auto page-entrance">
           <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-5xl font-black font-['Montserrat'] mb-6 tracking-tight text-white">FAQ</h2>
+            <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-6 tracking-tight text-white">FAQ</h2>
             <p className="text-gray-500 font-medium">Esclareça suas principais dúvidas sobre aplicação e durabilidade.</p>
           </div>
 

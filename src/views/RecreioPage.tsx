@@ -9,6 +9,7 @@ import { AnimatedCounter } from '../components/AnimatedCounter';
 import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Image from 'next/image';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -87,14 +88,13 @@ export function RecreioPage() {
             <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden px-4">
                 {/* Background Image */}
                 <div className="absolute inset-0 z-0">
-                    <img
-                        src="/recreio_hero_bg.webp"
-                        alt="Instalação de insulfilm profissional no Recreio dos Bandeirantes - LUME Controle Solar"
-                        className="w-full h-full object-cover"
-                        fetchPriority="high"
-                        onError={(e) => {
-                            e.currentTarget.src = "/campogrande_hero_bg.webp"; // Fallback temporary
-                        }}
+                    <Image 
+                        src="/recreio_hero_bg.webp" 
+                        alt="Instalação de insulfilm profissional no Recreio dos Bandeirantes - LUME Controle Solar" 
+                        fill 
+                        sizes="(max-width: 768px) 100vw, 100vw" 
+                        priority 
+                        className="w-full h-full object-cover" 
                     />
                     <div className="absolute inset-0 bg-gradient-to-r from-[#0a1628]/95 via-[#0a1628]/80 to-[#0a1628]/60" />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-transparent to-[#0a1628]/50" />
@@ -113,7 +113,7 @@ export function RecreioPage() {
                         <span className="text-[#c9a227] text-sm font-bold uppercase tracking-wider">Recreio dos Bandeirantes</span>
                     </div>
 
-                    <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-['Montserrat'] mb-6 leading-tight">
+                    <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-montserrat mb-6 leading-tight">
                         Insulfilm no <span className="text-gradient-gold">Recreio</span>
                     </h1>
 
@@ -159,7 +159,7 @@ export function RecreioPage() {
             <section className="py-24 bg-[#070f1a] relative px-4">
                 <div className="container-lume page-entrance">
                     <div className="max-w-4xl mx-auto text-center mb-16">
-                        <h2 className="text-3xl lg:text-5xl font-bold font-['Montserrat'] mb-10 text-white">Proteção e sofisticação para o estilo Recreio</h2>
+                        <h2 className="text-3xl lg:text-5xl font-bold font-montserrat mb-10 text-white">Proteção e sofisticação para o estilo Recreio</h2>
                         <div className="space-y-6 text-gray-400 leading-relaxed text-lg font-light text-left md:text-justify px-4">
                             <p>
                                 O Recreio dos Bandeirantes é um bairro que respira qualidade de vida e contato com a natureza. No entanto, a alta exposição solar, especialmente nos apartamentos da <strong className="text-white">Gleba A</strong> e <strong className="text-white">Gleba B</strong>, pode transformar ambientes em locais quentes e desconfortáveis, além de danificar móveis devido à forte incidência de raios UV vinda do mar.
@@ -174,7 +174,7 @@ export function RecreioPage() {
                     </div>
 
                     <div className="glass-card p-10 rounded-3xl border border-white/10 relative overflow-hidden max-w-4xl mx-auto text-center">
-                        <h3 className="text-2xl font-bold font-['Montserrat'] mb-8">Películas para Apartamentos e Lojas no Recreio</h3>
+                        <h3 className="text-2xl font-bold font-montserrat mb-8">Películas para Apartamentos e Lojas no Recreio</h3>
                         <p className="text-gray-400 leading-relaxed max-w-3xl mx-auto font-light text-lg">
                             Seja para reduzir o calor na sua varanda gourmet ou dar segurança e privacidade para sua loja de rua, a LUME entrega o melhor serviço de aplicação de películas do Recreio dos Bandeirantes.
                         </p>
@@ -186,7 +186,7 @@ export function RecreioPage() {
             <section id="tipos" className="py-24 bg-[#0a1628] border-y border-white/5 px-4 overflow-hidden relative">
                 <div className="container-lume relative z-10">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl lg:text-5xl font-bold font-['Montserrat'] mb-6 text-white">
+                        <h2 className="text-3xl lg:text-5xl font-bold font-montserrat mb-6 text-white">
                             Películas de <span className="text-gradient-gold">Alta Performance</span>
                         </h2>
                         <p className="text-gray-400 max-w-2xl mx-auto font-light text-lg">
@@ -198,7 +198,7 @@ export function RecreioPage() {
                         {[
                             {
                                 title: "Nano Cerâmica", selo: "Top de Linha", icon: Star, image: "/product-nano-ceramica.webp", path: "/nano-ceramica",
-                                desc: "Máxima rejeição de calor com transparência tecnológica. Ideal para apartamentos no Recreio que querem proteção total sem perder a claridade natural do sol."
+                                desc: "Máxima rejeição de calor with transparência tecnológica. Ideal para apartamentos no Recreio que querem proteção total sem perder a claridade natural do sol."
                             },
                             {
                                 title: "Carbono Premium", selo: "Best-Seller", icon: SunDim, image: "/product-carbono.webp", path: "/carbono",
@@ -223,18 +223,14 @@ export function RecreioPage() {
                                 </div>
                                 <Link href={product.path} className="flex flex-col flex-grow">
                                     <div className="relative h-44 overflow-hidden">
-                                        <img
-                                            src={product.image}
-                                            alt={product.title}
-                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                        />
+                                        <Image src={product.image} alt={product.title} fill sizes="(max-width: 768px) 100vw, 100vw"  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                                         <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-transparent to-transparent opacity-80" />
                                     </div>
 
                                     <div className="p-6 flex flex-col flex-grow">
                                         <div className="flex items-center gap-2 mb-4">
                                             <product.icon className="w-5 h-5 text-[#c9a227]" />
-                                            <h3 className="text-xl font-bold text-white font-['Montserrat'] leading-tight">
+                                            <h3 className="text-xl font-bold text-white font-montserrat leading-tight">
                                                 {product.title}
                                             </h3>
                                         </div>
@@ -280,7 +276,7 @@ export function RecreioPage() {
             <section id="vantagens" className="py-24 relative px-4 bg-[#070f1a] overflow-hidden">
                 <div className="container-lume">
                     <div className="text-center mb-20">
-                        <h2 className="text-3xl lg:text-5xl font-black font-['Montserrat'] mb-6 tracking-tight">Vantagens que Valorizam seu Imóvel</h2>
+                        <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-6 tracking-tight">Vantagens que Valorizam seu Imóvel</h2>
                         <p className="text-gray-400 max-w-3xl mx-auto text-lg font-light">Garanta o conforto térmico da sua família no Recreio com películas de padrão Elite.</p>
                     </div>
 
@@ -309,7 +305,7 @@ export function RecreioPage() {
                                 </div>
                                 
                                 <div className="mb-6">
-                                    <span className="text-5xl font-black text-gradient-gold font-['Montserrat'] leading-none">
+                                    <span className="text-5xl font-black text-gradient-gold font-montserrat leading-none">
                                         <AnimatedCounter 
                                             target={benefit.stat.replace(/[^0-9-]/g, '')} 
                                             suffix={benefit.stat.replace(/[0-9-]/g, '')} 
@@ -318,7 +314,7 @@ export function RecreioPage() {
                                     <p className="text-[11px] uppercase text-gray-500 font-black tracking-widest mt-2">{benefit.label}</p>
                                 </div>
 
-                                <h3 className="text-xl font-bold text-white mb-4 font-['Montserrat'] leading-tight">
+                                <h3 className="text-xl font-bold text-white mb-4 font-montserrat leading-tight">
                                     {benefit.title}
                                 </h3>
                                 <p className="text-gray-400 text-sm leading-relaxed font-light">
@@ -333,11 +329,11 @@ export function RecreioPage() {
             {/* Região de Atendimento - Recreio */}
             <section className="py-24 bg-[#0a1628] border-y border-white/5 relative px-4 overflow-hidden">
                 <div className="container-lume page-entrance relative z-10 text-center lg:text-left">
-                    <h2 className="text-3xl lg:text-5xl font-black font-['Montserrat'] mb-10 text-center text-[#c9a227] tracking-tight underline decoration-[#c9a227]/20 underline-offset-8">Atendimento em todo o Recreio</h2>
+                    <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-10 text-center text-[#c9a227] tracking-tight underline decoration-[#c9a227]/20 underline-offset-8">Atendimento em todo o Recreio</h2>
                     
                     <div className="grid lg:grid-cols-2 gap-12 items-stretch mt-12 text-left">
                         <div className="glass-card p-10 rounded-3xl border border-white/10 flex flex-col h-full bg-white/[0.01]">
-                            <h3 className="text-2xl font-bold font-['Montserrat'] mb-8 text-white flex items-center gap-3">
+                            <h3 className="text-2xl font-bold font-montserrat mb-8 text-white flex items-center gap-3">
                                 <MapPin size={24} className="text-[#c9a227]" /> Onde estamos no Recreio
                             </h3>
                             <p className="text-gray-400 leading-relaxed mb-8 text-base font-light">
@@ -375,7 +371,7 @@ export function RecreioPage() {
             <section className="py-24 relative px-4 overflow-hidden bg-[#070f1a]">
                 <div className="container-lume page-entrance max-w-4xl mx-auto">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl lg:text-5xl font-black font-['Montserrat'] mb-6 tracking-tight">Perguntas Frequentes (FAQ)</h2>
+                        <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-6 tracking-tight">Perguntas Frequentes (FAQ)</h2>
                         <p className="text-gray-500 font-medium">Esclareça suas principais dúvidas sobre aplicação no Recreio.</p>
                     </div>
 
@@ -435,7 +431,7 @@ export function RecreioPage() {
                 <div className="absolute inset-0 bg-gradient-to-b from-[#0a1628] to-[#070f1a]" />
                 <div className="container-lume relative z-10 px-4 text-center">
                     <div className="max-w-5xl mx-auto glass-card border border-white/10 rounded-[2.5rem] p-12 md:p-20 text-center relative overflow-hidden">
-                        <h2 className="text-4xl md:text-6xl font-black mb-8 font-['Montserrat'] tracking-tighter">
+                        <h2 className="text-4xl md:text-6xl font-black mb-8 font-montserrat tracking-tighter">
                              Sua Casa Fresca no <span className="text-gradient-gold">Recreio</span>
                         </h2>
                         <p className="text-lg text-gray-300 max-w-2xl mx-auto mb-12 font-light">

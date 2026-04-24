@@ -9,6 +9,7 @@ import { AnimatedCounter } from '../components/AnimatedCounter';
 import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Image from 'next/image';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -87,12 +88,7 @@ export function CampoGrandePage() {
             <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden px-4">
                 {/* Background Image */}
                 <div className="absolute inset-0 z-0">
-                    <img
-                        src="/campogrande_hero_bg.webp"
-                        alt="Instalação de insulfilm residencial em Campo Grande RJ - LUME Controle Solar"
-                        className="w-full h-full object-cover"
-                        fetchPriority="high"
-                    />
+                    <Image src="/campogrande_hero_bg.webp" alt="Instalação de insulfilm residencial em Campo Grande RJ - LUME Controle Solar" fill sizes="(max-width: 768px) 100vw, 100vw" priority className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-r from-[#0a1628]/95 via-[#0a1628]/80 to-[#0a1628]/60" />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-transparent to-[#0a1628]/50" />
                 </div>
@@ -110,7 +106,7 @@ export function CampoGrandePage() {
                         <span className="text-[#c9a227] text-sm font-bold uppercase tracking-wider">Zona Oeste do Rio de Janeiro</span>
                     </div>
 
-                    <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-['Montserrat'] mb-6 leading-tight">
+                    <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-montserrat mb-6 leading-tight">
                         Insulfilm em <br className="hidden md:block" /> <span className="text-gradient-gold">Campo Grande</span>
                     </h1>
 
@@ -168,7 +164,7 @@ export function CampoGrandePage() {
             <section className="py-24 bg-[#070f1a] relative px-4">
                 <div className="container-lume page-entrance">
                     <div className="max-w-4xl mx-auto text-center mb-16">
-                        <h2 className="text-3xl lg:text-5xl font-bold font-['Montserrat'] mb-10">Conforto Térmico em Campo Grande</h2>
+                        <h2 className="text-3xl lg:text-5xl font-bold font-montserrat mb-10">Conforto Térmico em Campo Grande</h2>
                         <div className="space-y-6 text-gray-400 leading-relaxed text-lg font-light text-left md:text-justify px-4">
                             <p>
                                 <strong>Campo Grande</strong> é o centro comercial e residencial da Zona Oeste, e seu microclima exige soluções de alto padrão. Com as temperaturas batendo recordes anualmente, as janelas de vidro tornam-se o principal radiador de calor para dentro da sua residência.
@@ -184,7 +180,7 @@ export function CampoGrandePage() {
 
                     <div className="glass-card p-10 rounded-3xl border border-white/10 relative overflow-hidden max-w-4xl mx-auto">
                         <div className="absolute top-0 left-0 w-32 h-32 bg-[#c9a227] blur-[100px] opacity-10" />
-                        <h3 className="text-2xl font-bold font-['Montserrat'] text-center mb-8">Especialista em Condomínios e Comércios</h3>
+                        <h3 className="text-2xl font-bold font-montserrat text-center mb-8">Especialista em Condomínios e Comércios</h3>
                         <p className="text-gray-400 leading-relaxed text-center max-w-3xl mx-auto font-light text-lg">
                             Seja para garantir a privacidade total de um apartamento ou reduzir o calor em fachadas comerciais de lojas e clínicas, a LUME oferece a consultoria ideal. Visitamos seu local em Campo Grande com amostras físicas para que você escolha a tonalidade perfeita para seu projeto, sempre com garantia oficial certificada de 5 anos (Acabamento Arquitetônico).
                         </p>
@@ -196,7 +192,7 @@ export function CampoGrandePage() {
             <section id="tipos" className="py-24 bg-[#0a1628] border-y border-white/5 px-4 overflow-hidden relative">
                 <div className="container-lume relative z-10">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl lg:text-5xl font-bold font-['Montserrat'] mb-6 text-white">
+                        <h2 className="text-3xl lg:text-5xl font-bold font-montserrat mb-6 text-white">
                             Películas de <span className="text-gradient-gold">Alta Performance</span>
                         </h2>
                         <p className="text-gray-400 max-w-2xl mx-auto font-light text-lg">
@@ -233,18 +229,14 @@ export function CampoGrandePage() {
                                 </div>
                                 <Link href={product.path} className="flex flex-col flex-grow">
                                     <div className="relative h-44 overflow-hidden">
-                                        <img
-                                            src={product.image}
-                                            alt={product.title}
-                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                        />
+                                        <Image src={product.image} alt={product.title} fill sizes="(max-width: 768px) 100vw, 100vw"  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                                         <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-transparent to-transparent opacity-80" />
                                     </div>
 
                                     <div className="p-6 flex flex-col flex-grow">
                                         <div className="flex items-center gap-2 mb-4">
                                             <product.icon className="w-5 h-5 text-[#c9a227]" />
-                                            <h3 className="text-xl font-bold text-white font-['Montserrat'] leading-tight">
+                                            <h3 className="text-xl font-bold text-white font-montserrat leading-tight">
                                                 {product.title}
                                             </h3>
                                         </div>
@@ -290,7 +282,7 @@ export function CampoGrandePage() {
             <section id="vantagens" className="py-24 relative px-4 bg-[#070f1a] overflow-hidden">
                 <div className="container-lume">
                     <div className="text-center mb-20">
-                        <h2 className="text-3xl lg:text-5xl font-black font-['Montserrat'] mb-6 tracking-tight">O Diferencial LUME em Campo Grande</h2>
+                        <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-6 tracking-tight">O Diferencial LUME em Campo Grande</h2>
                         <p className="text-gray-400 max-w-3xl mx-auto text-lg font-light">Compromisso com o prazo e performance térmica real para seus vidros.</p>
                     </div>
 
@@ -319,7 +311,7 @@ export function CampoGrandePage() {
                                 </div>
                                 
                                 <div className="mb-6">
-                                    <span className="text-5xl font-black text-gradient-gold font-['Montserrat'] leading-none">
+                                    <span className="text-5xl font-black text-gradient-gold font-montserrat leading-none">
                                         <AnimatedCounter 
                                             target={benefit.stat.replace(/[^0-9-]/g, '')} 
                                             suffix={benefit.stat.replace(/[0-9-]/g, '')} 
@@ -328,7 +320,7 @@ export function CampoGrandePage() {
                                     <p className="text-[11px] uppercase text-gray-500 font-black tracking-widest mt-2">{benefit.label}</p>
                                 </div>
 
-                                <h3 className="text-xl font-bold text-white mb-4 font-['Montserrat'] leading-tight">
+                                <h3 className="text-xl font-bold text-white mb-4 font-montserrat leading-tight">
                                     {benefit.title}
                                 </h3>
                                 <p className="text-gray-400 text-sm leading-relaxed font-light">
@@ -345,7 +337,7 @@ export function CampoGrandePage() {
                 <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-blue-500/5 to-transparent pointer-events-none" />
                 <div className="container-lume page-entrance relative z-10">
                     <div className="max-w-4xl mx-auto text-center lg:text-left">
-                        <h2 className="text-3xl lg:text-5xl font-black font-['Montserrat'] mb-10 text-center text-[#c9a227] tracking-tight underline decoration-[#c9a227]/20 underline-offset-8">Insulfilm em Campo Grande</h2>
+                        <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-10 text-center text-[#c9a227] tracking-tight underline decoration-[#c9a227]/20 underline-offset-8">Insulfilm em Campo Grande</h2>
                         
                         <div className="space-y-6 text-gray-400 leading-relaxed text-lg font-light text-center lg:text-justify mb-16 px-4 md:px-0">
                             <p>
@@ -358,7 +350,7 @@ export function CampoGrandePage() {
                         
                         <div className="grid lg:grid-cols-2 gap-12 items-stretch mt-12 text-left">
                             <div className="glass-card p-10 rounded-3xl border border-white/10 flex flex-col h-full bg-white/[0.01]">
-                                <h3 className="text-2xl font-bold font-['Montserrat'] mb-8 text-white flex items-center gap-3">
+                                <h3 className="text-2xl font-bold font-montserrat mb-8 text-white flex items-center gap-3">
                                     <MapPin size={24} className="text-[#c9a227]" /> Atendimento Especializado CG
                                 </h3>
                                 <p className="text-gray-400 leading-relaxed mb-8 text-base font-light">
@@ -404,7 +396,7 @@ export function CampoGrandePage() {
             <section className="py-24 relative px-4 overflow-hidden bg-[#070f1a]">
                 <div className="container-lume page-entrance max-w-4xl mx-auto">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl lg:text-5xl font-black font-['Montserrat'] mb-6 tracking-tight">FAQ - Insulfilm em Campo Grande</h2>
+                        <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-6 tracking-tight">FAQ - Insulfilm em Campo Grande</h2>
                         <p className="text-gray-500 font-medium">Principais dúvidas sobre preço, prazos e qualidade.</p>
                     </div>
 
@@ -457,7 +449,7 @@ export function CampoGrandePage() {
                     <div className="max-w-5xl mx-auto glass-card border border-white/10 rounded-[2.5rem] p-8 md:p-16 text-center animate-fade-in relative overflow-hidden">
                         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#c9a227] to-transparent opacity-30" />
                         
-                        <h2 className="text-4xl md:text-6xl lg:text-7xl font-black mb-8 font-['Montserrat'] tracking-tighter leading-tight">
+                        <h2 className="text-4xl md:text-6xl lg:text-7xl font-black mb-8 font-montserrat tracking-tighter leading-tight">
                             Seu Imóvel Protegido em <span className="text-gradient-gold">Campo Grande</span>
                         </h2>
                         

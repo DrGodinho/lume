@@ -5,6 +5,7 @@ import { ArrowRight, Check, MessageCircle } from 'lucide-react';
 import { Particles } from '../components/Particles';
 import gsap from 'gsap';
 import { handleGtagClick } from '../lib/gtag';
+import Image from 'next/image';
 
 export function Hero() {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -72,12 +73,7 @@ export function Hero() {
     >
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
-        <img
-          src="/hero-bg.webp"
-          alt="Sala de estar protegida com insulfilm residencial Lume na Zona Oeste do Rio"
-          className="w-full h-full object-cover"
-          fetchPriority="high"
-        />
+        <Image src="/hero-bg.webp" alt="Sala de estar protegida com insulfilm residencial Lume na Zona Oeste do Rio" fill sizes="(max-width: 768px) 100vw, 100vw" priority className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#0a1628]/95 via-[#0a1628]/80 to-[#0a1628]/60" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-transparent to-[#0a1628]/50" />
       </div>
@@ -99,7 +95,7 @@ export function Hero() {
           {/* Headline */}
           <h1
             ref={headlineRef}
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-[1.15] sm:leading-tight mb-4 sm:mb-6 font-['Montserrat']"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-[1.15] sm:leading-tight mb-4 sm:mb-6 font-montserrat"
           >
             <span className="word inline-block">Proteção</span>{' '}
             <span className="word inline-block">Solar</span>{' '}

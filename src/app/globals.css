@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&family=Open+Sans:wght@300;400;500;600;700;800&display=swap');
+
 
 @tailwind base;
 @tailwind components;
@@ -28,7 +28,7 @@
     --radius: 0.625rem;
 
     /* Custom LUME Colors */
-    --lume-navy: #0a1628;
+    --lume-navy: #070f1a;
     --lume-navy-light: #0d1f3c;
     --lume-royal: #1a3a5c;
     --lume-light-blue: #2d5a87;
@@ -56,8 +56,7 @@
   }
 
   body {
-    @apply bg-[#0a1628] text-white antialiased;
-    font-family: 'Open Sans', sans-serif;
+    @apply bg-[#070f1a] text-white antialiased;
   }
 
   h1,
@@ -66,7 +65,7 @@
   h4,
   h5,
   h6 {
-    font-family: 'Montserrat', sans-serif;
+    @apply font-montserrat;
   }
 }
 

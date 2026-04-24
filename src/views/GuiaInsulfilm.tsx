@@ -47,7 +47,7 @@ export function GuiaInsulfilm() {
                         Guia Definitivo LUME
                     </div>
 
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-black font-['Montserrat'] mb-6 leading-tight">
+                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-black font-montserrat mb-6 leading-tight">
                         Absolutamente tudo o que você precisa saber sobre <span className="text-gradient-gold">insulfilm</span> antes de comprar
                     </h1>
 
@@ -80,7 +80,7 @@ export function GuiaInsulfilm() {
                         <div className="w-12 h-12 rounded-xl bg-[#c9a227]/10 flex items-center justify-center text-[#c9a227]">
                             <Zap size={24} />
                         </div>
-                        <h2 className="text-3xl font-bold font-['Montserrat'] text-white">1. Conforto Térmico e Economia: O Fim do "Forno" em Casa</h2>
+                        <h2 className="text-3xl font-bold font-montserrat text-white">1. Conforto Térmico e Economia: O Fim do "Forno" em Casa</h2>
                     </div>
                     
                     <div className="text-gray-400 space-y-6 text-lg leading-relaxed mb-8">
@@ -111,7 +111,7 @@ export function GuiaInsulfilm() {
                         <div className="w-12 h-12 rounded-xl bg-[#c9a227]/10 flex items-center justify-center text-[#c9a227]">
                             <Shield size={24} />
                         </div>
-                        <h2 className="text-3xl font-bold font-['Montserrat'] text-white">2. Proteção UV: O Protetor Solar dos seus Móveis e Pele</h2>
+                        <h2 className="text-3xl font-bold font-montserrat text-white">2. Proteção UV: O Protetor Solar dos seus Móveis e Pele</h2>
                     </div>
 
                     <div className="text-gray-400 space-y-6 text-lg leading-relaxed mb-8">
@@ -155,7 +155,7 @@ export function GuiaInsulfilm() {
                         <div className="w-12 h-12 rounded-xl bg-[#c9a227]/10 flex items-center justify-center text-[#c9a227]">
                             <Target size={24} />
                         </div>
-                        <h2 className="text-3xl font-bold font-['Montserrat'] text-white">3. Privacidade e Segurança: Seu Lar, Seu Refúgio</h2>
+                        <h2 className="text-3xl font-bold font-montserrat text-white">3. Privacidade e Segurança: Seu Lar, Seu Refúgio</h2>
                     </div>
 
                     <div className="text-gray-400 space-y-6 text-lg leading-relaxed mb-8">
@@ -176,7 +176,7 @@ export function GuiaInsulfilm() {
 
                 {/* 4. Guia de Seleção */}
                 <section>
-                    <h2 className="text-3xl font-bold font-['Montserrat'] text-white mb-4">4. Guia de Seleção: Escolha a Película Ideal</h2>
+                    <h2 className="text-3xl font-bold font-montserrat text-white mb-4">4. Guia de Seleção: Escolha a Película Ideal</h2>
                     <p className="text-gray-400 text-lg mb-10">Escolher a película certa depende da sua prioridade. Identifique seu cenário abaixo:</p>
 
                     <div className="grid md:grid-cols-2 gap-6">
@@ -232,7 +232,7 @@ export function GuiaInsulfilm() {
 
                 {/* Tabela Comparativa */}
                 <section>
-                    <h2 className="text-3xl font-bold font-['Montserrat'] text-white mb-8 text-center md:text-left">Comparativo Técnico das Películas</h2>
+                    <h2 className="text-3xl font-bold font-montserrat text-white mb-8 text-center md:text-left">Comparativo Técnico das Películas</h2>
                     
                     <div className="overflow-x-auto rounded-2xl glass-card border border-white/10 shadow-2xl">
                         <table className="w-full text-left border-collapse min-w-[800px]">
@@ -364,7 +364,7 @@ export function GuiaInsulfilm() {
 
                 {/* 5 e 6: Durabilidade, Cuidados e Remoção */}
                 <section>
-                    <h2 className="text-3xl font-bold font-['Montserrat'] text-white mb-8">5. Qualidade e Cuidados Diários</h2>
+                    <h2 className="text-3xl font-bold font-montserrat text-white mb-8">5. Qualidade e Cuidados Diários</h2>
                     
                     <div className="text-gray-400 space-y-6 text-lg leading-relaxed mb-8">
                         <p>
@@ -391,7 +391,7 @@ export function GuiaInsulfilm() {
 
                 {/* 6. Remoção */}
                 <section>
-                    <h2 className="text-3xl font-bold font-['Montserrat'] text-white mb-6">6. Remoção: Quando é Hora de Mudar?</h2>
+                    <h2 className="text-3xl font-bold font-montserrat text-white mb-6">6. Remoção: Quando é Hora de Mudar?</h2>
                     
                     <div className="text-gray-400 space-y-6 text-lg leading-relaxed mb-8">
                         <p>

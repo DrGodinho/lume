@@ -4,6 +4,8 @@ import { useEffect, useRef } from 'react';
 import { MapPin, Navigation } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -20,6 +22,7 @@ export function Coverage() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const tagsRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -97,9 +100,16 @@ export function Coverage() {
               <div className="h-px w-10 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
             </div>
 
-            <h2 className="animate-item text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6 font-['Montserrat']">
+            <h2 className="animate-item text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6 font-montserrat">
               Atendimento em Toda a{' '}
-              <a href="/insulfilm-em-bangu" className="text-gradient-gold hover:opacity-80 transition-opacity">Zona Oeste</a> do Rio
+              <Link 
+                href="/insulfilm-em-bangu" 
+                prefetch={true}
+                onMouseEnter={() => router.prefetch('/insulfilm-em-bangu')}
+                className="text-gradient-gold hover:opacity-80 transition-opacity"
+              >
+                Zona Oeste
+              </Link> do Rio
             </h2>
 
             {/* Address Card */}
@@ -110,7 +120,7 @@ export function Coverage() {
               <div className="text-left">
                 <p className="text-white text-sm sm:text-base font-medium">Nossa Sede</p>
                 <p className="text-gray-400 text-xs sm:text-sm">
-                  Estrada do Realengo, 973 - <a href="/insulfilm-em-bangu" className="text-[#c9a227] hover:underline">Bangu</a>, Rio de Janeiro
+                  Estrada do Realengo, 973 - <Link href="/insulfilm-em-bangu" prefetch={true} onMouseEnter={() => router.prefetch('/insulfilm-em-bangu')} className="text-[#c9a227] hover:underline">Bangu</Link>, Rio de Janeiro
                 </p>
               </div>
             </div>

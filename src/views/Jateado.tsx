@@ -6,6 +6,7 @@ import { WhatsAppButton } from '../components/WhatsAppButton';
 import { ContactCTA } from '../sections/ContactCTA';
 import { SpecTooltip } from '../components/SpecTooltip';
 import gsap from 'gsap';
+import Image from 'next/image';
 
 export function JateadoPage() {
     useEffect(() => {
@@ -23,12 +24,7 @@ export function JateadoPage() {
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden px-4">
                 <div className="absolute inset-0 z-0">
-                    <img 
-                        src="/jateado-hero.png" 
-                        alt="Escritório moderno com divisórias de vidro jateado LUME - Rio de Janeiro" 
-                        className="w-full h-full object-cover opacity-40"
-                        fetchPriority="high"
-                    />
+                    <Image src="/jateado-hero.png" alt="Escritório moderno com divisórias de vidro jateado LUME - Rio de Janeiro" fill sizes="(max-width: 768px) 100vw, 100vw" priority className="w-full h-full object-cover opacity-40" />
                     <div className="absolute inset-0 bg-gradient-to-b from-[#070f1a] via-transparent to-[#070f1a]" />
                 </div>
 
@@ -37,7 +33,7 @@ export function JateadoPage() {
                         O Padrão Ouro em Arquitetura de Interiores 🏢
                     </div>
 
-                    <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-['Montserrat'] mb-6 leading-tight text-white">
+                    <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-montserrat mb-6 leading-tight text-white">
                         Película <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-gray-500">Jateada</span>
                     </h1>
 
@@ -60,7 +56,7 @@ export function JateadoPage() {
             <section className="py-20 bg-[#0a1628] border-b border-white/5 px-4">
                 <div className="container-lume page-entrance">
                     <div className="max-w-4xl mx-auto text-center">
-                        <h2 className="text-3xl lg:text-4xl font-bold font-['Montserrat'] mb-8 text-white">Privacidade Sem Escuridão</h2>
+                        <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-8 text-white">Privacidade Sem Escuridão</h2>
                         <p className="text-gray-400 leading-relaxed mb-6 text-lg">
                             Diferente das linhas térmicas (como G5 ou Refletivo Prata) cujo principal alvo é espancar o sol da Zona Oeste do Rio, a Linha <strong>Jateada</strong> atua no conforto ocular interno, na arquitetura e na privacidade direcional.
                         </p>
@@ -76,7 +72,7 @@ export function JateadoPage() {
                 <div className="container-lume page-entrance max-w-6xl mx-auto">
                     <div className="grid lg:grid-cols-2 gap-12 items-center">
                         <div className="order-2 lg:order-1 glass-card p-10 rounded-3xl border border-white/10 relative overflow-hidden group hover:border-gray-500/30 transition-all bg-gradient-to-br from-white/5 to-transparent backdrop-blur-xl">
-                            <h3 className="text-3xl font-bold font-['Montserrat'] mb-6 text-white">Aplicações Mais Populares</h3>
+                            <h3 className="text-3xl font-bold font-montserrat mb-6 text-white">Aplicações Mais Populares</h3>
 
                             <ul className="space-y-4 mb-8">
                                 <li className="flex items-center gap-3 text-gray-300"><Building2 className="text-gray-400" size={20} /> Clínicas e Consultórios Médicos</li>
@@ -93,7 +89,7 @@ export function JateadoPage() {
 
                         <div className="order-1 lg:order-2 space-y-8">
                             <div>
-                                <h2 className="text-4xl lg:text-5xl font-bold font-['Montserrat'] mb-4 text-white">Composição Estrutural</h2>
+                                <h2 className="text-4xl lg:text-5xl font-bold font-montserrat mb-4 text-white">Composição Estrutural</h2>
                                 <p className="text-gray-400 text-lg">A película é constituída por uma arquitetura focada no design e facilidade extrema de limpeza.</p>
                             </div>
 
@@ -134,7 +130,7 @@ export function JateadoPage() {
             {/* Tabela Técnica de Performance (Foco em Luminosidade) */}
             <section className="py-24 relative px-4">
                 <div className="container-lume page-entrance text-center mb-16">
-                    <h2 className="text-3xl lg:text-4xl font-bold font-['Montserrat'] mb-4 text-white">O Raio-X do Jateado</h2>
+                    <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-4 text-white">O Raio-X do Jateado</h2>
                     <p className="text-gray-400 max-w-2xl mx-auto text-lg mb-8">Performance testada para decorar sem estrangular a claridade do local.</p>
                     <span className="inline-flex px-6 py-2 bg-gradient-to-r from-gray-200 to-gray-400 text-black font-black uppercase text-xl rounded-lg shadow-[0_0_20px_rgba(255,255,255,0.2)] tracking-wider">
                         R$ 90/m² Instalado
@@ -146,7 +142,7 @@ export function JateadoPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2">
                             {/* Features Text */}
                             <div className="p-8 md:p-12 bg-black/40 border-r border-white/5 flex flex-col justify-center">
-                                <h3 className="text-2xl font-bold mb-4 font-['Montserrat']">Por que a taxa de calor é baixa?</h3>
+                                <h3 className="text-2xl font-bold mb-4 font-montserrat">Por que a taxa de calor é baixa?</h3>
                                 <p className="text-gray-400 leading-relaxed text-sm lg:text-base mb-6">
                                     Películas jateadas, por não conterem escurecimento denso de carbono, cerâmica ou metais pesados depositados, possuem índices baixos de TSER e Rejeição de Infravermelho (IRR). Se o seu foco for 100% matar o calor da sala, recomendamos as linhas Carbono e Nano Cerâmica. Se o foco é pura privacidade corporativa e decoração, o Jateado é a coroa do mercado.
                                 </p>
@@ -228,7 +224,7 @@ export function JateadoPage() {
                         <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-[#c9a227]/10 rounded-full blur-3xl"></div>
 
                         <div className="relative z-10">
-                            <h3 className="text-2xl font-bold font-['Montserrat'] mb-6 text-white flex items-center gap-3">
+                            <h3 className="text-2xl font-bold font-montserrat mb-6 text-white flex items-center gap-3">
                                 <ShieldCheck className="text-[#c9a227]" size={28} />
                                 Por que mesmo filmes claros bloqueiam o UV?
                             </h3>
@@ -253,7 +249,7 @@ export function JateadoPage() {
             <section className="py-20 relative px-4 bg-[#0a1628] border-t border-white/5">
                 <div className="container-lume page-entrance max-w-4xl mx-auto">
                     <div className="text-center mb-12">
-                        <h2 className="text-3xl font-bold font-['Montserrat'] mb-4 text-white">Dúvidas Frequentes</h2>
+                        <h2 className="text-3xl font-bold font-montserrat mb-4 text-white">Dúvidas Frequentes</h2>
                         <p className="text-gray-400">Tudo sobre instalação em divisórias e banheiros.</p>
                     </div>
 

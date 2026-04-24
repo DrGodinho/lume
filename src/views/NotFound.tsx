@@ -54,12 +54,12 @@ export function NotFound() {
             </div>
 
             <div className="container-lume relative z-10 text-center">
-                <div className="error-code text-[150px] md:text-[220px] font-bold font-['Montserrat'] leading-none text-transparent bg-clip-text bg-gradient-to-b from-[#c9a227] to-[#8a6d1a] drop-shadow-[0_0_30px_rgba(201,162,39,0.3)] inline-block">
+                <div className="error-code text-[150px] md:text-[220px] font-bold font-montserrat leading-none text-transparent bg-clip-text bg-gradient-to-b from-[#c9a227] to-[#8a6d1a] drop-shadow-[0_0_30px_rgba(201,162,39,0.3)] inline-block">
                     404
                 </div>
 
                 <div className="error-text">
-                    <h1 className="text-3xl md:text-5xl font-bold font-['Montserrat'] mb-6">
+                    <h1 className="text-3xl md:text-5xl font-bold font-montserrat mb-6">
                         Página Perdida no Espaço
                     </h1>
                     

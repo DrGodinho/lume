@@ -6,6 +6,7 @@ import { WhatsAppButton } from '../components/WhatsAppButton';
 import { ContactCTA } from '../sections/ContactCTA';
 import { SpecTooltip } from '../components/SpecTooltip';
 import gsap from 'gsap';
+import Image from 'next/image';
 
 export function RefletivaPage() {
     useEffect(() => {
@@ -23,12 +24,7 @@ export function RefletivaPage() {
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden px-4">
                 <div className="absolute inset-0 z-0">
-                    <img 
-                        src="/refletiva-hero.png" 
-                        alt="Edifício moderno com Insulfilm Refletivo LUME - Rio de Janeiro" 
-                        className="w-full h-full object-cover opacity-50"
-                        fetchPriority="high"
-                    />
+                    <Image src="/refletiva-hero.png" alt="Edifício moderno com Insulfilm Refletivo LUME - Rio de Janeiro" fill sizes="(max-width: 768px) 100vw, 100vw" priority className="w-full h-full object-cover opacity-50" />
                     <div className="absolute inset-0 bg-gradient-to-b from-[#070f1a] via-[#070f1a]/40 to-[#070f1a]" />
                 </div>
 
@@ -37,7 +33,7 @@ export function RefletivaPage() {
                         O Clássico que Derrota o Calor 🛡️
                     </div>
 
-                    <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-['Montserrat'] mb-6 leading-tight">
+                    <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-montserrat mb-6 leading-tight">
                         Insulfilm <span className="text-gradient-gold">Refletivo</span>
                     </h1>
 
@@ -60,7 +56,7 @@ export function RefletivaPage() {
             <section className="py-20 bg-[#0a1628] border-b border-white/5 px-4">
                 <div className="container-lume page-entrance">
                     <div className="max-w-4xl mx-auto text-center">
-                        <h2 className="text-3xl lg:text-4xl font-bold font-['Montserrat'] mb-8 text-white">Privacidade Diurna e Blindagem Térmica Extrema</h2>
+                        <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-8 text-white">Privacidade Diurna e Blindagem Térmica Extrema</h2>
                         <p className="text-gray-400 leading-relaxed mb-6 text-lg">
                             É indiscutível: os bairros da Zona Oeste do Rio como <strong>Bangu, Senador Camará e Campo Grande</strong> recebem a irradiação solar mais impiedosa do estado. Muitos clientes constroem belas frentes envidraçadas e percebem no primeiro verão que a sala de estar tornou-se uma estufa de vidro, forçando o Ar Condicionado ao seu limite enquanto toda a vizinhança na rua os observa no sofá de casa.
                         </p>
@@ -77,7 +73,7 @@ export function RefletivaPage() {
                     <div className="grid lg:grid-cols-2 gap-12 items-center">
                         <div className="order-2 lg:order-1 glass-card p-10 rounded-3xl border border-white/5 relative overflow-hidden group hover:border-[#c9a227]/30 transition-all">
                             <div className="absolute -right-20 -top-20 w-64 h-64 bg-[#c9a227]/5 rounded-full blur-3xl group-hover:bg-[#c9a227]/10 transition-colors"></div>
-                            <h3 className="text-3xl font-bold font-['Montserrat'] mb-6 text-[#c9a227]">A Mágica do "One-Way Mirror"</h3>
+                            <h3 className="text-3xl font-bold font-montserrat mb-6 text-[#c9a227]">A Mágica do "One-Way Mirror"</h3>
                             <p className="text-gray-300 mb-6 leading-relaxed">
                                 Você já se perguntou como as salas de interrogatório funcionam nos filmes? O truque físico se baseia estritamente na iluminação!
                             </p>
@@ -92,7 +88,7 @@ export function RefletivaPage() {
 
                         <div className="order-1 lg:order-2 space-y-8">
                             <div>
-                                <h2 className="text-4xl lg:text-5xl font-bold font-['Montserrat'] mb-4 text-white">Composição Metalizada</h2>
+                                <h2 className="text-4xl lg:text-5xl font-bold font-montserrat mb-4 text-white">Composição Metalizada</h2>
                                 <p className="text-gray-400 text-lg">Uma arquitetura em que uma camada densa de fita de metal precioso é fundida eletronicamente contra as paredes do filme PET.</p>
                             </div>
 
@@ -133,7 +129,7 @@ export function RefletivaPage() {
             {/* Tabela Técnica de Performance */}
             <section className="py-24 relative px-4">
                 <div className="container-lume page-entrance text-center mb-16">
-                    <h2 className="text-3xl lg:text-4xl font-bold font-['Montserrat'] mb-4 text-white">O Raio-X da Linha Refletiva Prata</h2>
+                    <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-4 text-white">O Raio-X da Linha Refletiva Prata</h2>
                     <p className="text-gray-400 max-w-2xl mx-auto text-lg mb-8">Performance testada e garantida para o calor subtropical. E a melhor parte? O preço incrivelmente acessível.</p>
                     <span className="inline-flex px-6 py-2 bg-gradient-to-r from-[#c9a227]/80 to-[#c9a227] text-black font-black uppercase text-xl rounded-lg shadow-[0_0_20px_rgba(201,162,39,0.3)] tracking-wider">
                         R$ 95/m² Instalado
@@ -145,7 +141,7 @@ export function RefletivaPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2">
                             {/* Features Text */}
                             <div className="p-8 md:p-12 bg-black/40 border-r border-white/5 flex flex-col justify-center">
-                                <h3 className="text-2xl font-bold mb-4 font-['Montserrat']">Por que esses números importam?</h3>
+                                <h3 className="text-2xl font-bold mb-4 font-montserrat">Por que esses números importam?</h3>
                                 <p className="text-gray-400 leading-relaxed text-sm lg:text-base mb-6">
                                     Os metais contidos nessa película atacam com ferocidade o Espectro Eletromagnético Solar que carrega energia quente. Uma rejeição de 70% do TSER significa que para cada hora de sol implacável ardendo contra a sua janela, somente 30% da potência térmica desse raio conseguirá vazar para sua casa.
                                 </p>
@@ -223,7 +219,7 @@ export function RefletivaPage() {
             <section className="py-20 relative px-4 bg-[#0a1628] border-t border-white/5">
                 <div className="container-lume page-entrance max-w-4xl mx-auto">
                     <div className="text-center mb-12">
-                        <h2 className="text-3xl font-bold font-['Montserrat'] mb-4">Dúvidas Frequentes</h2>
+                        <h2 className="text-3xl font-bold font-montserrat mb-4">Dúvidas Frequentes</h2>
                         <p className="text-gray-400">Instalação e funcionalidade do Filme Refletivo (A linha R Prata).</p>
                     </div>
 

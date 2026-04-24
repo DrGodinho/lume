@@ -458,7 +458,7 @@ self.onmessage = (e) => {
             });
         }
         setVidros([...vidros, ...novos]);
-        setHeightIn(''); setWidthIn(''); setQtyIn('1'); setLabelIn('');
+        setHeightIn(''); setWidthIn(''); setQtyIn('1');
         heightRef.current?.focus();
     };
 
@@ -468,6 +468,24 @@ self.onmessage = (e) => {
 
     const toggleSelection = (id: string) => {
         setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+    };
+
+    const toggleAmbienteSelection = (ambiente: string) => {
+        const targetLabel = ambiente === 'Sem Ambiente' ? '' : ambiente;
+        const vidrosAmbiente = vidros.filter(v => (v.label || '') === targetLabel);
+        if (vidrosAmbiente.length === 0) return;
+
+        const allSelected = vidrosAmbiente.every(v => selectedIds.includes(v.id));
+
+        if (allSelected) {
+            // Deselect all
+            const idsToRemove = new Set(vidrosAmbiente.map(v => v.id));
+            setSelectedIds(prev => prev.filter(id => !idsToRemove.has(id)));
+        } else {
+            // Select all
+            const idsToAdd = vidrosAmbiente.map(v => v.id).filter(id => !selectedIds.includes(id));
+            setSelectedIds(prev => [...prev, ...idsToAdd]);
+        }
     };
 
     const handleDeleteSelected = () => {
@@ -965,7 +983,7 @@ self.onmessage = (e) => {
                             <Calculator className="text-[#c9a227]" />
                         </div>
                         <div>
-                            <h1 className="text-xl sm:text-2xl font-bold font-['Montserrat']">LUME <span className="font-light text-gray-400">Calculator</span></h1>
+                            <h1 className="text-xl sm:text-2xl font-bold font-montserrat">LUME <span className="font-light text-gray-400">Calculator</span></h1>
                         </div>
                     </div>
                     <div className="flex items-center gap-1.5 flex-nowrap justify-end xl:justify-end overflow-x-auto pb-1 scrollbar-hide">
@@ -1034,13 +1052,24 @@ self.onmessage = (e) => {
 
                         <div className="space-y-1 mb-4">
                             <span className="text-[9px] text-gray-500 font-bold uppercase">Ambiente / Identificação</span>
-                            <input
-                                type="text"
-                                value={labelIn}
-                                onChange={(e) => setLabelIn(e.target.value)}
-                                className="w-full bg-[#040811] border border-white/10 rounded-xl p-3 text-sm outline-none focus:border-[#c9a227]/50"
-                                placeholder="Ex: Sala, Varanda..."
-                            />
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    value={labelIn}
+                                    onChange={(e) => setLabelIn(e.target.value)}
+                                    className="w-full bg-[#040811] border border-white/10 rounded-xl p-3 pr-10 text-sm outline-none focus:border-[#c9a227]/50"
+                                    placeholder="Ex: Sala, Varanda..."
+                                />
+                                {labelIn && (
+                                    <button 
+                                        onClick={() => setLabelIn('')} 
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-white transition-colors rounded-full hover:bg-white/10"
+                                        title="Limpar ambiente"
+                                    >
+                                        <X size={14} />
+                                    </button>
+                                )}
+                            </div>
                         </div>
 
                         <div className="grid grid-cols-3 gap-2 mb-4">
@@ -1064,8 +1093,20 @@ self.onmessage = (e) => {
                                 }, {} as globalThis.Record<string, typeof resumo>)
                             ).map(([ambiente, itens], idxGrp) => (
                                 <div key={idxGrp} className="space-y-1">
-                                    <div className="text-[9px] font-bold text-[#c9a227] uppercase tracking-widest px-1 mb-1.5 opacity-90 flex items-center gap-1.5">
-                                        <Layers size={10} /> {ambiente}
+                                    <div className="text-[9px] font-bold text-[#c9a227] uppercase tracking-widest px-1 mb-1.5 opacity-90 flex items-center justify-between">
+                                        <div className="flex items-center gap-1.5 cursor-pointer" onClick={() => toggleAmbienteSelection(ambiente)}>
+                                            <Layers size={10} /> {ambiente}
+                                        </div>
+                                        <input
+                                            type="checkbox"
+                                            className="w-3 h-3 accent-[#c9a227] cursor-pointer"
+                                            checked={(() => {
+                                                const tgt = ambiente === 'Sem Ambiente' ? '' : ambiente;
+                                                const pts = vidros.filter(v => (v.label || '') === tgt);
+                                                return pts.length > 0 && pts.every(v => selectedIds.includes(v.id));
+                                            })()}
+                                            onChange={() => toggleAmbienteSelection(ambiente)}
+                                        />
                                     </div>
                                     {itens.map((item, idx) => (
                                         <div key={idx} className="flex items-center justify-between p-2 bg-[#040811] rounded-lg border border-white/5">
@@ -1084,7 +1125,7 @@ self.onmessage = (e) => {
                     {vidros.length === 0 ? (
                         <div className="admin-entrance flex-1 border-2 border-dashed border-white/10 rounded-3xl flex flex-col items-center justify-center text-gray-500 p-10 min-h-[400px]">
                             <Scissors size={48} className="mb-4 opacity-50 text-[#c9a227]" />
-                            <p className="font-['Montserrat'] font-medium text-lg text-white/50">Otimizador de Corte</p>
+                            <p className="font-montserrat font-medium text-lg text-white/50">Otimizador de Corte</p>
                         </div>
                     ) : (
                         <>

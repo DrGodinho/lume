@@ -101,7 +101,7 @@ export function About() {
               <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
                 Sobre a Lume
               </span>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mt-1 sm:mt-2 mb-4 sm:mb-6 font-['Montserrat']">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mt-1 sm:mt-2 mb-4 sm:mb-6 font-montserrat">
                 8 Anos de <span className="text-gradient-gold">Excelência</span> em Insulfilm Residencial
               </h2>
             </div>
@@ -151,7 +151,7 @@ export function About() {
 
                 {/* Value */}
                 <div className="relative">
-                  <span className="text-2xl sm:text-4xl md:text-5xl font-bold text-gradient-gold font-['Montserrat']">
+                  <span className="text-2xl sm:text-4xl md:text-5xl font-bold text-gradient-gold font-montserrat">
                     {stat.value}
                   </span>
                   <p className="text-gray-400 text-xs sm:text-sm mt-1 sm:mt-2">{stat.label}</p>

@@ -6,6 +6,7 @@ import { WhatsAppButton } from '../components/WhatsAppButton';
 import { ContactCTA } from '../sections/ContactCTA';
 import { SpecTooltip } from '../components/SpecTooltip';
 import gsap from 'gsap';
+import Image from 'next/image';
 
 export function CarbonoPage() {
     useEffect(() => {
@@ -24,12 +25,7 @@ export function CarbonoPage() {
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden px-4">
                 <div className="absolute inset-0 z-0">
-                    <img
-                        src="/carbono-hero.webp"
-                        alt="Ambiente privativo com Insulfilm Carbono Premium LUME - Rio de Janeiro"
-                        className="w-full h-full object-cover"
-                        fetchPriority="high"
-                    />
+                    <Image src="/carbono-hero.webp" alt="Ambiente privativo com Insulfilm Carbono Premium LUME - Rio de Janeiro" fill sizes="(max-width: 768px) 100vw, 100vw" priority className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-black/60" />
                 </div>
 
@@ -38,7 +34,7 @@ export function CarbonoPage() {
                         <span className="text-[#c9a227] text-sm font-bold uppercase tracking-wider">A Estética do Preto Intenso absoluto</span>
                     </div>
 
-                    <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-['Montserrat'] mb-6 leading-tight">
+                    <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-montserrat mb-6 leading-tight">
                         Insulfilm <span className="text-gradient-gold">Carbono</span> Premium
                     </h1>
 
@@ -61,7 +57,7 @@ export function CarbonoPage() {
             <section className="py-20 bg-[#0a1628] border-b border-white/5">
                 <div className="container-lume page-entrance">
                     <div className="max-w-4xl mx-auto text-center">
-                        <h2 className="text-3xl font-bold font-['Montserrat'] mb-8 text-white">Por que o Insulfilm Carbono é o queridinho da Zona Oeste?</h2>
+                        <h2 className="text-3xl font-bold font-montserrat mb-8 text-white">Por que o Insulfilm Carbono é o queridinho da Zona Oeste?</h2>
                         <p className="text-gray-400 leading-relaxed mb-6 text-lg">
                             Nas residências e comércios do Rio de Janeiro, especialmente em bairros onde o sol é inclemente como <strong>Bangu, Campo Grande, Senador Camará e Realengo</strong>, a insolação intensa não apenas eleva as contas de luz ao extremo usando os ares-condicionados, como destrói tapetes, cortinas e estofados da noite para o dia.
                         </p>
@@ -76,7 +72,7 @@ export function CarbonoPage() {
             {/* Matriz Comparativa G5 vs G20 */}
             <section className="py-24 relative px-4 bg-[#050A11]">
                 <div className="container-lume page-entrance text-center mb-16">
-                    <h2 className="text-3xl lg:text-4xl font-bold font-['Montserrat'] mb-4 text-[#c9a227]">Escolha seu Grau de Privacidade</h2>
+                    <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-4 text-[#c9a227]">Escolha seu Grau de Privacidade</h2>
                     <p className="text-gray-400 max-w-2xl mx-auto text-lg">A exata transparência ideal para a necessidade da sua residência ou empresa (Apenas R$ 80/m² instalado).</p>
                 </div>
 
@@ -86,7 +82,7 @@ export function CarbonoPage() {
                     <div className="glass-card rounded-3xl border border-white/5 hover:border-[#c9a227]/40 transition-all duration-300 page-entrance overflow-hidden flex flex-col">
                         <div className="h-32 bg-black flex items-center justify-center relative border-b border-white/5">
                             <div className="absolute inset-0 bg-gradient-to-b from-black to-transparent opacity-80 z-10"></div>
-                            <h3 className="text-5xl font-black text-white/90 z-20 font-['Montserrat'] tracking-tighter">G5</h3>
+                            <h3 className="text-5xl font-black text-white/90 z-20 font-montserrat tracking-tighter">G5</h3>
                             <span className="absolute bottom-4 right-4 text-xs font-bold bg-[#c9a227] text-black px-2 py-1 rounded">PRIVACIDADE ABSOLUTA</span>
                         </div>
                         <div className="p-8 md:p-10 flex-grow relative z-10">
@@ -131,7 +127,7 @@ export function CarbonoPage() {
                     <div className="glass-card rounded-3xl border border-white/5 hover:border-[#c9a227]/40 transition-all duration-300 page-entrance overflow-hidden flex flex-col">
                         <div className="h-32 bg-[#1a1a1a] flex items-center justify-center relative border-b border-white/5">
                             <div className="absolute inset-0 bg-gradient-to-b from-[#1a1a1a] to-transparent opacity-80 z-10"></div>
-                            <h3 className="text-5xl font-black text-white/90 z-20 font-['Montserrat'] tracking-tighter">G20</h3>
+                            <h3 className="text-5xl font-black text-white/90 z-20 font-montserrat tracking-tighter">G20</h3>
                             <span className="absolute bottom-4 left-4 text-xs font-bold border border-[#c9a227]/30 text-[#c9a227] px-2 py-1 rounded">EQUILÍBRIO PERFEITO</span>
                         </div>
                         <div className="p-8 md:p-10 flex-grow relative z-10">
@@ -177,7 +173,7 @@ export function CarbonoPage() {
             {/* Diferenciais Técnicos */}
             <section className="py-20 relative px-4">
                 <div className="container-lume page-entrance text-center mb-16">
-                    <h2 className="text-3xl lg:text-4xl font-bold font-['Montserrat'] mb-4 text-white">Por que o Carbono é superior aos filmes comuns?</h2>
+                    <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-4 text-white">Por que o Carbono é superior aos filmes comuns?</h2>
                 </div>
 
                 <div className="container-lume grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -202,7 +198,7 @@ export function CarbonoPage() {
             <section className="py-20 relative px-4 bg-[#0a1628] border-t border-white/5">
                 <div className="container-lume page-entrance max-w-4xl mx-auto">
                     <div className="text-center mb-12">
-                        <h2 className="text-3xl font-bold font-['Montserrat'] mb-4">Dúvidas Frequentes da Linha Carbono</h2>
+                        <h2 className="text-3xl font-bold font-montserrat mb-4">Dúvidas Frequentes da Linha Carbono</h2>
                         <p className="text-gray-400">Desmistificando o insulfilm profissional</p>
                     </div>
 

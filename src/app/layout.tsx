@@ -1,7 +1,22 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
+import { Montserrat, Open_Sans } from 'next/font/google';
 import './globals.css';
 import { LayoutShell } from './LayoutShell';
+
+const montserrat = Montserrat({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-montserrat',
+  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900']
+});
+
+const openSans = Open_Sans({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-open-sans',
+  weight: ['300', '400', '500', '600', '700', '800']
+});
 
 export const metadata: Metadata = {
   title: {
@@ -112,7 +127,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body>
+      <body className={`${montserrat.variable} ${openSans.variable} font-sans`}>
         <LayoutShell>{children}</LayoutShell>
 
         {/* Google tag (gtag.js) */}

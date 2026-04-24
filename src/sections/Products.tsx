@@ -4,7 +4,9 @@ import { useEffect, useRef } from 'react';
 import { ArrowRight, Star, Thermometer, Sun, Eye, Droplets, Sparkles } from 'lucide-react';
 import gsap from 'gsap';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Image from 'next/image';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -95,6 +97,7 @@ export function Products() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -161,7 +164,7 @@ export function Products() {
             </span>
             <div className="h-px w-10 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
           </div>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-4 font-['Montserrat']">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-4 font-montserrat">
             Nossas <span className="text-gradient-gold">Películas</span>
           </h2>
           <p className="text-gray-400 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto px-2 sm:px-0">
@@ -188,14 +191,15 @@ export function Products() {
                 </div>
               )}
 
-              <Link href={product.path} className="block cursor-pointer">
+              <Link 
+                href={product.path} 
+                prefetch={true}
+                onMouseEnter={() => router.prefetch(product.path)}
+                className="block cursor-pointer"
+              >
                 {/* Image */}
                 <div className="relative h-40 sm:h-48 overflow-hidden">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
+                  <Image src={product.image} alt={product.name} fill sizes="(max-width: 768px) 100vw, 100vw"  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-transparent to-transparent" />
                 </div>
 
@@ -203,7 +207,7 @@ export function Products() {
                 <div className="p-4 sm:p-5">
                   <div className="flex items-center gap-2 mb-2 sm:mb-3">
                     <product.icon className="w-4 h-4 sm:w-5 sm:h-5 text-[#c9a227]" />
-                    <h3 className="text-sm sm:text-lg font-bold text-white font-['Montserrat']">
+                    <h3 className="text-sm sm:text-lg font-bold text-white font-montserrat">
                       {product.name}
                     </h3>
                   </div>
@@ -256,6 +260,8 @@ export function Products() {
               </p>
               <Link
                 href="/simulador"
+                prefetch={true}
+                onMouseEnter={() => router.prefetch('/simulador')}
                 className="btn-primary inline-flex items-center gap-3 py-4 px-8 text-lg group relative overflow-hidden"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />

@@ -32,7 +32,7 @@ export function DuplaCamadaPage() {
                         Resistência Extrema ao Sol do Rio 🌞
                     </div>
 
-                    <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-['Montserrat'] mb-6 leading-tight">
+                    <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-montserrat mb-6 leading-tight">
                         Insulfilm <span className="text-gradient-gold">Dupla Camada</span> <br className="hidden lg:block" />(G5 e G20)
                     </h1>
 
@@ -55,7 +55,7 @@ export function DuplaCamadaPage() {
             <section className="py-20 bg-[#0a1628] border-b border-white/5 px-4">
                 <div className="container-lume page-entrance">
                     <div className="max-w-4xl mx-auto text-center">
-                        <h2 className="text-3xl lg:text-4xl font-bold font-['Montserrat'] mb-8 text-white">O Fim da Conta de Luz nas Alturas na Zona Oeste</h2>
+                        <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-8 text-white">O Fim da Conta de Luz nas Alturas na Zona Oeste</h2>
                         <p className="text-gray-400 leading-relaxed mb-6 text-lg">
                             Se você mora ou possui comércio em <strong>Bangu, Campo Grande, Realengo ou adjacências</strong>, sabe que as temperaturas de verão não são uma mera inconveniência; elas são um dreno financeiro maciço na sua conta de energia por causa dos aparelhos de Ar Condicionado ligados no 16ºC, operando em pico durante o dia todo.
                         </p>
@@ -69,14 +69,14 @@ export function DuplaCamadaPage() {
             {/* Arquitetura Técnica */}
             <section className="py-20 relative px-4">
                 <div className="container-lume page-entrance text-center mb-16">
-                    <h2 className="text-3xl lg:text-4xl font-bold font-['Montserrat'] mb-4 text-[#c9a227]">A Ciência da Super Rejeição Térmica</h2>
+                    <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-4 text-[#c9a227]">A Ciência da Super Rejeição Térmica</h2>
                     <p className="text-gray-400 max-w-2xl mx-auto text-lg mb-12">Por que ela é muito superior a filmes básicos do mercado?</p>
 
                     <div className="max-w-4xl mx-auto text-left">
                         <div className="glass-card p-8 md:p-10 rounded-3xl border border-white/5 bg-white/[0.02] relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-[#c9a227]/5 blur-3xl rounded-full"></div>
                             
-                            <h3 className="text-2xl font-bold mb-6 text-white font-['Montserrat']">O que é a Tecnologia de Dupla Camada?</h3>
+                            <h3 className="text-2xl font-bold mb-6 text-white font-montserrat">O que é a Tecnologia de Dupla Camada?</h3>
                             <p className="text-gray-300 leading-relaxed mb-10 text-lg">
                                 Tecnicamente, trata-se de um processo de fabricação onde uma camada de <strong>Sputtering de Alumínio</strong> (altamente refletiva) é fundida a uma camada de <strong>Poliéster Pigmentado ou Carbono</strong> (fumê).
                             </p>
@@ -126,7 +126,7 @@ export function DuplaCamadaPage() {
             <section className="py-24 relative px-4 bg-[#050A11]">
                 <div className="container-lume page-entrance text-center mb-16">
                     <div className="inline-flex flex-col items-center">
-                        <h2 className="text-3xl lg:text-4xl font-bold font-['Montserrat'] mb-2 text-white">Escolha sua Dupla Camada</h2>
+                        <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-2 text-white">Escolha sua Dupla Camada</h2>
                         <span className="text-[#c9a227] font-semibold tracking-wide bg-[#c9a227]/10 px-4 py-1 rounded-full text-sm">Apenas R$ 120/m² Instalado</span>
                     </div>
                 </div>
@@ -138,7 +138,7 @@ export function DuplaCamadaPage() {
                         <div className="absolute inset-0 bg-gradient-to-t from-[#c9a227]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                         <div className="h-32 bg-[#020508] border-b border-white/10 flex items-center justify-center relative">
                             <div className="absolute inset-0 bg-gradient-to-b from-black to-transparent opacity-90 z-10"></div>
-                            <h3 className="text-5xl font-black text-white/90 z-20 font-['Montserrat'] tracking-tighter">G5</h3>
+                            <h3 className="text-5xl font-black text-white/90 z-20 font-montserrat tracking-tighter">G5</h3>
                             <span className="absolute bottom-4 right-4 text-xs font-bold bg-[#c9a227] text-black px-2 py-1 rounded shadow-lg">MÁXIMA PERFORMANCE</span>
                         </div>
                         <div className="p-8 md:p-10 pb-12 flex-grow relative z-10">
@@ -184,7 +184,7 @@ export function DuplaCamadaPage() {
                         <div className="absolute inset-0 bg-gradient-to-t from-[#c9a227]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                         <div className="h-32 bg-[#121b2b] border-b border-white/10 flex items-center justify-center relative">
                             <div className="absolute inset-0 bg-gradient-to-b from-[#0a101a] to-transparent opacity-80 z-10"></div>
-                            <h3 className="text-5xl font-black text-white/90 z-20 font-['Montserrat'] tracking-tighter">G20</h3>
+                            <h3 className="text-5xl font-black text-white/90 z-20 font-montserrat tracking-tighter">G20</h3>
                             <span className="absolute bottom-4 left-4 text-xs font-bold border border-[#c9a227]/50 text-[#c9a227]/90 px-2 py-1 rounded bg-[#c9a227]/10 backdrop-blur-sm">LUZ NATURAL + CONFORTO</span>
                         </div>
                         <div className="p-8 md:p-10 pb-12 flex-grow relative z-10">
@@ -232,7 +232,7 @@ export function DuplaCamadaPage() {
             <section className="py-20 relative px-4 bg-[#0a1628] border-t border-white/5">
                 <div className="container-lume page-entrance max-w-4xl mx-auto">
                     <div className="text-center mb-12">
-                        <h2 className="text-3xl font-bold font-['Montserrat'] mb-4 text-[#c9a227]">Respostas Rápidas e Claras</h2>
+                        <h2 className="text-3xl font-bold font-montserrat mb-4 text-[#c9a227]">Respostas Rápidas e Claras</h2>
                         <p className="text-gray-400 text-lg">Tudo sobre a instalação da linha Dupla Camada.</p>
                     </div>
 

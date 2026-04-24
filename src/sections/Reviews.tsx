@@ -23,7 +23,7 @@ export function Reviews() {
         >
             <div className="container-lume">
                 <div className="text-center mb-12 sm:mb-16">
-                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 font-['Montserrat']">
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 font-montserrat">
                         Avaliações de <span className="text-gradient-gold">Clientes</span>
                     </h2>
                     <p className="text-gray-400 text-lg sm:text-xl max-w-2xl mx-auto">

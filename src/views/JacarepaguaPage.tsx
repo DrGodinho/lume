@@ -9,6 +9,7 @@ import { AnimatedCounter } from '../components/AnimatedCounter';
 import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Image from 'next/image';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -87,14 +88,13 @@ export function JacarepaguaPage() {
             <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden px-4">
                 {/* Background Image */}
                 <div className="absolute inset-0 z-0">
-                    <img
-                        src="/jacarepagua_hero_bg.webp"
-                        alt="Instalação de insulfilm profissional em Jacarepaguá - LUME Controle Solar"
+                    <Image 
+                        src="/jacarepagua_hero_bg.webp" 
+                        alt="Instalação de insulfilm profissional em Jacarepaguá - LUME Controle Solar" 
+                        fill 
+                        sizes="(max-width: 768px) 100vw, 100vw" 
+                        priority 
                         className="w-full h-full object-cover"
-                        fetchPriority="high"
-                        onError={(e) => {
-                            e.currentTarget.src = "/bangu_hero_bg.webp"; // Fallback temporary
-                        }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-r from-[#0a1628]/95 via-[#0a1628]/80 to-[#0a1628]/60" />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-transparent to-[#0a1628]/50" />
@@ -113,7 +113,7 @@ export function JacarepaguaPage() {
                         <span className="text-[#c9a227] text-sm font-bold uppercase tracking-wider">Jacarepaguá e Região</span>
                     </div>
 
-                    <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-['Montserrat'] mb-6 leading-tight">
+                    <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-montserrat mb-6 leading-tight">
                         Insulfilm em <span className="text-gradient-gold">Jacarepaguá</span>
                     </h1>
 
@@ -159,7 +159,7 @@ export function JacarepaguaPage() {
             <section className="py-24 bg-[#070f1a] relative px-4">
                 <div className="container-lume page-entrance">
                     <div className="max-w-4xl mx-auto text-center mb-16">
-                        <h2 className="text-3xl lg:text-5xl font-bold font-['Montserrat'] mb-10">Conforto térmico em meio às montanhas de JPA</h2>
+                        <h2 className="text-3xl lg:text-5xl font-bold font-montserrat mb-10">Conforto térmico em meio às montanhas de JPA</h2>
                         <div className="space-y-6 text-gray-400 leading-relaxed text-lg font-light text-left md:text-justify px-4">
                             <p>
                                 Jacarepaguá é uma das regiões geográficas mais diversas do Rio, combinando áreas de montanha com a proximidade da Baixada de Jacarepaguá. O sol intenso da tarde, especialmente frequente em bairros como a <strong className="text-white">Taquara</strong> e <strong className="text-white">Curicica</strong>, exige proteção de alto nível para manter o ambiente interno habitável sem o uso 24h do ar-condicionado.
@@ -174,7 +174,7 @@ export function JacarepaguaPage() {
                     </div>
 
                     <div className="glass-card p-10 rounded-3xl border border-white/10 relative overflow-hidden max-w-4xl mx-auto text-center">
-                        <h3 className="text-2xl font-bold font-['Montserrat'] mb-8">Atendimento em Jacarepaguá e Região</h3>
+                        <h3 className="text-2xl font-bold font-montserrat mb-8">Atendimento em Jacarepaguá e Região</h3>
                         <p className="text-gray-400 leading-relaxed max-w-3xl mx-auto font-light text-lg">
                             Levamos as amostras de películas até você. Seja na Taquara, Pechincha ou Freguesia, nossa equipe técnica realiza a medição exata e sugere o material ideal para o seu vidro, garantindo performance e estética.
                         </p>
@@ -186,7 +186,7 @@ export function JacarepaguaPage() {
             <section id="tipos" className="py-24 bg-[#0a1628] border-y border-white/5 px-4 overflow-hidden relative">
                 <div className="container-lume relative z-10">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl lg:text-5xl font-bold font-['Montserrat'] mb-6 text-white">
+                        <h2 className="text-3xl lg:text-5xl font-bold font-montserrat mb-6 text-white">
                             Películas de <span className="text-gradient-gold">Alta Performance</span>
                         </h2>
                         <p className="text-gray-400 max-w-2xl mx-auto font-light text-lg">
@@ -223,18 +223,14 @@ export function JacarepaguaPage() {
                                 </div>
                                 <Link href={product.path} className="flex flex-col flex-grow">
                                     <div className="relative h-44 overflow-hidden">
-                                        <img
-                                            src={product.image}
-                                            alt={product.title}
-                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                        />
+                                        <Image src={product.image} alt={product.title} fill sizes="(max-width: 768px) 100vw, 100vw"  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                                         <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-transparent to-transparent opacity-80" />
                                     </div>
 
                                     <div className="p-6 flex flex-col flex-grow">
                                         <div className="flex items-center gap-2 mb-4">
                                             <product.icon className="w-5 h-5 text-[#c9a227]" />
-                                            <h3 className="text-xl font-bold text-white font-['Montserrat'] leading-tight">
+                                            <h3 className="text-xl font-bold text-white font-montserrat leading-tight">
                                                 {product.title}
                                             </h3>
                                         </div>
@@ -280,7 +276,7 @@ export function JacarepaguaPage() {
             <section id="vantagens" className="py-24 relative px-4 bg-[#070f1a] overflow-hidden">
                 <div className="container-lume">
                     <div className="text-center mb-20">
-                        <h2 className="text-3xl lg:text-5xl font-black font-['Montserrat'] mb-6 tracking-tight">Vantagens que Valorizam seu Ambiente</h2>
+                        <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-6 tracking-tight">Vantagens que Valorizam seu Ambiente</h2>
                         <p className="text-gray-400 max-w-3xl mx-auto text-lg font-light">Investir em películas de controle solar é garantir conforto imediato e economia a longo prazo em Jacarepaguá.</p>
                     </div>
 
@@ -309,7 +305,7 @@ export function JacarepaguaPage() {
                                 </div>
                                 
                                 <div className="mb-6">
-                                    <span className="text-5xl font-black text-gradient-gold font-['Montserrat'] leading-none">
+                                    <span className="text-5xl font-black text-gradient-gold font-montserrat leading-none">
                                         <AnimatedCounter 
                                             target={benefit.stat.replace(/[^0-9-]/g, '')} 
                                             suffix={benefit.stat.replace(/[0-9-]/g, '')} 
@@ -318,7 +314,7 @@ export function JacarepaguaPage() {
                                     <p className="text-[11px] uppercase text-gray-500 font-black tracking-widest mt-2">{benefit.label}</p>
                                 </div>
 
-                                <h3 className="text-xl font-bold text-white mb-4 font-['Montserrat'] leading-tight">
+                                <h3 className="text-xl font-bold text-white mb-4 font-montserrat leading-tight">
                                     {benefit.title}
                                 </h3>
                                 <p className="text-gray-400 text-sm leading-relaxed font-light">
@@ -334,11 +330,11 @@ export function JacarepaguaPage() {
             <section className="py-24 bg-[#0a1628] border-y border-white/5 relative px-4 overflow-hidden">
                 <div className="container-lume page-entrance relative z-10">
                     <div className="max-w-4xl mx-auto text-center lg:text-left">
-                        <h2 className="text-3xl lg:text-5xl font-black font-['Montserrat'] mb-10 text-center text-[#c9a227] tracking-tight underline decoration-[#c9a227]/20 underline-offset-8">Atendimento Jacarepaguá</h2>
+                        <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-10 text-center text-[#c9a227] tracking-tight underline decoration-[#c9a227]/20 underline-offset-8">Atendimento Jacarepaguá</h2>
                         
                         <div className="grid lg:grid-cols-2 gap-12 items-stretch mt-12 text-left">
                             <div className="glass-card p-10 rounded-3xl border border-white/10 flex flex-col h-full bg-white/[0.01]">
-                                <h3 className="text-2xl font-bold font-['Montserrat'] mb-8 text-white flex items-center gap-3">
+                                <h3 className="text-2xl font-bold font-montserrat mb-8 text-white flex items-center gap-3">
                                     <MapPin size={24} className="text-[#c9a227]" /> Onde estamos em JPA
                                 </h3>
                                 <p className="text-gray-400 leading-relaxed mb-8 text-base font-light">
@@ -377,7 +373,7 @@ export function JacarepaguaPage() {
             <section className="py-24 relative px-4 overflow-hidden bg-[#070f1a]">
                 <div className="container-lume page-entrance max-w-4xl mx-auto">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl lg:text-5xl font-black font-['Montserrat'] mb-6 tracking-tight">Perguntas Frequentes (FAQ)</h2>
+                        <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-6 tracking-tight">Perguntas Frequentes (FAQ)</h2>
                         <p className="text-gray-500 font-medium">Principais dúvidas sobre a aplicação em Jacarepaguá.</p>
                     </div>
 
@@ -439,7 +435,7 @@ export function JacarepaguaPage() {
                     <div className="max-w-5xl mx-auto glass-card border border-white/10 rounded-[2.5rem] p-8 md:p-16 text-center animate-fade-in relative overflow-hidden">
                         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#c9a227] to-transparent opacity-30" />
                         
-                        <h2 className="text-4xl md:text-6xl lg:text-7xl font-black mb-8 font-['Montserrat'] tracking-tighter leading-tight">
+                        <h2 className="text-4xl md:text-6xl lg:text-7xl font-black mb-8 font-montserrat tracking-tighter leading-tight">
                             Proteja seu Lar do <span className="text-gradient-gold">Calor de JPA</span>
                         </h2>
                         

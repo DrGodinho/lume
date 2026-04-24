@@ -88,7 +88,7 @@ export function ContactCTA() {
           {/* Left Column: CTA Content */}
           <div className="text-center lg:text-left">
             {/* Headline */}
-            <h2 className="animate-item text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-4 font-['Montserrat']">
+            <h2 className="animate-item text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-4 font-montserrat">
               Pronto para Transformar{' '}
               <span className="text-gradient-gold">Sua Casa</span>?
             </h2>
@@ -104,7 +104,7 @@ export function ContactCTA() {
               </div>
               <a
                 href="tel:+5521965140612"
-                className="text-xl sm:text-2xl md:text-3xl font-bold text-white hover:text-[#c9a227] transition-colors font-['Montserrat']"
+                className="text-xl sm:text-2xl md:text-3xl font-bold text-white hover:text-[#c9a227] transition-colors font-montserrat"
               >
                 (21) 96514-0612
               </a>

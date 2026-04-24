@@ -180,7 +180,7 @@ export function Benefits() {
             </span>
             <div className="h-px w-10 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
           </div>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-4 font-['Montserrat']">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-4 font-montserrat">
             Por Que Escolher a <span className="text-gradient-gold">Lume</span>?
           </h2>
           <p className="text-gray-400 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto px-2 sm:px-0">
@@ -212,7 +212,7 @@ export function Benefits() {
 
               {/* Stat */}
               <div className="mb-3 sm:mb-4">
-                <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-gradient-gold font-['Montserrat']">
+                <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-gradient-gold font-montserrat">
                   <AnimatedCounter
                     target={benefit.stat.replace(/[^0-9-]/g, '')}
                     suffix={benefit.stat.replace(/[0-9-]/g, '')}
@@ -222,7 +222,7 @@ export function Benefits() {
               </div>
 
               {/* Content */}
-              <h3 className="text-base sm:text-xl font-bold text-white mb-2 sm:mb-3 font-['Montserrat']">
+              <h3 className="text-base sm:text-xl font-bold text-white mb-2 sm:mb-3 font-montserrat">
                 {benefit.title}
               </h3>
               <p className="text-gray-400 text-xs sm:text-sm leading-relaxed">
@@ -240,7 +240,7 @@ export function Benefits() {
             { value: '100%', label: 'Clientes Satisfeitos' },
           ].map((item, index) => (
             <div key={index} className="text-center">
-              <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-gradient-gold font-['Montserrat']">
+              <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-gradient-gold font-montserrat">
                 {item.value}
               </div>
               <div className="text-xs sm:text-sm text-gray-400 mt-1">{item.label}</div>

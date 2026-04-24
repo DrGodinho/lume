@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Sun, CheckCircle, Smartphone, Home, Shield, Thermometer, Eye, Wind, Building2, Droplets, ChevronRight, ArrowLeft } from 'lucide-react';
 import gsap from 'gsap';
+import Link from 'next/link';
 
 type Step = 'welcome' | 'location' | 'condo' | 'priorities' | 'refine_heat_view' | 'refine_privacy' | 'result';
 
@@ -196,14 +197,14 @@ export function SimulatorPage() {
             <div className="w-full max-w-xl mx-auto flex-1 flex flex-col">
                 {/* Header Back Link */}
                 <header className="text-center mb-8">
-                    <a href="/" className="inline-block hover:opacity-80 transition-opacity group">
-                        <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl font-['Montserrat']">
+                    <Link href="/" className="inline-block hover:opacity-80 transition-opacity group">
+                        <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl font-montserrat">
                             LU<span className="text-gradient-gold">ME</span>
                         </h1>
                         <p className="text-[10px] text-gray-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
                             <ArrowLeft size={10} /> Voltar ao site
                         </p>
-                    </a>
+                    </Link>
                 </header>
 
                 {/* Main Content Area */}
@@ -214,7 +215,7 @@ export function SimulatorPage() {
                             <div className="w-16 h-16 mx-auto bg-[#c9a227]/20 rounded-full flex items-center justify-center mb-6 border border-[#c9a227]/50">
                                 <Smartphone className="text-[#c9a227] w-8 h-8" />
                             </div>
-                            <h2 className="text-2xl sm:text-3xl font-bold font-['Montserrat'] mb-4">Descubra sua Película Ideal</h2>
+                            <h2 className="text-2xl sm:text-3xl font-bold font-montserrat mb-4">Descubra sua Película Ideal</h2>
                             <p className="text-gray-400 mb-8 leading-relaxed">
                                 Olá! Sou o <strong>Assistente LUME</strong>. ☀️<br /><br />
                                 No Rio de Janeiro, o sol não perdoa, mas o conforto da sua casa é nossa prioridade. Vou te ajudar a escolher a película perfeita para a sua necessidade em menos de 1 minuto.
@@ -227,7 +228,7 @@ export function SimulatorPage() {
 
                     {step === 'location' && (
                         <div className="page-entrance glass-card p-6 sm:p-8 rounded-2xl border border-white/5">
-                            <h2 className="text-xl sm:text-2xl font-bold font-['Montserrat'] mb-6 flex items-center gap-3">
+                            <h2 className="text-xl sm:text-2xl font-bold font-montserrat mb-6 flex items-center gap-3">
                                 <span className="w-8 h-8 rounded-full bg-[#c9a227] text-black text-sm flex items-center justify-center">1</span>
                                 Onde faremos a instalação?
                             </h2>
@@ -253,7 +254,7 @@ export function SimulatorPage() {
 
                     {step === 'condo' && (
                         <div className="page-entrance glass-card p-6 sm:p-8 rounded-2xl border border-white/5">
-                            <h2 className="text-xl sm:text-2xl font-bold font-['Montserrat'] mb-2 flex items-center gap-3">
+                            <h2 className="text-xl sm:text-2xl font-bold font-montserrat mb-2 flex items-center gap-3">
                                 <span className="w-8 h-8 rounded-full bg-[#c9a227] text-black text-sm flex items-center justify-center">2</span>
                                 Regras do Condomínio
                             </h2>
@@ -278,7 +279,7 @@ export function SimulatorPage() {
 
                     {step === 'priorities' && (
                         <div className="page-entrance glass-card p-6 sm:p-8 rounded-2xl border border-white/5">
-                            <h2 className="text-xl sm:text-2xl font-bold font-['Montserrat'] mb-2 flex items-center gap-3">
+                            <h2 className="text-xl sm:text-2xl font-bold font-montserrat mb-2 flex items-center gap-3">
                                 <span className="w-8 h-8 rounded-full bg-[#c9a227] text-black text-sm flex items-center justify-center">3</span>
                                 Seus Desejos Principais
                             </h2>
@@ -313,7 +314,7 @@ export function SimulatorPage() {
 
                     {step === 'refine_heat_view' && (
                         <div className="page-entrance glass-card p-6 sm:p-8 rounded-2xl border border-white/5">
-                            <h2 className="text-xl sm:text-2xl font-bold font-['Montserrat'] mb-2 flex items-center gap-3">
+                            <h2 className="text-xl sm:text-2xl font-bold font-montserrat mb-2 flex items-center gap-3">
                                 <span className="text-[#c9a227]"><Wind size={28} /></span>
                                 Para Refinar:
                             </h2>
@@ -337,7 +338,7 @@ export function SimulatorPage() {
 
                     {step === 'refine_privacy' && (
                         <div className="page-entrance glass-card p-6 sm:p-8 rounded-2xl border border-white/5">
-                            <h2 className="text-xl sm:text-2xl font-bold font-['Montserrat'] mb-2 flex items-center gap-3">
+                            <h2 className="text-xl sm:text-2xl font-bold font-montserrat mb-2 flex items-center gap-3">
                                 <span className="text-[#c9a227]"><Eye size={28} /></span>
                                 Sobre a Privacidade:
                             </h2>
@@ -365,14 +366,14 @@ export function SimulatorPage() {
                                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 border border-green-500/30 text-green-400 text-sm font-bold mb-4">
                                     <CheckCircle size={16} /> ANÁLISE CONCLUÍDA
                                 </div>
-                                <h2 className="text-2xl sm:text-3xl font-bold font-['Montserrat']">Aqui está minha recomendação!</h2>
+                                <h2 className="text-2xl sm:text-3xl font-bold font-montserrat">Aqui está minha recomendação!</h2>
                             </div>
 
                             <div className="glass-card p-6 sm:p-8 rounded-2xl border mb-6 relative overflow-hidden" style={{ borderColor: `${bestMatch.color}40` }}>
                                 <div className="absolute top-0 right-0 w-32 h-32 rounded-bl-full opacity-10" style={{ backgroundColor: bestMatch.color }} />
 
                                 <span className="text-xs uppercase tracking-widest font-bold block mb-2" style={{ color: bestMatch.color }}>🥇 Melhor Escolha</span>
-                                <h3 className="text-2xl sm:text-3xl font-bold font-['Montserrat'] mb-4 text-white">
+                                <h3 className="text-2xl sm:text-3xl font-bold font-montserrat mb-4 text-white">
                                     {bestMatch.name}
                                 </h3>
 
@@ -415,7 +416,7 @@ export function SimulatorPage() {
                             {alternativeMatch && !directMatch && (
                                 <div className="glass-card p-5 sm:p-6 rounded-2xl border border-white/5 bg-[#0a1628]/80 text-left">
                                     <span className="text-[10px] uppercase tracking-widest font-bold text-gray-500 block mb-1">🥈 Opção Alternativa</span>
-                                    <h4 className="text-lg font-bold font-['Montserrat'] text-white mb-2">{alternativeMatch.name}</h4>
+                                    <h4 className="text-lg font-bold font-montserrat text-white mb-2">{alternativeMatch.name}</h4>
                                     <p className="text-sm text-gray-400 mb-3">{alternativeMatch.description}</p>
                                     <p className="text-xs font-bold text-[#c9a227]">A partir de R$ {alternativeMatch.price}/m²</p>
                                 </div>

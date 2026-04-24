@@ -6,6 +6,7 @@ import { WhatsAppButton } from '../components/WhatsAppButton';
 import { ContactCTA } from '../sections/ContactCTA';
 import { SpecTooltip } from '../components/SpecTooltip';
 import gsap from 'gsap';
+import Image from 'next/image';
 
 export function NanoCeramicaPage() {
     useEffect(() => {
@@ -24,12 +25,7 @@ export function NanoCeramicaPage() {
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden px-4">
                 <div className="absolute inset-0 z-0">
-                    <img
-                        src="/nano-ceramica-hero.webp"
-                        alt="Varanda gourmet com Insulfilm Nano Cerâmica Premium LUME - Rio de Janeiro"
-                        className="w-full h-full object-cover"
-                        fetchPriority="high"
-                    />
+                    <Image src="/nano-ceramica-hero.webp" alt="Varanda gourmet com Insulfilm Nano Cerâmica Premium LUME - Rio de Janeiro" fill sizes="(max-width: 768px) 100vw, 100vw" priority className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-black/50" />
                 </div>
 
@@ -38,7 +34,7 @@ export function NanoCeramicaPage() {
                         <span className="text-[#c9a227] text-sm font-bold uppercase tracking-wider">A Escolha de Luxo no RJ</span>
                     </div>
 
-                    <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-['Montserrat'] mb-6 leading-tight">
+                    <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-montserrat mb-6 leading-tight">
                         Insulfilm <span className="text-gradient-gold">Nano Cerâmica</span> Premium
                     </h1>
 
@@ -61,7 +57,7 @@ export function NanoCeramicaPage() {
             <section className="py-20 bg-[#0a1628] border-b border-white/5">
                 <div className="container-lume page-entrance">
                     <div className="max-w-4xl mx-auto text-center">
-                        <h2 className="text-3xl font-bold font-['Montserrat'] mb-8 text-white">Por que a Nano Cerâmica é a melhor escolha para a Zona Oeste?</h2>
+                        <h2 className="text-3xl font-bold font-montserrat mb-8 text-white">Por que a Nano Cerâmica é a melhor escolha para a Zona Oeste?</h2>
                         <p className="text-gray-400 leading-relaxed mb-6 text-lg">
                             Morar no Rio de Janeiro, especialmente em bairros como <strong>Bangu, Campo Grande, Barra e Recreio</strong>, significa enfrentar temperaturas extremas em grande parte do ano. O insulfilm residencial comum não é mais suficiente. Se você tem uma varanda gourmet, uma sala com amplos vidros ou uma fachada moderna, encontrar uma película que neutralize o calor sem transformar sua casa em uma "caverna escura" sempre foi um desafio.
                         </p>
@@ -75,7 +71,7 @@ export function NanoCeramicaPage() {
             {/* Diferenciais Técnicos */}
             <section className="py-20 relative px-4">
                 <div className="container-lume page-entrance text-center mb-16">
-                    <h2 className="text-3xl lg:text-4xl font-bold font-['Montserrat'] mb-4 text-[#c9a227]">Diferenciais Tecnológicos</h2>
+                    <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-4 text-[#c9a227]">Diferenciais Tecnológicos</h2>
                     <p className="text-gray-400 max-w-2xl mx-auto">Muito além de um filme escurecedor. Proteção avançada e durabilidade incomparável para seu lar.</p>
                 </div>
 
@@ -102,7 +98,7 @@ export function NanoCeramicaPage() {
                     <div className="grid lg:grid-cols-2 gap-16 items-center">
 
                         <div>
-                            <h2 className="text-3xl lg:text-4xl font-bold font-['Montserrat'] mb-6">A Engenharia por trás da Nano Cerâmica</h2>
+                            <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-6">A Engenharia por trás da Nano Cerâmica</h2>
                             <p className="text-gray-400 mb-8 leading-relaxed">
                                 Como uma película tão fina e transparente pode barrar tanto calor? O segredo estrutural multicamada da nossa película de mais alta performance garante essa mágica térmica.
                             </p>
@@ -128,7 +124,7 @@ export function NanoCeramicaPage() {
                         <div className="glass-card p-8 sm:p-10 rounded-3xl border border-[#c9a227]/20 relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-[#c9a227] blur-[100px] opacity-20" />
 
-                            <h3 className="text-2xl font-bold font-['Montserrat'] text-white mb-2 border-b border-white/10 pb-4">Tabela de Performance</h3>
+                            <h3 className="text-2xl font-bold font-montserrat text-white mb-2 border-b border-white/10 pb-4">Tabela de Performance</h3>
                             <div className="mb-8 text-[#c9a227] font-bold text-xl uppercase tracking-wider">A partir de R$ 220/m² instalado</div>
 
                             <div className="space-y-6">
@@ -198,7 +194,7 @@ export function NanoCeramicaPage() {
             <section className="py-20 relative px-4">
                 <div className="container-lume page-entrance max-w-4xl mx-auto">
                     <div className="text-center mb-12">
-                        <h2 className="text-3xl font-bold font-['Montserrat'] mb-4">Dúvidas Frequentes (FAQ)</h2>
+                        <h2 className="text-3xl font-bold font-montserrat mb-4">Dúvidas Frequentes (FAQ)</h2>
                         <p className="text-gray-400">Respostas rápidas sobre a Instalação da Nano Cerâmica</p>
                     </div>
 

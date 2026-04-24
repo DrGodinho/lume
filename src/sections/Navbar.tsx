@@ -56,7 +56,7 @@ export function Navbar() {
             href="/"
             className="flex items-center gap-2 group"
           >
-            <span className="text-2xl md:text-3xl font-bold tracking-tight text-white font-['Montserrat']">
+            <span className="text-2xl md:text-3xl font-bold tracking-tight text-white font-montserrat">
               LU<span className="text-gradient-gold">ME</span>
             </span>
             <span className="hidden sm:block text-xs text-gray-400 uppercase tracking-widest border-l border-gray-600 pl-2">
@@ -84,6 +84,8 @@ export function Navbar() {
                 <Link
                   key={link.name}
                   href={link.href}
+                  prefetch={true}
+                  onMouseEnter={() => router.prefetch(link.href)}
                   className="relative text-sm font-medium text-gray-300 hover:text-white transition-colors duration-300 group"
                 >
                   {link.name}
@@ -97,7 +99,9 @@ export function Navbar() {
           <div className="hidden lg:flex items-center gap-4">
             <Link
               href="/simulador"
-              className="btn-secondary flex items-center gap-2 text-xs py-2 px-4"
+              prefetch={true}
+              onMouseEnter={() => router.prefetch('/simulador')}
+              className="btn-secondary flex items-center gap-2 text-xs py-2 px-4 transition-transform hover:scale-105 active:scale-95"
             >
               Qual película escolher?
             </Link>
@@ -105,11 +109,12 @@ export function Navbar() {
               href="https://wa.me/5521965140612"
               target="_blank"
               rel="noopener noreferrer"
+              onMouseEnter={() => router.prefetch('/simulador')} // Prefetch alternate route while idle
               onClick={(e) => {
                 e.preventDefault();
                 handleGtagClick((e.currentTarget as HTMLAnchorElement).href);
               }}
-              className="btn-primary flex items-center gap-2 text-xs py-2 px-4"
+              className="btn-primary flex items-center gap-2 text-xs py-2 px-4 transition-transform hover:scale-105 active:scale-95"
             >
               <Phone className="w-4 h-4" />
               Especialista
