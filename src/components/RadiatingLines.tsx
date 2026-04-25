@@ -17,7 +17,7 @@ export function RadiatingLines() {
         repeat: -1,
         ease: 'power2.out',
       });
-      return () => anim.kill();
+      return () => { anim.kill(); };
     }
   }, []);
 
