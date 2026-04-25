@@ -123,14 +123,14 @@ export function Products() {
       if (cards) {
         gsap.fromTo(
           cards,
-          { opacity: 0, rotateY: -30, x: -50 },
+          { opacity: 0, y: 50 },
           {
             opacity: 1,
-            rotateY: 0,
-            x: 0,
+            y: 0,
             duration: 0.7,
             stagger: 0.12,
             ease: 'expo.out',
+            clearProps: 'transform',
             scrollTrigger: {
               trigger: cardsRef.current,
               start: 'top 75%',
@@ -151,8 +151,8 @@ export function Products() {
       className="relative section-padding bg-[#070f1a] overflow-hidden"
     >
       {/* Background decorations */}
-      <div className="absolute top-20 left-10 w-64 h-64 rounded-full bg-[#c9a227]/5 blur-3xl" />
-      <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full bg-[#1a3a5c]/20 blur-3xl" />
+      <div className="absolute top-20 left-10 w-64 h-64 rounded-full bg-[#c9a227]/5 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full bg-[#1a3a5c]/20 blur-3xl pointer-events-none" />
 
       <div className="container-lume relative z-10">
         {/* Section Header */}
@@ -182,7 +182,6 @@ export function Products() {
               key={product.id}
               className={`product-card group relative bg-gradient-to-b from-[#0a1628]/80 to-[#070f1a]/95 rounded-xl sm:rounded-2xl overflow-hidden border border-white/5 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 sm:hover:-translate-y-3 hover:shadow-2xl hover:shadow-[#c9a227]/10 ${index % 2 === 1 ? 'lg:mt-8' : ''
                 }`}
-              style={{ perspective: '1000px' }}
             >
               {/* Tag */}
               {product.tag && (
@@ -194,8 +193,7 @@ export function Products() {
               <Link 
                 href={product.path} 
                 prefetch={true}
-                onMouseEnter={() => router.prefetch(product.path)}
-                className="block cursor-pointer"
+                className="block cursor-pointer relative z-20"
               >
                 {/* Image */}
                 <div className="relative h-40 sm:h-48 overflow-hidden">
@@ -267,8 +265,7 @@ export function Products() {
               <Link
                 href="/simulador"
                 prefetch={true}
-                onMouseEnter={() => router.prefetch('/simulador')}
-                className="btn-primary inline-flex items-center gap-3 py-4 px-8 text-lg group relative overflow-hidden"
+                className="btn-primary inline-flex items-center gap-3 py-4 px-8 text-lg group relative overflow-hidden z-20"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                 <Sparkles className="w-5 h-5 animate-pulse" />
