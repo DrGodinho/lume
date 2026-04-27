@@ -22,6 +22,7 @@ Estas diretrizes garantem que toda nova página ou modificação mantenha o padr
 
 ## 🤝 Comunicação e Git
 - **Linguagem:** Comunicação exclusivamente em Português (Brasil).
+- **Verificação Pré-Upload:** ANTES de qualquer comando `git push` ou deploy, é OBRIGATÓRIO verificar e atualizar a data (`lastmod`) e o conteúdo do `public/sitemap.xml` para refletir as últimas mudanças. Nunca suba o código sem essa verificação.
 - **Git / Upload:** NUNCA realize `git push` ou qualquer forma de upload/deploy automático. O envio de código para o repositório remoto deve ser feito APENAS quando o usuário solicitar explicitamente. Commits locais e preparo de arquivos são permitidos, mas o passo final de "subir" o site é restrito.
 
 ## 🛠️ Padrões de Conteúdo

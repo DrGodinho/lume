@@ -1,13 +1,8 @@
 'use client';
 
-import { useRef } from 'react';
-import { MapPin, Phone, Mail, Clock, Facebook, Instagram, ExternalLink } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, Facebook, Instagram, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
 
 const quickLinks = [
   { name: 'Início', href: '/' },
@@ -34,8 +29,6 @@ const contactInfo = [
 ];
 
 export function Footer() {
-  const footerRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -59,7 +52,6 @@ export function Footer() {
 
   return (
     <footer
-      ref={footerRef}
       className="relative bg-[#04080f] pt-12 pb-6 overflow-hidden"
     >
       {/* Grid pattern overlay */}
@@ -76,7 +68,6 @@ export function Footer() {
 
       <div className="container-lume relative z-10">
         <div
-          ref={contentRef}
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 mb-10 sm:mb-16"
         >
           {/* Column 1: Logo & About */}
@@ -120,7 +111,7 @@ export function Footer() {
                 className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-[#1a3a5c]/50 flex items-center justify-center text-gray-400 hover:bg-[#25d366] hover:text-white transition-all duration-300 hover:-translate-y-1"
                 aria-label="WhatsApp"
               >
-                <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
+                <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
               </a>
             </div>
           </div>
@@ -149,7 +140,6 @@ export function Footer() {
                     <Link
                       href={link.href}
                       prefetch={true}
-                      onMouseEnter={() => router.prefetch(link.href)}
                       className="text-gray-400 hover:text-[#c9a227] transition-colors text-xs sm:text-sm inline-flex items-center gap-2 group"
                     >
                       <span className="w-0 h-px bg-[#c9a227] transition-all duration-300 group-hover:w-3" />
@@ -185,7 +175,6 @@ export function Footer() {
                     <Link
                       href={product.href}
                       prefetch={true}
-                      onMouseEnter={() => router.prefetch(product.href)}
                       className="text-gray-400 hover:text-[#c9a227] transition-colors text-xs sm:text-sm inline-flex items-center gap-2 group"
                     >
                       <span className="w-0 h-px bg-[#c9a227] transition-all duration-300 group-hover:w-3" />

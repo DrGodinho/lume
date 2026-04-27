@@ -57,6 +57,7 @@
 
   body {
     background-color: var(--lume-navy);
+    overflow-x: hidden;
     @apply text-white antialiased;
   }
 

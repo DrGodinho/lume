@@ -72,7 +72,7 @@ export function DuplaCamadaPage() {
 
                     <div className="max-w-4xl mx-auto text-left">
                         <div className="glass-card p-8 md:p-10 rounded-3xl border border-white/5 bg-white/[0.02] relative overflow-hidden">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-[#c9a227]/5 blur-3xl rounded-full"></div>
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-[#c9a227]/5 blur-3xl rounded-full pointer-events-none"></div>
                             
                             <h3 className="text-2xl font-bold mb-6 text-white font-montserrat">O que é a Tecnologia de Dupla Camada?</h3>
                             <p className="text-gray-300 leading-relaxed mb-10 text-lg">

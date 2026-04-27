@@ -70,7 +70,7 @@ export function RefletivaPage() {
                 <div className="container-lume page-entrance max-w-6xl mx-auto">
                     <div className="grid lg:grid-cols-2 gap-12 items-center">
                         <div className="order-2 lg:order-1 glass-card p-10 rounded-3xl border border-white/5 relative overflow-hidden group hover:border-[#c9a227]/30 transition-all">
-                            <div className="absolute -right-20 -top-20 w-64 h-64 bg-[#c9a227]/5 rounded-full blur-3xl group-hover:bg-[#c9a227]/10 transition-colors"></div>
+                            <div className="absolute -right-20 -top-20 w-64 h-64 bg-[#c9a227]/5 rounded-full blur-3xl group-hover:bg-[#c9a227]/10 transition-colors pointer-events-none"></div>
                             <h3 className="text-3xl font-bold font-montserrat mb-6 text-[#c9a227]">A Mágica do "One-Way Mirror"</h3>
                             <p className="text-gray-300 mb-6 leading-relaxed">
                                 Você já se perguntou como as salas de interrogatório funcionam nos filmes? O truque físico se baseia estritamente na iluminação!

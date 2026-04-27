@@ -82,7 +82,6 @@ export function Navbar() {
                   key={link.name}
                   href={link.href}
                   prefetch={true}
-                  onMouseEnter={() => router.prefetch(link.href)}
                   className="relative text-sm font-medium text-gray-300 hover:text-white transition-colors duration-300 group"
                 >
                   {link.name}
@@ -97,7 +96,6 @@ export function Navbar() {
             <Link
               href="/simulador"
               prefetch={true}
-              onMouseEnter={() => router.prefetch('/simulador')}
               className="btn-secondary flex items-center gap-2 text-xs py-2 px-4 transition-transform hover:scale-105 active:scale-95"
             >
               Qual película escolher?
@@ -106,7 +104,6 @@ export function Navbar() {
               href="https://wa.me/5521965140612"
               target="_blank"
               rel="noopener noreferrer"
-              onMouseEnter={() => router.prefetch('/simulador')} // Prefetch alternate route while idle
               onClick={() => {
                 if (typeof (window as any).gtag === 'function') {
                   (window as any).gtag('event', 'conversion_event_contact');

@@ -58,8 +58,8 @@ export function Benefits() {
       </div>
 
       {/* Decorative elements */}
-      <div className="absolute top-1/4 left-0 w-72 h-72 rounded-full bg-[#c9a227]/5 blur-3xl" />
-      <div className="absolute bottom-1/4 right-0 w-96 h-96 rounded-full bg-[#1a3a5c]/20 blur-3xl" />
+      <div className="absolute top-1/4 left-0 w-72 h-72 rounded-full bg-[#c9a227]/5 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 right-0 w-96 h-96 rounded-full bg-[#1a3a5c]/20 blur-3xl pointer-events-none" />
 
       <div className="container-lume relative z-10">
         {/* Section Header */}

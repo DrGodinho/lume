@@ -41,7 +41,7 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#04080f] text-white overflow-x-hidden">
+    <div className="min-h-screen bg-[#04080f] text-white">
       {!isAdmin && <Navbar />}
       <main>{children}</main>
       {!isAdmin && (

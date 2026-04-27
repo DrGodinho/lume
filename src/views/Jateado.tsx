@@ -219,7 +219,7 @@ export function JateadoPage() {
             <section className="py-12 relative px-4 bg-[#04080f]">
                 <div className="container-lume max-w-4xl mx-auto">
                     <div className="glass-card p-8 md:p-12 rounded-3xl border border-[#c9a227]/30 bg-gradient-to-br from-[#c9a227]/5 to-transparent relative overflow-hidden">
-                        <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-[#c9a227]/10 rounded-full blur-3xl"></div>
+                        <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-[#c9a227]/10 rounded-full blur-3xl pointer-events-none"></div>
 
                         <div className="relative z-10">
                             <h3 className="text-2xl font-bold font-montserrat mb-6 text-white flex items-center gap-3">

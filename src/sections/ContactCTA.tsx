@@ -22,7 +22,7 @@ export function ContactCTA() {
       <RadiatingLines />
 
       {/* Glow effect */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[#c9a227]/5 blur-3xl" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[#c9a227]/5 blur-3xl pointer-events-none" />
 
       <div className="container-lume relative z-10">
         <ScrollReveal animation="slide-up" className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center px-2 sm:px-0">
