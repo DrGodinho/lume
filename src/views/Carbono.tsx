@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { Shield, CheckCircle, EyeOff, Wifi, ArrowRight } from 'lucide-react';
 import { ContactCTA } from '../sections/ContactCTA';
 import { SpecTooltip } from '../components/SpecTooltip';
+import { NavigationBreadcrumbs } from '../components/NavigationBreadcrumbs';
 import gsap from 'gsap';
 import Image from 'next/image';
 
@@ -28,6 +29,12 @@ export function CarbonoPage() {
                 </div>
 
                 <div className="container-lume relative z-10 page-entrance text-center md:text-left">
+                    <NavigationBreadcrumbs 
+                        items={[
+                            { label: 'Início', href: '/' },
+                            { label: 'Carbono Premium' }
+                        ]}
+                    />
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#c9a227]/10 border border-[#c9a227]/30 mb-6">
                         <span className="text-[#c9a227] text-sm font-bold uppercase tracking-wider">A Estética do Preto Intenso absoluto</span>
                     </div>

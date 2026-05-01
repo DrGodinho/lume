@@ -180,7 +180,7 @@ export function Products() {
           {products.map((product, index) => (
             <div
               key={product.id}
-              className={`product-card group relative bg-gradient-to-b from-[#0a1628]/80 to-[#070f1a]/95 rounded-xl sm:rounded-2xl overflow-hidden border border-white/5 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 sm:hover:-translate-y-3 hover:shadow-2xl hover:shadow-[#c9a227]/10 ${index % 2 === 1 ? 'lg:mt-8' : ''
+              className={`product-card group relative bg-gradient-to-b from-[#0a1628]/80 to-[#070f1a]/95 rounded-xl sm:rounded-2xl border border-white/5 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 sm:hover:-translate-y-3 hover:shadow-2xl hover:shadow-[#c9a227]/10 ${index % 2 === 1 ? 'lg:mt-8' : ''
                 }`}
             >
               {/* Tag */}
@@ -193,7 +193,8 @@ export function Products() {
               <Link 
                 href={product.path} 
                 prefetch={true}
-                className="block cursor-pointer relative z-20"
+                onClick={() => router.push(product.path)}
+                className="block cursor-pointer relative z-30"
               >
                 {/* Image */}
                 <div className="relative h-40 sm:h-48 overflow-hidden">
@@ -202,6 +203,7 @@ export function Products() {
                     alt={product.name} 
                     fill 
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw" 
+                    loading="lazy"
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#04080f] via-transparent to-transparent" />
@@ -240,7 +242,7 @@ export function Products() {
               </Link>
 
               {/* Botão de WhatsApp fixo dentro do card, mas fora do Link da página */}
-              <div className="p-4 sm:p-5 pt-0 mt-[-20px]">
+              <div className="p-4 sm:p-5 pt-0">
                 <a
                   href={`https://wa.me/5521965140612?text=Olá! Tenho interesse na ${product.name}`}
                   target="_blank"
@@ -265,7 +267,8 @@ export function Products() {
               <Link
                 href="/simulador"
                 prefetch={true}
-                className="btn-primary inline-flex items-center gap-3 py-4 px-8 text-lg group relative overflow-hidden z-20"
+                onClick={() => router.push('/simulador')}
+                className="btn-primary inline-flex items-center gap-3 py-4 px-8 text-lg group relative overflow-hidden z-30"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                 <Sparkles className="w-5 h-5 animate-pulse" />

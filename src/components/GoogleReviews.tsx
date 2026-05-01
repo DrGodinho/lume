@@ -1,6 +1,19 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import Script from 'next/script';
+import { usePathname } from 'next/navigation';
 
 export function GoogleReviews() {
+  const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
   return (
     <section className="py-20 bg-[#04080f] overflow-hidden">
       <Script 
@@ -23,9 +36,10 @@ export function GoogleReviews() {
           </p>
         </div>
 
-        {/* Featurable Widget */}
+        {/* Featurable Widget Container with unique key to force re-render on navigation */}
         <div className="glass-card p-4 sm:p-8 rounded-3xl border border-white/5 bg-white/[0.01]">
           <div 
+            key={pathname}
             id="featurable-e1c220e3-0fca-4d03-974d-3cd8c1b1e37b" 
             data-featurable-async 
             data-location-code="pt-BR"

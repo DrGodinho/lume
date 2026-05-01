@@ -221,7 +221,7 @@ export function RecreioPage() {
                                 </div>
                                 <Link href={product.path} className="flex flex-col flex-grow">
                                     <div className="relative h-44 overflow-hidden">
-                                        <Image src={product.image} alt={product.title} fill sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                        <Image src={product.image} alt={product.title} fill sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw" loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                                         <div className="absolute inset-0 bg-gradient-to-t from-[#04080f] via-transparent to-transparent opacity-80" />
                                     </div>
 

@@ -126,10 +126,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-      </head>
-      <body className={`${montserrat.variable} ${openSans.variable} font-sans`}>
-        <LayoutShell>{children}</LayoutShell>
-
         {/* Google tag (gtag.js) */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-RKVB0YQTJY"
@@ -147,6 +143,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             }
           `}
         </Script>
+      </head>
+      <body className={`${montserrat.variable} ${openSans.variable} font-sans`}>
+        <LayoutShell>{children}</LayoutShell>
+
       </body>
     </html>
   );

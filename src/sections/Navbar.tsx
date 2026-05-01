@@ -30,10 +30,20 @@ export function Navbar() {
 
   const handleNavClick = (href: string) => {
     if (href.startsWith('#')) {
-      if (pathname !== '/') {
-        router.push('/' + href);
+      if (pathname === '/') {
+        const element = document.querySelector(href);
+        if (element) {
+          const offset = 80; // Altura da navbar fixa
+          const elementPosition = element.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+        }
       } else {
-        router.push(href);
+        router.push('/' + href);
       }
     }
     setIsMobileMenuOpen(false);

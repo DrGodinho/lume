@@ -3,6 +3,7 @@ import { WhatsAppButton } from './WhatsAppButton';
 import { GoogleReviews } from './GoogleReviews';
 import { Particles } from './Particles';
 import { AnimatedCounter } from './AnimatedCounter';
+import { NavigationBreadcrumbs } from './NavigationBreadcrumbs';
 import Link from 'next/link';
 import { NeighborhoodData } from '../data/neighborhoods';
 import { NeighborhoodAnimations } from './NeighborhoodAnimations';
@@ -110,6 +111,12 @@ export function NeighborhoodTemplate({ data }: Props) {
         <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-[#04080f]/30 blur-3xl animate-float z-10" style={{ animationDelay: '2s' }} />
 
         <div className="container-lume relative z-20 page-entrance text-center md:text-left pt-24 pb-12">
+          <NavigationBreadcrumbs 
+            items={[
+              { label: 'Início', href: '/' },
+              { label: data.neighborName }
+            ]}
+          />
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#c9a227]/10 border border-[#c9a227]/30 mb-6">
             <span className="w-2 h-2 rounded-full bg-[#c9a227] animate-pulse flex-shrink-0" />
             <span className="text-[#c9a227] text-sm font-bold uppercase tracking-wider">{data.region}</span>
@@ -201,7 +208,7 @@ export function NeighborhoodTemplate({ data }: Props) {
             </div>
             <div className="relative page-entrance">
               <div className="absolute inset-0 bg-gradient-to-tr from-[#c9a227]/20 to-transparent rounded-3xl blur-2xl" />
-              <Image src="/about_residential.webp" alt={`Insulfilm em ${data.neighborName}`} fill sizes="(max-width: 1024px) 100vw, 50vw" className="rounded-3xl border border-white/10 shadow-2xl relative z-10 w-full" />
+              <Image src="/about_residential.webp" alt={`Insulfilm em ${data.neighborName}`} fill sizes="(max-width: 1024px) 100vw, 50vw" loading="lazy" className="rounded-3xl border border-white/10 shadow-2xl relative z-10 w-full" />
               <div className="absolute -bottom-6 -right-6 bg-[#c9a227] p-8 rounded-2xl z-20 shadow-xl hidden md:block">
                 <p className="text-[#04080f] font-black text-4xl leading-none">
                   <AnimatedCounter target="1000" suffix="+" />

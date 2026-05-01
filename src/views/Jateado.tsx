@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { EyeOff, Sun, Layers, Droplets, Gem, ArrowRight, Building2, ShieldCheck, Thermometer, Zap } from 'lucide-react';
 import { ContactCTA } from '../sections/ContactCTA';
 import { SpecTooltip } from '../components/SpecTooltip';
+import { NavigationBreadcrumbs } from '../components/NavigationBreadcrumbs';
 import gsap from 'gsap';
 import Image from 'next/image';
 
@@ -27,6 +28,12 @@ export function JateadoPage() {
                 </div>
 
                 <div className="container-lume relative z-10 page-entrance text-center md:text-left">
+                    <NavigationBreadcrumbs 
+                        items={[
+                            { label: 'Início', href: '/' },
+                            { label: 'Jateado' }
+                        ]}
+                    />
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 mb-6 font-semibold tracking-wider text-white text-xs md:text-sm">
                         O Padrão Ouro em Arquitetura de Interiores 🏢
                     </div>

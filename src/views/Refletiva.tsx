@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { EyeOff, ShieldCheck, ThermometerSnowflake, Ruler, ArrowRight, Home, Sun, Zap, Thermometer } from 'lucide-react';
 import { ContactCTA } from '../sections/ContactCTA';
 import { SpecTooltip } from '../components/SpecTooltip';
+import { NavigationBreadcrumbs } from '../components/NavigationBreadcrumbs';
 import gsap from 'gsap';
 import Image from 'next/image';
 
@@ -27,6 +28,12 @@ export function RefletivaPage() {
                 </div>
 
                 <div className="container-lume relative z-10 page-entrance text-center md:text-left">
+                    <NavigationBreadcrumbs 
+                        items={[
+                            { label: 'Início', href: '/' },
+                            { label: 'Refletiva' }
+                        ]}
+                    />
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#c9a227]/10 border border-[#c9a227]/30 mb-6 font-semibold uppercase tracking-wider text-[#c9a227] text-xs md:text-sm shadow-[0_0_15px_rgba(201,162,39,0.2)]">
                         O Clássico que Derrota o Calor 🛡️
                     </div>

@@ -87,7 +87,7 @@ export function Footer() {
             {/* Social Links */}
             <div className="flex gap-2 sm:gap-3">
               <a
-                href="https://facebook.com"
+                href="https://www.facebook.com/lumecontrolesolar"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-[#1a3a5c]/50 flex items-center justify-center text-gray-400 hover:bg-[#c9a227] hover:text-[#04080f] transition-all duration-300 hover:-translate-y-1"

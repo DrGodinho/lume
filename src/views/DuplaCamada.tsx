@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { Sun, Droplets, Zap, ShieldCheck, Layers, ArrowRight } from 'lucide-react';
 import { ContactCTA } from '../sections/ContactCTA';
 import { SpecTooltip } from '../components/SpecTooltip';
+import { NavigationBreadcrumbs } from '../components/NavigationBreadcrumbs';
 import gsap from 'gsap';
 
 export function DuplaCamadaPage() {
@@ -26,6 +27,12 @@ export function DuplaCamadaPage() {
                 </div>
 
                 <div className="container-lume relative z-10 page-entrance text-center md:text-left">
+                    <NavigationBreadcrumbs 
+                        items={[
+                            { label: 'Início', href: '/' },
+                            { label: 'Dupla Camada' }
+                        ]}
+                    />
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#c9a227]/10 border border-[#c9a227]/30 mb-6 font-semibold uppercase tracking-wider text-[#c9a227] text-xs md:text-sm">
                         Resistência Extrema ao Sol do Rio 🌞
                     </div>

@@ -14,9 +14,11 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAdmin = pathname.startsWith('/admin');
 
-  // Scroll to top on route change
+  // Scroll to top on route change, but only if no hash is present
   useEffect(() => {
-    window.scrollTo(0, 0);
+    if (!window.location.hash) {
+      window.scrollTo(0, 0);
+    }
   }, [pathname]);
 
   // GSAP setup and Service Worker cleanup
@@ -28,7 +30,6 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
       navigator.serviceWorker.getRegistrations().then(registrations => {
         for (let registration of registrations) {
           registration.unregister();
-          console.log('Old Service Worker unregistered');
         }
       });
     }
