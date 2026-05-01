@@ -60,6 +60,9 @@ export const metadata: Metadata = {
   other: {
     'theme-color': '#04080f',
   },
+  verification: {
+    google: 'bM8DzS0HSsJUn4oRwX06OABRj0xJhHaWqyI1hay70Yw',
+  },
 };
 
 const jsonLd = {
