@@ -176,7 +176,7 @@ export function SimulatorPage() {
 
     const sendWhatsApp = () => {
         if (!bestMatch) return;
-        const msg = `Olá! O Assistente LUME me recomendou a película *${bestMatch.name}*. Gostaria de mais informações e um orçamento!`;
+        const msg = `Olá! O Assistente LUME me recomendou o insulfilm *${bestMatch.name}*. Gostaria de mais informações e um orçamento!`;
         const url = `https://wa.me/5521965140612?text=${msg}`;
         
         if (typeof (window as any).gtagSendEvent === 'function') {
@@ -215,10 +215,10 @@ export function SimulatorPage() {
                             <div className="w-16 h-16 mx-auto bg-[#c9a227]/20 rounded-full flex items-center justify-center mb-6 border border-[#c9a227]/50">
                                 <Smartphone className="text-[#c9a227] w-8 h-8" />
                             </div>
-                            <h2 className="text-2xl sm:text-3xl font-bold font-montserrat mb-4">Descubra sua Película Ideal</h2>
+                            <h2 className="text-2xl sm:text-3xl font-bold font-montserrat mb-4">Descubra seu Insulfilm Ideal</h2>
                             <p className="text-gray-400 mb-8 leading-relaxed">
                                 Olá! Sou o <strong>Assistente LUME</strong>. ☀️<br /><br />
-                                No Rio de Janeiro, o sol não perdoa, mas o conforto da sua casa é nossa prioridade. Vou te ajudar a escolher a película perfeita para a sua necessidade em menos de 1 minuto.
+                                No Rio de Janeiro, o sol não perdoa, mas o conforto da sua casa é nossa prioridade. Vou te ajudar a escolher o insulfilm perfeito para a sua necessidade em menos de 1 minuto.
                             </p>
                             <button onClick={processNextStep} className="w-full btn-primary flex items-center justify-center gap-2 text-lg py-4">
                                 VAMOS LÁ <ChevronRight size={20} />
@@ -258,7 +258,7 @@ export function SimulatorPage() {
                                 <span className="w-8 h-8 rounded-full bg-[#c9a227] text-black text-sm flex items-center justify-center">2</span>
                                 Regras do Condomínio
                             </h2>
-                            <p className="text-sm text-gray-400 mb-6 pl-11">Essencial no Rio: existe restrição para películas espelhadas/refletivas na fachada?</p>
+                            <p className="text-sm text-gray-400 mb-6 pl-11">Essencial no Rio: existe restrição para insulfilm espelhado/refletivo na fachada?</p>
                             <div className="space-y-3">
                                 {[
                                     { id: 'sim', label: 'Sim, o condomínio é rigoroso (Não pode alterar fachada externa)' },
@@ -342,7 +342,7 @@ export function SimulatorPage() {
                                 <span className="text-[#c9a227]"><Eye size={28} /></span>
                                 Sobre a Privacidade:
                             </h2>
-                            <p className="text-sm text-gray-400 mb-6">Sabemos que privacidade é importante. Porém, à noite (com a luz interna acesa), películas muito refletivas criam um efeito espelho interno. Isso te incomoda?</p>
+                            <p className="text-sm text-gray-400 mb-6">Sabemos que privacidade é importante. Porém, à noite (com a luz interna acesa), tipos de insulfilm muito refletivos criam um efeito espelho interno. Isso te incomoda?</p>
                             <div className="space-y-3">
                                 {[
                                     { id: 'sim', label: 'Sim, me incomoda. Quero evitar reflexões internas fortes.' },
@@ -409,7 +409,7 @@ export function SimulatorPage() {
                                 </div>
 
                                 <button onClick={sendWhatsApp} className="w-full btn-primary py-4 text-lg flex justify-center items-center gap-3">
-                                    <Smartphone /> QUERO ESSA NO MEU ORÇAMENTO
+                                    <Smartphone /> QUERO ESTE INSULFILM NO ORÇAMENTO
                                 </button>
                             </div>
 

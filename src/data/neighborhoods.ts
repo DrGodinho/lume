@@ -37,7 +37,7 @@ export const neighborhoods: Record<string, NeighborhoodData> = {
     canonical: 'https://lumecontrolesolar.com.br/insulfilm-em-bangu',
     whatsappMessage: 'Olá! Quero um orçamento de insulfilm em Bangu.',
     heroButtonText: 'Pedir Orçamento pelo WhatsApp',
-    secondaryButtonText: 'Ver Tipos de Película',
+    secondaryButtonText: 'Ver Tipos de Insulfilm',
     regionsList: [
       "Estrada do Engenho", "Estrada da Água Branca", "Rua Doze de Fevereiro", 
       "Rua Silva Cardoso", "Vila Kennedy", "Bangu Shopping e proximidades",

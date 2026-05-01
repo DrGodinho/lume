@@ -125,7 +125,7 @@ export function CampoGrandePage() {
                             href="#tipos"
                             className="btn-outline inline-flex items-center justify-center gap-3 text-lg py-4 px-8 border border-white/20 hover:bg-white/5 transition-colors rounded-xl font-bold uppercase tracking-widest text-sm"
                         >
-                            Ver Tipos de Película
+                            Ver Tipos de Insulfilm
                         </a>
                     </div>
                 </div>

@@ -220,11 +220,11 @@ export function NeighborhoodTemplate({ data }: Props) {
         </div>
       </section>
 
-      {/* Tipos de Película - Condensed from main sections but customized */}
+      {/* Tipos de Insulfilm - Condensed from main sections but customized */}
       <section id="tipos" className="py-24 bg-[#04080f] px-4">
         <div className="container-lume">
           <div className="text-center mb-16 page-entrance">
-            <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-6 tracking-tight">PELÍCULAS DE ALTA PERFORMANCE</h2>
+            <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-6 tracking-tight">INSULFILM DE ALTA PERFORMANCE</h2>
             <p className="text-gray-400 max-w-2xl mx-auto">Conheça as tecnologias mais procuradas em {data.neighborName} para controle térmico e privacidade.</p>
           </div>
 

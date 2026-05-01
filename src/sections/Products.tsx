@@ -4,7 +4,6 @@ import { useEffect, useRef } from 'react';
 import { ArrowRight, Star, Thermometer, Sun, Eye, Droplets, Sparkles } from 'lucide-react';
 import gsap from 'gsap';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Image from 'next/image';
 
@@ -97,7 +96,6 @@ export function Products() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -165,10 +163,10 @@ export function Products() {
             <div className="h-px w-10 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
           </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-4 font-montserrat">
-            Nossas <span className="text-gradient-gold">Películas</span>
+            Tipos de <span className="text-gradient-gold">Insulfilm</span>
           </h2>
           <p className="text-gray-400 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto px-2 sm:px-0">
-            Soluções premium para cada necessidade. Escolha a película ideal para seu ambiente.
+            Soluções premium para cada necessidade. Escolha o insulfilm ideal para seu ambiente.
           </p>
         </div>
 
@@ -193,7 +191,6 @@ export function Products() {
               <Link 
                 href={product.path} 
                 prefetch={true}
-                onClick={() => router.push(product.path)}
                 className="block cursor-pointer relative z-30"
               >
                 {/* Image */}
@@ -267,7 +264,6 @@ export function Products() {
               <Link
                 href="/simulador"
                 prefetch={true}
-                onClick={() => router.push('/simulador')}
                 className="btn-primary inline-flex items-center gap-3 py-4 px-8 text-lg group relative overflow-hidden z-30"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />

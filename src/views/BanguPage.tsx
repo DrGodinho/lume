@@ -109,7 +109,7 @@ export function BanguPage() {
                     </h1>
 
                     <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto md:mx-0 mb-10 leading-relaxed font-light">
-                        Aplicação profissional de películas de controle solar para residências e empresas em Bangu e toda a região da Zona Oeste. Proteção contra o calor intenso e privacidade garantida.
+                        Aplicação profissional de insulfilm de controle solar para residências e empresas em Bangu e toda a região da Zona Oeste. Proteção contra o calor intenso e privacidade garantida.
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
@@ -125,7 +125,7 @@ export function BanguPage() {
                             href="#tipos"
                             className="btn-outline inline-flex items-center justify-center gap-3 text-lg py-4 px-8 border border-white/20 hover:bg-white/5 transition-colors rounded-xl font-bold uppercase tracking-widest text-sm"
                         >
-                            Ver Tipos de Película
+                            Ver Tipos de Insulfilm
                         </a>
                     </div>
                 </div>
@@ -191,7 +191,7 @@ export function BanguPage() {
                 <div className="container-lume relative z-10">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl lg:text-5xl font-bold font-montserrat mb-6 text-white">
-                            Películas de <span className="text-gradient-gold">Alta Performance</span>
+                            Insulfilm de <span className="text-gradient-gold">Alta Performance</span>
                         </h2>
                         <p className="text-gray-400 max-w-2xl mx-auto font-light text-lg">
                             Conheça as principais opções tecnológicas que trabalhamos e descubra qual resolve o seu problema de calor ou privacidade.

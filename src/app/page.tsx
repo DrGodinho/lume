@@ -4,13 +4,12 @@ import { Products } from '../sections/Products';
 import { Benefits } from '../sections/Benefits';
 import { About } from '../sections/About';
 import { Coverage } from '../sections/Coverage';
-import { Reviews } from '../sections/Reviews';
 import { ContactCTA } from '../sections/ContactCTA';
 import { GoogleReviews } from '../components/GoogleReviews';
 
 export const metadata: Metadata = {
-  title: 'LUME Controle Solar | Insulfilm Residencial e Comercial no Rio de Janeiro',
-  description: 'Especialistas em películas de controle solar de alta performance (Nano Cerâmica, Carbono, Refletivas). Redução de calor, privacidade e 5 anos de garantia. Atendemos todo o Rio de Janeiro.',
+  title: 'LUME Controle Solar | Insulfilm Residencial Comercial RJ',
+  description: 'Instalação de insulfilm de alta performance no Rio de Janeiro. Redução de calor, privacidade e 5 anos de garantia. Peça seu orçamento pelo WhatsApp!',
   alternates: {
     canonical: 'https://lumecontrolesolar.com.br/',
   },

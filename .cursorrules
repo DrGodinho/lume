@@ -26,6 +26,8 @@ Estas diretrizes garantem que toda nova página ou modificação mantenha o padr
 - **Git / Upload:** NUNCA realize `git push` ou qualquer forma de upload/deploy automático. O envio de código para o repositório remoto deve ser feito APENAS quando o usuário solicitar explicitamente. Commits locais e preparo de arquivos são permitidos, mas o passo final de "subir" o site é restrito.
 
 ## 🛠️ Padrões de Conteúdo
+- **Keyword Prioritária:** Use preferencialmente a palavra **"insulfilm"** em vez de "película solar" ou "película de controle solar". A palavra "insulfilm" possui volume de busca significativamente maior e deve ser a principal âncora de conteúdo do site.
+- **Densidade:** Garanta que a palavra "insulfilm" apareça em H1s, H2s e textos de botões (CTAs) para maximizar o SEO local.
 - **Garantia:** Sempre **5 anos** para instalação/película (este é o foco principal).
 - **Durabilidade:** Estimada de **8 a 15 anos** (menção discreta/eventual, não deve ser tratada como um destaque principal).
 - **Contatos:** Priorize o WhatsApp `21 96514-0612` em todos os CTAs.

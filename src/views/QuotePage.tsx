@@ -340,7 +340,7 @@ export function QuotePage() {
                     </button>
 
                     <p className="text-center text-[10px] text-gray-600 mt-4 uppercase tracking-[0.2em]">
-                        © 2025 LUME Películas • Sistema de Orçamento Seguro
+                        © 2026 LUME Películas • Sistema de Orçamento Seguro
                     </p>
                 </div>
 
