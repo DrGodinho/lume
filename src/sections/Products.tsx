@@ -108,10 +108,11 @@ export function Products() {
           y: 0,
           duration: 0.8,
           ease: 'expo.out',
+          clearProps: 'all',
           scrollTrigger: {
             trigger: titleRef.current,
             start: 'top 80%',
-            toggleActions: 'play none none reverse',
+            toggleActions: 'play none none none',
           },
         }
       );
@@ -128,11 +129,11 @@ export function Products() {
             duration: 0.7,
             stagger: 0.12,
             ease: 'expo.out',
-            clearProps: 'transform',
+            clearProps: 'all',
             scrollTrigger: {
               trigger: cardsRef.current,
               start: 'top 75%',
-              toggleActions: 'play none none reverse',
+              toggleActions: 'play none none none',
             },
           }
         );

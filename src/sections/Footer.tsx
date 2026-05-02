@@ -32,20 +32,15 @@ export function Footer() {
   const pathname = usePathname();
   const router = useRouter();
 
-
-
-  const handleNavClick = (href: string) => {
+  const handleHashClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (href.startsWith('#')) {
+      e.preventDefault();
       if (pathname !== '/') {
-        // Se não estiver na home, navega para a home com o hash
         router.push('/' + href);
       } else {
-        // Se já estiver na home, apenas faz o scroll
         const id = href.substring(1);
         const element = document.getElementById(id);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }
+        if (element) element.scrollIntoView({ behavior: 'smooth' });
       }
     }
   };
@@ -127,10 +122,7 @@ export function Footer() {
                   {link.href.startsWith('#') ? (
                     <a
                       href={link.href.startsWith('#') ? '/' + link.href : link.href}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleNavClick(link.href);
-                      }}
+                      onClick={(e) => handleHashClick(e, link.href)}
                       className="text-gray-400 hover:text-[#c9a227] transition-colors text-xs sm:text-sm inline-flex items-center gap-2 group"
                     >
                       <span className="w-0 h-px bg-[#c9a227] transition-all duration-300 group-hover:w-3" />
@@ -162,10 +154,7 @@ export function Footer() {
                   {product.href.startsWith('#') ? (
                     <a
                       href={product.href.startsWith('#') ? '/' + product.href : product.href}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleNavClick(product.href);
-                      }}
+                      onClick={(e) => handleHashClick(e, product.href)}
                       className="text-gray-400 hover:text-[#c9a227] transition-colors text-xs sm:text-sm inline-flex items-center gap-2 group"
                     >
                       <span className="w-0 h-px bg-[#c9a227] transition-all duration-300 group-hover:w-3" />

@@ -36,10 +36,11 @@ export function ScrollReveal({ children, animation = 'fade-in', className = '' }
               duration: 0.6,
               stagger: 0.1,
               ease: 'expo.out',
+              clearProps: 'all',
               scrollTrigger: {
                 trigger: ref.current,
                 start: 'top 75%',
-                toggleActions: 'play none none reverse',
+                toggleActions: 'play none none none',
               },
             }
           );
@@ -59,10 +60,11 @@ export function ScrollReveal({ children, animation = 'fade-in', className = '' }
               duration: 0.6,
               stagger: 0.15,
               ease: 'expo.out',
+              clearProps: 'all',
               scrollTrigger: {
                 trigger: ref.current,
                 start: 'top 80%',
-                toggleActions: 'play none none reverse',
+                toggleActions: 'play none none none',
               },
             }
           );
