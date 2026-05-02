@@ -3,7 +3,6 @@ import { Particles } from '../components/Particles';
 import { HeroEntrance } from '../components/HeroEntrance';
 import { GtagLink } from '../components/GtagLink';
 import Image from 'next/image';
-import Link from 'next/link';
 
 export function Hero() {
   return (
@@ -68,13 +67,13 @@ export function Hero() {
               <span className="whitespace-nowrap">Solicitar Orçamento</span>
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </GtagLink>
-            <Link
-              href="#produtos"
+            <a
+              href="/produtos/"
               className="btn-secondary flex items-center justify-center gap-2 w-full sm:w-auto"
             >
               Conhecer Produtos
               <ArrowRight className="w-4 h-4" />
-            </Link>
+            </a>
           </div>
 
           {/* Trust Badge */}

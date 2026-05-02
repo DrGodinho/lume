@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import Link from 'next/link';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -49,12 +48,12 @@ export function NavigationBreadcrumbs({ items }: NavigationBreadcrumbsProps) {
                   </BreadcrumbPage>
                 ) : (
                   <BreadcrumbLink asChild>
-                    <Link 
-                      href={item.href} 
+                    <a 
+                      href={item.href + (item.href === '/' ? '' : '/')} 
                       className="text-gray-500 hover:text-[#c9a227] transition-colors"
                     >
                       {item.label}
-                    </Link>
+                    </a>
                   </BreadcrumbLink>
                 )}
               </BreadcrumbItem>

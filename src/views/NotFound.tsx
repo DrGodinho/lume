@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react';
 import { Home, ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
 import gsap from 'gsap';
 
 export function NotFound() {
@@ -68,12 +67,12 @@ export function NotFound() {
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <Link 
+                        <a 
                             href="/" 
                             className="btn-primary flex items-center gap-3 px-8 py-4 text-lg w-full sm:w-auto justify-center"
                         >
                             <Home size={20} /> Voltar ao Início
-                        </Link>
+                        </a>
                         
                         <button 
                             onClick={() => window.history.back()}
@@ -97,13 +96,13 @@ export function NotFound() {
                             { name: 'Simulador', path: '/simulador' },
                             { name: 'Orçamento', path: '/orcamento' },
                         ].map((link) => (
-                            <Link 
+                            <a 
                                 key={link.path}
-                                href={link.path}
+                                href={link.path + '/'}
                                 className="text-gray-400 hover:text-[#c9a227] transition-colors font-medium border-b border-white/5 hover:border-[#c9a227]/50 pb-1"
                             >
                                 {link.name}
-                            </Link>
+                            </a>
                         ))}
                     </div>
                 </div>

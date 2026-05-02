@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { Menu, X, Phone } from 'lucide-react';
-import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { handleGtagClick } from '../lib/gtag';
 
@@ -59,7 +58,7 @@ export function Navbar() {
       <div className="container-lume">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link
+          <a
             href="/"
             className="flex items-center gap-2 group"
           >
@@ -69,7 +68,7 @@ export function Navbar() {
             <span className="hidden sm:block text-xs text-gray-400 uppercase tracking-widest border-l border-gray-600 pl-2">
               Películas de<br />Controle Solar
             </span>
-          </Link>
+          </a>
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-8">
@@ -88,28 +87,26 @@ export function Navbar() {
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#c9a227] transition-all duration-300 group-hover:w-full" />
                 </a>
               ) : (
-                <Link
+                <a
                   key={link.name}
-                  href={link.href}
-                  prefetch={true}
+                  href={link.href + (link.href === '/' ? '' : '/')}
                   className="relative text-sm font-medium text-gray-300 hover:text-white transition-colors duration-300 group"
                 >
                   {link.name}
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#c9a227] transition-all duration-300 group-hover:w-full" />
-                </Link>
+                </a>
               )
             ))}
           </div>
 
           {/* CTA Button */}
           <div className="hidden lg:flex items-center gap-4">
-            <Link
-              href="/simulador"
-              prefetch={true}
+            <a
+              href="/simulador/"
               className="btn-secondary flex items-center gap-2 text-xs py-2 px-4 transition-transform hover:scale-105 active:scale-95"
             >
               Qual película escolher?
-            </Link>
+            </a>
             <a
               href="https://wa.me/5521965140612"
               target="_blank"
@@ -158,23 +155,23 @@ export function Navbar() {
                   {link.name}
                 </a>
               ) : (
-                <Link
+                <a
                   key={link.name}
-                  href={link.href}
+                  href={link.href + (link.href === '/' ? '' : '/')}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="text-lg font-medium text-gray-300 hover:text-[#c9a227] transition-colors py-2"
                 >
                   {link.name}
-                </Link>
+                </a>
               )
             ))}
-            <Link
-              href="/simulador"
+            <a
+              href="/simulador/"
               className="btn-secondary flex items-center justify-center gap-2 mt-2"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Qual película escolher?
-            </Link>
+            </a>
             <a
               href="https://wa.me/5521965140612"
               target="_blank"

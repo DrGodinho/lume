@@ -5,7 +5,6 @@ import { Shield, Sun, Thermometer, CheckCircle, ArrowRight, Eye, SunDim, Star, P
 import { GoogleReviews } from '../components/GoogleReviews';
 import { Particles } from '../components/Particles';
 import { AnimatedCounter } from '../components/AnimatedCounter';
-import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Image from 'next/image';
@@ -219,7 +218,7 @@ export function BarraPage() {
                                 <div className="absolute top-4 left-4 z-10 px-3 py-1 bg-[#c9a227] text-[#04080f] text-[10px] font-bold uppercase tracking-wider rounded-full shadow-lg pointer-events-none">
                                     {product.selo}
                                 </div>
-                                <Link href={product.path} className="flex flex-col flex-grow">
+                                <a href={`${product.path}/`} className="flex flex-col flex-grow">
                                     <div className="relative h-44 overflow-hidden">
                                         <Image 
                                             src={product.image} 
@@ -259,7 +258,7 @@ export function BarraPage() {
                                             </div>
                                         </div>
                                     </div>
-                                </Link>
+                                </a>
 
                                 <div className="p-6 pt-0">
                                     <a

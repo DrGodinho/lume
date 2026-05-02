@@ -1,7 +1,6 @@
 'use client';
 
 import { MapPin, Phone, Mail, Clock, Facebook, Instagram, MessageCircle } from 'lucide-react';
-import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
 const quickLinks = [
@@ -67,11 +66,11 @@ export function Footer() {
         >
           {/* Column 1: Logo & About */}
           <div className="footer-col sm:col-span-2 lg:col-span-1">
-            <Link href="/" className="inline-block mb-3 sm:mb-4">
+            <a href="/" className="inline-block mb-3 sm:mb-4">
               <span className="text-2xl sm:text-3xl font-bold text-white font-montserrat">
                 LU<span className="text-gradient-gold">ME</span>
               </span>
-            </Link>
+            </a>
             <p className="text-xs sm:text-sm text-gray-400 uppercase tracking-widest mb-3 sm:mb-4">
               Películas de Controle Solar
             </p>
@@ -129,14 +128,13 @@ export function Footer() {
                       {link.name}
                     </a>
                   ) : (
-                    <Link
-                      href={link.href}
-                      prefetch={true}
+                    <a
+                      href={link.href + (link.href === '/' ? '' : '/')}
                       className="text-gray-400 hover:text-[#c9a227] transition-colors text-xs sm:text-sm inline-flex items-center gap-2 group"
                     >
                       <span className="w-0 h-px bg-[#c9a227] transition-all duration-300 group-hover:w-3" />
                       {link.name}
-                    </Link>
+                    </a>
                   )}
                 </li>
               ))}
@@ -151,25 +149,13 @@ export function Footer() {
             <ul className="space-y-2 sm:space-y-3">
               {products.map((product) => (
                 <li key={product.name}>
-                  {product.href.startsWith('#') ? (
-                    <a
-                      href={product.href.startsWith('#') ? '/' + product.href : product.href}
-                      onClick={(e) => handleHashClick(e, product.href)}
-                      className="text-gray-400 hover:text-[#c9a227] transition-colors text-xs sm:text-sm inline-flex items-center gap-2 group"
-                    >
-                      <span className="w-0 h-px bg-[#c9a227] transition-all duration-300 group-hover:w-3" />
-                      {product.name}
-                    </a>
-                  ) : (
-                    <Link
-                      href={product.href}
-                      prefetch={true}
-                      className="text-gray-400 hover:text-[#c9a227] transition-colors text-xs sm:text-sm inline-flex items-center gap-2 group"
-                    >
-                      <span className="w-0 h-px bg-[#c9a227] transition-all duration-300 group-hover:w-3" />
-                      {product.name}
-                    </Link>
-                  )}
+                  <a
+                    href={product.href + '/'}
+                    className="text-gray-400 hover:text-[#c9a227] transition-colors text-xs sm:text-sm inline-flex items-center gap-2 group"
+                  >
+                    <span className="w-0 h-px bg-[#c9a227] transition-all duration-300 group-hover:w-3" />
+                    {product.name}
+                  </a>
                 </li>
               ))}
             </ul>
@@ -212,13 +198,13 @@ export function Footer() {
                 { name: 'Recreio', href: '/insulfilm-no-recreio' },
                 { name: 'Jacarepaguá', href: '/insulfilm-em-jacarepagua' }
               ].map((loc, i) => (
-                <Link 
+                <a 
                   key={i} 
-                  href={loc.href} 
+                  href={loc.href + '/'} 
                   className="hover:text-[#c9a227] transition-colors duration-300 underline underline-offset-4 decoration-white/5 hover:decoration-[#c9a227]/50"
                 >
                   {loc.name}
-                </Link>
+                </a>
               ))}
             </div>
           </div>

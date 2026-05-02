@@ -5,7 +5,6 @@ import { Shield, Sun, Thermometer, CheckCircle, ArrowRight, Eye, SunDim, Star, P
 import { GoogleReviews } from '../components/GoogleReviews';
 import { Particles } from '../components/Particles';
 import { AnimatedCounter } from '../components/AnimatedCounter';
-import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Image from 'next/image';
@@ -225,7 +224,7 @@ export function BanguPage() {
                                 <div className="absolute top-4 left-4 z-10 px-3 py-1 bg-[#c9a227] text-[#04080f] text-[10px] font-bold uppercase tracking-wider rounded-full shadow-lg pointer-events-none">
                                     {product.selo}
                                 </div>
-                                <Link href={product.path} className="flex flex-col flex-grow">
+                                <a href={product.path + '/'} className="flex flex-col flex-grow">
                                     <div className="relative h-44 overflow-hidden">
                                         <Image src={product.image} alt={product.title} fill sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw" loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                                         <div className="absolute inset-0 bg-gradient-to-t from-[#04080f] via-transparent to-transparent opacity-80" />
@@ -258,7 +257,7 @@ export function BanguPage() {
                                             </div>
                                         </div>
                                     </div>
-                                </Link>
+                                </a>
 
                                 <div className="p-6 pt-0">
                                     <a
@@ -478,12 +477,12 @@ export function BanguPage() {
                                 Orçamento via WhatsApp
                             </a>
                             
-                            <Link
+                            <a
                                 href="/"
                                 className="w-full sm:w-auto bg-white/5 hover:bg-white/10 text-white border border-white/10 px-10 py-6 rounded-2xl font-bold uppercase tracking-widest transition-all text-sm backdrop-blur-sm"
                             >
                                 Ver Outros Exemplos
-                            </Link>
+                            </a>
                         </div>
 
                         <div className="mt-12 flex flex-wrap justify-center gap-8 text-[11px] text-gray-500 font-bold uppercase tracking-[0.2em]">

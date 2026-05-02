@@ -4,7 +4,6 @@ import { GoogleReviews } from './GoogleReviews';
 import { Particles } from './Particles';
 import { AnimatedCounter } from './AnimatedCounter';
 import { NavigationBreadcrumbs } from './NavigationBreadcrumbs';
-import Link from 'next/link';
 import { NeighborhoodData } from '../data/neighborhoods';
 import { NeighborhoodAnimations } from './NeighborhoodAnimations';
 import Image from 'next/image';
@@ -241,7 +240,7 @@ export function NeighborhoodTemplate({ data }: Props) {
                 <product.icon size={48} className="text-[#c9a227] mb-6" />
                 <h3 className="text-2xl font-bold mb-4">{product.title}</h3>
                 <p className="text-gray-400 mb-8 flex-grow leading-relaxed">{product.desc}</p>
-                <Link href={product.path} className="btn-outline py-3 text-center text-xs tracking-widest font-bold uppercase border border-white/10 hover:bg-[#c9a227] hover:text-[#04080f] transition-all rounded-xl">Detalhes Técnicos</Link>
+                <a href={product.path + '/'} className="btn-outline py-3 text-center text-xs tracking-widest font-bold uppercase border border-white/10 hover:bg-[#c9a227] hover:text-[#04080f] transition-all rounded-xl">Detalhes Técnicos</a>
               </div>
             ))}
           </div>

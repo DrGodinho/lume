@@ -17,7 +17,6 @@ import {
     HelpCircle
 } from 'lucide-react';
 import gsap from 'gsap';
-import Link from 'next/link';
 
 interface GlassMeasure {
     h: number;
@@ -164,12 +163,12 @@ export function QuotePage() {
 
                 {/* Header */}
                 <header className="page-entrance text-center mb-10">
-                    <Link href="/" className="inline-block hover:opacity-80 transition-opacity group">
+                    <a href="/" className="inline-block hover:opacity-80 transition-opacity group">
                         <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl font-montserrat">
                             LU<span className="text-gradient-gold">ME</span>
                         </h1>
                         <p className="text-[10px] text-gray-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">Voltar ao site</p>
-                    </Link>
+                    </a>
                     <p className="text-xs uppercase tracking-[0.3em] text-[#c9a227] mt-1">
                         Orçamento Online
                     </p>

@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { Sun, CheckCircle, Smartphone, Home, Shield, Thermometer, Eye, Wind, Building2, Droplets, ChevronRight, ArrowLeft } from 'lucide-react';
 import gsap from 'gsap';
-import Link from 'next/link';
 
 type Step = 'welcome' | 'location' | 'condo' | 'priorities' | 'refine_heat_view' | 'refine_privacy' | 'result';
 
@@ -197,14 +196,14 @@ export function SimulatorPage() {
             <div className="w-full max-w-xl mx-auto flex-1 flex flex-col">
                 {/* Header Back Link */}
                 <header className="text-center mb-8">
-                    <Link href="/" className="inline-block hover:opacity-80 transition-opacity group">
+                    <a href="/" className="inline-block hover:opacity-80 transition-opacity group">
                         <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl font-montserrat">
                             LU<span className="text-gradient-gold">ME</span>
                         </h1>
                         <p className="text-[10px] text-gray-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
                             <ArrowLeft size={10} /> Voltar ao site
                         </p>
-                    </Link>
+                    </a>
                 </header>
 
                 {/* Main Content Area */}

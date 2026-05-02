@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react';
 import gsap from 'gsap';
-import Link from 'next/link';
 import { ContactCTA } from '../sections/ContactCTA';
 import { ArrowRight, Zap, Target, Shield, CheckCircle } from 'lucide-react';
 
@@ -93,7 +92,7 @@ export function GuiaInsulfilm() {
                         </p>
                         <h3 className="text-xl font-bold text-white mt-8 mb-4">Alta Tecnologia: Nanocerâmica e Películas Claras</h3>
                         <p>
-                            Muitas pessoas acreditam que, para tirar o calor, é preciso "escuridão total". Isso é coisa do passado. Graças à <Link href="/nano-ceramica" className="text-[#c9a227] hover:underline font-bold">Tecnologia de Nanocerâmica</Link>, hoje é possível ter películas quase transparentes with a performance térmica superior às películas escuras comuns.
+                            Muitas pessoas acreditam que, para tirar o calor, é preciso "escuridão total". Isso é coisa do passado. Graças à <a href="/nano-ceramica/" className="text-[#c9a227] hover:underline font-bold">Tecnologia de Nanocerâmica</a>, hoje é possível ter películas quase transparentes com uma performance térmica superior às películas escuras comuns.
                         </p>
                     </div>
 
@@ -128,7 +127,7 @@ export function GuiaInsulfilm() {
                             <li><strong>A sua pele:</strong> O câncer de pele também pode ser causado pela exposição contínua ao sol pela janela de casa.</li>
                         </ul>
                         <p>
-                            Destaque para a linha <Link href="/jateado" className="text-[#c9a227] hover:underline font-bold">Jateada</Link>, que além de decorativa, mantém 99% de bloqueio UV mesmo sendo fosca.
+                            Destaque para a linha <a href="/jateado/" className="text-[#c9a227] hover:underline font-bold">Jateada</a>, que além de decorativa, mantém 99% de bloqueio UV mesmo sendo fosca.
                         </p>
                     </div>
 
@@ -163,7 +162,7 @@ export function GuiaInsulfilm() {
                             Viver em grandes centros como o Rio de Janeiro traz o desafio da proximidade. Vizinhos em prédios em frente ou pessoas na rua podem acabar tirando a sua liberdade dentro de casa.
                         </p>
                         <p>
-                            As películas <Link href="/carbono" className="text-[#c9a227] hover:underline font-bold">Carbono G5</Link> ou as versões <Link href="/refletiva" className="text-[#c9a227] hover:underline font-bold">Refletivas</Link> criam o efeito de <strong>"visão única"</strong>: você enxerga tudo lá fora com nitidez, mas quem está do lado de fora vê apenas um reflexo ou uma superfície escura. Além disso, o filme segura estilhaços em caso de quebra de vidro, prevenindo acidentes.
+                            As películas <a href="/carbono/" className="text-[#c9a227] hover:underline font-bold">Carbono G5</a> ou as versões <a href="/refletiva/" className="text-[#c9a227] hover:underline font-bold">Refletivas</a> criam o efeito de <strong>"visão única"</strong>: você enxerga tudo lá fora com nitidez, mas quem está do lado de fora vê apenas um reflexo ou uma superfície escura. Além disso, o filme segura estilhaços em caso de quebra de vidro, prevenindo acidentes.
                         </p>
                     </div>
 
@@ -185,8 +184,8 @@ export function GuiaInsulfilm() {
                             <h3 className="text-[#c9a227] font-bold text-xl mb-2">Cenário 1: Privacidade Máxima</h3>
                             <p className="text-sm text-gray-500 mb-4 uppercase tracking-wider">Para salas e quartos térreos</p>
                             <ul className="space-y-3 text-gray-300">
-                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <Link href="/dupla-camada" className="hover:underline"><strong>Dupla Camada G5:</strong></Link> Espelhada por fora, clara por dentro.</li>
-                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <Link href="/carbono" className="hover:underline"><strong>Carbono G5:</strong></Link> Visual preto absoluto.</li>
+                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <a href="/dupla-camada/" className="hover:underline"><strong>Dupla Camada G5:</strong></a> Espelhada por fora, clara por dentro.</li>
+                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <a href="/carbono/" className="hover:underline"><strong>Carbono G5:</strong></a> Visual preto absoluto.</li>
                             </ul>
                         </div>
 
@@ -195,8 +194,8 @@ export function GuiaInsulfilm() {
                             <h3 className="text-[#c9a227] font-bold text-xl mb-2">Cenário 2: Foco em Luz Natural</h3>
                             <p className="text-sm text-gray-500 mb-4 uppercase tracking-wider">Tira o calor sem escurecer</p>
                             <ul className="space-y-3 text-gray-300">
-                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <Link href="/nano-ceramica" className="hover:underline"><strong>Nano Cerâmica:</strong></Link> Rejeita 97% do calor, alta transparência.</li>
-                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <Link href="/jateado" className="hover:underline"><strong>Jateada:</strong></Link> Difunde luz suavemente (fosco).</li>
+                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <a href="/nano-ceramica/" className="hover:underline"><strong>Nano Cerâmica:</strong></a> Rejeita 97% do calor, alta transparência.</li>
+                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <a href="/jateado/" className="hover:underline"><strong>Jateada:</strong></a> Difunde luz suavemente (fosco).</li>
                             </ul>
                         </div>
 
@@ -205,8 +204,8 @@ export function GuiaInsulfilm() {
                             <h3 className="text-[#c9a227] font-bold text-xl mb-2">Cenário 3: Custo-Benefício</h3>
                             <p className="text-sm text-gray-500 mb-4 uppercase tracking-wider">Proteção com orçamento controlado</p>
                             <ul className="space-y-3 text-gray-300">
-                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <Link href="/carbono" className="hover:underline"><strong>Carbono Premium:</strong></Link> A partir de R$ 80/m².</li>
-                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <Link href="/refletiva" className="hover:underline"><strong>Refletiva Clássica:</strong></Link> Melhor custo para redução bruta.</li>
+                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <a href="/carbono/" className="hover:underline"><strong>Carbono Premium:</strong></a> A partir de R$ 80/m².</li>
+                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <a href="/refletiva/" className="hover:underline"><strong>Refletiva Clássica:</strong></a> Melhor custo para redução bruta.</li>
                             </ul>
                         </div>
 
@@ -215,7 +214,7 @@ export function GuiaInsulfilm() {
                             <h3 className="text-[#c9a227] font-bold text-xl mb-2">Cenário Especial: O Astro-Rei</h3>
                             <p className="text-sm text-gray-500 mb-4 uppercase tracking-wider">Contra o sol da tarde extremo</p>
                             <ul className="space-y-3 text-gray-300">
-                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <Link href="/dupla-camada" className="hover:underline"><strong>Dupla Camada G5:</strong></Link> A barreira térmica definitiva (TSER 75%).</li>
+                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <a href="/dupla-camada/" className="hover:underline"><strong>Dupla Camada G5:</strong></a> A barreira térmica definitiva (TSER 75%).</li>
                             </ul>
                         </div>
                     </div>
@@ -249,7 +248,7 @@ export function GuiaInsulfilm() {
                             <tbody className="text-gray-300 divide-y divide-white/5">
                                 <tr className="hover:bg-white/[0.02] transition-colors">
                                     <td className="p-4 md:p-6 font-bold text-white">
-                                        <Link href="/nano-ceramica" className="hover:text-[#c9a227] transition-colors">Nano Cerâmica</Link>
+                                        <a href="/nano-ceramica/" className="hover:text-[#c9a227] transition-colors">Nano Cerâmica</a>
                                     </td>
                                     <td className="p-4 md:p-6 text-[#c9a227] font-bold">70%</td>
                                     <td className="p-4 md:p-6 text-[#c9a227] font-medium">99,9%</td>
@@ -259,7 +258,7 @@ export function GuiaInsulfilm() {
                                 </tr>
                                 <tr className="hover:bg-white/[0.02] transition-colors">
                                     <td className="p-4 md:p-6 font-bold text-white">
-                                        <Link href="/dupla-camada" className="hover:text-[#c9a227] transition-colors">Dupla Camada G5</Link>
+                                        <a href="/dupla-camada/" className="hover:text-[#c9a227] transition-colors">Dupla Camada G5</a>
                                     </td>
                                     <td className="p-4 md:p-6">5-8%</td>
                                     <td className="p-4 md:p-6 text-[#c9a227] font-medium">99%</td>
@@ -269,7 +268,7 @@ export function GuiaInsulfilm() {
                                 </tr>
                                 <tr className="hover:bg-white/[0.02] transition-colors">
                                     <td className="p-4 md:p-6 font-bold text-white">
-                                        <Link href="/dupla-camada" className="hover:text-[#c9a227] transition-colors">Dupla Camada G20</Link>
+                                        <a href="/dupla-camada/" className="hover:text-[#c9a227] transition-colors">Dupla Camada G20</a>
                                     </td>
                                     <td className="p-4 md:p-6">18-25%</td>
                                     <td className="p-4 md:p-6 text-[#c9a227] font-medium">99%</td>
@@ -279,7 +278,7 @@ export function GuiaInsulfilm() {
                                 </tr>
                                 <tr className="hover:bg-white/[0.02] transition-colors">
                                     <td className="p-4 md:p-6 font-bold text-white">
-                                        <Link href="/carbono" className="hover:text-[#c9a227] transition-colors">Carbono Premium G5</Link>
+                                        <a href="/carbono/" className="hover:text-[#c9a227] transition-colors">Carbono Premium G5</a>
                                     </td>
                                     <td className="p-4 md:p-6">5-8%</td>
                                     <td className="p-4 md:p-6 text-[#c9a227] font-medium">99%</td>
@@ -289,7 +288,7 @@ export function GuiaInsulfilm() {
                                 </tr>
                                 <tr className="hover:bg-white/[0.02] transition-colors">
                                     <td className="p-4 md:p-6 font-bold text-white">
-                                        <Link href="/carbono" className="hover:text-[#c9a227] transition-colors">Carbono Premium G20</Link>
+                                        <a href="/carbono/" className="hover:text-[#c9a227] transition-colors">Carbono Premium G20</a>
                                     </td>
                                     <td className="p-4 md:p-6">18-25%</td>
                                     <td className="p-4 md:p-6 text-[#c9a227] font-medium">99%</td>
@@ -299,7 +298,7 @@ export function GuiaInsulfilm() {
                                 </tr>
                                 <tr className="hover:bg-white/[0.02] transition-colors">
                                     <td className="p-4 md:p-6 font-bold text-white">
-                                        <Link href="/refletiva" className="hover:text-[#c9a227] transition-colors">Refletiva Clássica</Link>
+                                        <a href="/refletiva/" className="hover:text-[#c9a227] transition-colors">Refletiva Clássica</a>
                                     </td>
                                     <td className="p-4 md:p-6">8-35%</td>
                                     <td className="p-4 md:p-6 text-[#c9a227] font-medium">99%</td>
@@ -309,7 +308,7 @@ export function GuiaInsulfilm() {
                                 </tr>
                                 <tr className="hover:bg-white/[0.02] transition-colors">
                                     <td className="p-4 md:p-6 font-bold text-white">
-                                        <Link href="/jateado" className="hover:text-[#c9a227] transition-colors">Jateada</Link>
+                                        <a href="/jateado/" className="hover:text-[#c9a227] transition-colors">Jateada</a>
                                     </td>
                                     <td className="p-4 md:p-6">50-85%</td>
                                     <td className="p-4 md:p-6 text-[#c9a227] font-medium">99%</td>
