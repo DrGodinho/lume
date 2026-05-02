@@ -34,10 +34,15 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
       });
     }
 
-    ScrollTrigger.refresh();
+    // Delay ScrollTrigger.refresh() to ensure fonts, images and layout
+    // are fully settled before calculating trigger positions.
+    // A 200ms delay prevents the hard-load bug where triggers fire incorrectly.
+    const refreshTimer = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 200);
 
     return () => {
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+      clearTimeout(refreshTimer);
     };
   }, []);
 
