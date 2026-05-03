@@ -15,7 +15,7 @@ export function NeighborhoodAnimations() {
     const ctx = gsap.context(() => {
       // Smooth Scroll Animations for all sections
       const elements = gsap.utils.toArray('.page-entrance');
-      elements.forEach((el) => {
+      elements.forEach((el: any) => {
         gsap.fromTo(
           el,
           { opacity: 0, y: 30 },
