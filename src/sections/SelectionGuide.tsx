@@ -58,6 +58,7 @@ const roomsData = [
     title: 'Escritório',
     recs: [
       { film: 'Nano Cerâmica', tag: 'Premium', desc: 'Evita o calor que causa sonolência e mantém a claridade para leitura e tela sem glare excessivo.', link: '/nano-ceramica/' },
+      { film: 'Jateado', tag: 'Para divisórias', desc: 'Privacidade total em divisórias de vidro internas ou janelas com vista para áreas comuns, sem perder a luz.', link: '/jateado/' },
       { film: 'Carbono G20', tag: 'Confortável', desc: 'Reduz o reflexo na tela do computador e deixa a luminosidade confortável para longas jornadas de trabalho.', link: '/carbono/' },
     ]
   }
@@ -75,16 +76,15 @@ export function SelectionGuide() {
           <div className="animate-item flex items-center justify-center gap-4 mb-4">
             <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
             <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
-              Apoio à Decisão
+              Escolha Inteligente
             </span>
             <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
           </div>
           <h2 className="animate-item text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-6 font-montserrat">
-            Guia por Cômodo: <span className="text-gradient-gold">Encontre a Película Ideal</span>
+            Como Descobrir a <span className="text-gradient-gold">Película Ideal</span>
           </h2>
           <p className="animate-item text-gray-400 text-base sm:text-lg max-w-2xl mx-auto">
-            Compare as películas pelos 3 critérios que mais importam na sua casa.<br className="hidden sm:block" />
-            Quanto mais bolinhas douradas, maior a performance naquela categoria.
+            Um guia para te ajudar a escolher a melhor película de insulfilm para cada necessidade, comparando performance técnica e funcionalidade real em cada ambiente.
           </p>
         </ScrollReveal>
 

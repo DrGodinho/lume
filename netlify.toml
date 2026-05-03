@@ -2,4 +2,9 @@
   command = "npm run build"
   publish = "out"
 
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
 # Removemos a seção [[plugins]] do sitemap para não gerar erro

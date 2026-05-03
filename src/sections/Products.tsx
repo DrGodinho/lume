@@ -256,6 +256,13 @@ export function Products() {
           ))}
         </div>
 
+        {/* Outros Tipos Note */}
+        <div className="mt-12 text-center max-w-3xl mx-auto px-4">
+          <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
+            Estes são os nossos principais tipos de insulfilm de alta performance. No entanto, trabalhamos com <strong className="text-white">todas as tecnologias e marcas do mercado</strong> para atender qualquer demanda específica. Se você busca uma solução exclusiva ou não encontrou o que precisava aqui, <a href="https://wa.me/5521965140612?text=Olá! Gostaria de saber sobre um tipo de película específico que não encontrei no site." target="_blank" rel="noopener noreferrer" className="text-[#c9a227] hover:underline font-bold">entre em contato</a> e nós resolveremos o seu problema!
+          </p>
+        </div>
+
         {/* Bottom CTA - Simulator Highlight */}
         <div className="text-center mt-12 sm:mt-20">
           <div className="inline-block p-[1px] rounded-xl bg-gradient-to-r from-transparent via-[#c9a227]/50 to-transparent mb-6">
