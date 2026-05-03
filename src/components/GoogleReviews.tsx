@@ -48,13 +48,13 @@ export function GoogleReviews() {
         {/* Native Tailwind CSS Reviews Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-4 sm:px-0">
           {reviews.map((review) => (
-            <div 
-              key={review.id} 
+            <div
+              key={review.id}
               className="glass-panel p-6 sm:p-8 rounded-2xl border border-white/5 relative group hover:-translate-y-2 transition-transform duration-300 shadow-2xl bg-gradient-to-b from-[#0a1628]/80 to-[#070f1a]/95"
             >
               {/* Background accent */}
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#c9a227]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-tr-2xl pointer-events-none" />
-              
+
               <Quote className="absolute top-6 right-6 w-8 h-8 text-white/5" />
 
               {/* Stars */}
@@ -85,9 +85,9 @@ export function GoogleReviews() {
 
         {/* Call to action for more reviews */}
         <div className="text-center mt-12">
-          <a 
-            href="https://g.page/r/YOUR_GOOGLE_MAPS_LINK" 
-            target="_blank" 
+          <a
+            href="https://www.google.com/maps/search/?api=1&query=Estrada+do+Realengo+973,+Rio+de+Janeiro,+RJ"
+            target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 text-[#c9a227] hover:text-white transition-colors text-sm font-medium border border-[#c9a227]/30 hover:border-[#c9a227] rounded-full px-6 py-2 bg-[#c9a227]/5"
           >

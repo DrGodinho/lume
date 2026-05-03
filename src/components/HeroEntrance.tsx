@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 
 interface HeroEntranceProps {
   children: React.ReactNode;
@@ -10,8 +11,11 @@ interface HeroEntranceProps {
 
 export function HeroEntrance({ children, className }: HeroEntranceProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
+    if (prefersReducedMotion) return;
+
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
 
@@ -39,7 +43,7 @@ export function HeroEntrance({ children, className }: HeroEntranceProps) {
     }, containerRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [prefersReducedMotion]);
 
   return (
     <div ref={containerRef} className={className}>

@@ -63,16 +63,12 @@ const jsonLd = {
       name: 'LUME Controle Solar',
     },
   },
-  hasOfferCatalog: {
-    '@type': 'OfferCatalog',
-    name: 'Especificações Técnicas - Carbono Premium',
-    itemListElement: [
-      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Rejeição de Calor Infravermelho (IRR)', description: 'Até 80%' } },
-      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Bloqueio UV', description: '99%' } },
-      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Transmissão de Luz (VLT)', description: '5% a 50%' } },
-      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'TSER (Rejeição Solar Total)', description: 'Até 70%' } },
-    ],
-  },
+  additionalProperty: [
+    { '@type': 'PropertyValue', name: 'Rejeição de Calor Infravermelho (IRR)', value: 'Até 80%' },
+    { '@type': 'PropertyValue', name: 'Bloqueio UV', value: '99%' },
+    { '@type': 'PropertyValue', name: 'Transmissão de Luz (VLT)', value: '5% a 50%' },
+    { '@type': 'PropertyValue', name: 'TSER (Rejeição Solar Total)', value: 'Até 70%' },
+  ],
   termsOfService: 'Garantia de 5 anos contra bolhas, descolamento e alteração de cor.',
   aggregateRating: {
     '@type': 'AggregateRating',

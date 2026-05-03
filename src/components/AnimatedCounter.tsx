@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 
 interface AnimatedCounterProps {
   target: string;
@@ -11,10 +12,16 @@ export function AnimatedCounter({ target, suffix = '' }: AnimatedCounterProps) {
   const [count, setCount] = useState(0);
   const counterRef = useRef<HTMLSpanElement>(null);
   const hasAnimated = useRef(false);
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const numTarget = useMemo(() => parseInt(target.replace(/\D/g, '')), [target]);
 
   useEffect(() => {
-    const numTarget = parseInt(target.replace(/\D/g, ''));
     if (!numTarget) return;
+
+    if (prefersReducedMotion) {
+      hasAnimated.current = true;
+      return;
+    }
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -50,9 +57,10 @@ export function AnimatedCounter({ target, suffix = '' }: AnimatedCounterProps) {
     }
 
     return () => observer.disconnect();
-  }, [target]);
+  }, [numTarget, prefersReducedMotion]);
 
-  const displayValue = target.startsWith('-') ? `-${count}` : `${count}`;
+  const resolvedCount = prefersReducedMotion ? numTarget : count;
+  const displayValue = target.startsWith('-') ? `-${resolvedCount}` : `${resolvedCount}`;
 
   return (
     <span ref={counterRef}>

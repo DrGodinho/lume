@@ -63,16 +63,12 @@ const jsonLd = {
       name: 'LUME Controle Solar',
     },
   },
-  hasOfferCatalog: {
-    '@type': 'OfferCatalog',
-    name: 'Especificações Técnicas - Nano Cerâmica',
-    itemListElement: [
-      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Rejeição de Calor Infravermelho (IRR)', description: 'Até 97%' } },
-      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Bloqueio UV', description: '99%' } },
-      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Transmissão de Luz (VLT)', description: '40% a 70%' } },
-      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'TSER (Rejeição Solar Total)', description: 'Até 85%' } },
-    ],
-  },
+  additionalProperty: [
+    { '@type': 'PropertyValue', name: 'Rejeição de Calor Infravermelho (IRR)', value: 'Até 97%' },
+    { '@type': 'PropertyValue', name: 'Bloqueio UV', value: '99%' },
+    { '@type': 'PropertyValue', name: 'Transmissão de Luz (VLT)', value: '40% a 70%' },
+    { '@type': 'PropertyValue', name: 'TSER (Rejeição Solar Total)', value: 'Até 85%' },
+  ],
   termsOfService: 'Garantia de 5 anos contra bolhas, descolamento e alteração de cor.',
   aggregateRating: {
     '@type': 'AggregateRating',

@@ -17,9 +17,13 @@ interface BreadcrumbItem {
 
 interface NavigationBreadcrumbsProps {
   items: BreadcrumbItem[];
+  showVisualTrail?: boolean;
 }
 
-export function NavigationBreadcrumbs({ items }: NavigationBreadcrumbsProps) {
+export function NavigationBreadcrumbs({
+  items,
+  showVisualTrail = true,
+}: NavigationBreadcrumbsProps) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -37,33 +41,35 @@ export function NavigationBreadcrumbs({ items }: NavigationBreadcrumbsProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <Breadcrumb className="mb-6">
-        <BreadcrumbList className="text-gray-400">
-          {items.map((item, index) => (
-            <React.Fragment key={index}>
-              <BreadcrumbItem>
-                {index === items.length - 1 || !item.href ? (
-                  <BreadcrumbPage className="text-gray-300 font-medium">
-                    {item.label}
-                  </BreadcrumbPage>
-                ) : (
-                  <BreadcrumbLink asChild>
-                    <a 
-                      href={item.href + (item.href === '/' ? '' : '/')} 
-                      className="text-gray-500 hover:text-[#c9a227] transition-colors"
-                    >
+      {showVisualTrail && (
+        <Breadcrumb className="mb-6">
+          <BreadcrumbList className="text-gray-400">
+            {items.map((item, index) => (
+              <React.Fragment key={index}>
+                <BreadcrumbItem>
+                  {index === items.length - 1 || !item.href ? (
+                    <BreadcrumbPage className="text-gray-300 font-medium">
                       {item.label}
-                    </a>
-                  </BreadcrumbLink>
+                    </BreadcrumbPage>
+                  ) : (
+                    <BreadcrumbLink asChild>
+                      <a 
+                        href={item.href + (item.href === '/' ? '' : '/')} 
+                        className="text-gray-500 hover:text-[#c9a227] transition-colors"
+                      >
+                        {item.label}
+                      </a>
+                    </BreadcrumbLink>
+                  )}
+                </BreadcrumbItem>
+                {index < items.length - 1 && (
+                  <BreadcrumbSeparator className="text-gray-600" />
                 )}
-              </BreadcrumbItem>
-              {index < items.length - 1 && (
-                <BreadcrumbSeparator className="text-gray-600" />
-              )}
-            </React.Fragment>
-          ))}
-        </BreadcrumbList>
-      </Breadcrumb>
+              </React.Fragment>
+            ))}
+          </BreadcrumbList>
+        </Breadcrumb>
+      )}
     </>
   );
 }

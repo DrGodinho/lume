@@ -22,6 +22,49 @@ const FAQAccordion = ({ items }: { items: { q: string, a: string }[] }) => (
     </div>
 );
 
+const roomsData = [
+    {
+        icon: '🍳',
+        title: 'Cozinha',
+        recs: [
+            { film: 'Nano Cerâmica', tag: 'Top para calor', desc: 'Barrar o calor do sol sem escurecer o ambiente onde você prepara refeições e precisa de clareza natural.', link: '/nano-ceramica/' },
+            { film: 'Jateado', tag: 'Para privacidade', desc: 'Ideal se a cozinha tiver vista direta para a rua ou área comum do condomínio, mantendo a luz suave.', link: '/jateado/' },
+        ]
+    },
+    {
+        icon: '🛏️',
+        title: 'Quarto',
+        recs: [
+            { film: 'Dupla Camada', tag: 'Alta performance', desc: 'Escurecimento profundo + bloqueio total de calor. Perfeito para quem precisa dormir em qualquer horário.', link: '/dupla-camada/' },
+            { film: 'Carbono G5', tag: 'Opção econômica', desc: 'Visual preto absoluto com excelente privacidade. Ótimo custo-benefício para quem quer escurecer sem espelhamento.', link: '/carbono/' },
+        ]
+    },
+    {
+        icon: '🛋️',
+        title: 'Sala',
+        recs: [
+            { film: 'Nano Cerâmica', tag: 'Premium', desc: 'Mantém a sala clarinha e agradável, bloqueando intensamente o calor que entra pelas grandes janelas.', link: '/nano-ceramica/' },
+            { film: 'Refletiva', tag: 'Redução de calor', desc: 'Boa barreira térmica com espelhamento externo. Equilibra proteção e orçamento.', link: '/refletiva/' },
+            { film: 'Carbono G20', tag: 'Econômica', desc: 'Redução confortável de calor e luminosidade. Boa opção para sala de estar que não pega sol forte o dia todo.', link: '/carbono/' },
+        ]
+    },
+    {
+        icon: '🚿',
+        title: 'Banheiro',
+        recs: [
+            { film: 'Jateado', tag: 'Máxima privacidade', desc: 'Privacidade total sem deixar o ambiente escuro. A luz difusa deixa o banheiro iluminado e completamente blindado de olhares.', link: '/jateado/' },
+        ]
+    },
+    {
+        icon: '💻',
+        title: 'Escritório',
+        recs: [
+            { film: 'Nano Cerâmica', tag: 'Premium', desc: 'Evita o calor que causa sonolência e mantém a claridade para leitura e tela sem glare excessivo.', link: '/nano-ceramica/' },
+            { film: 'Carbono G20', tag: 'Confortável', desc: 'Reduz o reflexo na tela do computador e deixa a luminosidade confortável para longas jornadas de trabalho.', link: '/carbono/' },
+        ]
+    }
+];
+
 export function GuiaInsulfilm() {
     useEffect(() => {
         // Entrance Animation
@@ -62,6 +105,14 @@ export function GuiaInsulfilm() {
 
             {/* Main Content */}
             <main className="container-lume max-w-4xl mx-auto py-16 px-4 space-y-20 page-entrance">
+
+                {/* Definição Técnica */}
+                <section className="prose prose-lg prose-invert max-w-none text-gray-300">
+                    <h2 className="text-3xl font-bold font-montserrat text-white mb-6">O que é Insulfilm?</h2>
+                    <p className="text-xl leading-relaxed text-gray-400">
+                        Tecnicamente conhecido como <strong>Película de Controle Solar</strong>, o insulfilm é um laminado composto por múltiplas camadas de poliéster (PET) de alta resistência ótica. Diferente de um adesivo comum, ele é um dispositivo de engenharia de materiais que utiliza nanotecnologia, pigmentos inorgânicos e metais (em linhas específicas) para filtrar seletivamente o espectro solar. Sua estrutura conta com uma camada de adesivo sensível à pressão, camadas de filtragem de radiação Ultravioleta (UV) e Infravermelha (IR), e um revestimento externo chamado <strong>Hard Coat</strong>, que protege o material contra riscos e abrasão mecânica durante a limpeza.
+                    </p>
+                </section>
 
                 {/* Introdução */}
                 <section className="prose prose-lg prose-invert max-w-none text-gray-300">
@@ -178,45 +229,39 @@ export function GuiaInsulfilm() {
                     <h2 className="text-3xl font-bold font-montserrat text-white mb-4">4. Guia de Seleção: Escolha a Película Ideal</h2>
                     <p className="text-gray-400 text-lg mb-10">Escolher a película certa depende da sua prioridade. Identifique seu cenário abaixo:</p>
 
-                    <div className="grid md:grid-cols-2 gap-6">
-                        {/* Cenário 1 */}
-                        <div className="glass-card border border-white/10 rounded-2xl p-6 hover:border-[#c9a227]/30 transition-all text-left">
-                            <h3 className="text-[#c9a227] font-bold text-xl mb-2">Cenário 1: Privacidade Máxima</h3>
-                            <p className="text-sm text-gray-500 mb-4 uppercase tracking-wider">Para salas e quartos térreos</p>
-                            <ul className="space-y-3 text-gray-300">
-                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <a href="/dupla-camada/" className="hover:underline"><strong>Dupla Camada G5:</strong></a> Espelhada por fora, clara por dentro.</li>
-                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <a href="/carbono/" className="hover:underline"><strong>Carbono G5:</strong></a> Visual preto absoluto.</li>
-                            </ul>
-                        </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {roomsData.map((room, idx) => (
+                            <div
+                                key={idx}
+                                className="page-entrance group relative glass-card p-6 sm:p-8 rounded-2xl bg-gradient-to-b from-[#1a3a5c]/40 to-[#04080f]/60 border border-[#1a3a5c]/30 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 flex flex-col overflow-hidden text-left"
+                            >
+                                {/* Glow effect */}
+                                <div className="absolute inset-0 rounded-2xl bg-[#c9a227]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
-                        {/* Cenário 2 */}
-                        <div className="glass-card border border-white/10 rounded-2xl p-6 hover:border-[#c9a227]/30 transition-all text-left">
-                            <h3 className="text-[#c9a227] font-bold text-xl mb-2">Cenário 2: Foco em Luz Natural</h3>
-                            <p className="text-sm text-gray-500 mb-4 uppercase tracking-wider">Tira o calor sem escurecer</p>
-                            <ul className="space-y-3 text-gray-300">
-                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <a href="/nano-ceramica/" className="hover:underline"><strong>Nano Cerâmica:</strong></a> Rejeita 97% do calor, alta transparência.</li>
-                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <a href="/jateado/" className="hover:underline"><strong>Jateada:</strong></a> Difunde luz suavemente (fosco).</li>
-                            </ul>
-                        </div>
-
-                        {/* Cenário 3 */}
-                        <div className="glass-card border border-white/10 rounded-2xl p-6 hover:border-[#c9a227]/30 transition-all text-left">
-                            <h3 className="text-[#c9a227] font-bold text-xl mb-2">Cenário 3: Custo-Benefício</h3>
-                            <p className="text-sm text-gray-500 mb-4 uppercase tracking-wider">Proteção com orçamento controlado</p>
-                            <ul className="space-y-3 text-gray-300">
-                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <a href="/carbono/" className="hover:underline"><strong>Carbono Premium:</strong></a> A partir de R$ 80/m².</li>
-                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <a href="/refletiva/" className="hover:underline"><strong>Refletiva Clássica:</strong></a> Melhor custo para redução bruta.</li>
-                            </ul>
-                        </div>
-
-                        {/* Cenário 4 */}
-                        <div className="glass-card border border-white/10 rounded-2xl p-6 hover:border-[#c9a227]/30 transition-all bg-gradient-to-br from-[#c9a227]/5 to-transparent text-left">
-                            <h3 className="text-[#c9a227] font-bold text-xl mb-2">Cenário Especial: O Astro-Rei</h3>
-                            <p className="text-sm text-gray-500 mb-4 uppercase tracking-wider">Contra o sol da tarde extremo</p>
-                            <ul className="space-y-3 text-gray-300">
-                                <li className="flex gap-2"><CheckCircle size={20} className="text-[#c9a227] flex-shrink-0" /> <a href="/dupla-camada/" className="hover:underline"><strong>Dupla Camada G5:</strong></a> A barreira térmica definitiva (TSER 75%).</li>
-                            </ul>
-                        </div>
+                                <div className="relative z-10">
+                                    <div className="flex items-center gap-3 mb-6">
+                                        <span className="text-3xl group-hover:scale-110 transition-transform duration-300 inline-block">{room.icon}</span>
+                                        <h3 className="text-[#c9a227] font-bold text-xl font-montserrat">{room.title}</h3>
+                                    </div>
+                                    
+                                    <div className="space-y-5 flex-1">
+                                        {room.recs.map((rec, rIdx) => (
+                                            <div key={rIdx} className="pb-5 border-b border-white/10 last:border-0 last:pb-0">
+                                                <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                                    <a href={rec.link} className="font-bold text-white hover:text-[#c9a227] transition-colors relative z-20">
+                                                        {rec.film}
+                                                    </a>
+                                                    <span className="bg-[#c9a227]/15 text-[#c9a227] text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">
+                                                        {rec.tag}
+                                                    </span>
+                                                </div>
+                                                <p className="text-gray-400 text-sm leading-relaxed">{rec.desc}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
                     </div>
 
                     <FAQAccordion items={[

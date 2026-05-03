@@ -12,16 +12,16 @@ export function Hero() {
     >
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
-        <Image 
-          src="/hero-bg.webp" 
-          alt="Sala de estar protegida com insulfilm residencial Lume na Zona Oeste do Rio" 
-          fill 
-          sizes="100vw" 
-          priority 
-          className="w-full h-full object-cover" 
+        <Image
+          src="/hero-bg-v2.png"
+          alt="Sala de estar moderna com grandes janelas protegidas por insulfilm LUME, mostrando o contraste entre vidros protegidos e claros."
+          fill
+          sizes="100vw"
+          priority
+          className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#04080f]/95 via-[#04080f]/80 to-[#04080f]/60" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#04080f] via-transparent to-[#04080f]/50" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
       </div>
 
       {/* Particles */}
@@ -68,7 +68,7 @@ export function Hero() {
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </GtagLink>
             <a
-              href="/produtos/"
+              href="#produtos"
               className="btn-secondary flex items-center justify-center gap-2 w-full sm:w-auto"
             >
               Conhecer Produtos
@@ -101,7 +101,7 @@ export function Hero() {
 
       {/* Floating gold accent */}
       <div className="absolute top-1/4 right-10 w-32 h-32 rounded-full bg-[#c9a227]/5 blur-3xl animate-float pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-[#1a3a5c]/30 blur-3xl animate-float pointer-events-none" style={{ animationDelay: '2s' }} />
+      <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-[#c9a227]/10 blur-3xl animate-float pointer-events-none" style={{ animationDelay: '2s' }} />
     </section>
   );
 }

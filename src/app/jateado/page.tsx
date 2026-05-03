@@ -63,16 +63,12 @@ const jsonLd = {
       name: 'LUME Controle Solar',
     },
   },
-  hasOfferCatalog: {
-    '@type': 'OfferCatalog',
-    name: 'Especificações Técnicas - Película Jateada',
-    itemListElement: [
-      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Transmissão de Luz (VLT)', description: '50% a 85%' } },
-      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Bloqueio UV', description: '99%' } },
-      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Privacidade Visual', description: '100% (bloqueio total da visão)' } },
-      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Aplicação', description: 'Banheiros, divisórias, portas de vidro' } },
-    ],
-  },
+  additionalProperty: [
+    { '@type': 'PropertyValue', name: 'Transmissão de Luz (VLT)', value: '50% a 85%' },
+    { '@type': 'PropertyValue', name: 'Bloqueio UV', value: '99%' },
+    { '@type': 'PropertyValue', name: 'Privacidade Visual', value: '100% (bloqueio total da visão)' },
+    { '@type': 'PropertyValue', name: 'Aplicação', value: 'Banheiros, divisórias, portas de vidro' },
+  ],
   termsOfService: 'Garantia de 5 anos contra bolhas e descolamento.',
   aggregateRating: {
     '@type': 'AggregateRating',

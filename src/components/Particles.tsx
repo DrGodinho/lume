@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 
 interface Particle {
   x: number;
@@ -17,8 +18,11 @@ export function Particles() {
   const particlesRef = useRef<Particle[]>([]);
   const animationRef = useRef<number>(0);
   const mouseRef = useRef({ x: 0, y: 0 });
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
+    if (prefersReducedMotion) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -26,8 +30,12 @@ export function Particles() {
     if (!ctx) return;
 
     const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      canvas.width = Math.floor(window.innerWidth * dpr);
+      canvas.height = Math.floor(window.innerHeight * dpr);
+      canvas.style.width = `${window.innerWidth}px`;
+      canvas.style.height = `${window.innerHeight}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
 
     resizeCanvas();
@@ -53,7 +61,27 @@ export function Particles() {
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
 
     let frameCount = 0;
+    let isDocumentVisible = !document.hidden;
+
+    const handleVisibilityChange = () => {
+      isDocumentVisible = !document.hidden;
+
+      if (isDocumentVisible && !animationRef.current) {
+        animationRef.current = requestAnimationFrame(animate);
+      }
+
+      if (!isDocumentVisible && animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = 0;
+      }
+    };
+
     const animate = () => {
+      if (!isDocumentVisible) {
+        animationRef.current = 0;
+        return;
+      }
+
       frameCount++;
       // Render every 2nd frame for performance (30fps)
       if (frameCount % 2 === 0) {
@@ -109,18 +137,27 @@ export function Particles() {
       animationRef.current = requestAnimationFrame(animate);
     };
 
-    animate();
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    animationRef.current = requestAnimationFrame(animate);
 
     return () => {
       window.removeEventListener('resize', resizeCanvas);
       window.removeEventListener('mousemove', handleMouseMove);
-      cancelAnimationFrame(animationRef.current);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
     };
-  }, []);
+  }, [prefersReducedMotion]);
+
+  if (prefersReducedMotion) {
+    return null;
+  }
 
   return (
     <canvas
       ref={canvasRef}
+      aria-hidden="true"
       className="absolute inset-0 pointer-events-none z-10"
       style={{ opacity: 0.8 }}
     />

@@ -99,16 +99,28 @@ const jsonLd = {
     name: 'Serviços de Insulfilm',
     itemListElement: [
       {
-        '@type': 'Offer',
-        itemOffered: { '@type': 'Service', name: 'Insulfilm Nano Cerâmica', description: 'Alta redução de calor e proteção UV extrema.' },
+        '@type': 'ListItem',
+        position: 1,
+        item: {
+          '@type': 'Offer',
+          itemOffered: { '@type': 'Service', name: 'Insulfilm Nano Cerâmica', description: 'Alta redução de calor e proteção UV extrema.' },
+        },
       },
       {
-        '@type': 'Offer',
-        itemOffered: { '@type': 'Service', name: 'Insulfilm de Carbono', description: 'Estética premium e durabilidade superior.' },
+        '@type': 'ListItem',
+        position: 2,
+        item: {
+          '@type': 'Offer',
+          itemOffered: { '@type': 'Service', name: 'Insulfilm de Carbono', description: 'Estética premium e durabilidade superior.' },
+        },
       },
       {
-        '@type': 'Offer',
-        itemOffered: { '@type': 'Service', name: 'Insulfilm Refletivo', description: 'Privacidade total e redução de calor eficiente.' },
+        '@type': 'ListItem',
+        position: 3,
+        item: {
+          '@type': 'Offer',
+          itemOffered: { '@type': 'Service', name: 'Insulfilm Refletivo', description: 'Privacidade total e redução de calor eficiente.' },
+        },
       },
     ],
   },
@@ -149,7 +161,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={`${montserrat.variable} ${openSans.variable} font-sans`}>
         <LayoutShell>{children}</LayoutShell>
-
       </body>
     </html>
   );

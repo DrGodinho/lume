@@ -28,6 +28,7 @@ export function DuplaCamadaPage() {
 
                 <div className="container-lume relative z-10 page-entrance text-center md:text-left">
                     <NavigationBreadcrumbs 
+                        showVisualTrail={false}
                         items={[
                             { label: 'Início', href: '/' },
                             { label: 'Dupla Camada' }

@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -16,8 +17,11 @@ interface Props {
 
 export function ScrollReveal({ children, animation = 'fade-in', className = '' }: Props) {
   const ref = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
+    if (prefersReducedMotion) return;
+
     const ctx = gsap.context(() => {
       if (animation === 'fade-in' || animation === 'slide-up' || animation === 'slide-left') {
         const items = ref.current?.querySelectorAll('.animate-item');
@@ -73,7 +77,7 @@ export function ScrollReveal({ children, animation = 'fade-in', className = '' }
     }, ref);
 
     return () => ctx.revert();
-  }, [animation]);
+  }, [animation, prefersReducedMotion]);
 
   return (
     <div ref={ref} className={className}>

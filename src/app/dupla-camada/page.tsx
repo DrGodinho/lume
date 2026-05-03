@@ -63,17 +63,13 @@ const jsonLd = {
       name: 'LUME Controle Solar',
     },
   },
-  hasOfferCatalog: {
-    '@type': 'OfferCatalog',
-    name: 'Especificações Técnicas - Dupla Camada',
-    itemListElement: [
-      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Rejeição de Calor Infravermelho (IRR) - G5', description: '95%' } },
-      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Rejeição de Calor Infravermelho (IRR) - G20', description: '90%' } },
-      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Bloqueio UV', description: '99%' } },
-      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'TSER G5 (Rejeição Solar Total)', description: 'Até 75%' } },
-      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'TSER G20 (Rejeição Solar Total)', description: 'Até 65%' } },
-    ],
-  },
+  additionalProperty: [
+    { '@type': 'PropertyValue', name: 'Rejeição de Calor Infravermelho (IRR) - G5', value: '95%' },
+    { '@type': 'PropertyValue', name: 'Rejeição de Calor Infravermelho (IRR) - G20', value: '90%' },
+    { '@type': 'PropertyValue', name: 'Bloqueio UV', value: '99%' },
+    { '@type': 'PropertyValue', name: 'TSER G5 (Rejeição Solar Total)', value: 'Até 75%' },
+    { '@type': 'PropertyValue', name: 'TSER G20 (Rejeição Solar Total)', value: 'Até 65%' },
+  ],
   termsOfService: 'Garantia de 5 anos contra bolhas, descolamento e alteração de cor.',
   aggregateRating: {
     '@type': 'AggregateRating',

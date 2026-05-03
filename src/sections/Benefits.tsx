@@ -64,17 +64,17 @@ export function Benefits() {
       <div className="container-lume relative z-10">
         {/* Section Header */}
         <ScrollReveal animation="slide-up" className="text-center mb-8 sm:mb-12">
-          <div className="flex items-center justify-center gap-2 sm:gap-4 mb-3 sm:mb-4">
+          <div className="animate-item flex items-center justify-center gap-2 sm:gap-4 mb-3 sm:mb-4">
             <div className="h-px w-10 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
             <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
               Vantagens
             </span>
             <div className="h-px w-10 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
           </div>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-4 font-montserrat">
+          <h2 className="animate-item text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-4 font-montserrat">
             Por Que Escolher a <span className="text-gradient-gold">Lume</span>?
           </h2>
-          <p className="text-gray-400 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto px-2 sm:px-0">
+          <p className="animate-item text-gray-400 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto px-2 sm:px-0">
             Benefícios que fazem a diferença no seu dia a dia e na qualidade de vida da sua família.
           </p>
         </ScrollReveal>

@@ -63,17 +63,13 @@ const jsonLd = {
       name: 'LUME Controle Solar',
     },
   },
-  hasOfferCatalog: {
-    '@type': 'OfferCatalog',
-    name: 'Especificações Técnicas - Película Refletiva',
-    itemListElement: [
-      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Rejeição de Calor Infravermelho (IRR)', description: '70% a 85%' } },
-      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Bloqueio UV', description: '99%' } },
-      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Transmissão de Luz (VLT)', description: '8% a 35%' } },
-      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'TSER (Rejeição Solar Total)', description: '65% a 78%' } },
-      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Privacidade Diurna', description: 'Total (efeito espelho)' } },
-    ],
-  },
+  additionalProperty: [
+    { '@type': 'PropertyValue', name: 'Rejeição de Calor Infravermelho (IRR)', value: '70% a 85%' },
+    { '@type': 'PropertyValue', name: 'Bloqueio UV', value: '99%' },
+    { '@type': 'PropertyValue', name: 'Transmissão de Luz (VLT)', value: '8% a 35%' },
+    { '@type': 'PropertyValue', name: 'TSER (Rejeição Solar Total)', value: '65% a 78%' },
+    { '@type': 'PropertyValue', name: 'Privacidade Diurna', value: 'Total (efeito espelho)' },
+  ],
   termsOfService: 'Garantia de 5 anos contra bolhas, descolamento e alteração de cor.',
   aggregateRating: {
     '@type': 'AggregateRating',

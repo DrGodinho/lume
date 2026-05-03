@@ -5,6 +5,7 @@ import { ArrowRight, Star, Thermometer, Sun, Eye, Droplets, Sparkles } from 'luc
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Image from 'next/image';
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -95,8 +96,11 @@ export function Products() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
+    if (prefersReducedMotion) return;
+
     const ctx = gsap.context(() => {
       // Title animation
       gsap.fromTo(
@@ -140,7 +144,7 @@ export function Products() {
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [prefersReducedMotion]);
 
   return (
     <section
@@ -178,8 +182,7 @@ export function Products() {
           {products.map((product, index) => (
             <div
               key={product.id}
-              className={`product-card group relative bg-gradient-to-b from-[#0a1628]/80 to-[#070f1a]/95 rounded-xl sm:rounded-2xl border border-white/5 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 sm:hover:-translate-y-3 hover:shadow-2xl hover:shadow-[#c9a227]/10 ${index % 2 === 1 ? 'lg:mt-8' : ''
-                }`}
+              className={`product-card group relative bg-gradient-to-b from-[#0a1628]/80 to-[#070f1a]/95 rounded-xl sm:rounded-2xl border border-white/5 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 sm:hover:-translate-y-3 hover:shadow-2xl hover:shadow-[#c9a227]/10 ${index % 2 === 1 ? 'lg:mt-8' : ''}`}
             >
               {/* Tag */}
               {product.tag && (
@@ -188,19 +191,19 @@ export function Products() {
                 </div>
               )}
 
-              <a 
-                href={product.path + '/'} 
+              <a
+                href={product.path + '/'}
                 className="block cursor-pointer relative z-30"
               >
                 {/* Image */}
                 <div className="relative h-40 sm:h-48 overflow-hidden">
-                  <Image 
-                    src={product.image} 
-                    alt={product.name} 
-                    fill 
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw" 
+                  <Image
+                    src={product.image}
+                    alt={product.name}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw"
                     loading="lazy"
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#04080f] via-transparent to-transparent" />
                 </div>
@@ -240,7 +243,7 @@ export function Products() {
               {/* Botão de WhatsApp fixo dentro do card, mas fora do link da página */}
               <div className="p-4 sm:p-5 pt-0">
                 <a
-                  href={`https://wa.me/5521965140612?text=Olá! Tenho interesse na ${product.name}`}
+                  href={`https://wa.me/5521965140612?text=${encodeURIComponent(`Olá! Tenho interesse na ${product.name}`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg bg-[#070f1a] hover:bg-[#c9a227] text-white hover:text-[#04080f] text-xs sm:text-sm font-semibold uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-2 group/btn border border-white/5"
