@@ -102,10 +102,10 @@ export function Navbar() {
           {/* CTA Button */}
           <div className="hidden lg:flex items-center gap-4">
             <a
-              href="/simulador/"
+              href="/guia-insulfilm/"
               className="btn-secondary flex items-center gap-2 text-xs py-2 px-4 transition-transform hover:scale-105 active:scale-95"
             >
-              Qual película escolher?
+              Guia de Películas
             </a>
             <a
               href="https://wa.me/5521965140612"
@@ -166,11 +166,11 @@ export function Navbar() {
               )
             ))}
             <a
-              href="/simulador/"
+              href="/guia-insulfilm/"
               className="btn-secondary flex items-center justify-center gap-2 mt-2"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Qual película escolher?
+              Guia de Películas
             </a>
             <a
               href="https://wa.me/5521965140612"

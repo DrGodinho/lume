@@ -149,18 +149,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           src="https://www.googletagmanager.com/gtag/js?id=G-RKVB0YQTJY"
           strategy="afterInteractive"
         />
-        <Script id="gtag-init" strategy="afterInteractive">
-          {`
-            window.dataLayer=window.dataLayer||[];
-            function gtag(){dataLayer.push(arguments)}
-            gtag("js",new Date);
-            gtag("config","G-RKVB0YQTJY");
-            function gtagSendEvent(e){
-              var n=function(){"string"==typeof e&&(window.location=e)};
-              return gtag("event","conversion_event_contact",{event_callback:n,event_timeout:2e3}),!1
-            }
-          `}
-        </Script>
+        <Script 
+          id="gtag-init" 
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer=window.dataLayer||[];
+              function gtag(){dataLayer.push(arguments)}
+              gtag("js",new Date);
+              gtag("config","G-RKVB0YQTJY");
+              function gtagSendEvent(e){
+                var n=function(){"string"==typeof e&&(window.location=e)};
+                return gtag("event","conversion_event_contact",{event_callback:n,event_timeout:2e3}),!1
+              }
+            `
+          }}
+        />
       </head>
       <body className={`${montserrat.variable} ${openSans.variable} font-sans`}>
         <LayoutShell>{children}</LayoutShell>

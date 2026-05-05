@@ -24,6 +24,7 @@ const roomsData = [
   {
     icon: '🍳',
     title: 'Cozinha',
+    titleLink: '/insulfilm-na-cozinha/',
     recs: [
       { film: 'Nano Cerâmica', tag: 'Top para calor', desc: 'Barrar o calor do sol sem escurecer o ambiente onde você prepara refeições e precisa de clareza natural.', link: '/nano-ceramica/' },
       { film: 'Jateado', tag: 'Para privacidade', desc: 'Ideal se a cozinha tiver vista direta para a rua ou área comum do condomínio, mantendo a luz suave.', link: '/jateado/' },
@@ -32,6 +33,7 @@ const roomsData = [
   {
     icon: '🛏️',
     title: 'Quarto',
+    titleLink: '/insulfilm-no-quarto/',
     recs: [
       { film: 'Dupla Camada', tag: 'Alta performance', desc: 'Escurecimento profundo + bloqueio total de calor. Perfeito para quem precisa dormir em qualquer horário.', link: '/dupla-camada/' },
       { film: 'Carbono G5', tag: 'Opção econômica', desc: 'Visual preto absoluto com excelente privacidade. Ótimo custo-benefício para quem quer escurecer sem espelhamento.', link: '/carbono/' },
@@ -49,6 +51,7 @@ const roomsData = [
   {
     icon: '🚿',
     title: 'Banheiro',
+    titleLink: '/insulfilm-no-banheiro/',
     recs: [
       { film: 'Jateado', tag: 'Máxima privacidade', desc: 'Privacidade total sem deixar o ambiente escuro. A luz difusa deixa o banheiro iluminado e completamente blindado de olhares.', link: '/jateado/' },
     ]
@@ -95,8 +98,8 @@ export function SelectionGuide() {
           <div className="flex items-center gap-2"><span className="text-[#c9a227]">●</span> Privacidade: opacidade / espelhamento</div>
         </ScrollReveal>
 
-        {/* Table */}
-        <ScrollReveal animation="slide-up" className="overflow-x-auto mb-6 border border-white/10 rounded-2xl glass-card bg-gradient-to-br from-white/[0.02] to-transparent">
+         {/* Table - Desktop */}
+        <ScrollReveal animation="slide-up" className="overflow-x-auto mb-6 border border-white/10 rounded-2xl glass-card bg-gradient-to-br from-white/[0.02] to-transparent md:block hidden">
           <table className="w-full text-left min-w-[760px]">
             <thead>
               <tr className="border-b border-white/10 bg-white/[0.02]">
@@ -125,6 +128,36 @@ export function SelectionGuide() {
           </table>
         </ScrollReveal>
 
+        {/* Mobile Cards */}
+        <ScrollReveal animation="slide-up" className="md:hidden mb-6 space-y-4">
+          {filmsData.map((film, idx) => (
+            <div key={idx} className="border border-white/10 rounded-2xl glass-card bg-gradient-to-br from-white/[0.02] to-transparent p-5 hover:bg-white/[0.02] transition-colors">
+              <div className="flex items-start justify-between mb-4">
+                <a href={film.link} className="font-bold text-white hover:text-[#c9a227] transition-colors text-lg">
+                  {film.name}
+                </a>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-4 mb-4">
+                <div className="text-center">
+                  <div className="text-xs text-[#c9a227] uppercase tracking-wider mb-2">Calor</div>
+                  <LevelDots level={film.calor} />
+                </div>
+                <div className="text-center">
+                  <div className="text-xs text-[#c9a227] uppercase tracking-wider mb-2">Luz</div>
+                  <LevelDots level={film.luz} />
+                </div>
+                <div className="text-center">
+                  <div className="text-xs text-[#c9a227] uppercase tracking-wider mb-2">Privacidade</div>
+                  <LevelDots level={film.priv} />
+                </div>
+              </div>
+              
+              <p className="text-gray-400 text-sm leading-relaxed">{film.desc}</p>
+            </div>
+          ))}
+        </ScrollReveal>
+
         {/* Footnote */}
         <ScrollReveal animation="fade-in" className="mb-16">
           <p className="text-[10px] sm:text-xs text-gray-500 italic text-center sm:text-left px-4">
@@ -145,7 +178,15 @@ export function SelectionGuide() {
               <div className="relative z-10">
                 <div className="flex items-center gap-3 mb-6">
                   <span className="text-3xl group-hover:scale-110 transition-transform duration-300 inline-block">{room.icon}</span>
-                  <h3 className="text-[#c9a227] font-bold text-xl sm:text-2xl font-montserrat">{room.title}</h3>
+                  <h3 className="text-[#c9a227] font-bold text-xl sm:text-2xl font-montserrat">
+                    {room.titleLink ? (
+                      <a href={room.titleLink} className="hover:text-white transition-colors relative z-20">
+                        {room.title}
+                      </a>
+                    ) : (
+                      room.title
+                    )}
+                  </h3>
                 </div>
                 
                 <div className="space-y-5 flex-1">

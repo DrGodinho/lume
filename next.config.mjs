@@ -3,6 +3,7 @@ const nextConfig = {
   // Output export for static hosting (cPanel/Hostinger/etc)
   output: 'export',
   trailingSlash: true,
+  allowedDevOrigins: ['192.168.0.7', '192.168.0.0/24'],
 
   // Disable React strict mode to avoid double-rendering GSAP animations
   reactStrictMode: false,

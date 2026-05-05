@@ -268,15 +268,15 @@ export function Products() {
           <div className="inline-block p-[1px] rounded-xl bg-gradient-to-r from-transparent via-[#c9a227]/50 to-transparent mb-6">
             <div className="bg-[#04080f] rounded-xl px-6 py-4 border border-white/5">
               <p className="text-gray-300 text-sm sm:text-base mb-6 font-medium">
-                Dúvida na escolha? <span className="text-white">Veja na prática</span> como cada película transforma seu ambiente.
+                Dúvida na escolha? <span className="text-white">Acesse nosso guia completo</span> e descubra a película ideal para sua necessidade.
               </p>
               <a
-                href="/simulador/"
+                href="/guia-insulfilm/"
                 className="btn-primary inline-flex items-center gap-3 py-4 px-8 text-lg group relative overflow-hidden z-30"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                 <Sparkles className="w-5 h-5 animate-pulse" />
-                Testar Simulador de Ambientes
+                Ler o Guia de Películas
                 <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
               </a>
             </div>

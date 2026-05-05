@@ -26,6 +26,7 @@ const roomsData = [
     {
         icon: '🍳',
         title: 'Cozinha',
+        titleLink: '/insulfilm-na-cozinha/',
         recs: [
             { film: 'Nano Cerâmica', tag: 'Top para calor', desc: 'Barrar o calor do sol sem escurecer o ambiente onde você prepara refeições e precisa de clareza natural.', link: '/nano-ceramica/' },
             { film: 'Jateado', tag: 'Para privacidade', desc: 'Ideal se a cozinha tiver vista direta para a rua ou área comum do condomínio, mantendo a luz suave.', link: '/jateado/' },
@@ -34,6 +35,7 @@ const roomsData = [
     {
         icon: '🛏️',
         title: 'Quarto',
+        titleLink: '/insulfilm-no-quarto/',
         recs: [
             { film: 'Dupla Camada', tag: 'Alta performance', desc: 'Escurecimento profundo + bloqueio total de calor. Perfeito para quem precisa dormir em qualquer horário.', link: '/dupla-camada/' },
             { film: 'Carbono G5', tag: 'Opção econômica', desc: 'Visual preto absoluto com excelente privacidade. Ótimo custo-benefício para quem quer escurecer sem espelhamento.', link: '/carbono/' },
@@ -51,6 +53,7 @@ const roomsData = [
     {
         icon: '🚿',
         title: 'Banheiro',
+        titleLink: '/insulfilm-no-banheiro/',
         recs: [
             { film: 'Jateado', tag: 'Máxima privacidade', desc: 'Privacidade total sem deixar o ambiente escuro. A luz difusa deixa o banheiro iluminado e completamente blindado de olhares.', link: '/jateado/' },
         ]
@@ -242,7 +245,15 @@ export function GuiaInsulfilm() {
                                 <div className="relative z-10">
                                     <div className="flex items-center gap-3 mb-6">
                                         <span className="text-3xl group-hover:scale-110 transition-transform duration-300 inline-block">{room.icon}</span>
-                                        <h3 className="text-[#c9a227] font-bold text-xl font-montserrat">{room.title}</h3>
+                                        <h3 className="text-[#c9a227] font-bold text-xl font-montserrat">
+                                            {room.titleLink ? (
+                                                <a href={room.titleLink} className="hover:text-white transition-colors relative z-20">
+                                                    {room.title}
+                                                </a>
+                                            ) : (
+                                                room.title
+                                            )}
+                                        </h3>
                                     </div>
                                     
                                     <div className="space-y-5 flex-1">

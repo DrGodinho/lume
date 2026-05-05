@@ -62,10 +62,10 @@ export function Footer() {
 
       <div className="container-lume relative z-10">
         <div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 mb-10 sm:mb-16"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-8 sm:gap-10 mb-10 sm:mb-16"
         >
           {/* Column 1: Logo & About */}
-          <div className="footer-col sm:col-span-2 lg:col-span-1">
+          <div className="footer-col col-span-2 lg:col-span-1">
             <a href="/" className="inline-block mb-3 sm:mb-4">
               <span className="text-2xl sm:text-3xl font-bold text-white font-montserrat">
                 LU<span className="text-gradient-gold">ME</span>
@@ -111,7 +111,7 @@ export function Footer() {
           </div>
 
           {/* Column 2: Quick Links */}
-          <div className="footer-col">
+          <div className="footer-col col-span-1">
             <h4 className="text-white font-semibold mb-4 sm:mb-6 text-sm sm:text-base font-montserrat">
               Links Rápidos
             </h4>
@@ -142,7 +142,7 @@ export function Footer() {
           </div>
 
           {/* Column 3: Products */}
-          <div className="footer-col">
+          <div className="footer-col col-span-1">
             <h4 className="text-white font-semibold mb-4 sm:mb-6 text-sm sm:text-base font-montserrat">
               Nossos Produtos
             </h4>
@@ -162,7 +162,7 @@ export function Footer() {
           </div>
 
           {/* Column 4: Contact */}
-          <div className="footer-col">
+          <div className="footer-col col-span-2 lg:col-span-1">
             <h4 className="text-white font-semibold mb-4 sm:mb-6 text-sm sm:text-base font-montserrat">
               Entre em Contato
             </h4>
