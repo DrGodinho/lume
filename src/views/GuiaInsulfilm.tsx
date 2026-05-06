@@ -44,6 +44,7 @@ const roomsData = [
     {
         icon: '🛋️',
         title: 'Sala',
+        titleLink: '/insulfilm-na-sala/',
         recs: [
             { film: 'Nano Cerâmica', tag: 'Premium', desc: 'Mantém a sala clarinha e agradável, bloqueando intensamente o calor que entra pelas grandes janelas.', link: '/nano-ceramica/' },
             { film: 'Refletiva', tag: 'Redução de calor', desc: 'Boa barreira térmica com espelhamento externo. Equilibra proteção e orçamento.', link: '/refletiva/' },

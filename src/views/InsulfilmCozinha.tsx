@@ -9,6 +9,7 @@ import { WhatsAppButton } from '../components/WhatsAppButton';
 import { GoogleReviews } from '../components/GoogleReviews';
 import { Particles } from '../components/Particles';
 import { NavigationBreadcrumbs } from '../components/NavigationBreadcrumbs';
+import { LevelDots } from '../sections/SelectionGuide';
 
 const faqs = [
   {
@@ -155,20 +156,16 @@ export function InsulfilmCozinha() {
 
               <div className="space-y-4 mb-10 flex-grow bg-white/5 p-6 rounded-xl">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-300 font-medium">Visibilidade</span>
-                  <span className="text-[#c9a227] font-bold">Cristalina</span>
+                  <span className="text-gray-300 font-medium">Redução de Calor</span>
+                  <LevelDots level={5} />
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-300 font-medium">Rejeição de Calor</span>
-                  <div className="flex gap-1 text-[#c9a227]"><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /></div>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-300 font-medium">Proteção UV</span>
-                  <div className="flex gap-1 text-[#c9a227]"><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /></div>
+                  <span className="text-gray-300 font-medium">Redução de Luz</span>
+                  <LevelDots level={1} />
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-300 font-medium">Privacidade</span>
-                  <div className="flex gap-1 text-[#c9a227] opacity-60"><Star size={16} fill="currentColor" /><Star size={16} className="text-gray-600" /><Star size={16} className="text-gray-600" /><Star size={16} className="text-gray-600" /><Star size={16} className="text-gray-600" /></div>
+                  <LevelDots level={1} />
                 </div>
               </div>
               
@@ -193,20 +190,16 @@ export function InsulfilmCozinha() {
 
               <div className="space-y-4 mb-10 flex-grow bg-white/5 p-6 rounded-xl">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-300 font-medium">Visibilidade</span>
-                  <span className="text-white font-bold text-sm">Translúcida (Luz sim, Imagem não)</span>
+                  <span className="text-gray-300 font-medium">Redução de Calor</span>
+                  <LevelDots level={1} />
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-300 font-medium">Rejeição de Calor</span>
-                  <div className="flex gap-1 text-white"><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} className="text-gray-600" /><Star size={16} className="text-gray-600" /><Star size={16} className="text-gray-600" /></div>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-300 font-medium">Proteção UV</span>
-                  <div className="flex gap-1 text-white"><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /></div>
+                  <span className="text-gray-300 font-medium">Redução de Luz</span>
+                  <LevelDots level={2} />
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-300 font-medium">Privacidade</span>
-                  <div className="flex gap-1 text-white"><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /></div>
+                  <LevelDots level={5} />
                 </div>
               </div>
               

@@ -1,6 +1,6 @@
 import { ScrollReveal } from '../components/ScrollReveal';
 
-const LevelDots = ({ level }: { level: number }) => (
+export const LevelDots = ({ level }: { level: number }) => (
   <div className="flex gap-1.5 items-center">
     {[1, 2, 3, 4, 5].map((i) => (
       <div 
@@ -42,6 +42,7 @@ const roomsData = [
   {
     icon: '🛋️',
     title: 'Sala',
+    titleLink: '/insulfilm-na-sala/',
     recs: [
       { film: 'Nano Cerâmica', tag: 'Premium', desc: 'Mantém a sala clarinha e agradável, bloqueando intensamente o calor que entra pelas grandes janelas.', link: '/nano-ceramica/' },
       { film: 'Refletiva', tag: 'Redução de calor', desc: 'Boa barreira térmica com espelhamento externo. Equilibra proteção e orçamento.', link: '/refletiva/' },

@@ -4,11 +4,12 @@ import { useEffect } from 'react';
 import gsap from 'gsap';
 import Image from 'next/image';
 import { ContactCTA } from '../sections/ContactCTA';
-import { ArrowRight, Thermometer, Shield, CheckCircle, Star, Moon, Clock, power } from 'lucide-react';
+import { ArrowRight, Thermometer, Shield, CheckCircle, Moon, Clock, Power } from 'lucide-react';
 import { WhatsAppButton } from '../components/WhatsAppButton';
 import { GoogleReviews } from '../components/GoogleReviews';
 import { Particles } from '../components/Particles';
 import { NavigationBreadcrumbs } from '../components/NavigationBreadcrumbs';
+import { LevelDots } from '../sections/SelectionGuide';
 
 const faqs = [
   {
@@ -86,10 +87,10 @@ export function InsulfilmQuarto() {
         <div className="container-lume max-w-5xl mx-auto">
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <div className="page-entrance">
-              <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-6">Descanso em<span className="text-[#c9a227]">escuridão total</span>.</h2>
+              <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-6">Descanso em <span className="text-[#c9a227]">escuridão total</span>.</h2>
               <div className="space-y-6 text-gray-400 leading-relaxed font-light text-lg">
                 <p>
-                  No Rio de Janeiro, o sol forte da manhã seringue a acordar antes da hora, e o calor da tarde transforma o quarto em um forro. Quem trabalha em turnos noturnos, dorme durante o dia, ou simplesmente valoriza um sono de qualidade, sabe o quanto isso afeta o bem-estar.
+                  No Rio de Janeiro, o sol forte da manhã te faz acordar antes da hora, e o calor da tarde transforma o quarto em um forno. Quem trabalha em turnos noturnos, dorme durante o dia, ou simplesmente valoriza um sono de qualidade, sabe o quanto isso afeta o bem-estar.
                 </p>
                 <p>
                   As películas de escurecimento criam uma barreira completa: bloqueiam até 99% da luz visível e rejeitam o calor infravermelho, permitindo que você durma em total escuridão, em um ambiente fresco e confortável.
@@ -154,20 +155,16 @@ export function InsulfilmQuarto() {
 
               <div className="space-y-4 mb-10 flex-grow bg-white/5 p-6 rounded-xl">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-300 font-medium">Escurecimento</span>
-                  <span className="text-[#c9a227] font-bold">95%</span>
+                  <span className="text-gray-300 font-medium">Redução de Calor</span>
+                  <LevelDots level={5} />
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-300 font-medium">Rejeição de Calor</span>
-                  <div className="flex gap-1 text-[#c9a227]"><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /></div>
+                  <span className="text-gray-300 font-medium">Redução de Luz</span>
+                  <LevelDots level={5} />
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-300 font-medium">Proteção UV</span>
-                  <div className="flex gap-1 text-[#c9a227]"><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /></div>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-300 font-medium">Privacidade 24h</span>
-                  <div className="flex gap-1 text-[#c9a227]"><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /></div>
+                  <span className="text-gray-300 font-medium">Privacidade</span>
+                  <LevelDots level={5} />
                 </div>
               </div>
               
@@ -192,20 +189,16 @@ export function InsulfilmQuarto() {
 
               <div className="space-y-4 mb-10 flex-grow bg-white/5 p-6 rounded-xl">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-300 font-medium">Escurecimento</span>
-                  <span className="text-white font-bold">95%</span>
+                  <span className="text-gray-300 font-medium">Redução de Calor</span>
+                  <LevelDots level={4} />
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-300 font-medium">Rejeição de Calor</span>
-                  <div className="flex gap-1 text-white"><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} className="text-gray-600" /><Star size={16} className="text-gray-600" /></div>
+                  <span className="text-gray-300 font-medium">Redução de Luz</span>
+                  <LevelDots level={4} />
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-300 font-medium">Proteção UV</span>
-                  <div className="flex gap-1 text-white"><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /></div>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-300 font-medium">Privacidade 24h</span>
-                  <div className="flex gap-1 text-white"><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /></div>
+                  <span className="text-gray-300 font-medium">Privacidade</span>
+                  <LevelDots level={5} />
                 </div>
               </div>
               
@@ -222,7 +215,7 @@ export function InsulfilmQuarto() {
         <div className="container-lume max-w-5xl mx-auto page-entrance">
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-4">O Diferencial LUME: <span className="text-gradient-gold">Instalação Residencial Premium</span></h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">Seu quarto merece uma instalação impeccable, sem sujeira e com resultado perfeito.</p>
+            <p className="text-gray-400 max-w-2xl mx-auto">Seu quarto merece uma instalação impecável, sem sujeira e com resultado perfeito.</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -238,7 +231,7 @@ export function InsulfilmQuarto() {
             
             <div className="bg-[#0a1628]/40 p-8 rounded-2xl border border-white/5 text-center">
               <div className="w-16 h-16 bg-[#c9a227]/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <power className="text-[#c9a227]" size={32} />
+                <Power className="text-[#c9a227]" size={32} />
               </div>
               <h3 className="text-xl font-bold mb-4">Análise Técnica</h3>
               <p className="text-gray-400 text-sm">

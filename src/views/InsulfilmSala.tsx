@@ -4,11 +4,13 @@ import { useEffect } from 'react';
 import gsap from 'gsap';
 import Image from 'next/image';
 import { ContactCTA } from '../sections/ContactCTA';
-import { ArrowRight, Thermometer, Shield, CheckCircle, Star, Tv, Wallet, Home } from 'lucide-react';
+import { ArrowRight, Thermometer, Shield, CheckCircle, Star, Tv, Home } from 'lucide-react';
 import { WhatsAppButton } from '../components/WhatsAppButton';
 import { GoogleReviews } from '../components/GoogleReviews';
 import { Particles } from '../components/Particles';
 import { NavigationBreadcrumbs } from '../components/NavigationBreadcrumbs';
+import { ScrollReveal } from '../components/ScrollReveal';
+import { LevelDots } from '../sections/SelectionGuide';
 
 const faqs = [
   {
@@ -85,20 +87,20 @@ export function InsulfilmSala() {
       <section className="py-24 relative px-4 border-t border-white/5 bg-[#0a1628]/20">
         <div className="container-lume max-w-5xl mx-auto">
           <div className="grid md:grid-cols-2 gap-16 items-center">
-            <div className="page-entrance">
+            <ScrollReveal animation="slide-up">
               <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-6">Conforto e valorização <span className="text-[#c9a227]">para sua sala</span>.</h2>
               <div className="space-y-6 text-gray-400 leading-relaxed font-light text-lg">
                 <p>
                   A sala é o espaço de convivência da casa, mas o sol forte pode causar reflexo na TV, aumentar a temperatura e degradar seus móveis. A película de controle solar resolve isso de forma elegante e sem obras.
                 </p>
                 <p>
-                  Com instalação rápida e limpa, a película bloqueia até 80% do calor solar e 99% dos raios UV, mantendo o ambiente confortável e protegendo seu investimento em decoração.
+                  Com instalação rápida e limpa, a película bloqueia o calor solar e quase a totalidade dos raios UV, mantendo o ambiente confortável e protegendo seu investimento em decoração.
                 </p>
               </div>
-            </div>
+            </ScrollReveal>
             
-            <div className="grid gap-6 page-entrance">
-              <div className="glass-panel p-8 rounded-2xl border border-white/10 hover:border-[#c9a227]/50 transition-colors">
+            <div className="grid gap-6">
+              <ScrollReveal animation="slide-left" delay={100} className="glass-panel p-8 rounded-2xl border border-white/10 hover:border-[#c9a227]/50 transition-colors">
                 <div className="w-12 h-12 bg-[#c9a227]/10 rounded-xl flex items-center justify-center mb-6">
                   <Tv className="text-[#c9a227]" size={24} />
                 </div>
@@ -106,9 +108,9 @@ export function InsulfilmSala() {
                 <p className="text-gray-400">
                   Elimine o reflexo incômodo na tela da TV ou do home theater. Nossas películas reduzem a entrada de luz direta, melhorando a experiência de assistir filmes e séries mesmo durante o dia.
                 </p>
-              </div>
+              </ScrollReveal>
               
-              <div className="glass-panel p-8 rounded-2xl border border-white/10 hover:border-[#c9a227]/50 transition-colors">
+              <ScrollReveal animation="slide-left" delay={200} className="glass-panel p-8 rounded-2xl border border-white/10 hover:border-[#c9a227]/50 transition-colors">
                 <div className="w-12 h-12 bg-[#c9a227]/10 rounded-xl flex items-center justify-center mb-6">
                   <Thermometer className="text-[#c9a227]" size={24} />
                 </div>
@@ -116,143 +118,185 @@ export function InsulfilmSala() {
                 <p className="text-gray-400">
                   Ao bloquear o calor solar, a película reduz a carga térmica na sala, fazendo o ar-condicionado trabalhar menos. Isso pode gerar economia de até 30% na conta de energia.
                 </p>
-              </div>
+              </ScrollReveal>
             </div>
           </div>
           
-          <div className="mt-16 bg-[#c9a227]/10 border border-[#c9a227]/30 rounded-2xl p-8 page-entrance">
+          <ScrollReveal animation="fade-in" delay={300} className="mt-16 bg-[#c9a227]/10 border border-[#c9a227]/30 rounded-2xl p-8">
             <h4 className="text-xl font-bold text-[#c9a227] mb-3">💡 Por que escolher película para sala ao invés de persianas ou cortinas?</h4>
             <p className="text-gray-300">
               Persianas e cortinas acumulam poeira, exigem manutenção constante e bloqueiam a luz natural. A película mantém a vista livre, não acumula sujeira, tem durabilidade de até 10 anos e valoriza seu imóvel por ser uma solução moderna e discreta.
             </p>
-          </div>
+          </ScrollReveal>
         </div>
       </section>
 
       {/* Soluções */}
       <section className="py-24 bg-[#04080f] px-4">
         <div className="container-lume max-w-5xl mx-auto">
-          <div className="text-center mb-16 page-entrance">
+          <ScrollReveal animation="slide-up" className="text-center mb-16">
             <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-6 tracking-tight">Nossas <span className="text-gradient-gold">Soluções</span> para Salas</h2>
             <p className="text-gray-400 max-w-2xl mx-auto text-lg">Indicamos três tecnologias que se adaptam perfeitamente às necessidades de conforto e estética da sua sala de estar.</p>
-          </div>
+          </ScrollReveal>
 
-          <div className="grid md:grid-cols-3 gap-8 page-entrance">
+          <div className="grid md:grid-cols-3 gap-8">
             {/* Nano Cerâmica */}
-            <div className="product-card group relative bg-gradient-to-b from-[#1a3a5c]/20 to-[#04080f] rounded-2xl p-8 lg:p-10 border border-[#1a3a5c]/50 hover:border-[#c9a227]/50 transition-all duration-500 flex flex-col h-full overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-[#c9a227]/5 blur-3xl rounded-full -mr-32 -mt-32 pointer-events-none" />
+            <ScrollReveal animation="slide-up" delay={100} className="product-card group relative bg-gradient-to-b from-[#0a1628]/80 to-[#070f1a]/95 rounded-2xl p-6 lg:p-8 border border-[#1a3a5c]/50 hover:border-[#c9a227]/50 transition-all duration-500 flex flex-col h-full overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-[#c9a227]/5 blur-3xl rounded-full pointer-events-none" />
               
-              <div className="mb-8">
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#c9a227] text-[#04080f] text-xs font-bold uppercase rounded-full mb-6">
+              <div className="relative h-48 overflow-hidden rounded-xl mb-6 -mx-2 -mt-2">
+                <Image
+                  src="/product-nano-ceramica.webp"
+                  alt="Nano Cerâmica"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 33vw"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#070f1a]/95 via-transparent to-transparent" />
+                <div className="absolute top-3 left-3 z-10 px-3 py-1 bg-[#c9a227] text-[#04080f] text-xs font-bold uppercase rounded-full">
                   Recomendado
                 </div>
-                <h3 className="text-3xl font-bold mb-4 font-montserrat text-white">Nano Cerâmica</h3>
-                <p className="text-gray-400 leading-relaxed">
-                  A opção mais tecnológica: bloqueia até 80% do calor sem escurecer o vidro. Mantém a vista livre e a claridade natural, sendo ideal para salas com grandes janelas.
+              </div>
+
+              <div className="mb-6 z-10">
+                <div className="flex items-center gap-2 mb-3">
+                  <Star className="w-5 h-5 text-[#c9a227]" />
+                  <h3 className="text-2xl font-bold font-montserrat text-white">Nano Cerâmica</h3>
+                </div>
+                <p className="text-gray-400 text-sm leading-relaxed min-h-[80px]">
+                  Bloqueia o calor sem escurecer o vidro. Mantém a vista livre e a claridade natural, sendo ideal para salas com grandes janelas e sacadas integradas.
                 </p>
               </div>
 
-              <div className="space-y-4 mb-10 bg-white/5 p-6 rounded-xl">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-300 font-medium">Rejeição de Calor</span>
-                  <div className="flex gap-1 text-[#c9a227]"><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} className="text-gray-600" /></div>
+              <div className="space-y-4 mb-8 bg-white/5 p-4 rounded-xl text-sm z-10 flex-grow">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400">Redução de Calor</span>
+                  <LevelDots level={5} />
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-300 font-medium">Redução de Reflexo</span>
-                  <div className="flex gap-1 text-[#c9a227]"><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /></div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400">Redução de Luz</span>
+                  <LevelDots level={1} />
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-300 font-medium">Transmissão de Luz</span>
-                  <div className="flex gap-1 text-[#c9a227]"><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} className="text-gray-600" /></div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400">Privacidade</span>
+                  <LevelDots level={1} />
                 </div>
               </div>
 
-              <a href="/nano-ceramica/" className="w-full btn-outline py-4 text-center tracking-widest font-bold uppercase border border-[#c9a227]/30 text-[#c9a227] hover:bg-[#c9a227] hover:text-[#04080f] transition-all rounded-xl mt-auto">
-                Ver detalhes técnicos
+              <a href="/nano-ceramica/" className="w-full btn-outline py-3 text-sm text-center tracking-widest font-bold uppercase border border-[#c9a227]/30 text-[#c9a227] hover:bg-[#c9a227] hover:text-[#04080f] transition-all rounded-xl mt-auto z-10">
+                Ver detalhes
               </a>
-            </div>
+            </ScrollReveal>
 
             {/* Refletiva */}
-            <div className="product-card group relative bg-gradient-to-b from-[#1a3a5c]/20 to-[#04080f] rounded-2xl p-8 lg:p-10 border border-[#1a3a5c]/50 hover:border-[#c9a227]/50 transition-all duration-500 flex flex-col h-full overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-[#c9a227]/5 blur-3xl rounded-full -mr-32 -mt-32 pointer-events-none" />
+            <ScrollReveal animation="slide-up" delay={200} className="product-card group relative bg-gradient-to-b from-[#0a1628]/80 to-[#070f1a]/95 rounded-2xl p-6 lg:p-8 border border-[#1a3a5c]/50 hover:border-[#c9a227]/50 transition-all duration-500 flex flex-col h-full overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-[#c9a227]/5 blur-3xl rounded-full pointer-events-none" />
               
-              <div className="mb-8">
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#c9a227] text-[#04080f] text-xs font-bold uppercase rounded-full mb-6">
+              <div className="relative h-48 overflow-hidden rounded-xl mb-6 -mx-2 -mt-2">
+                <Image
+                  src="/product-refletiva.webp"
+                  alt="Refletiva"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 33vw"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#070f1a]/95 via-transparent to-transparent" />
+                <div className="absolute top-3 left-3 z-10 px-3 py-1 bg-[#c9a227] text-[#04080f] text-xs font-bold uppercase rounded-full">
                   Alta Performance
                 </div>
-                <h3 className="text-3xl font-bold mb-4 font-montserrat text-white">Refletiva</h3>
-                <p className="text-gray-400 leading-relaxed">
-                  Ideal para salas com incidência direta de sol, essa película reflete a radiação solar antes que ela entre no ambiente, garantindo o máximo conforto térmico.
+              </div>
+
+              <div className="mb-6 z-10">
+                <div className="flex items-center gap-2 mb-3">
+                  <Star className="w-5 h-5 text-[#c9a227]" />
+                  <h3 className="text-2xl font-bold font-montserrat text-white">Refletiva</h3>
+                </div>
+                <p className="text-gray-400 text-sm leading-relaxed min-h-[80px]">
+                  Ideal para salas com incidência direta de sol o dia todo. Transforma sua janela em um espelho por fora, garantindo privacidade e muita redução de calor.
                 </p>
               </div>
 
-              <div className="space-y-4 mb-10 bg-white/5 p-6 rounded-xl">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-300 font-medium">Rejeição de Calor</span>
-                  <div className="flex gap-1 text-[#c9a227]"><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /></div>
+              <div className="space-y-4 mb-8 bg-white/5 p-4 rounded-xl text-sm z-10 flex-grow">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400">Redução de Calor</span>
+                  <LevelDots level={4} />
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-300 font-medium">Privacidade Diurna</span>
-                  <div className="flex gap-1 text-[#c9a227]"><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} className="text-gray-600" /></div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400">Redução de Luz</span>
+                  <LevelDots level={2} />
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-300 font-medium">Transmissão de Luz</span>
-                  <div className="flex gap-1 text-[#c9a227]"><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} className="text-gray-600" /><Star size={16} className="text-gray-600" /></div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400">Privacidade</span>
+                  <LevelDots level={4} />
                 </div>
               </div>
 
-              <a href="/refletiva/" className="w-full btn-outline py-4 text-center tracking-widest font-bold uppercase border border-[#c9a227]/30 text-[#c9a227] hover:bg-[#c9a227] hover:text-[#04080f] transition-all rounded-xl mt-auto">
-                Ver detalhes técnicos
+              <a href="/refletiva/" className="w-full btn-outline py-3 text-sm text-center tracking-widest font-bold uppercase border border-[#c9a227]/30 text-[#c9a227] hover:bg-[#c9a227] hover:text-[#04080f] transition-all rounded-xl mt-auto z-10">
+                Ver detalhes
               </a>
-            </div>
+            </ScrollReveal>
 
             {/* Carbono G20 */}
-            <div className="product-card group relative bg-gradient-to-b from-[#1a3a5c]/20 to-[#04080f] rounded-2xl p-8 lg:p-10 border border-[#1a3a5c]/50 hover:border-[#c9a227]/50 transition-all duration-500 flex flex-col h-full overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-[#c9a227]/5 blur-3xl rounded-full -mr-32 -mt-32 pointer-events-none" />
+            <ScrollReveal animation="slide-up" delay={300} className="product-card group relative bg-gradient-to-b from-[#0a1628]/80 to-[#070f1a]/95 rounded-2xl p-6 lg:p-8 border border-[#1a3a5c]/50 hover:border-[#c9a227]/50 transition-all duration-500 flex flex-col h-full overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-[#c9a227]/5 blur-3xl rounded-full pointer-events-none" />
               
-              <div className="mb-8">
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#c9a227] text-[#04080f] text-xs font-bold uppercase rounded-full mb-6">
+              <div className="relative h-48 overflow-hidden rounded-xl mb-6 -mx-2 -mt-2">
+                <Image
+                  src="/product-carbono.webp"
+                  alt="Carbono Premium"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 33vw"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#070f1a]/95 via-transparent to-transparent" />
+                <div className="absolute top-3 left-3 z-10 px-3 py-1 bg-white text-[#04080f] text-xs font-bold uppercase rounded-full">
                   Custo-Benefício
                 </div>
-                <h3 className="text-3xl font-bold mb-4 font-montserrat text-white">Carbono G20</h3>
-                <p className="text-gray-400 leading-relaxed">
-                  Uma opção intermediária que combina proteção térmica com leve escurecimento, reduzindo o reflexo na TV e proporcionando maior privacidade sem perder muita luz.
+              </div>
+
+              <div className="mb-6 z-10">
+                <div className="flex items-center gap-2 mb-3">
+                  <Star className="w-5 h-5 text-[#c9a227]" />
+                  <h3 className="text-2xl font-bold font-montserrat text-white">Carbono G20</h3>
+                </div>
+                <p className="text-gray-400 text-sm leading-relaxed min-h-[80px]">
+                  Combina proteção térmica com leve escurecimento, reduzindo o reflexo na TV e proporcionando maior privacidade sem perder muita luz.
                 </p>
               </div>
 
-              <div className="space-y-4 mb-10 bg-white/5 p-6 rounded-xl">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-300 font-medium">Rejeição de Calor</span>
-                  <div className="flex gap-1 text-[#c9a227]"><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} className="text-gray-600" /></div>
+              <div className="space-y-4 mb-8 bg-white/5 p-4 rounded-xl text-sm z-10 flex-grow">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400">Redução de Calor</span>
+                  <LevelDots level={3} />
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-300 font-medium">Redução de Reflexo</span>
-                  <div className="flex gap-1 text-[#c9a227]"><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} className="text-gray-600" /></div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400">Redução de Luz</span>
+                  <LevelDots level={3} />
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-300 font-medium">Transmissão de Luz</span>
-                  <div className="flex gap-1 text-[#c9a227]"><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} fill="currentColor" /><Star size={16} className="text-gray-600" /><Star size={16} className="text-gray-600" /></div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400">Privacidade</span>
+                  <LevelDots level={2} />
                 </div>
               </div>
 
-              <a href="/carbono-g20/" className="w-full btn-outline py-4 text-center tracking-widest font-bold uppercase border border-[#c9a227]/30 text-[#c9a227] hover:bg-[#c9a227] hover:text-[#04080f] transition-all rounded-xl mt-auto">
-                Ver detalhes técnicos
+              <a href="/carbono/" className="w-full btn-outline py-3 text-sm text-center tracking-widest font-bold uppercase border border-[#c9a227]/30 text-[#c9a227] hover:bg-[#c9a227] hover:text-[#04080f] transition-all rounded-xl mt-auto z-10">
+                Ver detalhes
               </a>
-            </div>
+            </ScrollReveal>
           </div>
         </div>
       </section>
 
       {/* Diferencial Lume */}
       <section className="py-24 relative px-4 border-y border-white/5">
-        <div className="container-lume max-w-5xl mx-auto page-entrance">
-          <div className="text-center mb-16">
+        <div className="container-lume max-w-5xl mx-auto">
+          <ScrollReveal animation="slide-up" className="text-center mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-4">O Diferencial LUME: <span className="text-gradient-gold">Instalação Premium na Sala</span></h2>
             <p className="text-gray-400 max-w-2xl mx-auto">Sabemos que a sala é um ambiente de convivência que exige limpeza e respeito. Nosso processo é adaptado para garantir uma experiência impecável.</p>
-          </div>
+          </ScrollReveal>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-[#0a1628]/40 p-8 rounded-2xl border border-white/5 text-center">
+            <ScrollReveal animation="slide-up" delay={100} className="bg-[#0a1628]/40 p-8 rounded-2xl border border-white/5 text-center">
               <div className="w-16 h-16 bg-[#c9a227]/10 rounded-full flex items-center justify-center mx-auto mb-6">
                 <CheckCircle className="text-[#c9a227]" size={32} />
               </div>
@@ -260,9 +304,9 @@ export function InsulfilmSala() {
               <p className="text-gray-400 text-sm">
                 Sem sujeira, sem poeira, sem obra. Aplicamos a película diretamente no vidro existente em 2 a 3 horas para uma sala média, sem interromper sua rotina.
               </p>
-            </div>
+            </ScrollReveal>
             
-            <div className="bg-[#0a1628]/40 p-8 rounded-2xl border border-white/5 text-center">
+            <ScrollReveal animation="slide-up" delay={200} className="bg-[#0a1628]/40 p-8 rounded-2xl border border-white/5 text-center">
               <div className="w-16 h-16 bg-[#c9a227]/10 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Shield className="text-[#c9a227]" size={32} />
               </div>
@@ -270,9 +314,9 @@ export function InsulfilmSala() {
               <p className="text-gray-400 text-sm">
                 Utilizamos películas premium que resistem à exposição solar constante, não amarelam com o tempo e mantêm a eficiência por até 10 anos.
               </p>
-            </div>
+            </ScrollReveal>
             
-            <div className="bg-[#0a1628]/40 p-8 rounded-2xl border border-white/5 text-center">
+            <ScrollReveal animation="slide-up" delay={300} className="bg-[#0a1628]/40 p-8 rounded-2xl border border-white/5 text-center">
               <div className="w-16 h-16 bg-[#c9a227]/10 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Home className="text-[#c9a227]" size={32} />
               </div>
@@ -280,20 +324,20 @@ export function InsulfilmSala() {
               <p className="text-gray-400 text-sm">
                 Nossos técnicos são treinados para garantir recortes precisos e acabamento impecável nas bordas, preservando a estética da sua sala.
               </p>
-            </div>
+            </ScrollReveal>
           </div>
         </div>
       </section>
 
       {/* FAQ */}
       <section className="py-24 bg-[#04080f] px-4">
-        <div className="container-lume max-w-3xl mx-auto page-entrance">
-          <div className="text-center mb-12">
+        <div className="container-lume max-w-3xl mx-auto">
+          <ScrollReveal animation="slide-up" className="text-center mb-12">
             <h2 className="text-3xl font-bold font-montserrat mb-4">Dúvidas <span className="text-[#c9a227]">Frequentes</span></h2>
             <p className="text-gray-400">Esclareça suas principais dúvidas sobre películas para salas.</p>
-          </div>
+          </ScrollReveal>
 
-          <div className="space-y-4">
+          <ScrollReveal animation="fade-in" className="space-y-4">
             {faqs.map((faq, idx) => (
               <details key={idx} className="group glass-card border border-white/5 flex-col rounded-xl overflow-hidden cursor-pointer bg-white/[0.01]">
                 <summary className="font-bold text-lg p-6 hover:bg-white/[0.04] transition-colors outline-none flex justify-between items-center list-none text-white">
@@ -305,7 +349,7 @@ export function InsulfilmSala() {
                 </div>
               </details>
             ))}
-          </div>
+          </ScrollReveal>
         </div>
       </section>
 
