@@ -100,7 +100,7 @@ export function InsulfilmSala() {
             </ScrollReveal>
             
             <div className="grid gap-6">
-              <ScrollReveal animation="slide-left" delay={100} className="glass-panel p-8 rounded-2xl border border-white/10 hover:border-[#c9a227]/50 transition-colors">
+              <ScrollReveal animation="slide-left" className="glass-panel p-8 rounded-2xl border border-white/10 hover:border-[#c9a227]/50 transition-colors">
                 <div className="w-12 h-12 bg-[#c9a227]/10 rounded-xl flex items-center justify-center mb-6">
                   <Tv className="text-[#c9a227]" size={24} />
                 </div>
@@ -110,7 +110,7 @@ export function InsulfilmSala() {
                 </p>
               </ScrollReveal>
               
-              <ScrollReveal animation="slide-left" delay={200} className="glass-panel p-8 rounded-2xl border border-white/10 hover:border-[#c9a227]/50 transition-colors">
+              <ScrollReveal animation="slide-left" className="glass-panel p-8 rounded-2xl border border-white/10 hover:border-[#c9a227]/50 transition-colors">
                 <div className="w-12 h-12 bg-[#c9a227]/10 rounded-xl flex items-center justify-center mb-6">
                   <Thermometer className="text-[#c9a227]" size={24} />
                 </div>
@@ -122,7 +122,7 @@ export function InsulfilmSala() {
             </div>
           </div>
           
-          <ScrollReveal animation="fade-in" delay={300} className="mt-16 bg-[#c9a227]/10 border border-[#c9a227]/30 rounded-2xl p-8">
+          <ScrollReveal animation="fade-in" className="mt-16 bg-[#c9a227]/10 border border-[#c9a227]/30 rounded-2xl p-8">
             <h4 className="text-xl font-bold text-[#c9a227] mb-3">💡 Por que escolher película para sala ao invés de persianas ou cortinas?</h4>
             <p className="text-gray-300">
               Persianas e cortinas acumulam poeira, exigem manutenção constante e bloqueiam a luz natural. A película mantém a vista livre, não acumula sujeira, tem durabilidade de até 10 anos e valoriza seu imóvel por ser uma solução moderna e discreta.
@@ -141,7 +141,7 @@ export function InsulfilmSala() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {/* Nano Cerâmica */}
-            <ScrollReveal animation="slide-up" delay={100} className="product-card group relative bg-gradient-to-b from-[#0a1628]/80 to-[#070f1a]/95 rounded-2xl p-6 lg:p-8 border border-[#1a3a5c]/50 hover:border-[#c9a227]/50 transition-all duration-500 flex flex-col h-full overflow-hidden">
+            <ScrollReveal animation="slide-up" className="product-card group relative bg-gradient-to-b from-[#0a1628]/80 to-[#070f1a]/95 rounded-2xl p-6 lg:p-8 border border-[#1a3a5c]/50 hover:border-[#c9a227]/50 transition-all duration-500 flex flex-col h-full overflow-hidden">
               <div className="absolute top-0 right-0 w-64 h-64 bg-[#c9a227]/5 blur-3xl rounded-full pointer-events-none" />
               
               <div className="relative h-48 overflow-hidden rounded-xl mb-6 -mx-2 -mt-2">
@@ -189,7 +189,7 @@ export function InsulfilmSala() {
             </ScrollReveal>
 
             {/* Refletiva */}
-            <ScrollReveal animation="slide-up" delay={200} className="product-card group relative bg-gradient-to-b from-[#0a1628]/80 to-[#070f1a]/95 rounded-2xl p-6 lg:p-8 border border-[#1a3a5c]/50 hover:border-[#c9a227]/50 transition-all duration-500 flex flex-col h-full overflow-hidden">
+            <ScrollReveal animation="slide-up" className="product-card group relative bg-gradient-to-b from-[#0a1628]/80 to-[#070f1a]/95 rounded-2xl p-6 lg:p-8 border border-[#1a3a5c]/50 hover:border-[#c9a227]/50 transition-all duration-500 flex flex-col h-full overflow-hidden">
               <div className="absolute top-0 right-0 w-64 h-64 bg-[#c9a227]/5 blur-3xl rounded-full pointer-events-none" />
               
               <div className="relative h-48 overflow-hidden rounded-xl mb-6 -mx-2 -mt-2">
@@ -237,7 +237,7 @@ export function InsulfilmSala() {
             </ScrollReveal>
 
             {/* Carbono G20 */}
-            <ScrollReveal animation="slide-up" delay={300} className="product-card group relative bg-gradient-to-b from-[#0a1628]/80 to-[#070f1a]/95 rounded-2xl p-6 lg:p-8 border border-[#1a3a5c]/50 hover:border-[#c9a227]/50 transition-all duration-500 flex flex-col h-full overflow-hidden">
+            <ScrollReveal animation="slide-up" className="product-card group relative bg-gradient-to-b from-[#0a1628]/80 to-[#070f1a]/95 rounded-2xl p-6 lg:p-8 border border-[#1a3a5c]/50 hover:border-[#c9a227]/50 transition-all duration-500 flex flex-col h-full overflow-hidden">
               <div className="absolute top-0 right-0 w-64 h-64 bg-[#c9a227]/5 blur-3xl rounded-full pointer-events-none" />
               
               <div className="relative h-48 overflow-hidden rounded-xl mb-6 -mx-2 -mt-2">
@@ -296,7 +296,7 @@ export function InsulfilmSala() {
           </ScrollReveal>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <ScrollReveal animation="slide-up" delay={100} className="bg-[#0a1628]/40 p-8 rounded-2xl border border-white/5 text-center">
+            <ScrollReveal animation="slide-up" className="bg-[#0a1628]/40 p-8 rounded-2xl border border-white/5 text-center">
               <div className="w-16 h-16 bg-[#c9a227]/10 rounded-full flex items-center justify-center mx-auto mb-6">
                 <CheckCircle className="text-[#c9a227]" size={32} />
               </div>
@@ -306,7 +306,7 @@ export function InsulfilmSala() {
               </p>
             </ScrollReveal>
             
-            <ScrollReveal animation="slide-up" delay={200} className="bg-[#0a1628]/40 p-8 rounded-2xl border border-white/5 text-center">
+            <ScrollReveal animation="slide-up" className="bg-[#0a1628]/40 p-8 rounded-2xl border border-white/5 text-center">
               <div className="w-16 h-16 bg-[#c9a227]/10 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Shield className="text-[#c9a227]" size={32} />
               </div>
@@ -316,7 +316,7 @@ export function InsulfilmSala() {
               </p>
             </ScrollReveal>
             
-            <ScrollReveal animation="slide-up" delay={300} className="bg-[#0a1628]/40 p-8 rounded-2xl border border-white/5 text-center">
+            <ScrollReveal animation="slide-up" className="bg-[#0a1628]/40 p-8 rounded-2xl border border-white/5 text-center">
               <div className="w-16 h-16 bg-[#c9a227]/10 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Home className="text-[#c9a227]" size={32} />
               </div>
