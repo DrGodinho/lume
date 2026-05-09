@@ -1,17 +1,7 @@
 import React from 'react';
 import { History, X, Clock, ChevronRight, Trash2 } from 'lucide-react';
+import { OrcamentoSalvo } from '../views/AdminCalculator';
 
-interface OrcamentoSalvo {
-    id: string;
-    cliente: string;
-    data: string;
-    valor: number;
-    qtd: number;
-    config: { rollW: number; price: number; margin: number };
-    vidros: any[];
-    desconto: number;
-    modoOtimizacao: 'densidade' | 'facilidade';
-}
 
 interface HistoryPanelProps {
     aberto: boolean;

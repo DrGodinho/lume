@@ -4,15 +4,11 @@ import React, { useState, useEffect, useRef, useMemo, useReducer, useCallback } 
 import {
     Plus, Trash2, Smartphone, Save, FolderOpen, Scissors,
     Calculator, Camera, Layers, RotateCcw, AlignRight, AlignLeft, X,
-    History, Clock, ChevronRight, Undo2, Redo2, FileText, Settings
+    History, Clock, ChevronRight, Undo2, Redo2, FileText, Settings, RefreshCw, GripVertical
 } from 'lucide-react';
 import gsap from 'gsap';
-import * as htmlToImage from 'html-to-image';
-import { pdf } from '@react-pdf/renderer';
-import { InvoicePDF } from '../components/InvoicePDF';
-import { InvoicePNG } from '../components/InvoicePNG';
-import { ConfigPanel } from '../components/ConfigPanel';
-import { HistoryPanel } from '../components/HistoryPanel';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 
 // CAPACITOR NATIVE
 import { Share } from '@capacitor/share';
@@ -51,17 +47,18 @@ function saveConfig(cfg: AppConfig) {
 
 // ─── TIPOS ────────────────────────────────────────────────────────────────────
 
-export interface GlassItem {
+interface GlassItem {
     id: string;
     h: number;
     w: number;
-    oh: number;
     ow: number;
-    label?: string;
+    oh: number;
     cor: string;
-    forceRotate?: boolean;
+    label?: string;
+    forceRotate?: boolean | undefined;
     alignRight?: boolean;
-    sortOrder: number;
+    sortOrder?: number;
+    _manualPos?: { x: number; y: number }; // Posição manual após drag
 }
 
 interface Block {
@@ -80,7 +77,7 @@ interface Block {
     sortOrder?: number;
 }
 
-export interface OrcamentoSalvo {
+interface OrcamentoSalvo {
     id: string;
     cliente: string;
     data: string;
@@ -88,8 +85,6 @@ export interface OrcamentoSalvo {
     qtd: number;
     vidros: GlassItem[];
     config: { rollW: number; price: number; margin: number };
-    desconto: number;
-    modoOtimizacao: 'densidade' | 'facilidade';
 }
 
 // ─── UNDO/REDO REDUCER ────────────────────────────────────────────────────────
@@ -148,61 +143,64 @@ const MemoBlock = React.memo(({
     scale, 
     margin, 
     isSelected, 
+    isDraggingThis, 
+    isDropTarget, 
+    handleDragStart, 
     toggleSelection,
+    didDragRef 
 }: { 
     b: Block, 
     scale: number, 
     margin: number, 
     isSelected: boolean, 
+    isDraggingThis: boolean, 
+    isDropTarget: boolean, 
+    handleDragStart: (e: any, b: Block) => void, 
     toggleSelection: (id: string) => void,
+    didDragRef: React.RefObject<boolean>
 }) => {
     const pos = b.fit!;
-    const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
-
-    const handlePointerDown = (e: React.PointerEvent) => {
-        pointerStartRef.current = { x: e.clientX, y: e.clientY };
-    };
-
-    const handlePointerUp = (e: React.PointerEvent) => {
-        if (!pointerStartRef.current) return;
-        const dx = Math.abs(e.clientX - pointerStartRef.current.x);
-        const dy = Math.abs(e.clientY - pointerStartRef.current.y);
-        pointerStartRef.current = null;
-        if (dx < 10 && dy < 10) {
-            toggleSelection(b.id);
-        }
-    };
-
     return (
         <div
-            onPointerDown={handlePointerDown}
-            onPointerUp={handlePointerUp}
+            onMouseDown={(e) => handleDragStart(e, b)}
+            onTouchStart={(e) => handleDragStart(e, b)}
+            onClick={() => { if (!didDragRef.current) toggleSelection(b.id); }}
             className="absolute flex flex-col items-center justify-center text-black font-bold"
             style={{
                 left: pos.x * scale,
                 top: pos.y * scale,
                 width: (b.w - margin) * scale,
                 height: ((b.h_visual || b.h) - margin) * scale,
-                background: b.cor,
+                background: isDraggingThis ? 'rgba(255,255,255,0.05)' : b.cor,
                 fontSize: '8px',
-                border: isSelected
-                    ? '2px solid #3b82f6'
-                    : '1px solid rgba(0,0,0,0.3)',
-                boxShadow: isSelected
-                    ? '0 0 15px rgba(59,130,246,0.8)'
-                    : 'none',
-                zIndex: isSelected ? 20 : 10,
-                cursor: 'pointer',
-                transition: 'all 0.25s cubic-bezier(0.34,1.56,0.64,1)',
-                touchAction: 'pan-y',
+                border: isDraggingThis
+                    ? '2px dashed rgba(255,255,255,0.2)'
+                    : isDropTarget
+                        ? '2px solid #f97316'
+                        : isSelected
+                            ? '2px solid #3b82f6'
+                            : '1px solid rgba(0,0,0,0.3)',
+                boxShadow: isDropTarget
+                    ? '0 0 20px rgba(249,115,22,0.5)'
+                    : isSelected
+                        ? '0 0 15px rgba(59,130,246,0.8)'
+                        : 'none',
+                zIndex: isDraggingThis ? 1 : isSelected ? 20 : 10,
+                cursor: isDraggingThis ? 'grabbing' : 'grab',
+                transition: isDraggingThis ? 'none' : 'all 0.25s cubic-bezier(0.34,1.56,0.64,1)',
+                touchAction: 'none',
+                opacity: isDraggingThis ? 0.3 : 1,
             }}
         >
-            {b.label && (
+            <GripVertical size={10} className="absolute top-0.5 right-0.5 opacity-20" />
+            {!isDraggingThis && b.label && (
                 <span className="text-[7px] font-black uppercase tracking-tighter mb-1 truncate w-full px-0.5 text-center opacity-70">{b.label}</span>
             )}
-            <span className="text-[9px] font-black">{Math.round(b.rw)}</span>
-            <div className="w-1/2 h-px bg-black/10 my-0.5" />
-            <span className="text-[9px] font-black">{Math.round(b.rh)}</span>
+            {!isDraggingThis && <>
+                <span className="text-[9px] font-black">{Math.round(b.rw)}</span>
+                <div className="w-1/2 h-px bg-black/10 my-0.5" />
+                <span className="text-[9px] font-black">{Math.round(b.rh)}</span>
+            </>}
         </div>
     );
 });
@@ -256,7 +254,13 @@ export function AdminCalculator() {
 
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-
+    // ─── DRAG / MAGNETIC SNAP ─────────────────────────────────────────────────
+    const [dragId, setDragId] = useState<string | null>(null);
+    const [dragVisualPos, setDragVisualPos] = useState<{ x: number; y: number } | null>(null);
+    const [dragOverId, setDragOverId] = useState<string | null>(null);
+    const dragOffsetRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+    const didDragRef = useRef(false);
+    const isDragging = dragId !== null;
 
     const containerRef = useRef<HTMLDivElement>(null);
     const [containerWidth, setContainerWidth] = useState(500);
@@ -299,7 +303,6 @@ export function AdminCalculator() {
         );
     }, []);
 
-    // ─── COMANDOS DE TECLADO ──────────────────────────────────────────────────
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             const tag = (e.target as HTMLElement)?.tagName;
@@ -318,7 +321,137 @@ export function AdminCalculator() {
     }, [canUndo, canRedo]);
 
     useEffect(() => {
-        workerRef.current = new Worker(new URL('../workers/packer.worker.ts', import.meta.url));
+        const workerCode = `
+const cloneItems = (items) => items.map(b => ({ ...b }));
+self.onmessage = (e) => {
+    const { vidros, rollW, margin, modoOtimizacao } = e.data;
+    let baseItems = vidros.map(v => {
+        const bw = v.forceRotate ? (v.oh + margin) : (v.ow + margin);
+        const bh = v.forceRotate ? (v.ow + margin) : (v.oh + margin);
+        const brw = v.forceRotate ? v.oh : v.ow;
+        const brh = v.forceRotate ? v.ow : v.oh;
+        return { id: v.id, w: bw, h: bh, rw: brw, rh: brh, cor: v.cor, label: v.label, rotated: v.forceRotate === true, h_visual: bh, forceRotate: v.forceRotate, alignRight: v.alignRight === true, sortOrder: v.sortOrder ?? 0, _manualPos: v._manualPos };
+    });
+    // Always pack in explicit sortOrder so drag-reorder is respected
+    baseItems.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+    if (modoOtimizacao === 'densidade') {
+        let items = cloneItems(baseItems);
+        let freeRects = [{ x: 0, y: 0, w: rollW, h: 999999 }];
+        let currentMaxY = 0, currentAreaV = 0;
+        items.forEach(b => {
+            let bestRectIdx = -1, bestY = Infinity, bestScoreX = b.alignRight ? -1 : Infinity, finalX = 0, willRotate = false;
+            for (let i = 0; i < freeRects.length; i++) {
+                let r = freeRects[i];
+                if (b.w <= r.w && b.h <= r.h) { 
+                    if (r.y < bestY || (r.y === bestY && (b.alignRight ? (r.x + r.w > bestScoreX) : (r.x < bestScoreX)))) { 
+                        bestY = r.y; bestScoreX = b.alignRight ? (r.x + r.w) : r.x; finalX = b.alignRight ? (r.x + r.w - b.w) : r.x; bestRectIdx = i; willRotate = false; 
+                    } 
+                }
+                if (b.forceRotate !== true && b.h <= r.w && b.w <= r.h) { 
+                    if (r.y < bestY || (r.y === bestY && (b.alignRight ? (r.x + r.w > bestScoreX) : (r.x < bestScoreX)))) { 
+                        bestY = r.y; bestScoreX = b.alignRight ? (r.x + r.w) : r.x; finalX = b.alignRight ? (r.x + r.w - b.h) : r.x; bestRectIdx = i; willRotate = true; 
+                    } 
+                }
+            }
+            if (bestRectIdx !== -1) {
+                if (willRotate) { [b.w, b.h] = [b.h, b.w]; [b.rw, b.rh] = [b.rh, b.rw]; b.rotated = true; b.h_visual = b.h; }
+                b.fit = { x: finalX, y: bestY };
+                if (b.fit.y + b.h > currentMaxY) currentMaxY = b.fit.y + b.h;
+                currentAreaV += (b.rw * b.rh);
+                let newFR = [];
+                for (let i = 0; i < freeRects.length; i++) {
+                    let fr = freeRects[i];
+                    if (b.fit.x < fr.x + fr.w && b.fit.x + b.w > fr.x && b.fit.y < fr.y + fr.h && b.fit.y + b.h > fr.y) {
+                        if (b.fit.y > fr.y) newFR.push({ x: fr.x, y: fr.y, w: fr.w, h: b.fit.y - fr.y });
+                        if (b.fit.y + b.h < fr.y + fr.h) newFR.push({ x: fr.x, y: b.fit.y + b.h, w: fr.w, h: (fr.y + fr.h) - (b.fit.y + b.h) });
+                        if (b.fit.x > fr.x) newFR.push({ x: fr.x, y: fr.y, w: b.fit.x - fr.x, h: fr.h });
+                        if (b.fit.x + b.w < fr.x + fr.w) newFR.push({ x: b.fit.x + b.w, y: fr.y, w: (fr.x + fr.w) - (b.fit.x + b.w), h: fr.h });
+                    } else { newFR.push(fr); }
+                }
+                freeRects = [];
+                for (let i = 0; i < newFR.length; i++) {
+                    let r1 = newFR[i], isContained = false;
+                    for (let j = 0; j < newFR.length; j++) {
+                        if (i === j) continue;
+                        let r2 = newFR[j];
+                        if (r1.x >= r2.x && r1.y >= r2.y && r1.x + r1.w <= r2.x + r2.w && r1.y + r1.h <= r2.y + r2.h) { isContained = true; break; }
+                    }
+                    if (!isContained) freeRects.push(r1);
+                }
+            }
+        });
+        result = { blocos: items, maxY: currentMaxY, areaV: currentAreaV };
+    } else {
+        let strategies = [];
+        strategies.push(cloneItems(baseItems));
+        strategies.push(cloneItems(baseItems));
+        strategies.push(cloneItems(baseItems).map(b => { if (b.forceRotate !== true && b.w > b.h && b.h <= rollW) { [b.w, b.h] = [b.h, b.w]; [b.rw, b.rh] = [b.rh, b.rw]; b.rotated = true; b.h_visual = b.h; } return b; }));
+        strategies.push(cloneItems(baseItems).map(b => { if (b.forceRotate !== true && b.h > b.w && b.h <= rollW) { [b.w, b.h] = [b.h, b.w]; [b.rw, b.rh] = [b.rh, b.rw]; b.rotated = true; b.h_visual = b.h; } return b; }));
+        let bestResult = null, minTotalY = Infinity;
+        strategies.forEach(testItems => {
+            let shelves = [], totalY = 0, currentAreaV = 0;
+            testItems.forEach(item => {
+                let placed = false, bCSI = -1, bCI = -1, bCW = Infinity;
+                for (let i = 0; i < shelves.length; i++) {
+                    let shelf = shelves[i];
+                    for (let j = 0; j < shelf.columns.length; j++) {
+                        let col = shelf.columns[j], rH = shelf.height - col.currentHeight;
+                        if (item.w <= col.width && item.h <= rH) { let sc = (col.width - item.w) * 5 + (rH - item.h); if (sc < bCW) { bCW = sc; bCSI = i; bCI = j; } }
+                    }
+                }
+                if (bCSI !== -1) {
+                    let shelf = shelves[bCSI], col = shelf.columns[bCI], rH = shelf.height - col.currentHeight;
+                    if (rH - item.h <= 10) item.h = rH;
+                    item.fit = { x: col.x, y: shelf.y + col.currentHeight };
+                    col.blocks.push(item); col.currentHeight += item.h; placed = true; currentAreaV += (item.rw * item.rh);
+                }
+                if (!placed) {
+                    let bSI = -1, bW = Infinity;
+                    for (let i = 0; i < shelves.length; i++) {
+                        let shelf = shelves[i];
+                        if (item.w <= (rollW - shelf.currentWidth) && item.h <= shelf.height) { let wH = shelf.height - item.h; if (wH < bW) { bW = wH; bSI = i; } }
+                    }
+                    if (bSI !== -1) {
+                        let shelf = shelves[bSI];
+                        if (shelf.height - item.h <= 10) item.h = shelf.height;
+                        let nC = { x: shelf.currentWidth, width: item.w, currentHeight: item.h, blocks: [item] };
+                        item.fit = { x: nC.x, y: shelf.y }; shelf.columns.push(nC); shelf.currentWidth += item.w; placed = true; currentAreaV += (item.rw * item.rh);
+                    }
+                }
+                if (!placed) {
+                    let nC = { x: 0, width: item.w, currentHeight: item.h, blocks: [item] };
+                    let nS = { y: totalY, height: item.h, currentWidth: item.w, columns: [nC] };
+                    item.fit = { x: 0, y: totalY }; shelves.push(nS); totalY += item.h; currentAreaV += (item.rw * item.rh);
+                }
+            });
+            shelves.forEach(shelf => {
+                const sobra = rollW - shelf.currentWidth;
+                if (shelf.columns.length > 1 && sobra > 5 && sobra < 60) {
+                    const lC = shelf.columns[shelf.columns.length - 1], nX = rollW - lC.width, sh = nX - lC.x;
+                    lC.x = nX; lC.blocks.forEach(b => { if (b.fit) b.fit.x += sh; });
+                } else if (sobra > 0) {
+                    let currentRight = rollW;
+                    for (let c = shelf.columns.length - 1; c >= 0; c--) {
+                        let col = shelf.columns[c];
+                        if (col.blocks.some(b => b.alignRight === true)) {
+                            let nX = currentRight - col.width, sh = nX - col.x;
+                            col.x = nX;
+                            col.blocks.forEach(b => { if (b.fit) b.fit.x += sh; });
+                            currentRight = nX;
+                        } else break;
+                    }
+                }
+            });
+            let flatBlocks = shelves.flatMap(s => s.columns.flatMap(c => c.blocks));
+            if (totalY < minTotalY) { minTotalY = totalY; bestResult = { totalY, currentAreaV, blocks: flatBlocks }; }
+        });
+        result = { blocos: bestResult.blocks, maxY: bestResult.totalY, areaV: bestResult.currentAreaV };
+    }
+    self.postMessage(result);
+};
+        `;
+        const blob = new Blob([workerCode], { type: 'application/javascript' });
+        workerRef.current = new Worker(URL.createObjectURL(blob));
         workerRef.current.onmessage = (e) => {
             const { blocos, maxY, areaV } = e.data;
             setBlocosCalculados(blocos);
@@ -326,9 +459,7 @@ export function AdminCalculator() {
             setAreaV(areaV);
             setIsCalculating(false);
         };
-        return () => {
-            workerRef.current?.terminate();
-        };
+        return () => workerRef.current?.terminate();
     }, []);
 
     useEffect(() => {
@@ -370,46 +501,6 @@ export function AdminCalculator() {
         return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }, [descontoInput]);
 
-    // ─── AUTO-SAVE DRAFT ──────────────────────────────────────────────────
-    useEffect(() => {
-        const draft = {
-            cliente,
-            vidros,
-            desconto,
-            descontoInput,
-            rollW,
-            price,
-            margin,
-            modoOtimizacao,
-            userName,
-            lastSaved: Date.now()
-        };
-        localStorage.setItem('lume_calculator_draft', JSON.stringify(draft));
-    }, [cliente, vidros, desconto, descontoInput, rollW, price, margin, modoOtimizacao, userName]);
-
-    // RESTORE DRAFT ON MOUNT
-    useEffect(() => {
-        const saved = localStorage.getItem('lume_calculator_draft');
-        if (saved) {
-            try {
-                const draft = JSON.parse(saved);
-                if (draft.vidros && draft.vidros.length > 0 && vidros.length === 0) {
-                    dispatch({ type: 'SET', payload: draft.vidros });
-                    if (draft.cliente) setCliente(draft.cliente);
-                    if (draft.desconto !== undefined) setDesconto(draft.desconto);
-                    if (draft.descontoInput !== undefined) setDescontoInput(draft.descontoInput);
-                    if (draft.rollW) setRollW(draft.rollW);
-                    if (draft.price) setPrice(draft.price);
-                    if (draft.margin !== undefined) setMargin(draft.margin);
-                    if (draft.modoOtimizacao) setModoOtimizacao(draft.modoOtimizacao);
-                    if (draft.userName) setUserName(draft.userName);
-                }
-            } catch (e) {
-                console.error("Erro ao carregar rascunho", e);
-            }
-        }
-    }, []); 
-
     // ─── ENTER NOS INPUTS ──────────────────────────────────────────────────────
 
     const handleKeyDownHeight = (e: React.KeyboardEvent) => { if (e.key === 'Enter') widthRef.current?.focus(); };
@@ -442,16 +533,6 @@ export function AdminCalculator() {
 
     const removerTudoTipo = (h: number, w: number, label?: string) => {
         setVidros(current => current.filter(v => !(v.oh === h && v.ow === w && (v.label || '') === (label || ''))));
-    };
-
-    const limparTudo = () => {
-        if (vidros.length === 0) return;
-        if (window.confirm('Tem certeza que deseja remover TODAS as peças?')) {
-            setVidros([]);
-            setDesconto(0);
-            setDescontoInput('0');
-            setCliente('');
-        }
     };
 
     const toggleSelection = useCallback((id: string) => {
@@ -499,7 +580,89 @@ export function AdminCalculator() {
 
     const scale = containerWidth / rollW; // px per cm
 
+    const handleDragStart = useCallback((e: React.MouseEvent | React.TouchEvent | any, block: Block) => {
+        if (typeof e.stopPropagation === 'function') e.stopPropagation();
+        if (!containerRef.current || !block.fit) return;
+        const rect = containerRef.current.getBoundingClientRect();
+        const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+        const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+        dragOffsetRef.current = {
+            x: clientX - rect.left - block.fit.x * scale,
+            y: clientY - rect.top - block.fit.y * scale,
+        };
+        setDragId(block.id);
+        setDragVisualPos({ x: block.fit.x * scale, y: block.fit.y * scale });
+        setDragOverId(null);
+        didDragRef.current = false;
+    }, [scale]);
 
+    const handleDragMove = useCallback((e: MouseEvent | TouchEvent) => {
+        if (!dragId || !containerRef.current) return;
+        e.preventDefault();
+        const rect = containerRef.current.getBoundingClientRect();
+        const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+        const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+
+        const pxX = clientX - rect.left;
+        const pxY = clientY - rect.top;
+        setDragVisualPos({ x: pxX - dragOffsetRef.current.x, y: pxY - dragOffsetRef.current.y });
+        didDragRef.current = true;
+
+        // Detecta sobre qual peça o cursor está (apenas visual highlight)
+        const hoveredBlock = blocosCalculados.find(b => {
+            if (b.id === dragId || !b.fit) return false;
+            const bLeft = b.fit.x * scale;
+            const bTop = b.fit.y * scale;
+            const bRight = bLeft + (b.w - margin) * scale;
+            const bBottom = bTop + ((b.h_visual || b.h) - margin) * scale;
+            return pxX >= bLeft && pxX <= bRight && pxY >= bTop && pxY <= bBottom;
+        });
+
+        setDragOverId(hoveredBlock ? hoveredBlock.id : null);
+    }, [dragId, blocosCalculados, scale, margin]);
+
+    const handleDragEnd = useCallback(() => {
+        if (!dragId) return;
+
+        // Reordena no drop: estilo iOS — move o item arrastado para a posição do drop target
+        if (dragOverId) {
+            setVidros(prev => {
+                const sorted = [...prev].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+                const draggedIdx = sorted.findIndex(v => v.id === dragId);
+                const targetIdx = sorted.findIndex(v => v.id === dragOverId);
+                if (draggedIdx === -1 || targetIdx === -1) return prev;
+
+                const reordered = [...sorted];
+                const [moved] = reordered.splice(draggedIdx, 1);
+                reordered.splice(targetIdx, 0, moved);
+
+                return reordered.map((v, i) => ({ ...v, sortOrder: i }));
+            });
+        }
+
+        setDragId(null);
+        setDragVisualPos(null);
+        setDragOverId(null);
+    }, [dragId, dragOverId, setVidros]);
+
+    useEffect(() => {
+        if (isDragging) {
+            window.addEventListener('mousemove', handleDragMove, { passive: false });
+            window.addEventListener('touchmove', handleDragMove, { passive: false });
+            window.addEventListener('mouseup', handleDragEnd);
+            window.addEventListener('touchend', handleDragEnd);
+        }
+        return () => {
+            window.removeEventListener('mousemove', handleDragMove);
+            window.removeEventListener('touchmove', handleDragMove);
+            window.removeEventListener('mouseup', handleDragEnd);
+            window.removeEventListener('touchend', handleDragEnd);
+        };
+    }, [isDragging, handleDragMove, handleDragEnd]);
+
+    const resetOrdem = () => {
+        setVidros(prev => prev.map((v, i) => ({ ...v, sortOrder: i, _manualPos: undefined })));
+    };
 
     // ─── HISTÓRICO ─────────────────────────────────────────────────────────────
 
@@ -531,29 +694,26 @@ export function AdminCalculator() {
             data: new Date().toLocaleDateString('pt-BR'),
             valor: finalPrice,
             qtd: vidros.length,
-            vidros: [...vidros],
-            config: { rollW, price, margin },
-            desconto,
-            modoOtimizacao
+            vidros: vidros.map(v => {
+                const { _manualPos, ...rest } = v;
+                return rest;
+            }),
+            config: { rollW, price, margin }
         };
         const atualizado = [novo, ...historico].slice(0, 20);
         setHistorico(atualizado);
         localStorage.setItem('lume_historico', JSON.stringify(atualizado));
         setShowSaveToast(true);
         setTimeout(() => setShowSaveToast(false), 3000);
-    }, [vidros, cliente, finalPrice, rollW, price, margin, historico, desconto, modoOtimizacao]);
+    }, [vidros, cliente, finalPrice, rollW, price, margin, historico]);
 
     const carregarDoHistorico = (orc: OrcamentoSalvo) => {
         setCliente(orc.cliente);
         setRollW(orc.config.rollW);
         setPrice(orc.config.price);
         setMargin(orc.config.margin);
-        if (orc.desconto !== undefined) {
-            setDesconto(orc.desconto);
-            setDescontoInput((orc.desconto * 100).toString());
-        }
-        if (orc.modoOtimizacao) setModoOtimizacao(orc.modoOtimizacao);
         dispatch({ type: 'SET', payload: orc.vidros });
+        setDesconto(0);
         setHistoricoAberto(false);
     };
 
@@ -576,7 +736,12 @@ export function AdminCalculator() {
     };
 
     const salvarProjeto = () => {
-        const dados = { config: { cliente, rolo: rollW, preco: price }, vidros: [...vidros] };
+        const dados = {
+            config: { cliente, rolo: rollW, preco: price }, vidros: vidros.map(v => {
+                const { _manualPos, ...rest } = v;
+                return rest;
+            })
+        };
         const blob = new Blob([JSON.stringify(dados)], { type: 'application/json' });
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
         a.download = (cliente || 'projeto') + ".insul"; a.click();
@@ -601,14 +766,8 @@ export function AdminCalculator() {
         if (!invoiceRef.current) return;
         setIsCalculating(true);
         try {
-            const dataUrl = await htmlToImage.toPng(invoiceRef.current, {
-                pixelRatio: 2,
-                backgroundColor: "#0a0f1e",
-                style: {
-                    transform: 'none',
-                    margin: '0'
-                }
-            });
+            const canvas = await html2canvas(invoiceRef.current, { scale: 2, backgroundColor: "#0a0f1e" });
+            const dataUrl = canvas.toDataURL("image/png");
 
             if (Capacitor.isNativePlatform()) {
                 const fileName = `Orcamento_${cliente.replace(/\W+/g, '_') || 'LUME'}.png`;
@@ -636,44 +795,31 @@ export function AdminCalculator() {
     };
 
     const gerarPDF = async () => {
+        if (!invoiceRef.current) return;
         setIsCalculating(true);
         try {
-            const blob = await pdf(
-                <InvoicePDF
-                    cliente={cliente}
-                    userName={userName}
-                    resumo={resumo}
-                    totalAreaM2={totalAreaM2}
-                    areaV={areaV}
-                    eficiencia={eficiencia}
-                    finalPrice={finalPrice}
-                    descontoInput={descontoInput}
-                />
-            ).toBlob();
+            const canvas = await html2canvas(invoiceRef.current, { scale: 3, useCORS: true, backgroundColor: "#0a0f1e" });
+            const imgData = canvas.toDataURL('image/png');
+            const imgWidth = 100;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+            const pdf = new jsPDF('p', 'mm', [imgWidth, imgHeight]);
+            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
 
             if (Capacitor.isNativePlatform()) {
                 const fileName = `Orcamento_${cliente.replace(/\W+/g, '_') || 'LUME'}.pdf`;
-                const reader = new FileReader();
-                reader.readAsDataURL(blob); 
-                reader.onloadend = async () => {
-                    const base64data = (reader.result as string).split(',')[1];
-                    const savedFile = await Filesystem.writeFile({
-                        path: fileName,
-                        data: base64data,
-                        directory: Directory.Cache
-                    });
-                    await Share.share({
-                        title: 'Compartilhar Orçamento (PDF)',
-                        url: savedFile.uri,
-                    });
-                };
+                const pdfBase64 = pdf.output('datauristring').split(',')[1];
+                const savedFile = await Filesystem.writeFile({
+                    path: fileName,
+                    data: pdfBase64,
+                    directory: Directory.Cache
+                });
+                await Share.share({
+                    title: 'Compartilhar Orçamento (PDF)',
+                    url: savedFile.uri,
+                });
             } else {
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `Orcamento_${cliente.replace(/\W+/g, '_') || 'LUME'}.pdf`;
-                link.click();
-                setTimeout(() => URL.revokeObjectURL(url), 100);
+                pdf.save(`Orcamento_${cliente.replace(/\W+/g, '_') || 'LUME'}.pdf`);
             }
         } catch (err) {
             console.error(err);
@@ -712,49 +858,147 @@ export function AdminCalculator() {
         return Array.from(map.values()).sort((a, b) => a.label.localeCompare(b.label));
     }, [vidros]);
 
-    const groupedResumo = useMemo(() => {
-        return resumo.reduce((acc, item) => {
-            const groupName = item.label || 'Sem Ambiente';
-            if (!acc[groupName]) acc[groupName] = [];
-            acc[groupName].push(item);
-            return acc;
-        }, {} as Record<string, typeof resumo>);
-    }, [resumo]);
-
     const m = maxY / 100;
     const valorPraticoM2 = areaV > 0 ? finalPrice / (areaV / 10000) : 0;
 
     // ─── RENDER ────────────────────────────────────────────────────────────────
 
     return (
-        <div className="min-h-screen bg-[#040811] text-white py-6 px-2 sm:px-4 relative overflow-x-hidden">
+        <div className="min-h-screen bg-[#040811] text-white py-6 px-2 sm:px-4 relative">
 
-            {/* PAINEL LATERAL: CONFIGURAÇÕES (EXTRAÍDO) */}
-            <ConfigPanel 
-                aberto={configAberto}
-                setAberto={setConfigAberto}
-                cfgUserName={cfgUserName}
-                setCfgUserName={setCfgUserName}
-                cfgRollW={cfgRollW}
-                setCfgRollW={setCfgRollW}
-                cfgPrice={cfgPrice}
-                setCfgPrice={setCfgPrice}
-                cfgMargin={cfgMargin}
-                setCfgMargin={setCfgMargin}
-                cfgModo={cfgModo}
-                setCfgModo={setCfgModo}
-                onSalvar={salvarConfig}
-            />
+            {/* PAINEL LATERAL: CONFIGURAÇÕES */}
+            <div className={`fixed inset-y-0 left-0 z-50 w-80 bg-[#070f1f] border-r border-white/10 shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col ${configAberto ? 'translate-x-0' : '-translate-x-full'}`}>
+                <div className="flex items-center justify-between p-5 border-b border-white/10">
+                    <div className="flex items-center gap-3">
+                        <Settings size={18} className="text-[#c9a227]" />
+                        <span className="font-bold text-sm uppercase tracking-wider">Configurações Padrão</span>
+                    </div>
+                    <button onClick={() => setConfigAberto(false)} className="p-1.5 hover:bg-white/10 rounded-lg transition-colors">
+                        <X size={18} />
+                    </button>
+                </div>
+                <div className="flex-1 overflow-y-auto p-5 space-y-6">
+                    <div>
+                        <p className="text-[10px] text-gray-500 mb-4 leading-relaxed">
+                            Esses valores serão usados como padrão sempre que a calculadora for aberta. Você ainda pode alterá-los a qualquer momento durante o uso.
+                        </p>
+                    </div>
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-[10px] uppercase text-[#c9a227] font-bold mb-2">Nome do Responsável</label>
+                            <input
+                                type="text"
+                                value={cfgUserName}
+                                onChange={(e) => setCfgUserName(e.target.value)}
+                                placeholder="Seu Nome"
+                                className="w-full bg-[#040811] border border-white/10 rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-[#c9a227]/50 transition-colors"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-[10px] uppercase text-[#c9a227] font-bold mb-2">Largura do Rolo (cm)</label>
+                            <input
+                                type="number"
+                                value={cfgRollW}
+                                onChange={(e) => setCfgRollW(parseFloat(e.target.value) || 0)}
+                                onFocus={(e) => e.target.select()}
+                                className="w-full bg-[#040811] border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-center outline-none focus:border-[#c9a227]/50 transition-colors"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-[10px] uppercase text-[#c9a227] font-bold mb-2">Preço por m² (R$)</label>
+                            <input
+                                type="number"
+                                value={cfgPrice}
+                                onChange={(e) => setCfgPrice(parseFloat(e.target.value) || 0)}
+                                onFocus={(e) => e.target.select()}
+                                className="w-full bg-[#040811] border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-center outline-none focus:border-[#c9a227]/50 transition-colors"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-[10px] uppercase text-[#c9a227] font-bold mb-2">Margem de Corte (cm)</label>
+                            <input
+                                type="number"
+                                value={cfgMargin}
+                                onChange={(e) => setCfgMargin(parseFloat(e.target.value) || 0)}
+                                onFocus={(e) => e.target.select()}
+                                className="w-full bg-[#040811] border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-center outline-none focus:border-[#c9a227]/50 transition-colors"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-[10px] uppercase text-[#c9a227] font-bold mb-2">Algoritmo Padrão</label>
+                            <div className="flex bg-[#040811] border border-white/10 p-1 rounded-xl">
+                                <button
+                                    onClick={() => setCfgModo('densidade')}
+                                    className={`flex-1 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${cfgModo === 'densidade' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}
+                                >
+                                    Densidade
+                                </button>
+                                <button
+                                    onClick={() => setCfgModo('facilidade')}
+                                    className={`flex-1 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${cfgModo === 'facilidade' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}
+                                >
+                                    Fácil
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="p-5 border-t border-white/10">
+                    <button
+                        onClick={salvarConfig}
+                        className="w-full bg-[#c9a227] text-black py-3 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-[#e5c158] transition-colors"
+                    >
+                        <Settings size={14} /> Salvar e Aplicar
+                    </button>
+                </div>
+            </div>
+            {configAberto && (
+                <div onClick={() => setConfigAberto(false)} className="fixed inset-0 bg-black/40 z-40 backdrop-blur-sm" />
+            )}
 
-            {/* PAINEL LATERAL: HISTÓRICO (EXTRAÍDO) */}
-            <HistoryPanel 
-                aberto={historicoAberto}
-                setAberto={setHistoricoAberto}
-                historico={historico}
-                formatBRL={formatBRL}
-                onCarregar={carregarDoHistorico}
-                onDeletar={deletarDoHistorico}
-            />
+            {/* PAINEL LATERAL: HISTÓRICO */}
+            <div className={`fixed inset-y-0 right-0 z-50 w-80 bg-[#070f1f] border-l border-white/10 shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col ${historicoAberto ? 'translate-x-0' : 'translate-x-full'}`}>
+                <div className="flex items-center justify-between p-5 border-b border-white/10">
+                    <div className="flex items-center gap-3">
+                        <History size={18} className="text-[#c9a227]" />
+                        <span className="font-bold text-sm uppercase tracking-wider">Orçamentos Salvos</span>
+                    </div>
+                    <button onClick={() => setHistoricoAberto(false)} className="p-1.5 hover:bg-white/10 rounded-lg transition-colors">
+                        <X size={18} />
+                    </button>
+                </div>
+                <div className="flex-1 overflow-y-auto p-3 space-y-2">
+                    {historico.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center h-48 text-gray-600 text-sm text-center px-4">
+                            <Clock size={32} className="mb-3 opacity-30" />
+                            <p>Nenhum orçamento salvo ainda.</p>
+                            <p className="text-xs mt-1 opacity-60">Clique em "Salvar no Histórico" após calcular.</p>
+                        </div>
+                    ) : (
+                        historico.map(orc => (
+                            <div key={orc.id} className="bg-[#04080f] border border-white/5 rounded-xl p-3 hover:border-[#c9a227]/30 transition-colors">
+                                <div className="flex items-start justify-between mb-1">
+                                    <p className="font-bold text-sm text-white leading-tight truncate max-w-[160px]">{orc.cliente}</p>
+                                    <span className="text-[10px] text-gray-500 shrink-0 ml-2">{orc.data}</span>
+                                </div>
+                                <p className="text-green-400 font-bold text-base">{formatBRL(orc.valor)}</p>
+                                <p className="text-[11px] text-gray-500 mb-3">{orc.qtd} peças · rolo {orc.config.rollW}cm</p>
+                                <div className="flex gap-2">
+                                    <button onClick={() => carregarDoHistorico(orc)} className="flex-1 flex items-center justify-center gap-1.5 bg-[#c9a227]/10 hover:bg-[#c9a227]/20 text-[#c9a227] text-[11px] font-bold py-1.5 rounded-lg transition-colors">
+                                        <ChevronRight size={13} /> Carregar
+                                    </button>
+                                    <button onClick={() => deletarDoHistorico(orc.id)} className="p-1.5 text-red-500/50 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
+                                        <Trash2 size={14} />
+                                    </button>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+            </div>
+            {historicoAberto && (
+                <div onClick={() => setHistoricoAberto(false)} className="fixed inset-0 bg-black/40 z-40 backdrop-blur-sm" />
+            )}
 
             {/* BARRA FLUTUANTE: SELEÇÃO */}
             {selectedIds.length > 0 && (
@@ -902,18 +1146,9 @@ export function AdminCalculator() {
                             <input ref={widthRef} type="number" value={widthIn} onChange={(e) => setWidthIn(e.target.value)} onKeyDown={handleKeyDownWidth} placeholder="Largura" className="bg-[#040811] border border-white/10 rounded-xl p-2.5 text-sm md:text-base text-center" />
                             <input ref={qtyRef} type="number" value={qtyIn} onChange={(e) => setQtyIn(e.target.value)} onKeyDown={handleKeyDownQty} onFocus={(e) => e.target.select()} placeholder="Qtd" className="bg-[#040811] border border-white/10 rounded-xl p-2.5 text-sm md:text-base text-center" />
                         </div>
-                        <button onClick={adicionar} className="w-full bg-[#c9a227] text-black py-3 rounded-xl font-bold text-xs uppercase flex items-center justify-center gap-2">
+                        <button onClick={adicionar} className="w-full bg-[#c9a227] text-black py-3 rounded-xl font-bold text-xs uppercase flex items-center justify-center gap-2 mb-4">
                             <Plus size={16} /> Adicionar
                         </button>
-
-                        {vidros.length > 0 && (
-                            <button 
-                                onClick={limparTudo} 
-                                className="w-full flex items-center justify-center gap-1.5 py-2 text-[10px] font-bold text-red-400/60 hover:text-red-400 transition-colors uppercase tracking-widest"
-                            >
-                                <Trash2 size={12} /> Limpar Tudo
-                            </button>
-                        )}
                     </div>
 
                     {resumo.length > 0 && (
@@ -1046,12 +1281,22 @@ export function AdminCalculator() {
                                     <button onClick={() => setModoOtimizacao('densidade')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${modoOtimizacao === 'densidade' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}>Corte Densidade</button>
                                     <button onClick={() => setModoOtimizacao('facilidade')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${modoOtimizacao === 'facilidade' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}>Corte Fácil</button>
                                 </div>
+                                {false && (
+                                    <button
+                                        onClick={resetOrdem}
+                                        className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-wider bg-orange-500/20 border border-orange-500/40 text-orange-400 hover:bg-orange-500/30 transition-all"
+                                        title="Resetar ordem para o padrão otimizado"
+                                    >
+                                        <RefreshCw size={13} /> Reset Ordem
+                                    </button>
+                                )}
                             </div>
 
                             <div className="admin-entrance bg-[#111827] border border-white/10 rounded-xl overflow-hidden shadow-2xl relative min-h-[500px]">
                                 <div className="absolute top-0 left-0 w-full bg-[#1f2937] text-gray-400 text-[10px] uppercase font-bold flex justify-between px-3 py-1.5 z-10 border-b border-gray-700">
                                     <span className="flex items-center gap-2">
                                         0cm
+                                        {isDragging && <span className="text-blue-400 text-[9px] normal-case">· arraste livremente, snap automático</span>}
                                     </span>
                                     <span className="flex items-center gap-2">
                                         {isCalculating && <span className="w-2 h-2 rounded-full bg-[#c9a227] animate-pulse inline-block" title="Calculando..." />}
@@ -1072,14 +1317,45 @@ export function AdminCalculator() {
                                         <div className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: `${10 * scale}px ${10 * scale}px` }} />
                                         {blocosCalculados.map((b) => (
                                             b.fit && (
-                                                <MemoBlock
-                                                    key={b.id}
-                                                    b={b}
-                                                    scale={scale}
-                                                    margin={margin}
-                                                    isSelected={selectedIds.includes(b.id)}
-                                                    toggleSelection={toggleSelection}
-                                                />
+                                                <React.Fragment key={b.id}>
+                                                    <MemoBlock
+                                                        b={b}
+                                                        scale={scale}
+                                                        margin={margin}
+                                                        isSelected={selectedIds.includes(b.id)}
+                                                        isDraggingThis={dragId === b.id}
+                                                        isDropTarget={dragOverId === b.id}
+                                                        handleDragStart={handleDragStart}
+                                                        toggleSelection={toggleSelection}
+                                                        didDragRef={didDragRef}
+                                                    />
+
+                                                    {/* Floating clone during drag */}
+                                                    {dragId === b.id && dragVisualPos && (
+                                                        <div
+                                                            className="absolute flex flex-col items-center justify-center text-black font-bold pointer-events-none"
+                                                            style={{
+                                                                left: dragVisualPos.x,
+                                                                top: dragVisualPos.y,
+                                                                width: (b.w - margin) * scale,
+                                                                height: ((b.h_visual || b.h) - margin) * scale,
+                                                                background: b.cor,
+                                                                fontSize: '8px',
+                                                                border: '2px solid rgba(0,0,0,0.4)',
+                                                                boxShadow: '0 16px 48px rgba(0,0,0,0.6)',
+                                                                zIndex: 50,
+                                                                transform: 'rotate(2deg) scale(1.06)',
+                                                                opacity: 0.95,
+                                                                borderRadius: '3px',
+                                                            }}
+                                                        >
+                                                            {b.label && <span className="text-[7px] font-black uppercase tracking-tighter mb-1 truncate w-full px-0.5 text-center opacity-70">{b.label}</span>}
+                                                            <span className="text-[9px] font-black">{Math.round(b.rw)}</span>
+                                                            <div className="w-1/2 h-px bg-black/10 my-0.5" />
+                                                            <span className="text-[9px] font-black">{Math.round(b.rh)}</span>
+                                                        </div>
+                                                    )}
+                                                </React.Fragment>
                                             )
                                         ))}
                                     </div>
@@ -1090,19 +1366,156 @@ export function AdminCalculator() {
                 </div>
             </div>
 
-            {/* INVOICE PNG OCULTO (EXTRAÍDO) */}
-            <InvoicePNG 
-                ref={invoiceRef}
-                cliente={cliente}
-                userName={userName}
-                vidrosCount={vidros.length}
-                groupedResumo={groupedResumo}
-                totalAreaM2={totalAreaM2}
-                finalPrice={finalPrice}
-                subtotalBruto={subtotalBruto}
-                desconto={desconto}
-                formatBRL={formatBRL}
-            />
+            {/* INVOICE OCULTO */}
+            <div className="fixed top-[-10000px] left-0 pointer-events-none">
+                <div
+                    ref={invoiceRef}
+                    style={{
+                        width: '390px',
+                        boxSizing: 'border-box',
+                        background: '#0a0f1e',
+                        padding: '28px 24px 24px',
+                        fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                        color: '#ffffff',
+                        position: 'relative',
+                    }}
+                >
+                    <div style={{ position: 'absolute', top: '-80px', right: '-60px', width: '240px', height: '240px', background: 'radial-gradient(circle, rgba(201,162,39,0.15) 0%, transparent 65%)', borderRadius: '50%', pointerEvents: 'none' }} />
+                    <div style={{ position: 'absolute', bottom: '-60px', left: '-40px', width: '180px', height: '180px', background: 'radial-gradient(circle, rgba(16,185,129,0.10) 0%, transparent 65%)', borderRadius: '50%', pointerEvents: 'none' }} />
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '18px', width: '100%' }}>
+                        <div style={{ flexShrink: 0 }}>
+                            <div style={{ fontSize: '32px', fontWeight: '900', letterSpacing: '-2px', lineHeight: 1, color: '#ffffff' }}>LUME</div>
+                            <div style={{ fontSize: '7.5px', fontWeight: '800', letterSpacing: '4px', color: '#c9a227', marginTop: '3px', textTransform: 'uppercase' }}>Películas Premium</div>
+                        </div>
+                        <div style={{ textAlign: 'right', paddingTop: '4px', flexShrink: 0 }}>
+                            <div style={{ fontSize: '7.5px', fontWeight: '700', color: '#374151', textTransform: 'uppercase', letterSpacing: '2px' }}>Orçamento</div>
+                            <div style={{ fontSize: '12px', fontWeight: '800', color: '#6b7280', marginTop: '3px' }}>{new Date().toLocaleDateString('pt-BR')}</div>
+                        </div>
+                    </div>
+
+                    <div style={{ height: '2px', background: 'linear-gradient(90deg, #c9a227 0%, rgba(201,162,39,0.2) 60%, transparent 100%)', marginBottom: '18px', borderRadius: '2px' }} />
+
+                    <div style={{ marginBottom: '16px', width: '100%' }}>
+                        <div style={{ fontSize: '7.5px', fontWeight: '800', color: '#374151', textTransform: 'uppercase', letterSpacing: '3px', marginBottom: '4px' }}>Para</div>
+                        <div style={{ fontSize: '16px', fontWeight: '900', color: '#ffffff', letterSpacing: '-0.3px', lineHeight: 1.3 }}>
+                            {cliente || 'Consumidor Final'}
+                        </div>
+                        <div style={{ fontSize: '9px', fontWeight: '600', color: '#4b5563', marginTop: '2px' }}>
+                            Responsável: {userName}
+                        </div>
+                    </div>
+
+                    <div style={{ marginBottom: '18px', width: '100%' }}>
+                        <div style={{ fontSize: '7.5px', fontWeight: '800', color: '#374151', textTransform: 'uppercase', letterSpacing: '3px', marginBottom: '8px' }}>
+                            Itens · {vidros.length} peça{vidros.length !== 1 ? 's' : ''}
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', width: '100%' }}>
+                            {resumo.map((r, i) => (
+                                <div key={i} style={{
+                                    background: 'rgba(255,255,255,0.035)',
+                                    border: '1px solid rgba(255,255,255,0.07)',
+                                    borderRadius: '10px',
+                                    padding: '9px 10px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    overflow: 'hidden',
+                                    minWidth: 0,
+                                }}>
+                                    <div style={{
+                                        background: '#c9a227',
+                                        color: '#000000',
+                                        fontWeight: '900',
+                                        fontSize: '11px',
+                                        borderRadius: '6px',
+                                        padding: '3px 7px',
+                                        minWidth: '26px',
+                                        textAlign: 'center',
+                                        flexShrink: 0,
+                                    }}>{r.q}x</div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                                        <div style={{ fontSize: '13px', fontWeight: '800', color: '#e2e8f0', letterSpacing: '-0.5px', lineHeight: 1, overflow: 'hidden' }}>
+                                            {Math.round(r.h)}<span style={{ color: '#4b5563', fontSize: '11px', margin: '0 1px' }}>×</span>{Math.round(r.w)}
+                                            <span style={{ display: 'inline-block', fontSize: '8px', color: '#4b5563', fontWeight: '600', marginLeft: '2px' }}>cm</span>
+                                        </div>
+                                        {r.label && (
+                                            <div style={{ fontSize: '7px', color: '#a1a1aa', marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.5px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                {r.label}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div style={{ height: '1px', background: 'rgba(255,255,255,0.06)', marginBottom: '18px' }} />
+
+                    <div style={{
+                        background: 'linear-gradient(135deg, rgba(201,162,39,0.10) 0%, rgba(16,185,129,0.06) 100%)',
+                        border: '1px solid rgba(201,162,39,0.22)',
+                        borderRadius: '16px',
+                        padding: '18px 20px 16px',
+                        marginBottom: '16px',
+                        position: 'relative',
+                        width: '100%',
+                        boxSizing: 'border-box',
+                    }}>
+                        <div style={{ position: 'absolute', top: 0, right: 0, width: '80px', height: '80px', background: 'radial-gradient(circle at top right, rgba(201,162,39,0.12), transparent 70%)', pointerEvents: 'none' }} />
+
+                        {desconto > 0 && (
+                            <div style={{ marginBottom: '10px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                    <span style={{ fontSize: '12px', fontWeight: '600', color: '#6b7280' }}>Subtotal</span>
+                                    <span style={{ fontSize: '12px', fontWeight: '700', color: '#6b7280' }}>{formatBRL(subtotalBruto)}</span>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                    <span style={{ fontSize: '12px', fontWeight: '700', color: '#ef4444' }}>Desconto</span>
+                                    <span style={{ fontSize: '12px', fontWeight: '700', color: '#ef4444' }}>– {formatBRL(desconto)}</span>
+                                </div>
+                                <div style={{ height: '1px', background: 'rgba(255,255,255,0.06)', margin: '10px 0 0' }} />
+                            </div>
+                        )}
+
+                        <div style={{ fontSize: '8px', fontWeight: '800', color: '#c9a227', textTransform: 'uppercase', letterSpacing: '3px', marginBottom: '5px', marginTop: desconto > 0 ? '8px' : '0' }}>
+                            Total à Vista
+                        </div>
+
+                        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', width: '100%', gap: '8px' }}>
+                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', flexShrink: 1, minWidth: 0 }}>
+                                <div style={{ fontSize: '30px', fontWeight: '900', color: '#10b981', letterSpacing: '-1.5px', lineHeight: 1.1 }}>
+                                    {formatBRL(finalPrice)}
+                                </div>
+                                <div style={{ fontSize: '13px', fontWeight: '800', color: '#6b7280', paddingBottom: '2px', whiteSpace: 'nowrap' }}>
+                                    ({totalAreaM2.toFixed(2)} m²)
+                                </div>
+                            </div>
+                            <div style={{
+                                background: '#10b981',
+                                color: '#000',
+                                fontSize: '8px',
+                                fontWeight: '900',
+                                textTransform: 'uppercase',
+                                letterSpacing: '1.5px',
+                                padding: '5px 11px',
+                                borderRadius: '99px',
+                                marginBottom: '6px',
+                                flexShrink: 0,
+                            }}>CONFIRMADO</div>
+                        </div>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: '8px', color: '#1f2937', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                            Válido por 7 dias
+                        </span>
+                        <span style={{ fontSize: '7.5px', color: '#374151', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                            lumecontrolesolar.com.br
+                        </span>
+                    </div>
+                </div>
+            </div>
 
             <div className="text-center text-[10px] text-gray-500 mt-10 pb-4 font-bold tracking-widest uppercase">
                 2026 - lume controle solar - todos os direitos reservados
