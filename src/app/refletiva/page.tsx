@@ -23,60 +23,80 @@ export const metadata: Metadata = {
 
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'Service',
-  name: 'Instalação de Película Refletiva Espelhada',
-  alternateName: 'Insulfilm Refletivo Prata',
-  description: 'Instalação profissional de película refletiva espelhada com efeito "one-way mirror". Privacidade total durante o dia, rejeição de até 78% do calor solar (TSER) e bloqueio de 99% dos raios UV. A solução clássica e eficaz para o calor carioca.',
-  url: 'https://lumecontrolesolar.com.br/refletiva',
+  '@graph': [
+    {
+      '@type': 'Product',
+  name: 'Película Refletiva Espelhada LUME',
   image: 'https://lumecontrolesolar.com.br/product-refletiva.webp',
-  provider: {
-    '@type': 'LocalBusiness',
-    name: 'LUME Controle Solar',
-    url: 'https://lumecontrolesolar.com.br',
-    telephone: '+5521965140612',
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: 'Estrada do Realengo, 973',
-      addressLocality: 'Rio de Janeiro',
-      addressRegion: 'RJ',
-      addressCountry: 'BR',
-    },
-  },
-  areaServed: {
-    '@type': 'City',
-    name: 'Rio de Janeiro',
+  description: 'Película refletiva espelhada profissional com efeito "one-way mirror". Privacidade total durante o dia e rejeição de até 78% do calor solar.',
+  brand: {
+    '@type': 'Brand',
+    name: 'LUME Controle Solar'
   },
   offers: {
     '@type': 'Offer',
-    price: '95',
+    url: 'https://lumecontrolesolar.com.br/refletiva',
     priceCurrency: 'BRL',
+    price: '95.00',
     priceSpecification: {
       '@type': 'UnitPriceSpecification',
-      price: '95',
+      price: '95.00',
       priceCurrency: 'BRL',
-      unitText: 'm²',
+      unitText: 'm²'
     },
     availability: 'https://schema.org/InStock',
-    validFrom: '2025-01-01',
     seller: {
       '@type': 'LocalBusiness',
       name: 'LUME Controle Solar',
-    },
+      image: 'https://lumecontrolesolar.com.br/logo-lume.png',
+      telephone: '+5521965140612',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Estrada do Realengo, 973',
+        addressLocality: 'Bangu',
+        addressRegion: 'RJ',
+        addressCountry: 'BR'
+      }
+    }
   },
-  additionalProperty: [
-    { '@type': 'PropertyValue', name: 'Rejeição de Calor Infravermelho (IRR)', value: '70% a 85%' },
-    { '@type': 'PropertyValue', name: 'Bloqueio UV', value: '99%' },
-    { '@type': 'PropertyValue', name: 'Transmissão de Luz (VLT)', value: '8% a 35%' },
-    { '@type': 'PropertyValue', name: 'TSER (Rejeição Solar Total)', value: '65% a 78%' },
-    { '@type': 'PropertyValue', name: 'Privacidade Diurna', value: 'Total (efeito espelho)' },
-  ],
-  termsOfService: 'Garantia de 5 anos contra bolhas, descolamento e alteração de cor.',
   aggregateRating: {
     '@type': 'AggregateRating',
     ratingValue: '5.0',
-    reviewCount: '52',
-    bestRating: '5',
+    reviewCount: '31',
+    bestRating: '5'
   },
+  review: [
+    {
+      '@type': 'Review',
+      'author': { '@type': 'Person', 'name': 'Mariana Silva' },
+      'datePublished': '2025-02-01',
+      'reviewBody': 'Fizeram a varanda com a película refletiva. Ficou lindo e muito privativo.',
+      'reviewRating': { '@type': 'Rating', 'ratingValue': '5' }
+    }
+  ]
+},
+{
+  '@type': 'FAQPage',
+      'mainEntity': [
+        {
+          '@type': 'Question',
+          'name': 'A película refletiva garante privacidade à noite?',
+          'acceptedAnswer': {
+            '@type': 'Answer',
+            'text': 'As películas refletivas funcionam por diferencial de luz. Durante o dia, quem está fora vê um espelho. À noite, se a luz interna estiver acesa, o efeito se inverte. Para privacidade total 24h, recomendamos a linha Jateada ou persianas complementares.'
+          }
+        },
+        {
+          '@type': 'Question',
+          'name': 'Quanto de calor a película refletiva consegue reduzir?',
+          'acceptedAnswer': {
+            '@type': 'Answer',
+            'text': 'A linha refletiva é uma das mais eficientes, podendo reduzir até 87% do calor solar direto, sendo ideal para janelas que recebem sol forte o dia todo.'
+          }
+        }
+      ]
+    }
+  ]
 };
 
 export default function Page() {

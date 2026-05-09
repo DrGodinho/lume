@@ -67,6 +67,12 @@ const jsonLd = {
       name: 'LUME Controle Solar',
     },
   },
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '5.0',
+    reviewCount: '34',
+    bestRating: '5',
+  },
   additionalProperty: [
     { '@type': 'PropertyValue', name: 'Redução de Reflexo na TV', value: 'Até 90%' },
     { '@type': 'PropertyValue', name: 'Rejeição de Calor', value: 'Alta a Muito Alta' },

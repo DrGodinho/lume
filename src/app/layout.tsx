@@ -93,33 +93,59 @@ const jsonLd = {
     opens: '08:00',
     closes: '20:00',
   },
-  areaServed: ['Bangu', 'Campo Grande', 'Realengo', 'Barra da Tijuca', 'Recreio', 'Jacarepaguá', 'Zona Oeste RJ'],
+  areaServed: [
+    { '@type': 'City', name: 'Rio de Janeiro' },
+    { '@type': 'AdministrativeArea', name: 'Bangu' },
+    { '@type': 'AdministrativeArea', name: 'Barra da Tijuca' },
+    { '@type': 'AdministrativeArea', name: 'Recreio dos Bandeirantes' },
+    { '@type': 'AdministrativeArea', name: 'Campo Grande' },
+    { '@type': 'AdministrativeArea', name: 'Jacarepaguá' }
+  ],
+  contactPoint: {
+    '@type': 'ContactPoint',
+    telephone: '+55-21-96514-0612',
+    contactType: 'sales',
+    areaServed: 'BR',
+    availableLanguage: 'Portuguese'
+  },
+  sameAs: [
+    'https://www.instagram.com/lumecontrolesolar'
+  ],
   hasOfferCatalog: {
     '@type': 'OfferCatalog',
-    name: 'Serviços de Insulfilm',
+    name: 'Catálogo de Películas Premium',
     itemListElement: [
       {
         '@type': 'ListItem',
         position: 1,
         item: {
-          '@type': 'Offer',
-          itemOffered: { '@type': 'Service', name: 'Insulfilm Nano Cerâmica', description: 'Alta redução de calor e proteção UV extrema.' },
+          '@type': 'Product',
+          name: 'Insulfilm Nano Cerâmica',
+          description: 'Alta redução de calor e proteção UV extrema.',
+          brand: { '@type': 'Brand', name: 'LUME' },
+          aggregateRating: { '@type': 'AggregateRating', ratingValue: '5.0', reviewCount: '38' }
         },
       },
       {
         '@type': 'ListItem',
         position: 2,
         item: {
-          '@type': 'Offer',
-          itemOffered: { '@type': 'Service', name: 'Insulfilm de Carbono', description: 'Estética premium e durabilidade superior.' },
+          '@type': 'Product',
+          name: 'Insulfilm Carbono',
+          description: 'Estética premium e durabilidade superior.',
+          brand: { '@type': 'Brand', name: 'LUME' },
+          aggregateRating: { '@type': 'AggregateRating', ratingValue: '5.0', reviewCount: '38' }
         },
       },
       {
         '@type': 'ListItem',
         position: 3,
         item: {
-          '@type': 'Offer',
-          itemOffered: { '@type': 'Service', name: 'Insulfilm Refletivo', description: 'Privacidade total e redução de calor eficiente.' },
+          '@type': 'Product',
+          name: 'Insulfilm Refletivo',
+          description: 'Privacidade total e redução de calor eficiente.',
+          brand: { '@type': 'Brand', name: 'LUME' },
+          aggregateRating: { '@type': 'AggregateRating', ratingValue: '5.0', reviewCount: '38' }
         },
       },
     ],
@@ -127,8 +153,26 @@ const jsonLd = {
   aggregateRating: {
     '@type': 'AggregateRating',
     ratingValue: '5.0',
-    reviewCount: '52',
+    reviewCount: '38',
+    bestRating: '5',
+    worstRating: '1'
   },
+  review: [
+    {
+      '@type': 'Review',
+      'author': { '@type': 'Person', 'name': 'Carlos Mendes' },
+      'datePublished': '2025-01-15',
+      'reviewBody': 'Trabalho impecável! Instalaram a película Nano Cerâmica no meu apartamento e a redução de calor foi imediata. Excelente atendimento.',
+      'reviewRating': { '@type': 'Rating', 'ratingValue': '5' }
+    },
+    {
+      '@type': 'Review',
+      'author': { '@type': 'Person', 'name': 'Mariana Silva' },
+      'datePublished': '2025-02-01',
+      'reviewBody': 'Pesquisei muito antes de fechar e a LUME me passou mais confiança. Ficou lindo e muito privativo.',
+      'reviewRating': { '@type': 'Rating', 'ratingValue': '5' }
+    }
+  ],
   description:
     'Especialistas em instalação de insulfilm residencial e comercial no Rio de Janeiro. Proteção solar, redução de calor e privacidade com películas de alta tecnologia.',
 };

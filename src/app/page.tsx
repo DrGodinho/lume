@@ -50,81 +50,10 @@ export const metadata: Metadata = {
   },
 };
 
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@graph': [
-    {
-      '@type': 'LocalBusiness',
-      '@id': 'https://lumecontrolesolar.com.br/#localbusiness',
-      'name': 'LUME Controle Solar',
-      'image': 'https://lumecontrolesolar.com.br/og-image.jpg',
-      'url': 'https://lumecontrolesolar.com.br/',
-      'telephone': '+5521965140612',
-      'priceRange': '$$',
-      'address': {
-        '@type': 'PostalAddress',
-        'streetAddress': 'Estrada do Realengo, 973',
-        'addressLocality': 'Bangu',
-        'addressRegion': 'RJ',
-        'postalCode': '21820-000',
-        'addressCountry': 'BR'
-      },
-      'geo': {
-        '@type': 'GeoCoordinates',
-        'latitude': -22.8753,
-        'longitude': -43.4659
-      },
-      'areaServed': [
-        'Bangu', 'Realengo', 'Campo Grande', 'Barra da Tijuca', 'Recreio dos Bandeirantes', 'Jacarepaguá', 'Zona Oeste RJ'
-      ],
-      'openingHoursSpecification': {
-        '@type': 'OpeningHoursSpecification',
-        'dayOfWeek': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-        'opens': '08:00',
-        'closes': '18:00'
-      }
-    },
-    {
-      '@type': 'Service',
-      'serviceType': 'Instalação de Insulfilm',
-      'provider': {
-        '@id': 'https://lumecontrolesolar.com.br/#localbusiness'
-      },
-      'areaServed': {
-        '@type': 'State',
-        'name': 'Rio de Janeiro'
-      },
-      'hasOfferCatalog': {
-        '@type': 'OfferCatalog',
-        'name': 'Películas de Controle Solar',
-        'itemListElement': [
-          {
-            '@type': 'Offer',
-            'itemOffered': {
-              '@type': 'Service',
-              'name': 'Insulfilm Nano Cerâmica'
-            }
-          },
-          {
-            '@type': 'Offer',
-            'itemOffered': {
-              '@type': 'Service',
-              'name': 'Insulfilm Carbono'
-            }
-          }
-        ]
-      }
-    }
-  ]
-};
 
 export default function Home() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
       <Hero />
       <Benefits />
       <Products />

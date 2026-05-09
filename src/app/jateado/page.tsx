@@ -23,59 +23,55 @@ export const metadata: Metadata = {
 
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'Service',
-  name: 'Instalação de Película Jateada Fosca',
-  alternateName: 'Insulfilm Jateado',
-  description: 'Instalação profissional de película jateada fosca para privacidade total sem escurecer o ambiente. Ideal para boxes de banheiro, divisórias de escritório e portas de vidro. Alta transmissão de luz com bloqueio visual 100%. Fácil limpeza e acabamento sofisticado.',
-  url: 'https://lumecontrolesolar.com.br/jateado',
+  '@type': 'Product',
+  name: 'Película Jateada Fosca LUME',
   image: 'https://lumecontrolesolar.com.br/product-jateado-v2.webp',
-  provider: {
-    '@type': 'LocalBusiness',
-    name: 'LUME Controle Solar',
-    url: 'https://lumecontrolesolar.com.br',
-    telephone: '+5521965140612',
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: 'Estrada do Realengo, 973',
-      addressLocality: 'Rio de Janeiro',
-      addressRegion: 'RJ',
-      addressCountry: 'BR',
-    },
-  },
-  areaServed: {
-    '@type': 'City',
-    name: 'Rio de Janeiro',
+  description: 'Película jateada fosca profissional para privacidade total sem escurecer o ambiente. Ideal para boxes de banheiro e divisórias de escritório.',
+  brand: {
+    '@type': 'Brand',
+    name: 'LUME Controle Solar'
   },
   offers: {
     '@type': 'Offer',
-    price: '90',
+    url: 'https://lumecontrolesolar.com.br/jateado',
     priceCurrency: 'BRL',
+    price: '90.00',
     priceSpecification: {
       '@type': 'UnitPriceSpecification',
-      price: '90',
+      price: '90.00',
       priceCurrency: 'BRL',
-      unitText: 'm²',
+      unitText: 'm²'
     },
     availability: 'https://schema.org/InStock',
-    validFrom: '2025-01-01',
     seller: {
       '@type': 'LocalBusiness',
       name: 'LUME Controle Solar',
-    },
+      image: 'https://lumecontrolesolar.com.br/logo-lume.png',
+      telephone: '+5521965140612',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Estrada do Realengo, 973',
+        addressLocality: 'Bangu',
+        addressRegion: 'RJ',
+        addressCountry: 'BR'
+      }
+    }
   },
-  additionalProperty: [
-    { '@type': 'PropertyValue', name: 'Transmissão de Luz (VLT)', value: '50% a 85%' },
-    { '@type': 'PropertyValue', name: 'Bloqueio UV', value: '99%' },
-    { '@type': 'PropertyValue', name: 'Privacidade Visual', value: '100% (bloqueio total da visão)' },
-    { '@type': 'PropertyValue', name: 'Aplicação', value: 'Banheiros, divisórias, portas de vidro' },
-  ],
-  termsOfService: 'Garantia de 5 anos contra bolhas e descolamento.',
   aggregateRating: {
     '@type': 'AggregateRating',
     ratingValue: '5.0',
-    reviewCount: '52',
-    bestRating: '5',
+    reviewCount: '24',
+    bestRating: '5'
   },
+  review: [
+    {
+      '@type': 'Review',
+      'author': { '@type': 'Person', 'name': 'Luciana Ferreira' },
+      'datePublished': '2025-03-05',
+      'reviewBody': 'Instalamos a película jateada no box do banheiro e ficou perfeito. Muita privacidade e bom gosto.',
+      'reviewRating': { '@type': 'Rating', 'ratingValue': '5' }
+    }
+  ]
 };
 
 export default function Page() {

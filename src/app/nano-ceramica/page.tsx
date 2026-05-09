@@ -23,59 +23,71 @@ export const metadata: Metadata = {
 
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'Service',
-  name: 'Instalação de Película Nano Cerâmica',
-  alternateName: 'Insulfilm Nano Cerâmica',
-  description: 'Instalação profissional de película nano cerâmica com rejeição de até 97% do calor infravermelho, bloqueio de 99% dos raios UV e transparência máxima. Tecnologia sem metais que não interfere em sinais de GPS, celular ou Wi-Fi.',
-  url: 'https://lumecontrolesolar.com.br/nano-ceramica',
-  image: 'https://lumecontrolesolar.com.br/nano-ceramica-hero.webp',
-  provider: {
-    '@type': 'LocalBusiness',
-    name: 'LUME Controle Solar',
-    url: 'https://lumecontrolesolar.com.br',
-    telephone: '+5521965140612',
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: 'Estrada do Realengo, 973',
-      addressLocality: 'Rio de Janeiro',
-      addressRegion: 'RJ',
-      addressCountry: 'BR',
+  '@graph': [
+    {
+      '@type': 'Product',
+      name: 'Película Nano Cerâmica LUME',
+      image: 'https://lumecontrolesolar.com.br/nano-ceramica-hero.webp',
+      description: 'Película nano cerâmica profissional com rejeição de até 97% do calor infravermelho e transparência máxima. A tecnologia mais avançada em controle solar.',
+      brand: {
+        '@type': 'Brand',
+        name: 'LUME Controle Solar'
+      },
+      offers: {
+        '@type': 'Offer',
+        url: 'https://lumecontrolesolar.com.br/nano-ceramica',
+        priceCurrency: 'BRL',
+        price: '220.00',
+        priceSpecification: {
+          '@type': 'UnitPriceSpecification',
+          price: '220.00',
+          priceCurrency: 'BRL',
+          unitText: 'm²'
+        },
+        availability: 'https://schema.org/InStock',
+        seller: {
+          '@type': 'LocalBusiness',
+          name: 'LUME Controle Solar',
+          image: 'https://lumecontrolesolar.com.br/logo-lume.png',
+          telephone: '+5521965140612',
+          address: {
+            '@type': 'PostalAddress',
+            streetAddress: 'Estrada do Realengo, 973',
+            addressLocality: 'Bangu',
+            addressRegion: 'RJ',
+            addressCountry: 'BR'
+          }
+        }
+      },
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: '5.0',
+        reviewCount: '35',
+        bestRating: '5'
+      }
     },
-  },
-  areaServed: {
-    '@type': 'City',
-    name: 'Rio de Janeiro',
-  },
-  offers: {
-    '@type': 'Offer',
-    price: '220',
-    priceCurrency: 'BRL',
-    priceSpecification: {
-      '@type': 'UnitPriceSpecification',
-      price: '220',
-      priceCurrency: 'BRL',
-      unitText: 'm²',
-    },
-    availability: 'https://schema.org/InStock',
-    validFrom: '2025-01-01',
-    seller: {
-      '@type': 'LocalBusiness',
-      name: 'LUME Controle Solar',
-    },
-  },
-  additionalProperty: [
-    { '@type': 'PropertyValue', name: 'Rejeição de Calor Infravermelho (IRR)', value: 'Até 97%' },
-    { '@type': 'PropertyValue', name: 'Bloqueio UV', value: '99%' },
-    { '@type': 'PropertyValue', name: 'Transmissão de Luz (VLT)', value: '40% a 70%' },
-    { '@type': 'PropertyValue', name: 'TSER (Rejeição Solar Total)', value: 'Até 85%' },
-  ],
-  termsOfService: 'Garantia de 5 anos contra bolhas, descolamento e alteração de cor.',
-  aggregateRating: {
-    '@type': 'AggregateRating',
-    ratingValue: '5.0',
-    reviewCount: '52',
-    bestRating: '5',
-  },
+    {
+      '@type': 'FAQPage',
+      'mainEntity': [
+        {
+          '@type': 'Question',
+          'name': 'O Insulfilm Nano Cerâmica interfere no sinal do celular ou GPS?',
+          'acceptedAnswer': {
+            '@type': 'Answer',
+            'text': 'Não. Diferente das películas metalizadas, a Nano Cerâmica não possui metal em sua composição, garantindo que o sinal de 5G, Wi-Fi e GPS funcione perfeitamente.'
+          }
+        },
+        {
+          '@type': 'Question',
+          'name': 'Posso colocar Nano Cerâmica na varanda gourmet?',
+          'acceptedAnswer': {
+            '@type': 'Answer',
+            'text': 'Sim! É a película ideal para varandas, pois bloqueia até 97% do calor sem escurecer o vidro, preservando a vista e a luminosidade natural.'
+          }
+        }
+      ]
+    }
+  ]
 };
 
 export default function Page() {

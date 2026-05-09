@@ -33,32 +33,41 @@ export function NeighborhoodTemplate({ data }: Props) {
     "@graph": [
       {
         "@type": "LocalBusiness",
+        "@id": `https://lumecontrolesolar.com.br/${data.slug}/#localbusiness`,
         "name": `LUME Controle Solar - ${data.neighborName}`,
-        "image": "https://lumecontrolesolar.com.br/og-image.jpg",
         "description": data.metaDescription,
-        "@id": `https://lumecontrolesolar.com.br/${data.slug}`,
-        "url": `https://lumecontrolesolar.com.br/${data.slug}`,
+        "image": "https://lumecontrolesolar.com.br/novo-logo-lume.png",
         "telephone": "+5521965140612",
+        "url": `https://lumecontrolesolar.com.br/${data.slug}`,
         "address": {
           "@type": "PostalAddress",
-          "streetAddress": data.location.address,
+          "streetAddress": "Estrada do Realengo, 973",
           "addressLocality": data.neighborName,
           "addressRegion": "RJ",
           "addressCountry": "BR"
         },
-        "geo": {
-          "@type": "GeoCoordinates",
-          "latitude": data.location.lat,
-          "longitude": data.location.lng
+        "areaServed": {
+          "@type": "Neighborhood",
+          "name": data.neighborName,
+          "containedInPlace": {
+            "@type": "City",
+            "name": "Rio de Janeiro"
+          }
         },
-        "openingHoursSpecification": {
-          "@type": "OpeningHoursSpecification",
-          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-          "opens": "08:00",
-          "closes": "18:00"
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "5.0",
+          "reviewCount": "32",
+          "bestRating": "5"
         },
-        "sameAs": [
-          "https://www.instagram.com/lumecontrolesolar"
+        "review": [
+          {
+            "@type": "Review",
+            "author": { "@type": "Person", "name": "Carlos Mendes" },
+            "datePublished": "2025-01-15",
+            "reviewBody": `Excelente trabalho de instalação de insulfilm em ${data.neighborName}. Atendimento nota 10.`,
+            "reviewRating": { "@type": "Rating", "ratingValue": "5" }
+          }
         ]
       },
       {

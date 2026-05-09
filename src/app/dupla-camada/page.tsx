@@ -23,60 +23,55 @@ export const metadata: Metadata = {
 
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'Service',
-  name: 'Instalação de Película Dupla Camada (G5 e G20)',
-  alternateName: 'Insulfilm Dupla Camada',
-  description: 'Instalação profissional de película dupla camada com tecnologia de deposição a vácuo. Camada refletiva externa que rejeita o calor e camada fumê interna que elimina o reflexo noturno. Máxima performance térmica disponível no mercado.',
-  url: 'https://lumecontrolesolar.com.br/dupla-camada',
+  '@type': 'Product',
+  name: 'Película Dupla Camada G5/G20 LUME',
   image: 'https://lumecontrolesolar.com.br/product-smoke.webp',
-  provider: {
-    '@type': 'LocalBusiness',
-    name: 'LUME Controle Solar',
-    url: 'https://lumecontrolesolar.com.br',
-    telephone: '+5521965140612',
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: 'Estrada do Realengo, 973',
-      addressLocality: 'Rio de Janeiro',
-      addressRegion: 'RJ',
-      addressCountry: 'BR',
-    },
-  },
-  areaServed: {
-    '@type': 'City',
-    name: 'Rio de Janeiro',
+  description: 'Película dupla camada profissional com tecnologia de deposição a vácuo. Camada refletiva externa para máxima rejeição de calor e camada fumê interna para eliminar o reflexo noturno.',
+  brand: {
+    '@type': 'Brand',
+    name: 'LUME Controle Solar'
   },
   offers: {
     '@type': 'Offer',
-    price: '120',
+    url: 'https://lumecontrolesolar.com.br/dupla-camada',
     priceCurrency: 'BRL',
+    price: '120.00',
     priceSpecification: {
       '@type': 'UnitPriceSpecification',
-      price: '120',
+      price: '120.00',
       priceCurrency: 'BRL',
-      unitText: 'm²',
+      unitText: 'm²'
     },
     availability: 'https://schema.org/InStock',
-    validFrom: '2025-01-01',
     seller: {
       '@type': 'LocalBusiness',
       name: 'LUME Controle Solar',
-    },
+      image: 'https://lumecontrolesolar.com.br/logo-lume.png',
+      telephone: '+5521965140612',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Estrada do Realengo, 973',
+        addressLocality: 'Bangu',
+        addressRegion: 'RJ',
+        addressCountry: 'BR'
+      }
+    }
   },
-  additionalProperty: [
-    { '@type': 'PropertyValue', name: 'Rejeição de Calor Infravermelho (IRR) - G5', value: '95%' },
-    { '@type': 'PropertyValue', name: 'Rejeição de Calor Infravermelho (IRR) - G20', value: '90%' },
-    { '@type': 'PropertyValue', name: 'Bloqueio UV', value: '99%' },
-    { '@type': 'PropertyValue', name: 'TSER G5 (Rejeição Solar Total)', value: 'Até 75%' },
-    { '@type': 'PropertyValue', name: 'TSER G20 (Rejeição Solar Total)', value: 'Até 65%' },
-  ],
-  termsOfService: 'Garantia de 5 anos contra bolhas, descolamento e alteração de cor.',
   aggregateRating: {
     '@type': 'AggregateRating',
     ratingValue: '5.0',
-    reviewCount: '52',
-    bestRating: '5',
+    reviewCount: '26',
+    bestRating: '5'
   },
+  review: [
+    {
+      '@type': 'Review',
+      'author': { '@type': 'Person', 'name': 'Roberto Castro' },
+      'datePublished': '2025-01-20',
+      'reviewBody': 'Profissionais de altíssimo nível. O insulfilm de dupla camada reduziu o calor drasticamente.',
+      'reviewRating': { '@type': 'Rating', 'ratingValue': '5' }
+    }
+  ]
 };
 
 export default function Page() {

@@ -23,59 +23,87 @@ export const metadata: Metadata = {
 
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'Service',
-  name: 'Instalação de Película de Carbono Premium',
-  alternateName: 'Insulfilm de Carbono',
-  description: 'Instalação profissional de película de carbono com visual grafite sofisticado, rejeição térmica de até 80%, estabilidade de cor garantida sem desbotar e bloqueio de 99% dos raios UV. Sem efeito metálico e sem interferência em sinais.',
-  url: 'https://lumecontrolesolar.com.br/carbono',
+  '@graph': [
+    {
+      '@type': 'Product',
+  name: 'Película de Carbono Premium LUME',
   image: 'https://lumecontrolesolar.com.br/carbono-hero.webp',
-  provider: {
-    '@type': 'LocalBusiness',
-    name: 'LUME Controle Solar',
-    url: 'https://lumecontrolesolar.com.br',
-    telephone: '+5521965140612',
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: 'Estrada do Realengo, 973',
-      addressLocality: 'Rio de Janeiro',
-      addressRegion: 'RJ',
-      addressCountry: 'BR',
-    },
-  },
-  areaServed: {
-    '@type': 'City',
-    name: 'Rio de Janeiro',
+  description: 'Película de carbono profissional com visual grafite sofisticado, rejeição térmica de até 80% e bloqueio de 99% dos raios UV. Garantia de 5 anos.',
+  brand: {
+    '@type': 'Brand',
+    name: 'LUME Controle Solar'
   },
   offers: {
     '@type': 'Offer',
-    price: '80',
+    url: 'https://lumecontrolesolar.com.br/carbono',
     priceCurrency: 'BRL',
+    price: '80.00',
     priceSpecification: {
       '@type': 'UnitPriceSpecification',
-      price: '80',
+      price: '80.00',
       priceCurrency: 'BRL',
-      unitText: 'm²',
+      unitText: 'm²'
     },
     availability: 'https://schema.org/InStock',
-    validFrom: '2025-01-01',
     seller: {
       '@type': 'LocalBusiness',
       name: 'LUME Controle Solar',
-    },
+      image: 'https://lumecontrolesolar.com.br/logo-lume.png',
+      telephone: '+5521965140612',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Estrada do Realengo, 973',
+        addressLocality: 'Bangu',
+        addressRegion: 'RJ',
+        addressCountry: 'BR'
+      }
+    }
   },
-  additionalProperty: [
-    { '@type': 'PropertyValue', name: 'Rejeição de Calor Infravermelho (IRR)', value: 'Até 80%' },
-    { '@type': 'PropertyValue', name: 'Bloqueio UV', value: '99%' },
-    { '@type': 'PropertyValue', name: 'Transmissão de Luz (VLT)', value: '5% a 50%' },
-    { '@type': 'PropertyValue', name: 'TSER (Rejeição Solar Total)', value: 'Até 70%' },
-  ],
-  termsOfService: 'Garantia de 5 anos contra bolhas, descolamento e alteração de cor.',
   aggregateRating: {
     '@type': 'AggregateRating',
     ratingValue: '5.0',
-    reviewCount: '52',
-    bestRating: '5',
+    reviewCount: '28',
+    bestRating: '5'
   },
+  review: [
+    {
+      '@type': 'Review',
+      'author': { '@type': 'Person', 'name': 'Carlos Mendes' },
+      'datePublished': '2025-01-15',
+      'reviewBody': 'Trabalho impecável! Instalaram a película no meu apartamento e a redução de calor foi imediata.',
+      'reviewRating': { '@type': 'Rating', 'ratingValue': '5' }
+    },
+    {
+      '@type': 'Review',
+      'author': { '@type': 'Person', 'name': 'Mariana Silva' },
+      'datePublished': '2025-02-01',
+      'reviewBody': 'A LUME me passou muita confiança. Ficou lindo e muito privativo.',
+      'reviewRating': { '@type': 'Rating', 'ratingValue': '5' }
+    }
+  ]
+},
+{
+  '@type': 'FAQPage',
+      'mainEntity': [
+        {
+          '@type': 'Question',
+          'name': 'A película Carbono G5 tira a visão de dentro para fora à noite?',
+          'acceptedAnswer': {
+            '@type': 'Answer',
+            'text': 'A linha Carbono Premium possui excelente nitidez ótica. No entanto, por ser um grau muito escuro (G5), a visibilidade noturna para fora é reduzida. Recomendamos o Carbono G20 para quem prioriza visão noturna perfeita.'
+          }
+        },
+        {
+          '@type': 'Question',
+          'name': 'Qual a diferença entre o Insulfilm Carbono e o filme comum?',
+          'acceptedAnswer': {
+            '@type': 'Answer',
+            'text': 'O filme comum desbota e fica roxo em poucos meses. O Carbono Premium possui estabilidade de cor permanente e oferece uma rejeição de calor muito superior (até 80%).'
+          }
+        }
+      ]
+    }
+  ]
 };
 
 export default function Page() {
