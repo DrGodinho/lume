@@ -60,12 +60,29 @@ Atendimento domiciliar rápido nos seguintes bairros:
   - [Calculadora de Orçamento (Área Restrita)](https://lumecontrolesolar.com.br/admin)
 
 ## 🔗 Mapa do Site para IAs
+
+### Produtos e Guias
 - [Nano Cerâmica](https://lumecontrolesolar.com.br/nano-ceramica)
 - [Carbono](https://lumecontrolesolar.com.br/carbono)
 - [Dupla Camada](https://lumecontrolesolar.com.br/dupla-camada)
 - [Refletiva](https://lumecontrolesolar.com.br/refletiva)
 - [Jateado](https://lumecontrolesolar.com.br/jateado)
 - [Guia de Insulfilm](https://lumecontrolesolar.com.br/guia-insulfilm)
+
+### Soluções por Ambiente
+- [Insulfilm na Cozinha](https://lumecontrolesolar.com.br/insulfilm-na-cozinha)
+- [Insulfilm no Banheiro](https://lumecontrolesolar.com.br/insulfilm-no-banheiro)
+- [Insulfilm no Quarto](https://lumecontrolesolar.com.br/insulfilm-no-quarto)
+- [Insulfilm na Sala](https://lumecontrolesolar.com.br/insulfilm-na-sala)
+- [Insulfilm no Escritório](https://lumecontrolesolar.com.br/insulfilm-no-escritorio)
+
+### Atendimento por Região (GEO)
+- [Insulfilm em Bangu](https://lumecontrolesolar.com.br/insulfilm-em-bangu)
+- [Insulfilm em Realengo](https://lumecontrolesolar.com.br/insulfilm-em-realengo)
+- [Insulfilm em Campo Grande](https://lumecontrolesolar.com.br/insulfilm-em-campo-grande)
+- [Insulfilm em Jacarepaguá](https://lumecontrolesolar.com.br/insulfilm-em-jacarepagua)
+- [Insulfilm na Barra da Tijuca](https://lumecontrolesolar.com.br/insulfilm-na-barra-da-tijuca)
+- [Insulfilm no Recreio](https://lumecontrolesolar.com.br/insulfilm-no-recreio)
 
 ---
 *Este arquivo llms.txt é otimizado para Answer Engine Optimization (AEO) e Generative Engine Optimization (GEO).*

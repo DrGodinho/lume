@@ -111,6 +111,7 @@ export function NeighborhoodTemplate({ data }: Props) {
 
         <div className="container-lume relative z-20 page-entrance text-center md:text-left pt-24 pb-12">
           <NavigationBreadcrumbs 
+            showVisualTrail={false}
             items={[
               { label: 'Início', href: '/' },
               { label: data.neighborName }

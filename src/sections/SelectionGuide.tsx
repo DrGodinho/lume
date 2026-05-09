@@ -60,6 +60,7 @@ const roomsData = [
   {
     icon: '💻',
     title: 'Escritório',
+    titleLink: '/insulfilm-no-escritorio/',
     recs: [
       { film: 'Nano Cerâmica', tag: 'Premium', desc: 'Evita o calor que causa sonolência e mantém a claridade para leitura e tela sem glare excessivo.', link: '/nano-ceramica/' },
       { film: 'Jateado', tag: 'Para divisórias', desc: 'Privacidade total em divisórias de vidro internas ou janelas com vista para áreas comuns, sem perder a luz.', link: '/jateado/' },
