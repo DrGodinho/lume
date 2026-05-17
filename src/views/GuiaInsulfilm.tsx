@@ -42,6 +42,14 @@ const roomsData = [
         ]
     },
     {
+        icon: '🚿',
+        title: 'Banheiro',
+        titleLink: '/insulfilm-no-banheiro/',
+        recs: [
+            { film: 'Jateado', tag: 'Máxima privacidade', desc: 'Privacidade total sem deixar o ambiente escuro. A luz difusa deixa o banheiro iluminado e completamente blindado de olhares.', link: '/jateado/' },
+        ]
+    },
+    {
         icon: '🛋️',
         title: 'Sala',
         titleLink: '/insulfilm-na-sala/',
@@ -49,14 +57,6 @@ const roomsData = [
             { film: 'Nano Cerâmica', tag: 'Premium', desc: 'Mantém a sala clarinha e agradável, bloqueando intensamente o calor que entra pelas grandes janelas.', link: '/nano-ceramica/' },
             { film: 'Refletiva', tag: 'Redução de calor', desc: 'Boa barreira térmica com espelhamento externo. Equilibra proteção e orçamento.', link: '/refletiva/' },
             { film: 'Carbono G20', tag: 'Econômica', desc: 'Redução confortável de calor e luminosidade. Boa opção para sala de estar que não pega sol forte o dia todo.', link: '/carbono/' },
-        ]
-    },
-    {
-        icon: '🚿',
-        title: 'Banheiro',
-        titleLink: '/insulfilm-no-banheiro/',
-        recs: [
-            { film: 'Jateado', tag: 'Máxima privacidade', desc: 'Privacidade total sem deixar o ambiente escuro. A luz difusa deixa o banheiro iluminado e completamente blindado de olhares.', link: '/jateado/' },
         ]
     },
     {

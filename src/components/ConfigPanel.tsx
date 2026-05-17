@@ -14,6 +14,10 @@ interface ConfigPanelProps {
     setCfgMargin: (v: number) => void;
     cfgModo: 'densidade' | 'facilidade';
     setCfgModo: (v: 'densidade' | 'facilidade') => void;
+    cfgModoPerdas: 'dinamico' | 'fixo';
+    setCfgModoPerdas: (v: 'dinamico' | 'fixo') => void;
+    cfgPerdasFixas: number;
+    setCfgPerdasFixas: (v: number) => void;
     onSalvar: () => void;
 }
 
@@ -30,6 +34,10 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
     setCfgMargin,
     cfgModo,
     setCfgModo,
+    cfgModoPerdas,
+    setCfgModoPerdas,
+    cfgPerdasFixas,
+    setCfgPerdasFixas,
     onSalvar
 }) => {
     return (
@@ -107,6 +115,42 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
                                     Fácil
                                 </button>
                             </div>
+                        </div>
+                        <div>
+                            <label className="block text-[10px] uppercase text-[#c9a227] font-bold mb-2">Modo de Perdas</label>
+                            <div className="flex bg-[#040811] border border-white/10 p-1 rounded-xl">
+                                <button
+                                    onClick={() => setCfgModoPerdas('dinamico')}
+                                    className={`flex-1 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${cfgModoPerdas === 'dinamico' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}
+                                >
+                                    Dinâmico
+                                </button>
+                                <button
+                                    onClick={() => setCfgModoPerdas('fixo')}
+                                    className={`flex-1 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${cfgModoPerdas === 'fixo' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}
+                                >
+                                    Fixo
+                                </button>
+                            </div>
+                            <p className="text-[9px] text-gray-600 mt-2 leading-relaxed">
+                                {cfgModoPerdas === 'dinamico'
+                                    ? 'Calcula a perda automaticamente com base na eficiência do corte.'
+                                    : 'Aplica uma porcentagem fixa de perda sobre o subtotal.'}
+                            </p>
+                            {cfgModoPerdas === 'fixo' && (
+                                <div className="mt-3">
+                                    <label className="block text-[9px] uppercase text-gray-400 font-bold mb-1">Porcentagem Fixa (%)</label>
+                                    <input
+                                        type="number"
+                                        value={cfgPerdasFixas}
+                                        onChange={(e) => setCfgPerdasFixas(parseFloat(e.target.value) || 0)}
+                                        onFocus={(e) => e.target.select()}
+                                        min={0}
+                                        max={100}
+                                        className="w-full bg-[#040811] border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-center outline-none focus:border-[#c9a227]/50 transition-colors"
+                                    />
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

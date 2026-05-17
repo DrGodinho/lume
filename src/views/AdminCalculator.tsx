@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useMemo, useReducer, useCallback } 
 import {
     Plus, Trash2, Smartphone, Save, FolderOpen, Scissors,
     Calculator, Camera, Layers, RotateCcw, AlignRight, AlignLeft, X,
-    History, Clock, ChevronRight, Undo2, Redo2, FileText, Settings
+    History, Clock, ChevronRight, Undo2, Redo2, FileText, Settings, Cloud, CloudOff, Loader2
 } from 'lucide-react';
 import gsap from 'gsap';
 import * as htmlToImage from 'html-to-image';
@@ -13,6 +13,11 @@ import { InvoicePDF } from '../components/InvoicePDF';
 import { InvoicePNG } from '../components/InvoicePNG';
 import { ConfigPanel } from '../components/ConfigPanel';
 import { HistoryPanel } from '../components/HistoryPanel';
+import {
+    saveDraftToCloud, loadDraftFromCloud,
+    saveHistoryItemToCloud, loadHistoryFromCloud, deleteHistoryItemFromCloud,
+    saveConfigToCloud, loadConfigFromCloud,
+} from '../lib/cloudSync';
 
 // CAPACITOR NATIVE
 import { Share } from '@capacitor/share';
@@ -27,6 +32,8 @@ interface AppConfig {
     margin: number;
     modoOtimizacao: 'densidade' | 'facilidade';
     userName: string;
+    modoPerdas: 'dinamico' | 'fixo';
+    perdasFixas: number;
 }
 
 const DEFAULT_CONFIG: AppConfig = {
@@ -35,6 +42,8 @@ const DEFAULT_CONFIG: AppConfig = {
     margin: 3,
     modoOtimizacao: 'densidade',
     userName: 'MP Godinho',
+    modoPerdas: 'dinamico',
+    perdasFixas: 20,
 };
 
 function loadConfig(): AppConfig {
@@ -220,12 +229,16 @@ export function AdminCalculator() {
     const [modoOtimizacao, setModoOtimizacao] = useState<'densidade' | 'facilidade'>(cfg.modoOtimizacao);
     const [configAberto, setConfigAberto] = useState(false);
     const [compensarPerdas, setCompensarPerdas] = useState(false);
+    const [modoPerdas, setModoPerdas] = useState<'dinamico' | 'fixo'>(cfg.modoPerdas);
+    const [perdasFixas, setPerdasFixas] = useState(cfg.perdasFixas);
 
     const [cfgRollW, setCfgRollW] = useState(cfg.rollW);
     const [cfgPrice, setCfgPrice] = useState(cfg.price);
     const [cfgMargin, setCfgMargin] = useState(cfg.margin);
     const [cfgModo, setCfgModo] = useState<'densidade' | 'facilidade'>(cfg.modoOtimizacao);
     const [cfgUserName, setCfgUserName] = useState(cfg.userName);
+    const [cfgModoPerdas, setCfgModoPerdas] = useState<'dinamico' | 'fixo'>(cfg.modoPerdas);
+    const [cfgPerdasFixas, setCfgPerdasFixas] = useState(cfg.perdasFixas);
 
     const [heightIn, setHeightIn] = useState('');
     const [widthIn, setWidthIn] = useState('');
@@ -255,6 +268,8 @@ export function AdminCalculator() {
     const [isCalculating, setIsCalculating] = useState(false);
 
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
+    const [cloudStatus, setCloudStatus] = useState<'idle' | 'syncing' | 'synced' | 'error'>('idle');
+    const cloudTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 
 
@@ -286,10 +301,19 @@ export function AdminCalculator() {
     const qtyRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        try {
-            const saved = localStorage.getItem('lume_historico');
-            if (saved) setHistorico(JSON.parse(saved));
-        } catch (e) { }
+        const load = async () => {
+            const cloudHistory = await loadHistoryFromCloud();
+            if (cloudHistory.length > 0) {
+                setHistorico(cloudHistory as OrcamentoSalvo[]);
+                localStorage.setItem('lume_historico', JSON.stringify(cloudHistory));
+                return;
+            }
+            try {
+                const saved = localStorage.getItem('lume_historico');
+                if (saved) setHistorico(JSON.parse(saved));
+            } catch (e) { }
+        };
+        load();
     }, []);
 
     useEffect(() => {
@@ -387,27 +411,63 @@ export function AdminCalculator() {
         localStorage.setItem('lume_calculator_draft', JSON.stringify(draft));
     }, [cliente, vidros, desconto, descontoInput, rollW, price, margin, modoOtimizacao, userName]);
 
-    // RESTORE DRAFT ON MOUNT
+    // ─── CLOUD AUTO-SAVE (debounced 2s) ──────────────────────────────────────
     useEffect(() => {
-        const saved = localStorage.getItem('lume_calculator_draft');
-        if (saved) {
-            try {
-                const draft = JSON.parse(saved);
-                if (draft.vidros && draft.vidros.length > 0 && vidros.length === 0) {
-                    dispatch({ type: 'SET', payload: draft.vidros });
-                    if (draft.cliente) setCliente(draft.cliente);
-                    if (draft.desconto !== undefined) setDesconto(draft.desconto);
-                    if (draft.descontoInput !== undefined) setDescontoInput(draft.descontoInput);
-                    if (draft.rollW) setRollW(draft.rollW);
-                    if (draft.price) setPrice(draft.price);
-                    if (draft.margin !== undefined) setMargin(draft.margin);
-                    if (draft.modoOtimizacao) setModoOtimizacao(draft.modoOtimizacao);
-                    if (draft.userName) setUserName(draft.userName);
-                }
-            } catch (e) {
-                console.error("Erro ao carregar rascunho", e);
+        if (cloudTimerRef.current) clearTimeout(cloudTimerRef.current);
+        cloudTimerRef.current = setTimeout(async () => {
+            setCloudStatus('syncing');
+            const ok = await saveDraftToCloud({
+                cliente, vidros, desconto, desconto_input: descontoInput,
+                roll_w: rollW, price, margin, modo_otimizacao: modoOtimizacao,
+                user_name: userName,
+            });
+            setCloudStatus(ok ? 'synced' : 'error');
+            if (ok) setTimeout(() => setCloudStatus('idle'), 3000);
+        }, 2000);
+        return () => { if (cloudTimerRef.current) clearTimeout(cloudTimerRef.current); };
+    }, [cliente, vidros, desconto, descontoInput, rollW, price, margin, modoOtimizacao, userName]);
+
+    // RESTORE DRAFT ON MOUNT (cloud-first, localStorage fallback)
+    useEffect(() => {
+        const restoreDraft = async () => {
+            // Try cloud first
+            const cloud = await loadDraftFromCloud();
+            if (cloud && cloud.vidros && (cloud.vidros as any[]).length > 0) {
+                dispatch({ type: 'SET', payload: cloud.vidros as any });
+                if (cloud.cliente) setCliente(cloud.cliente);
+                if (cloud.desconto !== undefined) setDesconto(cloud.desconto);
+                if (cloud.desconto_input !== undefined) setDescontoInput(cloud.desconto_input);
+                if (cloud.roll_w) setRollW(cloud.roll_w);
+                if (cloud.price) setPrice(cloud.price);
+                if (cloud.margin !== undefined) setMargin(cloud.margin);
+                if (cloud.modo_otimizacao) setModoOtimizacao(cloud.modo_otimizacao as any);
+                if (cloud.user_name) setUserName(cloud.user_name);
+                setCloudStatus('synced');
+                setTimeout(() => setCloudStatus('idle'), 3000);
+                return;
             }
-        }
+            // Fallback to localStorage
+            const saved = localStorage.getItem('lume_calculator_draft');
+            if (saved) {
+                try {
+                    const draft = JSON.parse(saved);
+                    if (draft.vidros && draft.vidros.length > 0) {
+                        dispatch({ type: 'SET', payload: draft.vidros });
+                        if (draft.cliente) setCliente(draft.cliente);
+                        if (draft.desconto !== undefined) setDesconto(draft.desconto);
+                        if (draft.descontoInput !== undefined) setDescontoInput(draft.descontoInput);
+                        if (draft.rollW) setRollW(draft.rollW);
+                        if (draft.price) setPrice(draft.price);
+                        if (draft.margin !== undefined) setMargin(draft.margin);
+                        if (draft.modoOtimizacao) setModoOtimizacao(draft.modoOtimizacao);
+                        if (draft.userName) setUserName(draft.userName);
+                    }
+                } catch (e) {
+                    console.error('Erro ao carregar rascunho local', e);
+                }
+            }
+        };
+        restoreDraft();
     }, []); 
 
     // ─── ENTER NOS INPUTS ──────────────────────────────────────────────────────
@@ -517,9 +577,14 @@ export function AdminCalculator() {
     }, [maxY, areaV, rollW]);
 
     const compensacaoPerda = useMemo(() => {
-        if (!compensarPerdas || eficiencia >= 100 || eficiencia <= 0) return 0;
+        if (!compensarPerdas) return 0;
+        if (modoPerdas === 'fixo') {
+            return subtotalBruto * (perdasFixas / 100);
+        }
+        // dinâmico
+        if (eficiencia >= 100 || eficiencia <= 0) return 0;
         return subtotalBruto * ((100 - eficiencia) / 100);
-    }, [compensarPerdas, eficiencia, subtotalBruto]);
+    }, [compensarPerdas, modoPerdas, perdasFixas, eficiencia, subtotalBruto]);
 
     const finalPrice = subtotalBruto + compensacaoPerda - desconto;
 
@@ -539,6 +604,7 @@ export function AdminCalculator() {
         const atualizado = [novo, ...historico].slice(0, 20);
         setHistorico(atualizado);
         localStorage.setItem('lume_historico', JSON.stringify(atualizado));
+        saveHistoryItemToCloud(novo as any);
         setShowSaveToast(true);
         setTimeout(() => setShowSaveToast(false), 3000);
     }, [vidros, cliente, finalPrice, rollW, price, margin, historico, desconto, modoOtimizacao]);
@@ -561,6 +627,7 @@ export function AdminCalculator() {
         const atualizado = historico.filter(o => o.id !== id);
         setHistorico(atualizado);
         localStorage.setItem('lume_historico', JSON.stringify(atualizado));
+        deleteHistoryItemFromCloud(id);
     };
 
     // ─── IMPORTAR / SALVAR / ABRIR ─────────────────────────────────────────────
@@ -683,13 +750,16 @@ export function AdminCalculator() {
     };
 
     const salvarConfig = () => {
-        const nova: AppConfig = { rollW: cfgRollW, price: cfgPrice, margin: cfgMargin, modoOtimizacao: cfgModo, userName: cfgUserName };
+        const nova: AppConfig = { rollW: cfgRollW, price: cfgPrice, margin: cfgMargin, modoOtimizacao: cfgModo, userName: cfgUserName, modoPerdas: cfgModoPerdas, perdasFixas: cfgPerdasFixas };
         saveConfig(nova);
+        saveConfigToCloud(nova);
         setRollW(cfgRollW);
         setPrice(cfgPrice);
         setMargin(cfgMargin);
         setModoOtimizacao(cfgModo);
         setUserName(cfgUserName);
+        setModoPerdas(cfgModoPerdas);
+        setPerdasFixas(cfgPerdasFixas);
         setConfigAberto(false);
     };
 
@@ -743,6 +813,10 @@ export function AdminCalculator() {
                 setCfgMargin={setCfgMargin}
                 cfgModo={cfgModo}
                 setCfgModo={setCfgModo}
+                cfgModoPerdas={cfgModoPerdas}
+                setCfgModoPerdas={setCfgModoPerdas}
+                cfgPerdasFixas={cfgPerdasFixas}
+                setCfgPerdasFixas={setCfgPerdasFixas}
                 onSalvar={salvarConfig}
             />
 
@@ -810,10 +884,16 @@ export function AdminCalculator() {
                         <div>
                             <h1 className="text-xl sm:text-2xl font-bold font-montserrat">LUME <span className="font-light text-gray-400">Calculator</span></h1>
                         </div>
+                        <div className="flex items-center gap-1.5 ml-2" title={cloudStatus === 'synced' ? 'Sincronizado com a nuvem' : cloudStatus === 'syncing' ? 'Sincronizando...' : cloudStatus === 'error' ? 'Erro de sincronização' : 'Nuvem'}>
+                            {cloudStatus === 'syncing' && <Loader2 size={14} className="text-[#c9a227] animate-spin" />}
+                            {cloudStatus === 'synced' && <Cloud size={14} className="text-green-400" />}
+                            {cloudStatus === 'error' && <CloudOff size={14} className="text-red-400" />}
+                            {cloudStatus === 'idle' && <Cloud size={14} className="text-gray-600" />}
+                        </div>
                     </div>
                     <div className="flex items-center gap-1.5 flex-nowrap justify-end xl:justify-end overflow-x-auto pb-1 scrollbar-hide">
                         <button
-                            onClick={() => { setCfgRollW(rollW); setCfgPrice(price); setCfgMargin(margin); setCfgModo(modoOtimizacao); setCfgUserName(userName); setConfigAberto(true); }}
+                            onClick={() => { setCfgRollW(rollW); setCfgPrice(price); setCfgMargin(margin); setCfgModo(modoOtimizacao); setCfgUserName(userName); setCfgModoPerdas(modoPerdas); setCfgPerdasFixas(perdasFixas); setConfigAberto(true); }}
                             className="flex items-center gap-1 px-2.5 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10 hover:text-white transition-all shrink-0"
                             title="Configurações Padrão"
                         >
@@ -849,7 +929,7 @@ export function AdminCalculator() {
 
                 {/* COLUNA ESQUERDA */}
                 <div className="col-span-1 xl:col-span-4 space-y-6">
-                    <div className="admin-entrance bg-[#04080f] border border-white/10 rounded-2xl p-5 shadow-2xl">
+                    <div className="admin-entrance bg-[#0a0e17] border-2 border-[#c9a227]/30 rounded-2xl p-5 shadow-2xl">
                         <label className="block text-[10px] uppercase text-[#c9a227] mb-2 font-bold">Cliente</label>
                         <input type="text" value={cliente} onChange={(e) => setCliente(e.target.value)} className="w-full bg-[#040811] border border-white/10 rounded-xl px-4 py-3 outline-none text-sm mb-4" />
                         <div className="grid grid-cols-1 gap-2">
@@ -864,7 +944,7 @@ export function AdminCalculator() {
                         </div>
                     </div>
 
-                    <div className="admin-entrance bg-[#04080f] border border-white/10 rounded-2xl p-5 shadow-2xl">
+                    <div className="admin-entrance bg-[#070c14] border-2 border-[#c9a227]/25 rounded-2xl p-5 shadow-2xl">
                         <div className="grid grid-cols-3 gap-2">
                             <div><label className="block text-[10px] text-gray-400 mb-1 text-center font-bold uppercase">Rolo</label><input type="number" value={rollW} onChange={(e) => setRollW(parseFloat(e.target.value))} onFocus={(e) => e.target.select()} className="w-full bg-[#040811] border border-white/10 rounded-lg p-3 text-sm text-center font-bold" /></div>
                             <div><label className="block text-[10px] text-gray-400 mb-1 text-center font-bold uppercase">R$/m²</label><input type="number" value={price} onChange={(e) => setPrice(parseFloat(e.target.value))} onFocus={(e) => e.target.select()} className="w-full bg-[#040811] border border-white/10 rounded-lg p-3 text-sm text-center font-bold" /></div>
@@ -872,7 +952,7 @@ export function AdminCalculator() {
                         </div>
                     </div>
 
-                    <div className="admin-entrance bg-[#04080f] border border-white/10 rounded-2xl p-5 shadow-2xl">
+                    <div className="admin-entrance bg-[#0d1018] border-2 border-[#c9a227]/35 rounded-2xl p-5 shadow-2xl">
                         <label className="block text-[10px] uppercase text-[#c9a227] mb-4 font-bold flex items-center gap-2"><Layers size={14} /> Medidas</label>
 
                         <div className="space-y-1 mb-4">
@@ -917,7 +997,7 @@ export function AdminCalculator() {
                     </div>
 
                     {resumo.length > 0 && (
-                        <div className="admin-entrance bg-[#04080f] border border-white/10 rounded-2xl p-3 max-h-60 overflow-y-auto space-y-4">
+                        <div className="admin-entrance bg-[#080d16] border-2 border-[#c9a227]/20 rounded-2xl p-3 max-h-60 overflow-y-auto space-y-4">
                             {Object.entries(
                                 resumo.reduce((acc, item) => {
                                     const lbl = item.label || 'Sem Ambiente';
@@ -963,7 +1043,7 @@ export function AdminCalculator() {
                         </div>
                     ) : (
                         <>
-                            <div className="admin-entrance bg-gradient-to-br from-[#111e33] to-[#04080f] border border-blue-500/30 rounded-2xl p-5 shadow-2xl relative overflow-hidden">
+                            <div className="admin-entrance bg-gradient-to-br from-[#111e33] to-[#04080f] border-2 border-[#c9a227]/40 rounded-2xl p-5 shadow-2xl relative overflow-hidden">
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/5 blur-3xl rounded-full" />
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                                     <div>
@@ -1019,11 +1099,14 @@ export function AdminCalculator() {
                                         <button
                                             onClick={() => setCompensarPerdas(!compensarPerdas)}
                                             className={`p-2 rounded-lg border transition-all flex items-center gap-1.5 h-[34px] ${compensarPerdas ? 'bg-green-500/20 border-green-500/50 text-green-400' : 'bg-white/5 border-white/10 text-gray-500 hover:text-white'}`}
-                                            title="Compensar perdas (Adiciona o excedente até 100% de eficiência)"
+                                            title={modoPerdas === 'fixo' ? `Perdas fixas: ${perdasFixas}%` : 'Compensar perdas (dinâmico, baseado na eficiência)'}
                                         >
                                             <Scissors size={14} />
                                             <span className="text-[9px] font-bold uppercase whitespace-nowrap">
-                                                {compensarPerdas ? `+${100 - eficiencia}%` : 'Perdas'}
+                                                {compensarPerdas
+                                                    ? (modoPerdas === 'fixo' ? `+${perdasFixas}%` : `+${100 - eficiencia}%`)
+                                                    : (modoPerdas === 'fixo' ? `${perdasFixas}%` : 'Perdas')
+                                                }
                                             </span>
                                         </button>
                                     </div>
@@ -1048,7 +1131,7 @@ export function AdminCalculator() {
                                 </div>
                             </div>
 
-                            <div className="admin-entrance bg-[#111827] border border-white/10 rounded-xl overflow-hidden shadow-2xl relative min-h-[500px]">
+                            <div className="admin-entrance bg-[#111827] border-2 border-[#c9a227]/25 rounded-xl overflow-hidden shadow-2xl relative min-h-[500px]">
                                 <div className="absolute top-0 left-0 w-full bg-[#1f2937] text-gray-400 text-[10px] uppercase font-bold flex justify-between px-3 py-1.5 z-10 border-b border-gray-700">
                                     <span className="flex items-center gap-2">
                                         0cm
