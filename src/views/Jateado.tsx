@@ -62,6 +62,13 @@ export function JateadoPage() {
             <section className="py-20 bg-[#04080f] border-b border-white/5 px-4">
                 <div className="container-lume page-entrance">
                     <div className="max-w-4xl mx-auto text-center">
+                        <div className="flex items-center justify-center gap-4 mb-4">
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
+                            <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
+                                Luz & Privacidade
+                            </span>
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
+                        </div>
                         <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-8 text-white">Privacidade Sem Escuridão</h2>
                         <p className="text-gray-400 leading-relaxed mb-6 text-lg">
                             Diferente das linhas térmicas (como G5 ou Refletivo Prata) cujo principal alvo é espancar o sol da Zona Oeste do Rio, a Linha <strong>Jateada</strong> atua no conforto ocular interno, na arquitetura e na privacidade direcional.
@@ -95,7 +102,10 @@ export function JateadoPage() {
 
                         <div className="order-1 lg:order-2 space-y-8">
                             <div>
-                                <h2 className="text-4xl lg:text-5xl font-bold font-montserrat mb-4 text-white">Composição Estrutural</h2>
+                                <div className="relative pl-4 sm:pl-6 border-l-2 border-[#c9a227] mb-6">
+                                    <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">Composição</span>
+                                    <h2 className="text-4xl lg:text-5xl font-bold font-montserrat mt-2 text-white">Composição Estrutural</h2>
+                                </div>
                                 <p className="text-gray-400 text-lg">A película é constituída por uma arquitetura focada no design e facilidade extrema de limpeza.</p>
                             </div>
 
@@ -136,6 +146,13 @@ export function JateadoPage() {
             {/* Tabela Técnica de Performance (Foco em Luminosidade) */}
             <section className="py-24 relative px-4">
                 <div className="container-lume page-entrance text-center mb-16">
+                    <div className="flex items-center justify-center gap-4 mb-4">
+                        <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
+                        <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
+                            Ficha Técnica
+                        </span>
+                        <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
+                    </div>
                     <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-4 text-white">O Raio-X do Jateado</h2>
                     <p className="text-gray-400 max-w-2xl mx-auto text-lg mb-8">Performance testada para decorar sem estrangular a claridade do local.</p>
                     <span className="inline-flex px-6 py-2 bg-gradient-to-r from-gray-200 to-gray-400 text-black font-black uppercase text-xl rounded-lg shadow-[0_0_20px_rgba(255,255,255,0.2)] tracking-wider">
@@ -255,6 +272,13 @@ export function JateadoPage() {
             <section className="py-20 relative px-4 bg-[#04080f] border-t border-white/5">
                 <div className="container-lume page-entrance max-w-4xl mx-auto">
                     <div className="text-center mb-12">
+                        <div className="flex items-center justify-center gap-4 mb-4">
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
+                            <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
+                                FAQ
+                            </span>
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
+                        </div>
                         <h2 className="text-3xl font-bold font-montserrat mb-4 text-white">Dúvidas Frequentes</h2>
                         <p className="text-gray-400">Tudo sobre instalação em divisórias e banheiros.</p>
                     </div>

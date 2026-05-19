@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect } from 'react';
-import gsap from 'gsap';
 import { ContactCTA } from '../sections/ContactCTA';
 import { ArrowRight, Zap, Target, Shield, CheckCircle } from 'lucide-react';
+import { HeroEntrance } from '../components/HeroEntrance';
 
 // Reusable Accordion Component for FAQs
 const FAQAccordion = ({ items }: { items: { q: string, a: string }[] }) => (
@@ -72,14 +71,6 @@ const roomsData = [
 ];
 
 export function GuiaInsulfilm() {
-    useEffect(() => {
-        // Entrance Animation
-        gsap.fromTo('.page-entrance',
-            { opacity: 0, y: 20 },
-            { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out', stagger: 0.1 }
-        );
-    }, []);
-
     return (
         <div className="bg-[#04080f] text-white min-h-screen">
 
@@ -90,23 +81,34 @@ export function GuiaInsulfilm() {
                     <div className="absolute inset-0 bg-black/50" />
                 </div>
 
-                <div className="container-lume relative z-10 page-entrance text-center max-w-4xl mx-auto">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#c9a227]/10 border border-[#c9a227]/30 mb-6 font-semibold uppercase tracking-wider text-[#c9a227] text-xs md:text-sm shadow-[0_0_15px_rgba(201,162,39,0.2)]">
+                <HeroEntrance className="container-lume relative z-10 text-center max-w-4xl mx-auto">
+                    <div className="animate-hero opacity-0 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#c9a227]/10 border border-[#c9a227]/30 mb-6 font-semibold uppercase tracking-wider text-[#c9a227] text-xs md:text-sm shadow-[0_0_15px_rgba(201,162,39,0.2)]">
                         Guia Definitivo LUME
                     </div>
 
                     <h1 className="text-4xl md:text-5xl lg:text-6xl font-black font-montserrat mb-6 leading-tight">
-                        Absolutamente tudo o que você precisa saber sobre <span className="text-gradient-gold">insulfilm</span> antes de comprar
+                        <span className="word opacity-0 inline-block">Absolutamente</span>{' '}
+                        <span className="word opacity-0 inline-block">tudo</span>{' '}
+                        <span className="word opacity-0 inline-block">o</span>{' '}
+                        <span className="word opacity-0 inline-block">que</span>{' '}
+                        <span className="word opacity-0 inline-block">você</span>{' '}
+                        <span className="word opacity-0 inline-block">precisa</span>{' '}
+                        <span className="word opacity-0 inline-block">saber</span>{' '}
+                        <span className="word opacity-0 inline-block">sobre</span>{' '}
+                        <span className="word opacity-0 inline-block text-gradient-gold">insulfilm</span>{' '}
+                        <span className="word opacity-0 inline-block">antes</span>{' '}
+                        <span className="word opacity-0 inline-block">de</span>{' '}
+                        <span className="word opacity-0 inline-block">comprar</span>
                     </h1>
 
-                    <p className="text-lg md:text-xl text-gray-300 mx-auto mb-10 leading-relaxed font-light">
+                    <p className="animate-hero opacity-0 text-lg md:text-xl text-gray-300 mx-auto mb-10 leading-relaxed font-light">
                         Se você mora no <strong className="text-white">Rio de Janeiro</strong>, sabe que o sol não é apenas uma estrela; ele é um vizinho onipresente que muitas vezes cobra caro pela visita. Descubra como escolher a tecnologia certa para proteger seu lar.
                     </p>
 
-                    <a href="https://wa.me/5521965140612?text=Olá! Estava lendo o Guia de Insulfilm e gostaria de um orçamento." target="_blank" rel="noopener noreferrer" className="btn-primary inline-flex items-center justify-center gap-3 text-lg py-4 px-8">
+                    <a href="https://wa.me/5521965140612?text=Olá! Estava lendo o Guia de Insulfilm e gostaria de um orçamento." target="_blank" rel="noopener noreferrer" className="animate-hero opacity-0 btn-primary inline-flex items-center justify-center gap-3 text-lg py-4 px-8">
                         Orçamento Rápido via WhatsApp <ArrowRight size={20} />
                     </a>
-                </div>
+                </HeroEntrance>
             </section>
 
             {/* Main Content */}

@@ -11,7 +11,7 @@ if (typeof window !== 'undefined') {
 
 interface Props {
   children: React.ReactNode;
-  animation?: 'fade-in' | 'slide-up' | 'slide-left' | 'stagger-stats';
+  animation?: 'fade-in' | 'slide-up' | 'slide-left' | 'stagger-stats' | 'elastic-rotate';
   className?: string;
 }
 
@@ -64,6 +64,30 @@ export function ScrollReveal({ children, animation = 'fade-in', className = '' }
               duration: 0.6,
               stagger: 0.15,
               ease: 'expo.out',
+              clearProps: 'all',
+              scrollTrigger: {
+                trigger: ref.current,
+                start: 'top 80%',
+                toggleActions: 'play none none none',
+              },
+            }
+          );
+        }
+      }
+
+      if (animation === 'elastic-rotate') {
+        const cards = ref.current?.querySelectorAll('.stat-card');
+        if (cards?.length) {
+          gsap.fromTo(
+            cards,
+            { opacity: 0, scale: 0.8, rotate: -10 },
+            {
+              opacity: 1,
+              scale: 1,
+              rotate: 0,
+              duration: 0.6,
+              stagger: 0.15,
+              ease: 'elastic.out(1, 0.5)',
               clearProps: 'all',
               scrollTrigger: {
                 trigger: ref.current,

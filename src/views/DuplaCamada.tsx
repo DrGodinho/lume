@@ -61,6 +61,13 @@ export function DuplaCamadaPage() {
             <section className="py-20 bg-[#04080f] border-b border-white/5 px-4">
                 <div className="container-lume page-entrance">
                     <div className="max-w-4xl mx-auto text-center">
+                        <div className="flex items-center justify-center gap-4 mb-4">
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
+                            <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
+                                Economia de Energia
+                            </span>
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
+                        </div>
                         <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-8 text-white">O Fim da Conta de Luz nas Alturas na Zona Oeste</h2>
                         <p className="text-gray-400 leading-relaxed mb-6 text-lg">
                             Se você mora ou possui comércio em <strong>Bangu, Campo Grande, Realengo ou adjacências</strong>, sabe que as temperaturas de verão não são uma mera inconveniência; elas são um dreno financeiro maciço na sua conta de energia por causa dos aparelhos de Ar Condicionado ligados no 16ºC, operando em pico durante o dia todo.
@@ -75,6 +82,13 @@ export function DuplaCamadaPage() {
             {/* Arquitetura Técnica */}
             <section className="py-20 relative px-4">
                 <div className="container-lume page-entrance text-center mb-16">
+                    <div className="flex items-center justify-center gap-4 mb-4">
+                        <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
+                        <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
+                            Tecnologia
+                        </span>
+                        <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
+                    </div>
                     <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-4 text-[#c9a227]">A Ciência da Super Rejeição Térmica</h2>
                     <p className="text-gray-400 max-w-2xl mx-auto text-lg mb-12">Por que ela é muito superior a filmes básicos do mercado?</p>
 
@@ -131,6 +145,13 @@ export function DuplaCamadaPage() {
             {/* Matriz Comparativa G5 vs G20 */}
             <section className="py-24 relative px-4 bg-[#050A11]">
                 <div className="container-lume page-entrance text-center mb-16">
+                    <div className="flex items-center justify-center gap-4 mb-4">
+                        <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
+                        <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
+                            Especificações
+                        </span>
+                        <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
+                    </div>
                     <div className="inline-flex flex-col items-center">
                         <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-2 text-white">Escolha sua Dupla Camada</h2>
                         <span className="text-[#c9a227] font-semibold tracking-wide bg-[#c9a227]/10 px-4 py-1 rounded-full text-sm">Apenas R$ 120/m² Instalado</span>
@@ -238,6 +259,13 @@ export function DuplaCamadaPage() {
             <section className="py-20 relative px-4 bg-[#04080f] border-t border-white/5">
                 <div className="container-lume page-entrance max-w-4xl mx-auto">
                     <div className="text-center mb-12">
+                        <div className="flex items-center justify-center gap-4 mb-4">
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
+                            <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
+                                FAQ
+                            </span>
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
+                        </div>
                         <h2 className="text-3xl font-bold font-montserrat mb-4 text-[#c9a227]">Respostas Rápidas e Claras</h2>
                         <p className="text-gray-400 text-lg">Tudo sobre a instalação da linha Dupla Camada.</p>
                     </div>

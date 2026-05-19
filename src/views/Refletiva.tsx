@@ -62,6 +62,13 @@ export function RefletivaPage() {
             <section className="py-20 bg-[#04080f] border-b border-white/5 px-4">
                 <div className="container-lume page-entrance">
                     <div className="max-w-4xl mx-auto text-center">
+                        <div className="flex items-center justify-center gap-4 mb-4">
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
+                            <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
+                                Segurança & Conforto
+                            </span>
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
+                        </div>
                         <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-8 text-white">Privacidade Diurna e Blindagem Térmica Extrema</h2>
                         <p className="text-gray-400 leading-relaxed mb-6 text-lg">
                             É indiscutível: os bairros da Zona Oeste do Rio como <strong>Bangu, Senador Camará e Campo Grande</strong> recebem a irradiação solar mais impiedosa do estado. Muitos clientes constroem belas frentes envidraçadas e percebem no primeiro verão que a sala de estar tornou-se uma estufa de vidro, forçando o Ar Condicionado ao seu limite enquanto toda a vizinhança na rua os observa no sofá de casa.
@@ -94,7 +101,10 @@ export function RefletivaPage() {
 
                         <div className="order-1 lg:order-2 space-y-8">
                             <div>
-                                <h2 className="text-4xl lg:text-5xl font-bold font-montserrat mb-4 text-white">Composição Metalizada</h2>
+                                <div className="relative pl-4 sm:pl-6 border-l-2 border-[#c9a227] mb-6">
+                                    <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">Engenharia</span>
+                                    <h2 className="text-4xl lg:text-5xl font-bold font-montserrat mt-2 text-white">Composição Metalizada</h2>
+                                </div>
                                 <p className="text-gray-400 text-lg">Uma arquitetura em que uma camada densa de fita de metal precioso é fundida eletronicamente contra as paredes do filme PET.</p>
                             </div>
 
@@ -135,6 +145,13 @@ export function RefletivaPage() {
             {/* Tabela Técnica de Performance */}
             <section className="py-24 relative px-4">
                 <div className="container-lume page-entrance text-center mb-16">
+                    <div className="flex items-center justify-center gap-4 mb-4">
+                        <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
+                        <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
+                            Ficha Técnica
+                        </span>
+                        <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
+                    </div>
                     <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-4 text-white">O Raio-X da Linha Refletiva Prata</h2>
                     <p className="text-gray-400 max-w-2xl mx-auto text-lg mb-8">Performance testada e garantida para o calor subtropical. E a melhor parte? O preço incrivelmente acessível.</p>
                     <span className="inline-flex px-6 py-2 bg-gradient-to-r from-[#c9a227]/80 to-[#c9a227] text-black font-black uppercase text-xl rounded-lg shadow-[0_0_20px_rgba(201,162,39,0.3)] tracking-wider">
@@ -225,6 +242,13 @@ export function RefletivaPage() {
             <section className="py-20 relative px-4 bg-[#04080f] border-t border-white/5">
                 <div className="container-lume page-entrance max-w-4xl mx-auto">
                     <div className="text-center mb-12">
+                        <div className="flex items-center justify-center gap-4 mb-4">
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
+                            <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
+                                FAQ
+                            </span>
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
+                        </div>
                         <h2 className="text-3xl font-bold font-montserrat mb-4">Dúvidas Frequentes</h2>
                         <p className="text-gray-400">Instalação e funcionalidade do Filme Refletivo (A linha R Prata).</p>
                     </div>

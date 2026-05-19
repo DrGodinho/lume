@@ -86,6 +86,13 @@ export function RecreioPage() {
             <section className="py-24 bg-[#04080f] relative px-4">
                 <div className="container-lume page-entrance">
                     <div className="max-w-4xl mx-auto text-center mb-16">
+                        <div className="flex items-center justify-center gap-4 mb-4">
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
+                            <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
+                                Estilo
+                            </span>
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
+                        </div>
                         <h2 className="text-3xl lg:text-5xl font-bold font-montserrat mb-10 text-white">Proteção e sofisticação para o estilo Recreio</h2>
                         <div className="space-y-6 text-gray-400 leading-relaxed text-lg font-light text-left md:text-justify px-4">
                             <p>
@@ -113,6 +120,13 @@ export function RecreioPage() {
             <section id="tipos" className="py-24 bg-[#04080f] border-y border-white/5 px-4 overflow-hidden relative">
                 <div className="container-lume relative z-10">
                     <div className="text-center mb-16">
+                        <div className="flex items-center justify-center gap-4 mb-4">
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
+                            <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
+                                Películas
+                            </span>
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
+                        </div>
                         <h2 className="text-3xl lg:text-5xl font-bold font-montserrat mb-6 text-white">
                             Películas de <span className="text-gradient-gold">Alta Performance</span>
                         </h2>
@@ -203,6 +217,13 @@ export function RecreioPage() {
             <section id="vantagens" className="py-24 relative px-4 bg-[#04080f] overflow-hidden">
                 <div className="container-lume">
                     <div className="text-center mb-20">
+                        <div className="flex items-center justify-center gap-4 mb-4">
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
+                            <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
+                                Diferenciais
+                            </span>
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
+                        </div>
                         <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-6 tracking-tight">Vantagens que Valorizam seu Imóvel</h2>
                         <p className="text-gray-400 max-w-3xl mx-auto text-lg font-light">Garanta o conforto térmico da sua família no Recreio com películas de padrão Elite.</p>
                     </div>
@@ -256,6 +277,13 @@ export function RecreioPage() {
             {/* Região de Atendimento - Recreio */}
             <section className="py-24 bg-[#04080f] border-y border-white/5 relative px-4 overflow-hidden">
                 <div className="container-lume page-entrance relative z-10 text-center lg:text-left">
+                    <div className="flex items-center justify-center gap-4 mb-4">
+                        <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
+                        <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
+                            Região
+                        </span>
+                        <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
+                    </div>
                     <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-10 text-center text-[#c9a227] tracking-tight underline decoration-[#c9a227]/20 underline-offset-8">Atendimento em todo o Recreio</h2>
                     
                     <div className="grid lg:grid-cols-2 gap-12 items-stretch mt-12 text-left">
@@ -298,6 +326,13 @@ export function RecreioPage() {
             <section className="py-24 relative px-4 overflow-hidden bg-[#04080f]">
                 <div className="container-lume page-entrance max-w-4xl mx-auto">
                     <div className="text-center mb-16">
+                        <div className="flex items-center justify-center gap-4 mb-4">
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
+                            <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
+                                FAQ
+                            </span>
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
+                        </div>
                         <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-6 tracking-tight">Perguntas Frequentes (FAQ)</h2>
                         <p className="text-gray-500 font-medium">Esclareça suas principais dúvidas sobre aplicação no Recreio.</p>
                     </div>

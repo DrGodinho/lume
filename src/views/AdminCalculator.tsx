@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useMemo, useReducer, useCallback } 
 import {
     Plus, Trash2, Smartphone, Save, FolderOpen, Scissors,
     Calculator, Camera, Layers, RotateCcw, AlignRight, AlignLeft, X,
-    History, Clock, ChevronRight, Undo2, Redo2, FileText, Settings, Cloud, CloudOff, Loader2
+    History, Clock, ChevronRight, Undo2, Redo2, FileText, Settings, Cloud, CloudOff, Loader2, Copy, ClipboardPaste
 } from 'lucide-react';
 import gsap from 'gsap';
 import * as htmlToImage from 'html-to-image';
@@ -193,7 +193,7 @@ const MemoBlock = React.memo(({
                 width: (b.w - margin) * scale,
                 height: ((b.h_visual || b.h) - margin) * scale,
                 background: b.cor,
-                fontSize: '8px',
+                fontSize: '12px',
                 border: isSelected
                     ? '2px solid #3b82f6'
                     : '1px solid rgba(0,0,0,0.3)',
@@ -207,11 +207,11 @@ const MemoBlock = React.memo(({
             }}
         >
             {b.label && (
-                <span className="text-[7px] font-black uppercase tracking-tighter mb-1 truncate w-full px-0.5 text-center opacity-70">{b.label}</span>
+                <span className="text-[9px] font-black uppercase tracking-tighter mb-1 truncate w-full px-0.5 text-center opacity-70">{b.label}</span>
             )}
-            <span className="text-[9px] font-black">{Math.round(b.rw)}</span>
+            <span className="text-[12px] font-black">{Math.round(b.rw)}</span>
             <div className="w-1/2 h-px bg-black/10 my-0.5" />
-            <span className="text-[9px] font-black">{Math.round(b.rh)}</span>
+            <span className="text-[12px] font-black">{Math.round(b.rh)}</span>
         </div>
     );
 });
@@ -292,6 +292,21 @@ export function AdminCalculator() {
     const [historicoAberto, setHistoricoAberto] = useState(false);
     const [historico, setHistorico] = useState<OrcamentoSalvo[]>([]);
     const [showSaveToast, setShowSaveToast] = useState(false);
+
+    // Estados para edição de nomes de ambientes
+    const [editingAmbiente, setEditingAmbiente] = useState<string | null>(null);
+    const [editNome, setEditNome] = useState('');
+    const editInputRef = useRef<HTMLInputElement>(null);
+
+    // Estados para copiar e colar peças
+    const [itensCopiados, setItensCopiados] = useState<GlassItem[] | null>(null);
+    const [showColarModal, setShowColarModal] = useState(false);
+
+    useEffect(() => {
+        if (editingAmbiente !== null && editInputRef.current) {
+            editInputRef.current.focus();
+        }
+    }, [editingAmbiente, editNome]);
 
     const invoiceRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -536,6 +551,35 @@ export function AdminCalculator() {
         }
     };
 
+    const confirmarRenomeacao = () => {
+        if (!editingAmbiente || !editNome.trim()) {
+            setEditingAmbiente(null);
+            setEditNome('');
+            return;
+        }
+        const novoNome = editNome.trim();
+        const labelAntigo = editingAmbiente === 'Sem Ambiente' ? '' : editingAmbiente;
+        if (novoNome === labelAntigo || (editingAmbiente === 'Sem Ambiente' && novoNome === '')) {
+            setEditingAmbiente(null);
+            setEditNome('');
+            return;
+        }
+        // Verifica se já existe ambiente com esse nome
+        const jaExiste = vidros.some(v => (v.label || '') === novoNome && (v.label || '') !== labelAntigo);
+        if (jaExiste) {
+            alert('Já existe um ambiente com este nome!');
+            return;
+        }
+        setVidros(prev => prev.map(v => (v.label || '') === labelAntigo ? { ...v, label: novoNome || undefined } : v));
+        setEditingAmbiente(null);
+        setEditNome('');
+    };
+
+    const iniciarRenomeacao = (label: string) => {
+        setEditingAmbiente(label || 'Sem Ambiente');
+        setEditNome(label);
+    };
+
     const handleDeleteSelected = () => {
         setVidros(prev => prev.filter(v => !selectedIds.includes(v.id)));
         setSelectedIds([]);
@@ -553,6 +597,32 @@ export function AdminCalculator() {
         setVidros(prev => prev.map(v =>
             selectedIds.includes(v.id) ? { ...v, alignRight: dir === 'right' } : v
         ));
+    };
+
+    const handleCopiarSelecionados = () => {
+        const selecionados = vidros.filter(v => selectedIds.includes(v.id));
+        if (selecionados.length === 0) return;
+        setItensCopiados([...selecionados]);
+        setSelectedIds([]);
+    };
+
+    const handleAbrirModalColar = () => {
+        if (!itensCopiados || itensCopiados.length === 0) return;
+        setShowColarModal(true);
+    };
+
+    const colarItens = (labelDestino: string) => {
+        if (!itensCopiados || itensCopiados.length === 0) return;
+        const novos = itensCopiados.map(item => ({
+            ...item,
+            id: Math.random().toString(36).substr(2, 9),
+            label: labelDestino || undefined,
+            cor: `hsl(${(item.h * item.w + item.h + item.w + Date.now()) % 360}, 65%, 75%)`,
+        }));
+        setVidros(prev => [...prev, ...novos]);
+        setSelectedIds([]);
+        setItensCopiados(null);
+        setShowColarModal(false);
     };
 
     // ─── DRAG HANDLERS COM MAGNETIC SNAP ────────────────────────────────────────
@@ -770,6 +840,11 @@ export function AdminCalculator() {
         const area = vidros.filter(v => selectedIds.includes(v.id)).reduce((acc, v) => acc + (v.ow * v.oh), 0);
         return (area / 10000) * price;
     }, [vidros, selectedIds, price]);
+    const areaSelecionadaM2 = useMemo(() => {
+        if (selectedIds.length === 0) return 0;
+        const area = vidros.filter(v => selectedIds.includes(v.id)).reduce((acc, v) => acc + (v.ow * v.oh), 0);
+        return area / 10000;
+    }, [vidros, selectedIds]);
 
     const resumo = useMemo(() => {
         const map = new Map<string, { h: number, w: number, q: number, label: string }>();
@@ -832,44 +907,61 @@ export function AdminCalculator() {
 
             {/* BARRA FLUTUANTE: SELEÇÃO */}
             {selectedIds.length > 0 && (
-                <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-[#1e293b] border border-[#3b82f6]/50 shadow-[0_0_30px_rgba(59,130,246,0.2)] p-3 rounded-2xl z-50 flex items-center gap-3 xl:gap-4 transition-all animate-fade-in w-[95%] max-w-md">
-                    <div className="flex flex-col min-w-[80px]">
-                        <span className="text-[10px] text-blue-300 font-bold uppercase tracking-wider">{selectedIds.length} Selecionados</span>
+                <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-[#1e293b] border border-[#3b82f6]/50 shadow-[0_0_30px_rgba(59,130,246,0.2)] p-3 rounded-2xl z-50 flex flex-col gap-3 transition-all animate-fade-in w-[95%] max-w-md">
+                    <div className="flex items-center justify-between gap-3">
                         <span className="text-base sm:text-lg xl:text-xl font-black text-green-400 leading-none">{formatBRL(valorSelecionados)}</span>
+                        <span className="text-sm sm:text-base font-bold text-blue-300 leading-none whitespace-nowrap">{areaSelecionadaM2.toFixed(2)} m²</span>
                     </div>
-                    <div className="h-10 w-px bg-white/10 mx-1" />
-                    <div className="flex gap-1.5 sm:gap-2">
+                    <div className="h-px w-full bg-white/10" />
+                    <div className="flex items-center justify-between gap-3">
+                        <div className="flex-1 flex items-center gap-2 sm:gap-3">
                         <button
                             onPointerDown={(e) => { e.preventDefault(); handleRotateSelected(); }}
-                            className="p-2 sm:p-2.5 bg-white/5 hover:bg-white/10 hover:text-[#c9a227] rounded-xl transition-colors"
+                            className="flex-1 p-2 sm:p-2.5 bg-white/5 hover:bg-white/10 hover:text-[#c9a227] rounded-xl transition-colors flex items-center justify-center"
                             title="Girar 90º"
                         >
                             <RotateCcw size={18} />
                         </button>
                         <button
                             onPointerDown={(e) => { e.preventDefault(); handleAlignSelected('left'); }}
-                            className="p-2 sm:p-2.5 bg-white/5 hover:bg-white/10 hover:text-blue-400 rounded-xl transition-colors"
+                            className="flex-1 p-2 sm:p-2.5 bg-white/5 hover:bg-white/10 hover:text-blue-400 rounded-xl transition-colors flex items-center justify-center"
                             title="Alinhar à Esquerda"
                         >
                             <AlignLeft size={18} />
                         </button>
                         <button
                             onPointerDown={(e) => { e.preventDefault(); handleAlignSelected('right'); }}
-                            className="p-2 sm:p-2.5 bg-white/5 hover:bg-white/10 hover:text-blue-400 rounded-xl transition-colors"
+                            className="flex-1 p-2 sm:p-2.5 bg-white/5 hover:bg-white/10 hover:text-blue-400 rounded-xl transition-colors flex items-center justify-center"
                             title="Alinhar à Direita"
                         >
                             <AlignRight size={18} />
                         </button>
                         <button
+                            onPointerDown={(e) => { e.preventDefault(); handleCopiarSelecionados(); }}
+                            className="flex-1 p-2 sm:p-2.5 bg-white/5 hover:bg-white/10 hover:text-[#25d366] rounded-xl transition-colors flex items-center justify-center"
+                            title="Copiar Peças Selecionadas"
+                        >
+                            <Copy size={18} />
+                        </button>
+                        {itensCopiados && itensCopiados.length > 0 && (
+                            <button
+                                onPointerDown={(e) => { e.preventDefault(); handleAbrirModalColar(); }}
+                                className="flex-1 p-2 sm:p-2.5 bg-[#c9a227]/10 border border-[#c9a227]/30 hover:bg-[#c9a227]/20 text-[#c9a227] rounded-xl transition-colors flex items-center justify-center"
+                                title={`Colar ${itensCopiados.length} peça(s) copiada(s)`}
+                            >
+                                <ClipboardPaste size={18} />
+                            </button>
+                        )}
+                        <button
                             onPointerDown={(e) => { e.preventDefault(); handleDeleteSelected(); }}
-                            className="p-2 sm:p-2.5 bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300 rounded-xl transition-colors"
+                            className="flex-1 p-2 sm:p-2.5 bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300 rounded-xl transition-colors flex items-center justify-center"
                             title="Deletar Peças"
                         >
                             <Trash2 size={18} />
                         </button>
+                        </div>
+                        <button onClick={() => setSelectedIds([])} className="p-2 text-gray-400 hover:text-white transition-colors shrink-0"><X size={18} /></button>
                     </div>
-                    <div className="h-10 w-px bg-white/10 mx-1" />
-                    <button onClick={() => setSelectedIds([])} className="p-2 text-gray-400 hover:text-white transition-colors"><X size={18} /></button>
                 </div>
             )}
 
@@ -1008,9 +1100,37 @@ export function AdminCalculator() {
                             ).map(([ambiente, itens], idxGrp) => (
                                 <div key={idxGrp} className="space-y-1">
                                     <div className="text-[9px] font-bold text-[#c9a227] uppercase tracking-widest px-1 mb-1.5 opacity-90 flex items-center justify-between">
-                                        <div className="flex items-center gap-1.5 cursor-pointer" onClick={() => toggleAmbienteSelection(ambiente)}>
-                                            <Layers size={10} /> {ambiente}
-                                        </div>
+                                        {editingAmbiente === ambiente ? (
+                                            <input
+                                                ref={editInputRef}
+                                                type="text"
+                                                value={editNome}
+                                                onChange={(e) => setEditNome(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') { e.preventDefault(); confirmarRenomeacao(); }
+                                                    if (e.key === 'Escape') { setEditingAmbiente(null); setEditNome(''); }
+                                                }}
+                                                onBlur={confirmarRenomeacao}
+                                                autoFocus
+                                                className="bg-[#040811] border border-[#c9a227]/50 rounded px-2 py-0.5 text-[#c9a227] text-[9px] uppercase tracking-widest font-bold outline-none min-w-[80px] flex-1"
+                                            />
+                                        ) : (
+                                            <div
+                                                className="flex items-center gap-1.5 cursor-pointer"
+                                                onClick={() => {
+                                                    const tgt = ambiente === 'Sem Ambiente' ? '' : ambiente;
+                                                    const pts = vidros.filter(v => (v.label || '') === tgt);
+                                                    const allSelected = pts.length > 0 && pts.every(v => selectedIds.includes(v.id));
+                                                    if (allSelected) {
+                                                        iniciarRenomeacao(pts[0].label || '');
+                                                    } else {
+                                                        toggleAmbienteSelection(ambiente);
+                                                    }
+                                                }}
+                                            >
+                                                <Layers size={10} /> {ambiente}
+                                            </div>
+                                        )}
                                         <input
                                             type="checkbox"
                                             className="w-3 h-3 accent-[#c9a227] cursor-pointer"
@@ -1194,6 +1314,59 @@ export function AdminCalculator() {
             {showSaveToast && (
                 <div className="fixed top-20 left-1/2 transform -translate-x-1/2 bg-green-500 text-black font-black text-xs uppercase px-6 py-3 rounded-full shadow-[0_0_40px_rgba(34,197,94,0.4)] z-[100] animate-bounce">
                     Orçamento salvo no histórico!
+                </div>
+            )}
+
+            {/* MODAL: COLAR EM... */}
+            {showColarModal && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowColarModal(false)} />
+                    <div className="relative bg-[#111e33] border border-white/10 rounded-2xl shadow-2xl w-full max-w-sm p-5 max-h-[80vh] overflow-y-auto">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                                <ClipboardPaste size={16} className="text-[#c9a227]" />
+                                Colar em...
+                            </h3>
+                            <button onClick={() => setShowColarModal(false)} className="p-1 text-gray-400 hover:text-white transition-colors">
+                                <X size={18} />
+                            </button>
+                        </div>
+                        <div className="space-y-2">
+                            {Object.entries(
+                                resumo.reduce((acc, item) => {
+                                    const lbl = item.label || 'Sem Ambiente';
+                                    if (!acc[lbl]) acc[lbl] = [];
+                                    acc[lbl].push(item);
+                                    return acc;
+                                }, {} as globalThis.Record<string, typeof resumo>)
+                            ).map(([ambiente, _]) => (
+                                <button
+                                    key={ambiente}
+                                    onClick={() => colarItens(ambiente === 'Sem Ambiente' ? '' : ambiente)}
+                                    className="w-full text-left p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-[#c9a227]/30 text-white transition-all flex items-center gap-2 active:scale-[0.98]"
+                                >
+                                    <Layers size={14} className="text-[#c9a227]" />
+                                    <span className="text-sm font-bold">{ambiente}</span>
+                                    <span className="text-[10px] text-gray-400 ml-auto">existente</span>
+                                </button>
+                            ))}
+                            <div className="pt-2 border-t border-white/10 mt-2">
+                                <button
+                                    onClick={() => {
+                                        const novoLabel = labelIn.trim();
+                                        if (novoLabel) {
+                                            colarItens(novoLabel);
+                                        }
+                                    }}
+                                    disabled={!labelIn.trim()}
+                                    className="w-full text-left p-3 rounded-xl bg-[#c9a227]/10 hover:bg-[#c9a227]/20 border border-[#c9a227]/30 text-[#c9a227] transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
+                                >
+                                    <Plus size={14} />
+                                    <span className="text-sm font-bold">Novo: {labelIn || 'Digite o nome acima'}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

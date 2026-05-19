@@ -5,16 +5,59 @@ import { Shield, CheckCircle, EyeOff, Wifi, ArrowRight } from 'lucide-react';
 import { ContactCTA } from '../sections/ContactCTA';
 import { SpecTooltip } from '../components/SpecTooltip';
 import { NavigationBreadcrumbs } from '../components/NavigationBreadcrumbs';
+import { AnimatedCounter } from '../components/AnimatedCounter';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Image from 'next/image';
 
 export function CarbonoPage() {
     useEffect(() => {
-        // Entrance Animation
-        gsap.fromTo('.page-entrance',
-            { opacity: 0, y: 20 },
-            { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out', stagger: 0.1 }
-        );
+        gsap.registerPlugin(ScrollTrigger);
+        
+        let ctx = gsap.context(() => {
+            // Entrance Animation
+            gsap.fromTo('.page-entrance',
+                { opacity: 0, y: 20 },
+                { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out', stagger: 0.1 }
+            );
+
+            // Performance Table Animation
+            const perfRows = gsap.utils.toArray('.perf-row');
+            if (perfRows.length > 0) {
+                gsap.fromTo(perfRows,
+                    { opacity: 0, x: -20 },
+                    {
+                        opacity: 1, x: 0, duration: 0.6, stagger: 0.15, ease: 'power2.out',
+                        scrollTrigger: {
+                            trigger: perfRows[0] as Element,
+                            start: 'top 85%',
+                        }
+                    }
+                );
+
+                perfRows.forEach((row: any) => {
+                    const bar = row.querySelector('.perf-bar-fill');
+                    if (bar) {
+                        const targetWidth = bar.getAttribute('data-width');
+                        gsap.fromTo(bar,
+                            { width: '0%' },
+                            {
+                                width: targetWidth,
+                                duration: 1.5,
+                                ease: 'power3.out',
+                                delay: 0.2,
+                                scrollTrigger: {
+                                    trigger: row,
+                                    start: 'top 85%',
+                                }
+                            }
+                        );
+                    }
+                });
+            }
+        });
+
+        return () => ctx.revert();
     }, []);
 
     return (
@@ -63,6 +106,13 @@ export function CarbonoPage() {
             <section className="py-20 bg-[#070f1a] border-b border-white/5">
                 <div className="container-lume page-entrance">
                     <div className="max-w-4xl mx-auto text-center">
+                        <div className="flex items-center justify-center gap-4 mb-4">
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
+                            <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
+                                Privacidade & Proteção
+                            </span>
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
+                        </div>
                         <h2 className="text-3xl font-bold font-montserrat mb-8 text-white">Por que o Insulfilm Carbono é o queridinho da Zona Oeste?</h2>
                         <p className="text-gray-400 leading-relaxed mb-6 text-lg">
                             Nas residências e comércios do Rio de Janeiro, especialmente em bairros onde o sol é inclemente como <strong>Bangu, Campo Grande, Senador Camará e Realengo</strong>, a insolação intensa não apenas eleva as contas de luz ao extremo usando os ares-condicionados, como destrói tapetes, cortinas e estofados da noite para o dia.
@@ -78,6 +128,13 @@ export function CarbonoPage() {
             {/* Matriz Comparativa G5 vs G20 */}
             <section className="py-24 relative px-4 bg-[#070f1a]">
                 <div className="container-lume page-entrance text-center mb-16">
+                    <div className="flex items-center justify-center gap-4 mb-4">
+                        <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
+                        <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
+                            Opções
+                        </span>
+                        <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
+                    </div>
                     <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-4 text-[#c9a227]">Escolha seu Grau de Privacidade</h2>
                     <p className="text-gray-400 max-w-2xl mx-auto text-lg">A exata transparência ideal para a necessidade da sua residência ou empresa (Apenas R$ 80/m² instalado).</p>
                 </div>
@@ -97,33 +154,33 @@ export function CarbonoPage() {
                             </p>
 
                             <div className="space-y-6">
-                                <div>
+                                <div className="perf-row opacity-0">
                                     <div className="flex justify-between text-sm mb-1">
                                         <SpecTooltip term="VLT"><span className="text-gray-400">VLT (Transmissão de Luz)</span></SpecTooltip>
-                                        <span className="font-bold text-white">5% a 8%</span>
+                                        <span className="font-bold text-white"><AnimatedCounter target="5" suffix="% a " /><AnimatedCounter target="8" suffix="%" /></span>
                                     </div>
-                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227] h-1.5 rounded shadow-[0_0_10px_rgba(201,162,39,0.3)]" style={{ width: '8%' }}></div></div>
+                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="perf-bar-fill bg-[#c9a227] h-1.5 rounded shadow-[0_0_10px_rgba(201,162,39,0.3)]" data-width="8%" style={{ width: '0%' }}></div></div>
                                 </div>
-                                <div>
+                                <div className="perf-row opacity-0">
                                     <div className="flex justify-between text-sm mb-1">
                                         <SpecTooltip term="UVR"><span className="text-gray-400">Proteção UV</span></SpecTooltip>
-                                        <span className="font-bold text-[#c9a227]">99%</span>
+                                        <span className="font-bold text-[#c9a227]"><AnimatedCounter target="99" suffix="%" /></span>
                                     </div>
-                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227] h-1.5 rounded shadow-[0_0_10px_rgba(201,162,39,0.3)]" style={{ width: '99%' }}></div></div>
+                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="perf-bar-fill bg-[#c9a227] h-1.5 rounded shadow-[0_0_10px_rgba(201,162,39,0.3)]" data-width="99%" style={{ width: '0%' }}></div></div>
                                 </div>
-                                <div>
+                                <div className="perf-row opacity-0">
                                     <div className="flex justify-between text-sm mb-1">
                                         <SpecTooltip term="IRR"><span className="text-gray-400">Rejeição de Calor (IRR)</span></SpecTooltip>
-                                        <span className="font-bold text-[#c9a227]">Até 90%</span>
+                                        <span className="font-bold text-[#c9a227]">Até <AnimatedCounter target="90" suffix="%" /></span>
                                     </div>
-                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227] h-1.5 rounded shadow-[0_0_10px_rgba(201,162,39,0.3)]" style={{ width: '90%' }}></div></div>
+                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="perf-bar-fill bg-[#c9a227] h-1.5 rounded shadow-[0_0_10px_rgba(201,162,39,0.3)]" data-width="90%" style={{ width: '0%' }}></div></div>
                                 </div>
-                                <div>
+                                <div className="perf-row opacity-0">
                                     <div className="flex justify-between text-sm mb-1">
                                         <SpecTooltip term="TSER"><span className="text-gray-400">TSER (Poder Total)</span></SpecTooltip>
-                                        <span className="font-bold text-white text-lg">Até 70%</span>
+                                        <span className="font-bold text-white text-lg">Até <AnimatedCounter target="70" suffix="%" /></span>
                                     </div>
-                                    <div className="w-full bg-gray-800 rounded h-1.5 border border-white/5"><div className="bg-[#c9a227] h-1.5 rounded opacity-60" style={{ width: '70%' }}></div></div>
+                                    <div className="w-full bg-gray-800 rounded h-1.5 border border-white/5"><div className="perf-bar-fill bg-[#c9a227] h-1.5 rounded opacity-60" data-width="70%" style={{ width: '0%' }}></div></div>
                                 </div>
                             </div>
                         </div>
@@ -142,33 +199,33 @@ export function CarbonoPage() {
                             </p>
 
                             <div className="space-y-6">
-                                <div>
+                                <div className="perf-row opacity-0">
                                     <div className="flex justify-between text-sm mb-1">
                                         <SpecTooltip term="VLT"><span className="text-gray-400">VLT (Transmissão de Luz)</span></SpecTooltip>
-                                        <span className="font-bold text-white">18% a 25%</span>
+                                        <span className="font-bold text-white"><AnimatedCounter target="18" suffix="% a " /><AnimatedCounter target="25" suffix="%" /></span>
                                     </div>
-                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227] h-1.5 rounded shadow-[0_0_10px_rgba(201,162,39,0.3)]" style={{ width: '22%' }}></div></div>
+                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="perf-bar-fill bg-[#c9a227] h-1.5 rounded shadow-[0_0_10px_rgba(201,162,39,0.3)]" data-width="22%" style={{ width: '0%' }}></div></div>
                                 </div>
-                                <div>
+                                <div className="perf-row opacity-0">
                                     <div className="flex justify-between text-sm mb-1">
                                         <SpecTooltip term="UVR"><span className="text-gray-400">Proteção UV</span></SpecTooltip>
-                                        <span className="font-bold text-[#c9a227]">99%</span>
+                                        <span className="font-bold text-[#c9a227]"><AnimatedCounter target="99" suffix="%" /></span>
                                     </div>
-                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227] h-1.5 rounded shadow-[0_0_10px_rgba(201,162,39,0.3)]" style={{ width: '99%' }}></div></div>
+                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="perf-bar-fill bg-[#c9a227] h-1.5 rounded shadow-[0_0_10px_rgba(201,162,39,0.3)]" data-width="99%" style={{ width: '0%' }}></div></div>
                                 </div>
-                                <div>
+                                <div className="perf-row opacity-0">
                                     <div className="flex justify-between text-sm mb-1">
                                         <SpecTooltip term="IRR"><span className="text-gray-400">Rejeição de Calor (IRR)</span></SpecTooltip>
-                                        <span className="font-bold text-[#c9a227]">Até 85%</span>
+                                        <span className="font-bold text-[#c9a227]">Até <AnimatedCounter target="85" suffix="%" /></span>
                                     </div>
-                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227] h-1.5 rounded shadow-[0_0_10px_rgba(201,162,39,0.3)]" style={{ width: '85%' }}></div></div>
+                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="perf-bar-fill bg-[#c9a227] h-1.5 rounded shadow-[0_0_10px_rgba(201,162,39,0.3)]" data-width="85%" style={{ width: '0%' }}></div></div>
                                 </div>
-                                <div>
+                                <div className="perf-row opacity-0">
                                     <div className="flex justify-between text-sm mb-1">
                                         <SpecTooltip term="TSER"><span className="text-gray-400">TSER (Poder Total)</span></SpecTooltip>
-                                        <span className="font-bold text-white text-lg">Até 60%</span>
+                                        <span className="font-bold text-white text-lg">Até <AnimatedCounter target="60" suffix="%" /></span>
                                     </div>
-                                    <div className="w-full bg-gray-800 rounded h-1.5 border border-white/5"><div className="bg-[#c9a227] h-1.5 rounded opacity-60" style={{ width: '60%' }}></div></div>
+                                    <div className="w-full bg-gray-800 rounded h-1.5 border border-white/5"><div className="perf-bar-fill bg-[#c9a227] h-1.5 rounded opacity-60" data-width="60%" style={{ width: '0%' }}></div></div>
                                 </div>
                             </div>
                         </div>
@@ -179,6 +236,13 @@ export function CarbonoPage() {
             {/* Diferenciais Técnicos */}
             <section className="py-20 relative px-4">
                 <div className="container-lume page-entrance text-center mb-16">
+                    <div className="flex items-center justify-center gap-4 mb-4">
+                        <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
+                        <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
+                            Diferenciais
+                        </span>
+                        <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
+                    </div>
                     <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-4 text-white">Por que o Carbono é superior aos filmes comuns?</h2>
                 </div>
 
@@ -204,6 +268,13 @@ export function CarbonoPage() {
             <section className="py-20 relative px-4 bg-[#070f1a] border-t border-white/5">
                 <div className="container-lume page-entrance max-w-4xl mx-auto">
                     <div className="text-center mb-12">
+                        <div className="flex items-center justify-center gap-4 mb-4">
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
+                            <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
+                                FAQ
+                            </span>
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
+                        </div>
                         <h2 className="text-3xl font-bold font-montserrat mb-4">Dúvidas Frequentes da Linha Carbono</h2>
                         <p className="text-gray-400">Desmistificando o insulfilm profissional</p>
                     </div>

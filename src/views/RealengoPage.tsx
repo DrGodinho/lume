@@ -91,6 +91,13 @@ export function RealengoPage() {
             <section className="py-24 bg-[#04080f] relative px-4">
                 <div className="container-lume page-entrance">
                     <div className="max-w-4xl mx-auto text-center mb-16">
+                        <div className="flex items-center justify-center gap-4 mb-4">
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
+                            <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
+                                Clima
+                            </span>
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
+                        </div>
                         <h2 className="text-3xl lg:text-5xl font-bold font-montserrat mb-10">Realengo merece conforto térmico</h2>
                         <div className="space-y-6 text-gray-400 leading-relaxed text-lg font-light text-left md:text-justify px-4">
                             <p>
@@ -119,6 +126,13 @@ export function RealengoPage() {
             <section id="tipos" className="py-24 bg-[#04080f] border-y border-white/5 px-4 overflow-hidden relative">
                 <div className="container-lume relative z-10">
                     <div className="text-center mb-16">
+                        <div className="flex items-center justify-center gap-4 mb-4">
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
+                            <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
+                                Películas
+                            </span>
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
+                        </div>
                         <h2 className="text-3xl lg:text-5xl font-bold font-montserrat mb-6 text-white">
                             Películas de <span className="text-gradient-gold">Alta Performance</span>
                         </h2>
@@ -209,6 +223,13 @@ export function RealengoPage() {
             <section id="vantagens" className="py-24 relative px-4 bg-[#04080f] overflow-hidden">
                 <div className="container-lume">
                     <div className="text-center mb-20">
+                        <div className="flex items-center justify-center gap-4 mb-4">
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
+                            <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
+                                Diferenciais
+                            </span>
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
+                        </div>
                         <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-6 tracking-tight">O Diferencial LUME em Realengo</h2>
                         <p className="text-gray-400 max-w-3xl mx-auto text-lg font-light">Mais que estética, entregamos performance térmica e rapidez real no atendimento.</p>
                     </div>
@@ -264,6 +285,13 @@ export function RealengoPage() {
                 <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-blue-500/5 to-transparent pointer-events-none" />
                 <div className="container-lume page-entrance relative z-10">
                     <div className="max-w-4xl mx-auto text-center lg:text-left">
+                        <div className="flex items-center justify-center gap-4 mb-4">
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
+                            <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
+                                Região
+                            </span>
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
+                        </div>
                         <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-10 text-center text-[#c9a227] tracking-tight underline decoration-[#c9a227]/20 underline-offset-8">Insulfilm na Zona Oeste</h2>
                         
                         <div className="space-y-6 text-gray-400 leading-relaxed text-lg font-light text-center lg:text-justify mb-16 px-4 md:px-0">
@@ -323,6 +351,13 @@ export function RealengoPage() {
             <section className="py-24 relative px-4 overflow-hidden bg-[#04080f]">
                 <div className="container-lume page-entrance max-w-4xl mx-auto">
                     <div className="text-center mb-16">
+                        <div className="flex items-center justify-center gap-4 mb-4">
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
+                            <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
+                                FAQ
+                            </span>
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
+                        </div>
                         <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-6 tracking-tight">FAQ - Insulfilm em Realengo</h2>
                         <p className="text-gray-500 font-medium">Esclareça suas principais dúvidas sobre custos e prazos.</p>
                     </div>
