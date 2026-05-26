@@ -3,8 +3,16 @@
   publish = "out"
 
 [[headers]]
-  for = "/*.html"
-  [headers.values]
-    Cache-Control = "public, max-age=0, must-revalidate"
+for = "/*.html"
+[headers.values]
+Cache-Control = "public, max-age=0, must-revalidate"
 
-# Removemos a seção [[plugins]] do sitemap para não gerar erro
+[[headers]]
+for = "/*.xml"
+[headers.values]
+Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+for = "/*.txt"
+[headers.values]
+Cache-Control = "public, max-age=0, must-revalidate"
