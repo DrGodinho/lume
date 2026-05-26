@@ -30,20 +30,65 @@ interface AppConfig {
     rollW: number;
     price: number;
     margin: number;
-    modoOtimizacao: 'densidade' | 'facilidade';
+    modoOtimizacao: 'densidade' | 'facilidade' | 'facilidade_v2';
     userName: string;
     modoPerdas: 'dinamico' | 'fixo';
     perdasFixas: number;
+    modoCorConfig: 'ambiente' | 'tamanho';
+    agressividadeCorte: number;
 }
 
 const DEFAULT_CONFIG: AppConfig = {
     rollW: 152,
     price: 80,
     margin: 3,
-    modoOtimizacao: 'densidade',
+    modoOtimizacao: 'facilidade_v2',
     userName: 'MP Godinho',
     modoPerdas: 'dinamico',
     perdasFixas: 20,
+    modoCorConfig: 'tamanho',
+    agressividadeCorte: 35,
+};
+
+const DEFAULT_ROOM_COLORS: Record<string, string> = {
+  sala: '#60a5fa',
+  cozinha: '#facc15',
+  quarto: '#c084fc',
+  banheiro: '#34d399',
+  varanda: '#fb923c',
+  area: '#f87171',
+  escritorio: '#38bdf8',
+  garagem: '#a78bfa',
+  lavanderia: '#2dd4bf',
+  hall: '#fbbf24',
+  suite: '#e879f9',
+  closet: '#fb7185',
+  corredor: '#a3e635',
+  terraço: '#f59e0b',
+  jardim: '#4ade80',
+};
+const ROOM_COLOR_SWATCHES = [
+  '#60a5fa', '#facc15', '#c084fc', '#34d399', '#fb923c',
+  '#f87171', '#38bdf8', '#a78bfa', '#2dd4bf', '#fbbf24',
+  '#e879f9', '#fb7185', '#a3e635', '#f59e0b', '#4ade80',
+];
+
+const normalizeRoomKey = (label: string) => label.trim().toLowerCase();
+
+const GOLDEN_ANGLE = 137.508;
+const hashColorFromLabel = (label: string) => {
+  const l = label.trim();
+  if (!l) return '#94a3b8';
+  let hash = 0;
+  for (let i = 0; i < l.length; i++) {
+    hash = ((hash << 5) - hash) + l.charCodeAt(i);
+    hash = hash & hash;
+  }
+  const idx = Math.abs(hash);
+  const hue = (idx * GOLDEN_ANGLE) % 360;
+  const saturation = 60 + (idx % 20);
+  const lightness = 68 + (idx % 12);
+  return `hsl(${hue.toFixed(1)}, ${saturation}%, ${lightness}%)`;
 };
 
 function loadConfig(): AppConfig {
@@ -98,7 +143,7 @@ export interface OrcamentoSalvo {
     vidros: GlassItem[];
     config: { rollW: number; price: number; margin: number };
     desconto: number;
-    modoOtimizacao: 'densidade' | 'facilidade';
+    modoOtimizacao: 'densidade' | 'facilidade' | 'facilidade_v2';
 }
 
 // ─── UNDO/REDO REDUCER ────────────────────────────────────────────────────────
@@ -226,24 +271,29 @@ export function AdminCalculator() {
     const [price, setPrice] = useState(cfg.price);
     const [userName, setUserName] = useState(cfg.userName);
     const [desconto, setDesconto] = useState(0);
-    const [modoOtimizacao, setModoOtimizacao] = useState<'densidade' | 'facilidade'>(cfg.modoOtimizacao);
+    const [modoOtimizacao, setModoOtimizacao] = useState<'densidade' | 'facilidade' | 'facilidade_v2'>(cfg.modoOtimizacao);
     const [configAberto, setConfigAberto] = useState(false);
     const [compensarPerdas, setCompensarPerdas] = useState(false);
     const [modoPerdas, setModoPerdas] = useState<'dinamico' | 'fixo'>(cfg.modoPerdas);
     const [perdasFixas, setPerdasFixas] = useState(cfg.perdasFixas);
+    const [agressividadeCorte, setAgressividadeCorte] = useState(cfg.agressividadeCorte);
 
     const [cfgRollW, setCfgRollW] = useState(cfg.rollW);
     const [cfgPrice, setCfgPrice] = useState(cfg.price);
     const [cfgMargin, setCfgMargin] = useState(cfg.margin);
-    const [cfgModo, setCfgModo] = useState<'densidade' | 'facilidade'>(cfg.modoOtimizacao);
+    const [cfgModo, setCfgModo] = useState<'densidade' | 'facilidade' | 'facilidade_v2'>(cfg.modoOtimizacao);
     const [cfgUserName, setCfgUserName] = useState(cfg.userName);
     const [cfgModoPerdas, setCfgModoPerdas] = useState<'dinamico' | 'fixo'>(cfg.modoPerdas);
     const [cfgPerdasFixas, setCfgPerdasFixas] = useState(cfg.perdasFixas);
+    const [cfgModoCorConfig, setCfgModoCorConfig] = useState<'ambiente' | 'tamanho'>(cfg.modoCorConfig);
+    const [cfgAgressividadeCorte, setCfgAgressividadeCorte] = useState(cfg.agressividadeCorte);
 
     const [heightIn, setHeightIn] = useState('');
     const [widthIn, setWidthIn] = useState('');
     const [qtyIn, setQtyIn] = useState('1');
     const [labelIn, setLabelIn] = useState('');
+    const [usarCoresPorAmbiente, setUsarCoresPorAmbiente] = useState(cfg.modoCorConfig === 'ambiente');
+    const [roomColors, setRoomColors] = useState<Record<string, string>>(DEFAULT_ROOM_COLORS);
 
     const [vidrosState, dispatch] = useReducer(historyReducer, {
         past: [],
@@ -373,7 +423,7 @@ export function AdminCalculator() {
     useEffect(() => {
         if (vidros.length > 0) {
             setIsCalculating(true);
-            workerRef.current?.postMessage({ vidros, rollW, margin, modoOtimizacao });
+            workerRef.current?.postMessage({ vidros, rollW, margin, modoOtimizacao, agressividadeCorte });
             if (vidros.length !== prevVidrosLengthRef.current) {
                 setDesconto(0);
             }
@@ -385,7 +435,7 @@ export function AdminCalculator() {
             setSelectedIds([]);
         }
         prevVidrosLengthRef.current = vidros.length;
-    }, [vidros, rollW, margin, modoOtimizacao]);
+    }, [vidros, rollW, margin, modoOtimizacao, agressividadeCorte]);
 
     // ─── FORMATAÇÃO ────────────────────────────────────────────────────────────
 
@@ -491,6 +541,33 @@ export function AdminCalculator() {
     const handleKeyDownWidth = (e: React.KeyboardEvent) => { if (e.key === 'Enter') qtyRef.current?.focus(); };
     const handleKeyDownQty = (e: React.KeyboardEvent) => { if (e.key === 'Enter') adicionar(); };
 
+  const getColorForItem = useCallback((label?: string, h?: number, w?: number, forceRoomScheme?: boolean) => {
+    const useRoomScheme = forceRoomScheme ?? usarCoresPorAmbiente;
+    if (!useRoomScheme) {
+      if (typeof h === 'number' && typeof w === 'number') {
+        const area = h * w;
+        const hue = (area * GOLDEN_ANGLE) % 360;
+        const saturation = 60 + (Math.round(area) % 20);
+        const lightness = 68 + (Math.round(area * 7) % 12);
+        return `hsl(${hue.toFixed(1)}, ${saturation}%, ${lightness}%)`;
+      }
+      return '#94a3b8';
+    }
+    const roomLabel = (label || '').trim();
+    if (!roomLabel) {
+      if (typeof h === 'number' && typeof w === 'number') {
+        const area = h * w;
+        const hue = (area * GOLDEN_ANGLE) % 360;
+        const saturation = 60 + (Math.round(area) % 20);
+        const lightness = 68 + (Math.round(area * 7) % 12);
+        return `hsl(${hue.toFixed(1)}, ${saturation}%, ${lightness}%)`;
+      }
+      return '#94a3b8';
+    }
+    const key = normalizeRoomKey(roomLabel);
+    return DEFAULT_ROOM_COLORS[key] || roomColors[key] || hashColorFromLabel(roomLabel);
+  }, [usarCoresPorAmbiente, roomColors]);
+
     // ─── AÇÕES DE VIDROS ───────────────────────────────────────────────────────
 
     const adicionar = () => {
@@ -498,13 +575,15 @@ export function AdminCalculator() {
         const w = parseFloat(widthIn.replace(',', '.'));
         const q = parseInt(qtyIn) || 1;
         if (!h || !w || h <= 0 || w <= 0 || q <= 0) return;
+        const label = labelIn.trim();
+        const roomColor = getColorForItem(label, h, w);
         const novos: GlassItem[] = [];
         for (let i = 0; i < q; i++) {
             novos.push({
                 id: Math.random().toString(36).substr(2, 9),
                 h, w, oh: h, ow: w,
-                label: labelIn,
-                cor: `hsl(${(h * w + h + w) % 360}, 65%, 75%)`,
+                label: label || undefined,
+                cor: roomColor,
                 forceRotate: undefined,
                 alignRight: false,
                 sortOrder: vidros.length + i,
@@ -613,11 +692,12 @@ export function AdminCalculator() {
 
     const colarItens = (labelDestino: string) => {
         if (!itensCopiados || itensCopiados.length === 0) return;
+        const roomColor = getColorForItem(labelDestino);
         const novos = itensCopiados.map(item => ({
             ...item,
             id: Math.random().toString(36).substr(2, 9),
             label: labelDestino || undefined,
-            cor: `hsl(${(item.h * item.w + item.h + item.w + Date.now()) % 360}, 65%, 75%)`,
+            cor: roomColor,
         }));
         setVidros(prev => [...prev, ...novos]);
         setSelectedIds([]);
@@ -820,7 +900,17 @@ export function AdminCalculator() {
     };
 
     const salvarConfig = () => {
-        const nova: AppConfig = { rollW: cfgRollW, price: cfgPrice, margin: cfgMargin, modoOtimizacao: cfgModo, userName: cfgUserName, modoPerdas: cfgModoPerdas, perdasFixas: cfgPerdasFixas };
+        const nova: AppConfig = {
+            rollW: cfgRollW,
+            price: cfgPrice,
+            margin: cfgMargin,
+            modoOtimizacao: cfgModo,
+            userName: cfgUserName,
+            modoPerdas: cfgModoPerdas,
+            perdasFixas: cfgPerdasFixas,
+            modoCorConfig: cfgModoCorConfig,
+            agressividadeCorte: cfgAgressividadeCorte,
+        };
         saveConfig(nova);
         saveConfigToCloud(nova);
         setRollW(cfgRollW);
@@ -830,6 +920,8 @@ export function AdminCalculator() {
         setUserName(cfgUserName);
         setModoPerdas(cfgModoPerdas);
         setPerdasFixas(cfgPerdasFixas);
+        setAgressividadeCorte(cfgAgressividadeCorte);
+        setUsarCoresPorAmbiente(cfgModoCorConfig === 'ambiente');
         setConfigAberto(false);
     };
 
@@ -866,6 +958,18 @@ export function AdminCalculator() {
         }, {} as Record<string, typeof resumo>);
     }, [resumo]);
 
+    const currentRoomLabel = labelIn.trim();
+    const currentRoomKey = normalizeRoomKey(currentRoomLabel);
+    const currentRoomColor = currentRoomLabel ? (roomColors[currentRoomKey] || DEFAULT_ROOM_COLORS[currentRoomKey] || hashColorFromLabel(currentRoomLabel)) : '#94a3b8';
+    const hasCurrentRoomPieces = currentRoomLabel ? vidros.some(v => (v.label || '') === currentRoomLabel) : false;
+    const getColorForRoom = getColorForItem;
+    const aplicarCorNoAmbiente = (ambiente: string) => {
+        const trimmed = ambiente.trim();
+        if (!trimmed) return;
+        const color = getColorForItem(trimmed, undefined, undefined, true);
+        setVidros(prev => prev.map(v => (v.label || '') === trimmed ? { ...v, cor: color } : v));
+    };
+
     const m = maxY / 100;
     const valorPraticoM2 = areaV > 0 ? finalPrice / (areaV / 10000) : 0;
 
@@ -892,6 +996,10 @@ export function AdminCalculator() {
                 setCfgModoPerdas={setCfgModoPerdas}
                 cfgPerdasFixas={cfgPerdasFixas}
                 setCfgPerdasFixas={setCfgPerdasFixas}
+                cfgModoCorConfig={cfgModoCorConfig}
+                setCfgModoCorConfig={setCfgModoCorConfig}
+                cfgAgressividadeCorte={cfgAgressividadeCorte}
+                setCfgAgressividadeCorte={setCfgAgressividadeCorte}
                 onSalvar={salvarConfig}
             />
 
@@ -909,6 +1017,7 @@ export function AdminCalculator() {
             {selectedIds.length > 0 && (
                 <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-[#1e293b] border border-[#3b82f6]/50 shadow-[0_0_30px_rgba(59,130,246,0.2)] p-3 rounded-2xl z-50 flex flex-col gap-3 transition-all animate-fade-in w-[95%] max-w-md">
                     <div className="flex items-center justify-between gap-3">
+                        <span className="text-sm sm:text-base font-black text-white leading-none whitespace-nowrap">{selectedIds.length} <span className="text-gray-400 text-xs">filme(s)</span></span>
                         <span className="text-base sm:text-lg xl:text-xl font-black text-green-400 leading-none">{formatBRL(valorSelecionados)}</span>
                         <span className="text-sm sm:text-base font-bold text-blue-300 leading-none whitespace-nowrap">{areaSelecionadaM2.toFixed(2)} m²</span>
                     </div>
@@ -985,7 +1094,7 @@ export function AdminCalculator() {
                     </div>
                     <div className="flex items-center gap-1.5 flex-nowrap justify-end xl:justify-end overflow-x-auto pb-1 scrollbar-hide">
                         <button
-                            onClick={() => { setCfgRollW(rollW); setCfgPrice(price); setCfgMargin(margin); setCfgModo(modoOtimizacao); setCfgUserName(userName); setCfgModoPerdas(modoPerdas); setCfgPerdasFixas(perdasFixas); setConfigAberto(true); }}
+                            onClick={() => { setCfgRollW(rollW); setCfgPrice(price); setCfgMargin(margin); setCfgModo(modoOtimizacao); setCfgUserName(userName); setCfgModoPerdas(modoPerdas); setCfgPerdasFixas(perdasFixas); setCfgModoCorConfig(usarCoresPorAmbiente ? 'ambiente' : 'tamanho'); setCfgAgressividadeCorte(agressividadeCorte); setConfigAberto(true); }}
                             className="flex items-center gap-1 px-2.5 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10 hover:text-white transition-all shrink-0"
                             title="Configurações Padrão"
                         >
@@ -1069,6 +1178,61 @@ export function AdminCalculator() {
                             </div>
                         </div>
 
+                        <button
+                            type="button"
+                            onClick={() => {
+                                const next = !usarCoresPorAmbiente;
+                                setUsarCoresPorAmbiente(next);
+                                setVidros(prev => prev.map(v => ({
+                                    ...v,
+                                    cor: getColorForItem(v.label, v.oh, v.ow, next)
+                                })));
+                            }}
+                            className={`w-full mb-4 py-2.5 rounded-xl font-bold text-[10px] uppercase tracking-wider border transition-all ${
+                                usarCoresPorAmbiente
+                                    ? 'bg-[#c9a227]/15 border-[#c9a227]/50 text-[#c9a227]'
+                                    : 'bg-[#1a2c4e] border-white/10 text-blue-300'
+                            }`}
+                            title="Alterna entre cor por tamanho e cor por ambiente"
+                        >
+                            {usarCoresPorAmbiente ? 'Esquema: Cor por Ambiente (ON)' : 'Esquema: Cor por Tamanho (ON)'}
+                        </button>
+
+                        <div className="hidden">
+                            <div className="flex items-center justify-between">
+                                <span className="text-[9px] text-gray-500 font-bold uppercase">Cor do Ambiente</span>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-[9px] text-gray-400 uppercase">Atual</span>
+                                    <span className="w-4 h-4 rounded-full border border-white/40" style={{ backgroundColor: currentRoomColor }} />
+                                </div>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                                {ROOM_COLOR_SWATCHES.map((swatch) => (
+                                    <button
+                                        key={swatch}
+                                        type="button"
+                                        onClick={() => {
+                                            if (!currentRoomLabel) return;
+                                            setRoomColors(prev => ({ ...prev, [currentRoomKey]: swatch }));
+                                        }}
+                                        disabled={!currentRoomLabel}
+                                        className={`w-6 h-6 rounded-full border transition-all ${currentRoomColor === swatch ? 'border-[#c9a227] scale-110' : 'border-white/20'} ${!currentRoomLabel ? 'opacity-40 cursor-not-allowed' : 'hover:scale-105'}`}
+                                        style={{ backgroundColor: swatch }}
+                                        title={currentRoomLabel ? `Aplicar cor em ${currentRoomLabel}` : 'Digite o ambiente para escolher cor'}
+                                    />
+                                ))}
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => aplicarCorNoAmbiente(currentRoomLabel)}
+                                disabled={!currentRoomLabel || !hasCurrentRoomPieces}
+                                className="w-full bg-[#1a2c4e] text-blue-300 py-2 rounded-lg font-semibold text-[10px] uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed"
+                                title={!currentRoomLabel ? 'Digite o ambiente' : 'Reaplicar cor nas peças já adicionadas deste ambiente'}
+                            >
+                                Aplicar Cor nas Peças Deste Ambiente
+                            </button>
+                        </div>
+
                         <div className="grid grid-cols-3 gap-2 mb-4">
                             <input ref={heightRef} type="number" value={heightIn} onChange={(e) => setHeightIn(e.target.value)} onKeyDown={handleKeyDownHeight} placeholder="Altura" className="bg-[#040811] border border-white/10 rounded-xl p-2.5 text-sm md:text-base text-center" />
                             <input ref={widthRef} type="number" value={widthIn} onChange={(e) => setWidthIn(e.target.value)} onKeyDown={handleKeyDownWidth} placeholder="Largura" className="bg-[#040811] border border-white/10 rounded-xl p-2.5 text-sm md:text-base text-center" />
@@ -1128,6 +1292,16 @@ export function AdminCalculator() {
                                                     }
                                                 }}
                                             >
+                                                <span
+                                                    className="w-2.5 h-2.5 rounded-full border border-white/40"
+                                                    style={{
+                                                        backgroundColor: (() => {
+                                                            const tgt = ambiente === 'Sem Ambiente' ? '' : ambiente;
+                                                            const first = vidros.find(v => (v.label || '') === tgt);
+                                                            return first?.cor || getColorForItem(tgt);
+                                                        })()
+                                                    }}
+                                                />
                                                 <Layers size={10} /> {ambiente}
                                             </div>
                                         )}
@@ -1247,7 +1421,8 @@ export function AdminCalculator() {
                             <div className="flex items-center gap-2 mb-4 w-full">
                                 <div className="flex bg-[#04080f] border border-white/10 p-1.5 rounded-xl shadow-2xl flex-1 max-w-sm ml-auto">
                                     <button onClick={() => setModoOtimizacao('densidade')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${modoOtimizacao === 'densidade' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}>Corte Densidade</button>
-                                    <button onClick={() => setModoOtimizacao('facilidade')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${modoOtimizacao === 'facilidade' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}>Corte Fácil</button>
+                                    <button onClick={() => setModoOtimizacao('facilidade')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${modoOtimizacao === 'facilidade' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}>Corte Fácil v1</button>
+                                    <button onClick={() => setModoOtimizacao('facilidade_v2')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${modoOtimizacao === 'facilidade_v2' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}>Corte Fácil v2</button>
                                 </div>
                             </div>
 

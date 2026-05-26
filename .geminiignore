@@ -1,0 +1,27 @@
+# --- PASTAS PESADAS DA ESTRUTURA ---
+node_modules/
+.next/
+dist/
+build/
+out/
+.cache/
+.vercel/
+
+# --- IMAGENS E MÍDIAS (A IA nao precisa ler o codigo binario disso) ---
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.ico
+*.mp4
+*.pdf
+*.zip
+
+# --- LOGS, BANCO LOCAL E CONFIGS DA IDE ---
+*.log
+.vscode/
+.idea/
+.env
+.env.*
+supabase/.temp/

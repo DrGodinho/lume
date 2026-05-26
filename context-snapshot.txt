@@ -1,0 +1,19 @@
+[TECNOLOGIAS]
+Next.js 16 App Router; React 19; TypeScript; Tailwind CSS 3; GSAP; Supabase (@supabase/ssr, @supabase/supabase-js); Capacitor; Radix UI; Lucide; react-hook-form; zod; Recharts; Sonner.
+
+[ESTRUTURA DE PASTAS ATUAL]
+src/app/: layout.tsx, page.tsx, globals.css, LayoutShell.tsx, not-found.tsx, admin/, simulador/, orcamento/, guia-insulfilm/, nano-ceramica/, carbono/, refletiva/, jateado/, dupla-camada/, insulfilm-em-*/, insulfilm-na-*/, calculadora-economia-energia-insulfilm/
+src/sections/: Hero.tsx, Products.tsx, Benefits.tsx, About.tsx, Coverage.tsx, SelectionGuide.tsx, Reviews.tsx, ContactCTA.tsx, Navbar.tsx, Footer.tsx
+src/components/: WhatsAppButton.tsx, GtagLink.tsx, GoogleReviews.tsx, HeroEntrance.tsx, ScrollReveal.tsx, Particles.tsx, RadiatingLines.tsx, NavigationBreadcrumbs.tsx, ui/*
+src/views/: AdminCalculator.tsx, AdminDados.tsx, GuiaInsulfilm.tsx, QuotePage.tsx, Simulator.tsx, Carbono.tsx, Refletiva.tsx, Jateado.tsx, NanoCeramica.tsx, DuplaCamada.tsx, BanguPage.tsx, BarraPage.tsx, CampoGrandePage.tsx, JacarepaguaPage.tsx, RealengoPage.tsx, RecreioPage.tsx, InsulfilmSala.tsx, InsulfilmQuarto.tsx, InsulfilmCozinha.tsx, InsulfilmBanheiro.tsx, InsulfilmEscritorio.tsx
+src/lib/: supabase.ts, cloudSync.ts, gtag.ts, utils.ts
+src/hooks/: usePrefersReducedMotion.ts, use-mobile.ts
+src/data/: neighborhoods.ts
+
+[ESCOPO E REGRAS DE DESIGN]
+Site comercial de insulfilm/peliculas de controle solar no RJ, forte em conversao via WhatsApp, telefone, orcamento e simulador/calculadora; foco residencial, bairros da Zona Oeste e paginas de produto/guia. Design cinematico escuro com dourado. Tailwind utilitario; evitar novas classes arbitrarias, exceto quando ja fizerem parte do padrao visual existente.
+
+[VARIAVEIS E TIPOS CRITICOS]
+Config: tailwind.config.js, next.config.mjs, postcss.config.js, components.json, tsconfig.json, eslint.config.ts
+Backend: src/lib/supabase.ts, src/lib/cloudSync.ts, .env.local (NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY)
+SEO/track: src/app/layout.tsx, src/app/page.tsx, src/app/simulador/page.tsx, public/sitemap.xml, GA G-RKVB0YQTJY

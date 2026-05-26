@@ -36,13 +36,16 @@ interface DraftRow {
 }
 
 interface ConfigRow {
-    id: string;
-    roll_w: number;
-    price: number;
-    margin: number;
-    modo_otimizacao: string;
-    user_name: string;
-    updated_at: string;
+  id: string;
+  roll_w: number;
+  price: number;
+  margin: number;
+  modo_otimizacao: string;
+  user_name: string;
+  updated_at: string;
+  modo_perdas: string;
+  perdas_fixas: number;
+  modo_cor_config: string;
 }
 
 type TabType = 'history' | 'draft' | 'config';
@@ -405,11 +408,14 @@ export function AdminDados() {
                                         </div>
                                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                                             {[
-                                                { label: 'Usuário', value: config.user_name },
-                                                { label: 'Largura do Rolo', value: `${config.roll_w} cm` },
-                                                { label: 'Preço por m²', value: formatBRL(config.price) },
-                                                { label: 'Margem de Corte', value: `${config.margin} cm` },
-                                                { label: 'Modo de Otimização', value: config.modo_otimizacao },
+              { label: 'Usuário', value: config.user_name },
+              { label: 'Largura do Rolo', value: `${config.roll_w} cm` },
+              { label: 'Preço por m²', value: formatBRL(config.price) },
+              { label: 'Margem de Corte', value: `${config.margin} cm` },
+              { label: 'Modo de Otimização', value: config.modo_otimizacao },
+              { label: 'Modo de Perdas', value: config.modo_perdas ?? '—' },
+              { label: 'Perdas Fixas', value: config.perdas_fixas != null ? `${config.perdas_fixas} cm` : '—' },
+              { label: 'Modo de Cor', value: config.modo_cor_config ?? '—' },
                                             ].map((f, i) => (
                                                 <div key={i} className="bg-[#060a12] rounded-xl p-4 border border-white/5">
                                                     <p className="text-[9px] text-gray-500 uppercase font-bold mb-1">{f.label}</p>

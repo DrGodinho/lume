@@ -3,12 +3,15 @@
 import { useState, useEffect } from 'react';
 import { Menu, X, Phone } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
-import { handleGtagClick } from '../lib/gtag';
+
+type GtagWindow = Window & {
+  gtag?: (...args: unknown[]) => void;
+};
 
 const navLinks = [
-  { name: 'Início', href: '/' },
+  { name: 'Inicio', href: '/' },
   { name: 'Produtos', href: '#produtos' },
-  { name: 'Benefícios', href: '#beneficios' },
+  { name: 'Beneficios', href: '#beneficios' },
   { name: 'Contato', href: '#contato' },
 ];
 
@@ -32,7 +35,7 @@ export function Navbar() {
       if (pathname === '/') {
         const element = document.querySelector(href);
         if (element) {
-          const offset = 80; // Altura da navbar fixa
+          const offset = 80;
           const elementPosition = element.getBoundingClientRect().top;
           const offsetPosition = elementPosition + window.pageYOffset - offset;
 
@@ -48,29 +51,32 @@ export function Navbar() {
     setIsMobileMenuOpen(false);
   };
 
+  const trackContact = () => {
+    const w = window as GtagWindow;
+    if (typeof w.gtag === 'function') {
+      w.gtag('event', 'conversion_event_contact');
+    }
+  };
+
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled
-        ? 'glass-effect border-b border-[#c9a227]/20'
-        : 'bg-transparent'
-        }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        isScrolled ? 'glass-effect border-b border-[#c9a227]/20' : 'bg-transparent'
+      }`}
     >
       <div className="container-lume">
         <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <a
-            href="/"
-            className="flex items-center gap-2 group"
-          >
+          <a href="/" className="flex items-center gap-2 group">
             <span className="text-2xl md:text-3xl font-bold tracking-tight text-white font-montserrat">
               LU<span className="text-gradient-gold">ME</span>
             </span>
             <span className="hidden sm:block text-xs text-gray-400 uppercase tracking-widest border-l border-gray-600 pl-2">
-              Películas de<br />Controle Solar
+              Peliculas de
+              <br />
+              Controle Solar
             </span>
           </a>
 
-          {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-8">
             {navLinks.map((link) => (
               link.href.startsWith('#') ? (
@@ -99,23 +105,24 @@ export function Navbar() {
             ))}
           </div>
 
-          {/* CTA Button */}
           <div className="hidden lg:flex items-center gap-4">
             <a
               href="/guia-insulfilm/"
               className="btn-secondary flex items-center gap-2 text-xs py-2 px-4 transition-transform hover:scale-105 active:scale-95"
             >
-              Guia de Películas
+              Guia de Peliculas
+            </a>
+            <a
+              href="/calculadora-economia-energia-insulfilm/"
+              className="btn-secondary flex items-center gap-2 text-xs py-2 px-4 transition-transform hover:scale-105 active:scale-95"
+            >
+              Economia de Energia
             </a>
             <a
               href="https://wa.me/5521965140612"
               target="_blank"
               rel="noopener noreferrer"
-              onClick={() => {
-                if (typeof (window as any).gtag === 'function') {
-                  (window as any).gtag('event', 'conversion_event_contact');
-                }
-              }}
+              onClick={trackContact}
               className="btn-primary flex items-center gap-2 text-xs py-2 px-4 transition-transform hover:scale-105 active:scale-95"
             >
               <Phone className="w-4 h-4" />
@@ -123,7 +130,6 @@ export function Navbar() {
             </a>
           </div>
 
-          {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="lg:hidden p-2 text-white hover:text-[#c9a227] transition-colors"
@@ -134,10 +140,10 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       <div
-        className={`lg:hidden absolute top-full left-0 right-0 glass-effect border-b border-[#c9a227]/20 transition-all duration-300 ${isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
-          }`}
+        className={`lg:hidden absolute top-full left-0 right-0 glass-effect border-b border-[#c9a227]/20 transition-all duration-300 ${
+          isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+        }`}
       >
         <div className="container-lume py-6">
           <div className="flex flex-col gap-4">
@@ -170,17 +176,20 @@ export function Navbar() {
               className="btn-secondary flex items-center justify-center gap-2 mt-2"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Guia de Películas
+              Guia de Peliculas
+            </a>
+            <a
+              href="/calculadora-economia-energia-insulfilm/"
+              className="btn-secondary flex items-center justify-center gap-2 mt-2"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Economia de Energia
             </a>
             <a
               href="https://wa.me/5521965140612"
               target="_blank"
               rel="noopener noreferrer"
-              onClick={() => {
-                if (typeof (window as any).gtag === 'function') {
-                  (window as any).gtag('event', 'conversion_event_contact');
-                }
-              }}
+              onClick={trackContact}
               className="btn-primary flex items-center justify-center gap-2 mt-4"
             >
               <Phone className="w-4 h-4" />
@@ -190,10 +199,10 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Gold accent line */}
       <div
-        className={`absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#c9a227] to-transparent transition-opacity duration-500 ${isScrolled ? 'opacity-100' : 'opacity-0'
-          }`}
+        className={`absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#c9a227] to-transparent transition-opacity duration-500 ${
+          isScrolled ? 'opacity-100' : 'opacity-0'
+        }`}
       />
     </nav>
   );

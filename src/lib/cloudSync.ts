@@ -1,7 +1,5 @@
 import { supabase } from './supabase';
 
-// ─── DRAFT ────────────────────────────────────────────────────────────────────
-
 interface DraftData {
   cliente: string;
   vidros: any[];
@@ -33,8 +31,6 @@ export async function loadDraftFromCloud(): Promise<DraftData | null> {
   if (error || !data) return null;
   return data as DraftData;
 }
-
-// ─── HISTORY ──────────────────────────────────────────────────────────────────
 
 interface HistoryItem {
   id: string;
@@ -98,31 +94,57 @@ export async function deleteHistoryItemFromCloud(id: string): Promise<boolean> {
   return !error;
 }
 
-// ─── CONFIG ───────────────────────────────────────────────────────────────────
-
 interface ConfigData {
   rollW: number;
   price: number;
   margin: number;
   modoOtimizacao: string;
   userName: string;
+  modoPerdas: string;
+  perdasFixas: number;
+  modoCorConfig: string;
 }
+
+const CONFIG_OPTIONAL_COLUMNS = {
+  modo_perdas: "ALTER TABLE calculator_config ADD COLUMN modo_perdas text DEFAULT 'dinamico';",
+  perdas_fixas: "ALTER TABLE calculator_config ADD COLUMN perdas_fixas numeric DEFAULT 20;",
+  modo_cor_config: "ALTER TABLE calculator_config ADD COLUMN modo_cor_config text DEFAULT 'tamanho';",
+} as const;
 
 export async function saveConfigToCloud(config: ConfigData): Promise<boolean> {
   if (!supabase) return false;
-  const { error } = await supabase
-    .from('calculator_config')
-    .upsert({
-      id: 'default',
-      roll_w: config.rollW,
-      price: config.price,
-      margin: config.margin,
-      modo_otimizacao: config.modoOtimizacao,
-      user_name: config.userName,
-      updated_at: new Date().toISOString(),
-    });
-  if (error) console.error('[Cloud] Config save failed:', error.message);
-  return !error;
+
+  const row: Record<string, any> = {
+    id: 'default',
+    roll_w: config.rollW,
+    price: config.price,
+    margin: config.margin,
+    modo_otimizacao: config.modoOtimizacao,
+    user_name: config.userName,
+    modo_perdas: config.modoPerdas,
+    perdas_fixas: config.perdasFixas,
+    modo_cor_config: config.modoCorConfig,
+    updated_at: new Date().toISOString(),
+  };
+
+  while (true) {
+    const { error } = await supabase
+      .from('calculator_config')
+      .upsert(row);
+
+    if (!error) return true;
+
+    const missingColumn = (Object.keys(CONFIG_OPTIONAL_COLUMNS) as Array<keyof typeof CONFIG_OPTIONAL_COLUMNS>)
+      .find((column) => error.message?.includes(column));
+
+    if (!missingColumn || !(missingColumn in row)) {
+      console.error('[Cloud] Config save failed:', error.message);
+      return false;
+    }
+
+    delete row[missingColumn];
+    console.warn(`[Cloud] Column ${missingColumn} missing - run: ${CONFIG_OPTIONAL_COLUMNS[missingColumn]}`);
+  }
 }
 
 export async function loadConfigFromCloud(): Promise<ConfigData | null> {
@@ -139,5 +161,8 @@ export async function loadConfigFromCloud(): Promise<ConfigData | null> {
     margin: data.margin,
     modoOtimizacao: data.modo_otimizacao,
     userName: data.user_name,
+    modoPerdas: data.modo_perdas ?? 'dinamico',
+    perdasFixas: data.perdas_fixas ?? 20,
+    modoCorConfig: data.modo_cor_config ?? 'tamanho',
   };
 }
