@@ -2,21 +2,21 @@ import type { Metadata } from 'next';
 import { JateadoPage } from '../../views/Jateado';
 
 export const metadata: Metadata = {
-  title: 'Película Jateada Fosca | Privacidade Decorativa - LUME',
-  description: 'Película jateada fosca para privacidade total em banheiros e divisórias. Efeito vidro jateado com custo acessível. Orçamento grátis via WhatsApp.',
+  title: 'PelÃ­cula Jateada Fosca | Privacidade Decorativa - LUME',
+  description: 'PelÃ­cula jateada fosca para privacidade total em banheiros e divisÃ³rias. Efeito vidro jateado com custo acessÃ­vel. OrÃ§amento grÃ¡tis via WhatsApp.',
   alternates: { canonical: 'https://lumecontrolesolar.com.br/jateado' },
   openGraph: {
-    title: 'Película Jateada Fosca | Privacidade Decorativa - LUME',
-    description: 'Privacidade total em banheiros e divisórias sem escurecer o ambiente. Efeito vidro jateado com acabamento sofisticado e fácil limpeza.',
+    title: 'PelÃ­cula Jateada Fosca | Privacidade Decorativa - LUME',
+    description: 'Privacidade total em banheiros e divisÃ³rias sem escurecer o ambiente. Efeito vidro jateado com acabamento sofisticado e fÃ¡cil limpeza.',
     url: 'https://lumecontrolesolar.com.br/jateado',
     type: 'website',
     siteName: 'LUME Controle Solar',
-    images: [{ url: 'https://lumecontrolesolar.com.br/product-jateado-v2.webp', width: 1200, height: 630, alt: 'Película Jateada Fosca LUME' }],
+    images: [{ url: 'https://lumecontrolesolar.com.br/product-jateado-v2.webp', width: 1200, height: 630, alt: 'PelÃ­cula Jateada Fosca LUME' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Película Jateada Fosca | LUME Controle Solar',
-    description: 'Privacidade total sem escurecer o ambiente. Ideal para banheiros e divisórias. Orçamento grátis.',
+    title: 'PelÃ­cula Jateada Fosca | LUME Controle Solar',
+    description: 'Privacidade total sem escurecer o ambiente. Ideal para banheiros e divisÃ³rias. OrÃ§amento grÃ¡tis.',
     images: ['https://lumecontrolesolar.com.br/product-jateado-v2.webp'],
   },
 };
@@ -24,12 +24,12 @@ export const metadata: Metadata = {
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Product',
-  name: 'Película Jateada Fosca LUME',
+  name: 'PelÃ­cula Jateada Fosca LUME',
   image: 'https://lumecontrolesolar.com.br/product-jateado-v2.webp',
-  description: 'Película jateada fosca profissional para privacidade total sem escurecer o ambiente. Ideal para boxes de banheiro e divisórias de escritório.',
+  description: 'PelÃ­cula jateada fosca profissional para privacidade total sem escurecer o ambiente. Ideal para boxes de banheiro e divisÃ³rias de escritÃ³rio.',
   brand: {
     '@type': 'Brand',
-    name: 'LUME Controle Solar'
+    name: 'LUME Controle Solar',
   },
   offers: {
     '@type': 'Offer',
@@ -40,9 +40,15 @@ const jsonLd = {
       '@type': 'UnitPriceSpecification',
       price: '90.00',
       priceCurrency: 'BRL',
-      unitText: 'm²'
+      unitText: 'mÂ²',
     },
     availability: 'https://schema.org/InStock',
+    hasMerchantReturnPolicy: {
+      '@type': 'MerchantReturnPolicy',
+      returnPolicyCategory: 'https://schema.org/MerchantReturnNotPermitted',
+      merchantReturnDays: 0,
+      applicableCountry: 'BR',
+    },
     seller: {
       '@type': 'LocalBusiness',
       name: 'LUME Controle Solar',
@@ -53,25 +59,16 @@ const jsonLd = {
         streetAddress: 'Estrada do Realengo, 973',
         addressLocality: 'Bangu',
         addressRegion: 'RJ',
-        addressCountry: 'BR'
-      }
-    }
+        addressCountry: 'BR',
+      },
+    },
   },
   aggregateRating: {
     '@type': 'AggregateRating',
     ratingValue: '5.0',
     reviewCount: '24',
-    bestRating: '5'
+    bestRating: '5',
   },
-  review: [
-    {
-      '@type': 'Review',
-      'author': { '@type': 'Person', 'name': 'Luciana Ferreira' },
-      'datePublished': '2025-03-05',
-      'reviewBody': 'Instalamos a película jateada no box do banheiro e ficou perfeito. Muita privacidade e bom gosto.',
-      'reviewRating': { '@type': 'Rating', 'ratingValue': '5' }
-    }
-  ]
 };
 
 export default function Page() {

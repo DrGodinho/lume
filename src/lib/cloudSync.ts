@@ -103,12 +103,14 @@ interface ConfigData {
   modoPerdas: string;
   perdasFixas: number;
   modoCorConfig: string;
+  agressividadeCorte: number;
 }
 
 const CONFIG_OPTIONAL_COLUMNS = {
   modo_perdas: "ALTER TABLE calculator_config ADD COLUMN modo_perdas text DEFAULT 'dinamico';",
   perdas_fixas: "ALTER TABLE calculator_config ADD COLUMN perdas_fixas numeric DEFAULT 20;",
   modo_cor_config: "ALTER TABLE calculator_config ADD COLUMN modo_cor_config text DEFAULT 'tamanho';",
+  agressividade_corte: "ALTER TABLE calculator_config ADD COLUMN agressividade_corte numeric DEFAULT 35;",
 } as const;
 
 export async function saveConfigToCloud(config: ConfigData): Promise<boolean> {
@@ -124,6 +126,7 @@ export async function saveConfigToCloud(config: ConfigData): Promise<boolean> {
     modo_perdas: config.modoPerdas,
     perdas_fixas: config.perdasFixas,
     modo_cor_config: config.modoCorConfig,
+    agressividade_corte: config.agressividadeCorte,
     updated_at: new Date().toISOString(),
   };
 
@@ -164,5 +167,6 @@ export async function loadConfigFromCloud(): Promise<ConfigData | null> {
     modoPerdas: data.modo_perdas ?? 'dinamico',
     perdasFixas: data.perdas_fixas ?? 20,
     modoCorConfig: data.modo_cor_config ?? 'tamanho',
+    agressividadeCorte: data.agressividade_corte ?? 35,
   };
 }

@@ -17,3 +17,12 @@ Site comercial de insulfilm/peliculas de controle solar no RJ, forte em conversa
 Config: tailwind.config.js, next.config.mjs, postcss.config.js, components.json, tsconfig.json, eslint.config.ts
 Backend: src/lib/supabase.ts, src/lib/cloudSync.ts, .env.local (NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY)
 SEO/track: src/app/layout.tsx, src/app/page.tsx, src/app/simulador/page.tsx, public/sitemap.xml, GA G-RKVB0YQTJY
+
+# WORKFLOW OBRIGATÓRIO DE DEPLOY (GIT & GITHUB)
+
+1. Sempre que o usuário solicitar alterações no código, correções de bugs ou novas funcionalidades, você deve implementar e testar os arquivos localmente.
+2. Quando o usuário disser "pode fazer o push", "pode subir", "pode publicar" ou expressões similares, você DEVE executar obrigatoriamente a seguinte sequência de comandos no terminal integrado:
+   
+   git add .
+   git commit -m "feat/fix: [breve descrição em português do que foi feito]"
+   git push origin main

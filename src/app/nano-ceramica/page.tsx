@@ -45,6 +45,12 @@ const jsonLd = {
           unitText: 'm²'
         },
         availability: 'https://schema.org/InStock',
+        hasMerchantReturnPolicy: {
+          '@type': 'MerchantReturnPolicy',
+          returnPolicyCategory: 'https://schema.org/MerchantReturnNotPermitted',
+          merchantReturnDays: 0,
+          applicableCountry: 'BR'
+        },
         seller: {
           '@type': 'LocalBusiness',
           name: 'LUME Controle Solar',

@@ -2,36 +2,34 @@ import type { Metadata } from 'next';
 import { CarbonoPage } from '../../views/Carbono';
 
 export const metadata: Metadata = {
-  title: 'Película de Carbono Premium | Privacidade e Controle Solar',
-  description: 'Película de Carbono Premium com visual grafite sofisticado, rejeição térmica de até 80% e estabilidade de cor garantida. Orçamento grátis via WhatsApp.',
+  title: 'PelÃ­cula de Carbono Premium | Privacidade e Controle Solar',
+  description: 'PelÃ­cula de Carbono Premium com visual grafite sofisticado, rejeiÃ§Ã£o tÃ©rmica de atÃ© 80% e estabilidade de cor garantida. OrÃ§amento grÃ¡tis via WhatsApp.',
   alternates: { canonical: 'https://lumecontrolesolar.com.br/carbono' },
   openGraph: {
-    title: 'Película de Carbono Premium | Privacidade e Redução de Calor - LUME',
-    description: 'Visual grafite sofisticado com rejeição térmica de até 80%. A película que une estética e performance no Rio de Janeiro.',
+    title: 'PelÃ­cula de Carbono Premium | Privacidade e ReduÃ§Ã£o de Calor - LUME',
+    description: 'Visual grafite sofisticado com rejeiÃ§Ã£o tÃ©rmica de atÃ© 80%. A pelÃ­cula que une estÃ©tica e performance no Rio de Janeiro.',
     url: 'https://lumecontrolesolar.com.br/carbono',
     type: 'website',
     siteName: 'LUME Controle Solar',
-    images: [{ url: 'https://lumecontrolesolar.com.br/carbono-hero.webp', width: 1200, height: 630, alt: 'Película de Carbono Premium LUME' }],
+    images: [{ url: 'https://lumecontrolesolar.com.br/carbono-hero.webp', width: 1200, height: 630, alt: 'PelÃ­cula de Carbono Premium LUME' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Película de Carbono Premium | LUME Controle Solar',
-    description: 'Visual grafite sofisticado com rejeição térmica de até 80%. Orçamento grátis.',
+    title: 'PelÃ­cula de Carbono Premium | LUME Controle Solar',
+    description: 'Visual grafite sofisticado com rejeiÃ§Ã£o tÃ©rmica de atÃ© 80%. OrÃ§amento grÃ¡tis.',
     images: ['https://lumecontrolesolar.com.br/carbono-hero.webp'],
   },
 };
 
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@graph': [
-    {
-      '@type': 'Product',
-  name: 'Película de Carbono Premium LUME',
+  '@type': 'Product',
+  name: 'PelÃ­cula de Carbono Premium LUME',
   image: 'https://lumecontrolesolar.com.br/carbono-hero.webp',
-  description: 'Película de carbono profissional com visual grafite sofisticado, rejeição térmica de até 80% e bloqueio de 99% dos raios UV. Garantia de 5 anos.',
+  description: 'PelÃ­cula de carbono profissional com visual grafite sofisticado, rejeiÃ§Ã£o tÃ©rmica de atÃ© 80% e bloqueio de 99% dos raios UV. Garantia de 5 anos.',
   brand: {
     '@type': 'Brand',
-    name: 'LUME Controle Solar'
+    name: 'LUME Controle Solar',
   },
   offers: {
     '@type': 'Offer',
@@ -42,9 +40,15 @@ const jsonLd = {
       '@type': 'UnitPriceSpecification',
       price: '80.00',
       priceCurrency: 'BRL',
-      unitText: 'm²'
+      unitText: 'mÂ²',
     },
     availability: 'https://schema.org/InStock',
+    hasMerchantReturnPolicy: {
+      '@type': 'MerchantReturnPolicy',
+      returnPolicyCategory: 'https://schema.org/MerchantReturnNotPermitted',
+      merchantReturnDays: 0,
+      applicableCountry: 'BR',
+    },
     seller: {
       '@type': 'LocalBusiness',
       name: 'LUME Controle Solar',
@@ -55,55 +59,16 @@ const jsonLd = {
         streetAddress: 'Estrada do Realengo, 973',
         addressLocality: 'Bangu',
         addressRegion: 'RJ',
-        addressCountry: 'BR'
-      }
-    }
+        addressCountry: 'BR',
+      },
+    },
   },
   aggregateRating: {
     '@type': 'AggregateRating',
     ratingValue: '5.0',
     reviewCount: '28',
-    bestRating: '5'
+    bestRating: '5',
   },
-  review: [
-    {
-      '@type': 'Review',
-      'author': { '@type': 'Person', 'name': 'Carlos Mendes' },
-      'datePublished': '2025-01-15',
-      'reviewBody': 'Trabalho impecável! Instalaram a película no meu apartamento e a redução de calor foi imediata.',
-      'reviewRating': { '@type': 'Rating', 'ratingValue': '5' }
-    },
-    {
-      '@type': 'Review',
-      'author': { '@type': 'Person', 'name': 'Mariana Silva' },
-      'datePublished': '2025-02-01',
-      'reviewBody': 'A LUME me passou muita confiança. Ficou lindo e muito privativo.',
-      'reviewRating': { '@type': 'Rating', 'ratingValue': '5' }
-    }
-  ]
-},
-{
-  '@type': 'FAQPage',
-      'mainEntity': [
-        {
-          '@type': 'Question',
-          'name': 'A película Carbono G5 tira a visão de dentro para fora à noite?',
-          'acceptedAnswer': {
-            '@type': 'Answer',
-            'text': 'A linha Carbono Premium possui excelente nitidez ótica. No entanto, por ser um grau muito escuro (G5), a visibilidade noturna para fora é reduzida. Recomendamos o Carbono G20 para quem prioriza visão noturna perfeita.'
-          }
-        },
-        {
-          '@type': 'Question',
-          'name': 'Qual a diferença entre o Insulfilm Carbono e o filme comum?',
-          'acceptedAnswer': {
-            '@type': 'Answer',
-            'text': 'O filme comum desbota e fica roxo em poucos meses. O Carbono Premium possui estabilidade de cor permanente e oferece uma rejeição de calor muito superior (até 80%).'
-          }
-        }
-      ]
-    }
-  ]
 };
 
 export default function Page() {

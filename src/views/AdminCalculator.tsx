@@ -197,41 +197,48 @@ function historyReducer(state: HistoryState, action: HistoryAction): HistoryStat
 
 // ─── COMPONENTES AUXILIARES MEMOIZADOS ────────────────────────────────────────
 
-const MemoBlock = React.memo(({ 
-    b, 
-    scale, 
-    margin, 
-    isSelected, 
-    toggleSelection,
-}: { 
-    b: Block, 
-    scale: number, 
-    margin: number, 
-    isSelected: boolean, 
-    toggleSelection: (id: string) => void,
+const MemoBlock = React.memo(({
+  b,
+  scale,
+  margin,
+  isSelected,
+  toggleSelection,
+  selectSameSize,
+}: {
+  b: Block,
+  scale: number,
+  margin: number,
+  isSelected: boolean,
+  toggleSelection: (id: string) => void,
+  selectSameSize: (oh: number, ow: number, label?: string) => void,
 }) => {
-    const pos = b.fit!;
-    const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
+  const pos = b.fit!;
+  const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
 
-    const handlePointerDown = (e: React.PointerEvent) => {
-        pointerStartRef.current = { x: e.clientX, y: e.clientY };
-    };
+  const handlePointerDown = (e: React.PointerEvent) => {
+    pointerStartRef.current = { x: e.clientX, y: e.clientY };
+  };
 
-    const handlePointerUp = (e: React.PointerEvent) => {
-        if (!pointerStartRef.current) return;
-        const dx = Math.abs(e.clientX - pointerStartRef.current.x);
-        const dy = Math.abs(e.clientY - pointerStartRef.current.y);
-        pointerStartRef.current = null;
-        if (dx < 10 && dy < 10) {
-            toggleSelection(b.id);
-        }
-    };
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (!pointerStartRef.current) return;
+    const dx = Math.abs(e.clientX - pointerStartRef.current.x);
+    const dy = Math.abs(e.clientY - pointerStartRef.current.y);
+    pointerStartRef.current = null;
+    if (dx < 10 && dy < 10) {
+      toggleSelection(b.id);
+    }
+  };
+
+  const handleDoubleClick = () => {
+    selectSameSize(b.rh, b.rw, b.label);
+  };
 
     return (
-        <div
-            onPointerDown={handlePointerDown}
-            onPointerUp={handlePointerUp}
-            className="absolute flex flex-col items-center justify-center text-black font-bold"
+    <div
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      onDoubleClick={handleDoubleClick}
+      className="absolute flex flex-col items-center justify-center text-black font-bold"
             style={{
                 left: pos.x * scale,
                 top: pos.y * scale,
@@ -278,15 +285,7 @@ export function AdminCalculator() {
     const [perdasFixas, setPerdasFixas] = useState(cfg.perdasFixas);
     const [agressividadeCorte, setAgressividadeCorte] = useState(cfg.agressividadeCorte);
 
-    const [cfgRollW, setCfgRollW] = useState(cfg.rollW);
-    const [cfgPrice, setCfgPrice] = useState(cfg.price);
-    const [cfgMargin, setCfgMargin] = useState(cfg.margin);
-    const [cfgModo, setCfgModo] = useState<'densidade' | 'facilidade' | 'facilidade_v2'>(cfg.modoOtimizacao);
-    const [cfgUserName, setCfgUserName] = useState(cfg.userName);
-    const [cfgModoPerdas, setCfgModoPerdas] = useState<'dinamico' | 'fixo'>(cfg.modoPerdas);
-    const [cfgPerdasFixas, setCfgPerdasFixas] = useState(cfg.perdasFixas);
-    const [cfgModoCorConfig, setCfgModoCorConfig] = useState<'ambiente' | 'tamanho'>(cfg.modoCorConfig);
-    const [cfgAgressividadeCorte, setCfgAgressividadeCorte] = useState(cfg.agressividadeCorte);
+
 
     const [heightIn, setHeightIn] = useState('');
     const [widthIn, setWidthIn] = useState('');
@@ -492,7 +491,55 @@ export function AdminCalculator() {
         return () => { if (cloudTimerRef.current) clearTimeout(cloudTimerRef.current); };
     }, [cliente, vidros, desconto, descontoInput, rollW, price, margin, modoOtimizacao, userName]);
 
-    // RESTORE DRAFT ON MOUNT (cloud-first, localStorage fallback)
+    // ─── CLOUD CONFIG AUTO-SAVE (debounced 2s) ────────────────────────────────
+  const configCloudTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (configCloudTimerRef.current) clearTimeout(configCloudTimerRef.current);
+    configCloudTimerRef.current = setTimeout(() => {
+      const cfgToSave: AppConfig = {
+        rollW, price, margin, modoOtimizacao, userName,
+        modoPerdas, perdasFixas,
+        modoCorConfig: usarCoresPorAmbiente ? 'ambiente' : 'tamanho',
+        agressividadeCorte,
+      };
+      saveConfigToCloud(cfgToSave);
+    }, 2000);
+    return () => { if (configCloudTimerRef.current) clearTimeout(configCloudTimerRef.current); };
+  }, [rollW, price, margin, modoOtimizacao, userName, modoPerdas, perdasFixas, usarCoresPorAmbiente, agressividadeCorte]);
+
+  // RESTORE CONFIG ON MOUNT (cloud-first, localStorage fallback) ────────────
+  useEffect(() => {
+    const restoreConfig = async () => {
+      const cloud = await loadConfigFromCloud();
+      if (cloud) {
+        if (cloud.rollW) setRollW(cloud.rollW);
+        if (cloud.price) setPrice(cloud.price);
+        if (cloud.margin !== undefined) setMargin(cloud.margin);
+        if (cloud.modoOtimizacao) setModoOtimizacao(cloud.modoOtimizacao as any);
+        if (cloud.userName) setUserName(cloud.userName);
+        if (cloud.modoPerdas) setModoPerdas(cloud.modoPerdas as any);
+        if (cloud.perdasFixas !== undefined) setPerdasFixas(cloud.perdasFixas);
+        if (cloud.modoCorConfig) setUsarCoresPorAmbiente(cloud.modoCorConfig === 'ambiente');
+        if (cloud.agressividadeCorte !== undefined) setAgressividadeCorte(cloud.agressividadeCorte);
+        const fullCfg: AppConfig = { ...DEFAULT_CONFIG, ...cloud, modoOtimizacao: cloud.modoOtimizacao as AppConfig['modoOtimizacao'], modoPerdas: (cloud.modoPerdas ?? 'dinamico') as AppConfig['modoPerdas'], modoCorConfig: (cloud.modoCorConfig ?? 'tamanho') as AppConfig['modoCorConfig'] };
+        saveConfig(fullCfg);
+        return;
+      }
+      const local = loadConfig();
+      setRollW(local.rollW);
+      setPrice(local.price);
+      setMargin(local.margin);
+      setModoOtimizacao(local.modoOtimizacao);
+      setUserName(local.userName);
+      setModoPerdas(local.modoPerdas);
+      setPerdasFixas(local.perdasFixas);
+      setUsarCoresPorAmbiente(local.modoCorConfig === 'ambiente');
+      setAgressividadeCorte(local.agressividadeCorte);
+    };
+    restoreConfig();
+  }, []);
+
+  // RESTORE DRAFT ON MOUNT (cloud-first, localStorage fallback)
     useEffect(() => {
         const restoreDraft = async () => {
             // Try cloud first
@@ -570,6 +617,19 @@ export function AdminCalculator() {
 
     // ─── AÇÕES DE VIDROS ───────────────────────────────────────────────────────
 
+  const selectSameSize = useCallback((oh: number, ow: number, label?: string) => {
+    const targetLabel = label || '';
+    const ids = vidros
+      .filter(v => v.oh === oh && v.ow === ow && (v.label || '') === targetLabel)
+      .map(v => v.id);
+    const allAlreadySelected = ids.length > 0 && ids.every(id => selectedIds.includes(id));
+    if (allAlreadySelected) {
+      setSelectedIds(prev => prev.filter(id => !ids.includes(id)));
+    } else {
+      setSelectedIds(prev => [...new Set([...prev, ...ids])]);
+    }
+  }, [vidros, selectedIds]);
+
     const adicionar = () => {
         const h = parseFloat(heightIn.replace(',', '.'));
         const w = parseFloat(widthIn.replace(',', '.'));
@@ -605,6 +665,10 @@ export function AdminCalculator() {
             setDesconto(0);
             setDescontoInput('0');
             setCliente('');
+            setRollW(DEFAULT_CONFIG.rollW);
+            setPrice(DEFAULT_CONFIG.price);
+            setMargin(DEFAULT_CONFIG.margin);
+            setSelectedIds([]);
         }
     };
 
@@ -899,31 +963,31 @@ export function AdminCalculator() {
         }
     };
 
-    const salvarConfig = () => {
-        const nova: AppConfig = {
-            rollW: cfgRollW,
-            price: cfgPrice,
-            margin: cfgMargin,
-            modoOtimizacao: cfgModo,
-            userName: cfgUserName,
-            modoPerdas: cfgModoPerdas,
-            perdasFixas: cfgPerdasFixas,
-            modoCorConfig: cfgModoCorConfig,
-            agressividadeCorte: cfgAgressividadeCorte,
-        };
-        saveConfig(nova);
-        saveConfigToCloud(nova);
-        setRollW(cfgRollW);
-        setPrice(cfgPrice);
-        setMargin(cfgMargin);
-        setModoOtimizacao(cfgModo);
-        setUserName(cfgUserName);
-        setModoPerdas(cfgModoPerdas);
-        setPerdasFixas(cfgPerdasFixas);
-        setAgressividadeCorte(cfgAgressividadeCorte);
-        setUsarCoresPorAmbiente(cfgModoCorConfig === 'ambiente');
-        setConfigAberto(false);
+  const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: AppConfig[K]) => {
+    const setters: Record<string, React.Dispatch<React.SetStateAction<any>>> = {
+      rollW: setRollW,
+      price: setPrice,
+      margin: setMargin,
+      modoOtimizacao: setModoOtimizacao as any,
+      userName: setUserName,
+      modoPerdas: setModoPerdas as any,
+      perdasFixas: setPerdasFixas,
+      modoCorConfig: null as any,
+      agressividadeCorte: setAgressividadeCorte,
     };
+    if (key === 'modoCorConfig') {
+      setUsarCoresPorAmbiente(value === 'ambiente');
+      setVidros(prev => prev.map(v => ({
+        ...v,
+        cor: getColorForItem(v.label, v.oh, v.ow, value === 'ambiente'),
+      })));
+    } else if (setters[key]) {
+      setters[key](value);
+    }
+    const currentCfg: AppConfig = { rollW, price, margin, modoOtimizacao, userName, modoPerdas, perdasFixas, modoCorConfig: usarCoresPorAmbiente ? 'ambiente' : 'tamanho', agressividadeCorte };
+    const updated = { ...currentCfg, [key]: value };
+    saveConfig(updated);
+  }, [rollW, price, margin, modoOtimizacao, userName, modoPerdas, perdasFixas, usarCoresPorAmbiente, agressividadeCorte, getColorForItem]);
 
     // ─── MEMOS ─────────────────────────────────────────────────────────────────
 
@@ -979,29 +1043,13 @@ export function AdminCalculator() {
         <div className="min-h-screen bg-[#040811] text-white py-6 px-2 sm:px-4 relative overflow-x-hidden">
 
             {/* PAINEL LATERAL: CONFIGURAÇÕES (EXTRAÍDO) */}
-            <ConfigPanel 
-                aberto={configAberto}
-                setAberto={setConfigAberto}
-                cfgUserName={cfgUserName}
-                setCfgUserName={setCfgUserName}
-                cfgRollW={cfgRollW}
-                setCfgRollW={setCfgRollW}
-                cfgPrice={cfgPrice}
-                setCfgPrice={setCfgPrice}
-                cfgMargin={cfgMargin}
-                setCfgMargin={setCfgMargin}
-                cfgModo={cfgModo}
-                setCfgModo={setCfgModo}
-                cfgModoPerdas={cfgModoPerdas}
-                setCfgModoPerdas={setCfgModoPerdas}
-                cfgPerdasFixas={cfgPerdasFixas}
-                setCfgPerdasFixas={setCfgPerdasFixas}
-                cfgModoCorConfig={cfgModoCorConfig}
-                setCfgModoCorConfig={setCfgModoCorConfig}
-                cfgAgressividadeCorte={cfgAgressividadeCorte}
-                setCfgAgressividadeCorte={setCfgAgressividadeCorte}
-                onSalvar={salvarConfig}
-            />
+      <ConfigPanel
+        aberto={configAberto}
+        setAberto={setConfigAberto}
+        config={{ rollW, price, margin, modoOtimizacao, userName, modoPerdas, perdasFixas, modoCorConfig: usarCoresPorAmbiente ? 'ambiente' : 'tamanho', agressividadeCorte }}
+        onUpdate={atualizarConfig}
+        cloudStatus={cloudStatus}
+      />
 
             {/* PAINEL LATERAL: HISTÓRICO (EXTRAÍDO) */}
             <HistoryPanel 
@@ -1094,11 +1142,19 @@ export function AdminCalculator() {
                     </div>
                     <div className="flex items-center gap-1.5 flex-nowrap justify-end xl:justify-end overflow-x-auto pb-1 scrollbar-hide">
                         <button
-                            onClick={() => { setCfgRollW(rollW); setCfgPrice(price); setCfgMargin(margin); setCfgModo(modoOtimizacao); setCfgUserName(userName); setCfgModoPerdas(modoPerdas); setCfgPerdasFixas(perdasFixas); setCfgModoCorConfig(usarCoresPorAmbiente ? 'ambiente' : 'tamanho'); setCfgAgressividadeCorte(agressividadeCorte); setConfigAberto(true); }}
+                            onClick={() => setConfigAberto(true)}
                             className="flex items-center gap-1 px-2.5 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10 hover:text-white transition-all shrink-0"
                             title="Configurações Padrão"
                         >
                             <Settings size={14} /> <span className="hidden sm:inline">Config</span>
+                        </button>
+                        <button
+                            onClick={limparTudo}
+                            disabled={vidros.length === 0}
+                            title="Limpar tudo"
+                            className={`flex items-center gap-1 px-2.5 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all border shrink-0 ${vidros.length > 0 ? 'bg-red-500/10 border-red-500/30 text-red-300 hover:bg-red-500/20 hover:text-red-200' : 'border-white/5 text-white/20 cursor-not-allowed'}`}
+                        >
+                            <Trash2 size={14} /> <span className="hidden sm:inline">Limpar</span>
                         </button>
                         <button
                             onClick={() => dispatch({ type: 'UNDO' })}
@@ -1451,13 +1507,14 @@ export function AdminCalculator() {
                                         {blocosCalculados.map((b) => (
                                             b.fit && (
                                                 <MemoBlock
-                                                    key={b.id}
-                                                    b={b}
-                                                    scale={scale}
-                                                    margin={margin}
-                                                    isSelected={selectedIds.includes(b.id)}
-                                                    toggleSelection={toggleSelection}
-                                                />
+                key={b.id}
+                b={b}
+                scale={scale}
+                margin={margin}
+                isSelected={selectedIds.includes(b.id)}
+                toggleSelection={toggleSelection}
+                selectSameSize={selectSameSize}
+              />
                                             )
                                         ))}
                                     </div>

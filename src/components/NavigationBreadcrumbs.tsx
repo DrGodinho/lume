@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { usePathname } from 'next/navigation';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -24,15 +25,22 @@ export function NavigationBreadcrumbs({
   items,
   showVisualTrail = true,
 }: NavigationBreadcrumbsProps) {
+  const pathname = usePathname();
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    "itemListElement": items.map((item, index) => ({
-      "@type": "ListItem",
-      "position": index + 1,
-      "name": item.label,
-      "item": item.href ? `https://lumecontrolesolar.com.br${item.href}` : undefined
-    }))
+    "itemListElement": items
+      .map((item, index) => {
+        const href = item.href ?? (index === items.length - 1 ? pathname : undefined);
+        if (!href) return null;
+        return {
+          "@type": "ListItem",
+          "position": index + 1,
+          "name": item.label,
+          "item": `https://lumecontrolesolar.com.br${href}`
+        };
+      })
+      .filter(Boolean)
   };
 
   return (
