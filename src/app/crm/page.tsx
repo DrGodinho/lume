@@ -1,0 +1,2434 @@
+'use client';
+
+import { useState, useEffect, useMemo } from 'react';
+import { supabase } from '@/lib/supabase';
+import { addDays, differenceInDays, eachDayOfInterval, endOfMonth, format, isPast, isSameDay, isToday, isWithinInterval, parseISO, startOfMonth, startOfWeek } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+import { ExtratosMensaisSupabase } from './ExtratosMensaisSupabase';
+
+// Interfaces
+interface Lead {
+  id: string;
+  name: string;
+  phone: string;
+  email: string;
+  address: string;
+  neighborhood: string;
+  filmType: string;
+  sqm: number;
+  value: number;
+  status: 'Novo' | 'Em Contato' | 'Proposta Enviada' | 'Fechado' | 'Perdido';
+  createdAt: string;
+  statusChangedAt: string;
+  notes: string;
+  proximoContato?: string | null;
+  updatedAt?: string;
+}
+
+// Initial Mock Data
+const INITIAL_LEADS: Lead[] = [
+  {
+    id: 'lead_1',
+    name: 'Carlos Henrique Silva',
+    phone: '(21) 98765-4321',
+    email: 'carlos.henrique@gmail.com',
+    address: 'Av. das Américas, 4200 - Bloco 2',
+    neighborhood: 'Barra da Tijuca',
+    filmType: 'Nano Cerâmica',
+    sqm: 14.5,
+    value: 2175,
+    status: 'Novo',
+    createdAt: '2026-06-01',
+    statusChangedAt: '2026-06-01',
+    notes: 'Cliente quer redução de calor na sala de estar. Agendar medição.'
+  },
+  {
+    id: 'lead_2',
+    name: 'Mariana Costa Ferreira',
+    phone: '(21) 99888-7766',
+    email: 'mariana.costa@hotmail.com',
+    address: 'Rua Nelson Cardoso, 321',
+    neighborhood: 'Jacarepaguá',
+    filmType: 'Refletiva',
+    sqm: 8.2,
+    value: 738,
+    status: 'Proposta Enviada',
+    createdAt: '2026-06-02',
+    statusChangedAt: '2026-06-02',
+    notes: 'Orçamento enviado por WhatsApp. Aguardando retorno sobre película de privacidade.'
+  },
+  {
+    id: 'lead_3',
+    name: 'Roberto de Souza',
+    phone: '(21) 97111-2233',
+    email: 'roberto.souza@yahoo.com.br',
+    address: 'Rua Cônego de Vasconcelos, 15',
+    neighborhood: 'Bangu',
+    filmType: 'Carbono',
+    sqm: 22.0,
+    value: 2640,
+    status: 'Fechado',
+    createdAt: '2026-05-28',
+    statusChangedAt: '2026-05-30',
+    notes: 'Contrato assinado. Instalação agendada para sábado de manhã. Película Carbono 20%.'
+  },
+  {
+    id: 'lead_4',
+    name: 'Doutor Godinho',
+    phone: '(21) 98888-9999',
+    email: 'drgodinho@gmail.com',
+    address: 'Rua Silva Cardoso, 125',
+    neighborhood: 'Bangu',
+    filmType: 'Nano Cerâmica',
+    sqm: 18.0,
+    value: 2700,
+    status: 'Em Contato',
+    createdAt: '2026-06-03',
+    statusChangedAt: '2026-06-03',
+    notes: 'Interesse na película de alto desempenho térmico para consultório.'
+  }
+];
+
+const FILM_PRICES: Record<string, number> = {
+  'Nano Cerâmica': 150,
+  'Refletiva': 90,
+  'Carbono': 120,
+  'Jateada': 100,
+};
+
+const RJ_NEIGHBORHOODS = [
+  'Barra da Tijuca',
+  'Recreio dos Bandeirantes',
+  'Jacarepaguá',
+  'Bangu',
+  'Realengo',
+  'Campo Grande',
+  'Outro'
+];
+
+// ─── HISTORICO SUPABASE COMPONENT ────────────────────────────────────────────
+
+const isClosedLead = (status: Lead['status']) => status === 'Fechado' || status === 'Perdido';
+
+const parseAgendaDate = (value?: string | null) => {
+  if (!value) return null;
+  const parsed = parseISO(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+};
+
+const getLeadActivityDate = (lead: Lead) => parseAgendaDate(lead.updatedAt || lead.statusChangedAt || lead.createdAt);
+
+const getLeadFollowUpDate = (lead: Lead) => parseAgendaDate(lead.proximoContato || null);
+
+function LeadCardAgenda({
+  lead,
+  onAgendar,
+  onMarcarFeito,
+  onAbrirLead,
+}: {
+  lead: Lead;
+  onAgendar: (leadId: string, data: string) => Promise<void>;
+  onMarcarFeito: (leadId: string) => Promise<void>;
+  onAbrirLead: (lead: Lead) => void;
+}) {
+  const [agendando, setAgendando] = useState(false);
+  const [novaData, setNovaData] = useState('');
+  const [salvando, setSalvando] = useState(false);
+
+  const followUpDate = getLeadFollowUpDate(lead);
+  const activityDate = getLeadActivityDate(lead);
+  const inactivityDays = activityDate ? differenceInDays(new Date(), activityDate) : null;
+  const atrasado = !!followUpDate && isPast(followUpDate) && !isToday(followUpDate);
+  const hasFollowUp = !!followUpDate;
+
+  const salvarAgendamento = async () => {
+    if (!novaData) return;
+    setSalvando(true);
+    try {
+      await onAgendar(lead.id, novaData);
+      setAgendando(false);
+      setNovaData('');
+    } finally {
+      setSalvando(false);
+    }
+  };
+
+  return (
+    <article
+      className={`group rounded-3xl border p-5 shadow-lg transition duration-300 ${
+        atrasado
+          ? 'border-red-500/20 bg-red-500/[0.06] hover:border-red-500/35'
+          : 'border-white/5 bg-[#04080f]/90 hover:border-[#c9a227]/20'
+      }`}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <button onClick={() => onAbrirLead(lead)} className="min-w-0 text-left">
+          <p className="truncate text-sm font-bold text-white transition group-hover:text-[#f5d77a]">
+            {lead.name}
+          </p>
+          <p className="mt-1 text-[11px] text-white/40">
+            {lead.neighborhood} · {lead.filmType}
+          </p>
+        </button>
+
+        <span
+          className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${
+            lead.status === 'Fechado'
+              ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-300'
+              : lead.status === 'Proposta Enviada'
+                ? 'border-purple-500/20 bg-purple-500/10 text-purple-300'
+                : lead.status === 'Em Contato'
+                  ? 'border-amber-500/20 bg-amber-500/10 text-amber-300'
+                  : lead.status === 'Perdido'
+                    ? 'border-red-500/20 bg-red-500/10 text-red-300'
+                    : 'border-white/10 bg-white/[0.03] text-white/60'
+          }`}
+        >
+          {lead.status}
+        </span>
+      </div>
+
+      <div className="mt-4 flex flex-wrap gap-2 text-[11px]">
+        {atrasado && (
+          <span className="rounded-full border border-red-500/20 bg-red-500/10 px-2.5 py-1 text-red-300">
+            Atrasado
+          </span>
+        )}
+        {!hasFollowUp && inactivityDays !== null && inactivityDays >= 3 && (
+          <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-white/50">
+            Parado ha {inactivityDays}d
+          </span>
+        )}
+        {hasFollowUp && followUpDate && (
+          <span className="rounded-full border border-[#c9a227]/20 bg-[#c9a227]/10 px-2.5 py-1 text-[#f2d98a]">
+            {atrasado ? 'Contato hoje' : format(followUpDate, "d 'de' MMM", { locale: ptBR })}
+          </span>
+        )}
+      </div>
+
+      <div className="mt-4 grid grid-cols-2 gap-3 text-xs text-white/55">
+        <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-3">
+          <p className="text-[10px] uppercase tracking-[0.25em] text-white/35 group-hover:text-white/50">Telefone</p>
+          <p className="mt-1 font-medium text-white">{lead.phone || 'Sem telefone'}</p>
+        </div>
+        <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-3">
+          <p className="text-[10px] uppercase tracking-[0.25em] text-white/35 group-hover:text-white/50">Valor</p>
+          <p className="mt-1 font-semibold text-[#f5d77a]">
+            R$ {lead.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </p>
+        </div>
+      </div>
+
+      {agendando ? (
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+          <input
+            type="date"
+            value={novaData}
+            min={format(new Date(), 'yyyy-MM-dd')}
+            onChange={(e) => setNovaData(e.target.value)}
+            className="min-w-0 flex-1 rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white outline-none focus:border-[#c9a227]/40"
+          />
+          <button
+            onClick={salvarAgendamento}
+            disabled={!novaData || salvando}
+            className="rounded-2xl bg-[#c9a227] px-4 py-2 text-xs font-bold uppercase tracking-wider text-[#04080f] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {salvando ? 'Salvando...' : 'Salvar'}
+          </button>
+          <button
+            onClick={() => {
+              setAgendando(false);
+              setNovaData('');
+            }}
+            className="rounded-2xl border border-white/10 px-4 py-2 text-xs font-semibold text-white/60 transition hover:bg-white/[0.03] hover:text-white"
+          >
+            Cancelar
+          </button>
+        </div>
+      ) : (
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button
+            onClick={() => setAgendando(true)}
+            className="rounded-2xl border border-white/10 px-4 py-2 text-xs font-semibold text-white/70 transition hover:border-[#c9a227]/40 hover:text-[#f5d77a]"
+          >
+            {hasFollowUp ? 'Re-agendar' : 'Agendar retorno'}
+          </button>
+          {hasFollowUp && (
+            <button
+              onClick={() => onMarcarFeito(lead.id)}
+              className="rounded-2xl border border-emerald-500/20 px-4 py-2 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-500/10"
+            >
+              Feito
+            </button>
+          )}
+          <a
+            href={`https://wa.me/55${lead.phone.replace(/\D/g, '')}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-2xl border border-white/10 px-4 py-2 text-xs font-semibold text-white/70 transition hover:border-emerald-500/40 hover:text-emerald-300"
+          >
+            WhatsApp
+          </a>
+          <button
+            onClick={() => onAbrirLead(lead)}
+            className="rounded-2xl border border-white/10 px-4 py-2 text-xs font-semibold text-white/70 transition hover:border-white/20 hover:text-white"
+          >
+            Abrir
+          </button>
+        </div>
+      )}
+    </article>
+  );
+}
+
+function AgendaFollowUpSection({
+  leads,
+  onAgendarRetorno,
+  onMarcarFeito,
+  onAbrirLead,
+  onIrParaLeads,
+}: {
+  leads: Lead[];
+  onAgendarRetorno: (leadId: string, data: string) => Promise<void>;
+  onMarcarFeito: (leadId: string) => Promise<void>;
+  onAbrirLead: (lead: Lead) => void;
+  onIrParaLeads: () => void;
+}) {
+  const [diaSelecionado, setDiaSelecionado] = useState<Date | null>(null);
+
+  const hoje = new Date();
+  const inicioSemana = startOfWeek(hoje, { weekStartsOn: 1 });
+  const diasSemana = Array.from({ length: 7 }, (_, index) => addDays(inicioSemana, index));
+
+  const leadsAtivos = useMemo(() => leads.filter((lead) => !isClosedLead(lead.status)), [leads]);
+  const leadsComRetorno = useMemo(() => leadsAtivos.filter((lead) => !!lead.proximoContato), [leadsAtivos]);
+
+  const contactarHoje = useMemo(() => {
+    return leadsAtivos.filter((lead) => {
+      const followUpDate = getLeadFollowUpDate(lead);
+      if (!followUpDate) return false;
+      if (diaSelecionado) {
+        if (isToday(diaSelecionado)) {
+          return isSameDay(followUpDate, diaSelecionado) || isPast(followUpDate);
+        }
+        return isSameDay(followUpDate, diaSelecionado);
+      }
+      return isToday(followUpDate) || isPast(followUpDate);
+    });
+  }, [diaSelecionado, leadsAtivos]);
+
+  const proximos7Dias = useMemo(() => {
+    return leadsAtivos.filter((lead) => {
+      const followUpDate = getLeadFollowUpDate(lead);
+      if (!followUpDate) return false;
+
+      const withinNextWeek = isWithinInterval(followUpDate, {
+        start: addDays(hoje, 1),
+        end: addDays(hoje, 7),
+      });
+
+      if (!withinNextWeek) return false;
+      if (!diaSelecionado) return true;
+      return isSameDay(followUpDate, diaSelecionado);
+    });
+  }, [diaSelecionado, leadsAtivos, hoje]);
+
+  const parados = useMemo(() => {
+    return leadsAtivos.filter((lead) => {
+      if (lead.proximoContato) return false;
+      const activityDate = getLeadActivityDate(lead);
+      if (!activityDate) return false;
+      return differenceInDays(hoje, activityDate) >= 3;
+    });
+  }, [hoje, leadsAtivos]);
+
+  const emDiaCount = useMemo(() => {
+    return leadsAtivos.filter((lead) => {
+      if (lead.proximoContato) return false;
+      const activityDate = getLeadActivityDate(lead);
+      if (!activityDate) return true;
+      return differenceInDays(hoje, activityDate) < 3;
+    }).length;
+  }, [hoje, leadsAtivos]);
+
+  const agendaCountByDay = (day: Date) =>
+    leadsComRetorno.filter((lead) => {
+      const followUpDate = getLeadFollowUpDate(lead);
+      return followUpDate ? isSameDay(followUpDate, day) : false;
+    }).length;
+
+  const selectedDayLabel = diaSelecionado ? format(diaSelecionado, "EEEE, d 'de' MMMM", { locale: ptBR }) : '';
+
+  const sectionsEmpty = contactarHoje.length === 0 && proximos7Dias.length === 0 && parados.length === 0;
+
+  const highlightDay = (day: Date) => {
+    if (diaSelecionado && isSameDay(day, diaSelecionado)) {
+      setDiaSelecionado(null);
+      return;
+    }
+    setDiaSelecionado(day);
+  };
+
+  return (
+    <div className="space-y-8">
+      <section className="overflow-hidden rounded-[2.25rem] border border-white/5 bg-[radial-gradient(circle_at_top_left,_rgba(201,162,39,0.18),_transparent_28%),radial-gradient(circle_at_bottom_right,_rgba(255,255,255,0.04),_transparent_25%),linear-gradient(180deg,#0a1320_0%,#050a11_100%)] p-6 shadow-2xl shadow-black/25 sm:p-8">
+        <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
+          <div className="max-w-3xl">
+            <p className="text-[10px] font-bold uppercase tracking-[0.45em] text-[#f5d77a]">LUME ELITE</p>
+            <h2 className="mt-2 font-display text-3xl font-black tracking-tight text-white sm:text-4xl">
+              Agenda & Follow-up
+            </h2>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-white/60">
+              Organize contatos por urg?ncia, acompanhe retornos da semana e destaque quem est? parado para n?o deixar lead esfriar.
+            </p>
+          </div>
+
+          <div className="rounded-[1.75rem] border border-white/5 bg-white/[0.04] p-4 shadow-lg shadow-black/15 backdrop-blur-md">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.35em] text-white/35">Hoje</p>
+            <p className="mt-2 text-lg font-bold text-white">
+              {format(hoje, "EEEE, d 'de' MMMM 'de' yyyy", { locale: ptBR })}
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2 text-[11px]">
+              <span className="rounded-full border border-red-500/20 bg-red-500/10 px-3 py-1 text-red-300 shadow-[0_0_0_1px_rgba(239,68,68,0.1)]">
+                {contactarHoje.length} urgentes
+              </span>
+              <span className="rounded-full border border-[#c9a227]/20 bg-[#c9a227]/10 px-3 py-1 text-[#f5d77a] shadow-[0_0_0_1px_rgba(201,162,39,0.1)]">
+                {proximos7Dias.length} proximos 7 dias
+              </span>
+              <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-white/60">
+                {emDiaCount} em dia
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="rounded-[1.75rem] border border-red-500/20 bg-[linear-gradient(180deg,rgba(239,68,68,0.12),rgba(239,68,68,0.04))] p-5 shadow-lg shadow-black/10">
+          <p className="text-[10px] uppercase tracking-[0.35em] text-red-300/70">Contatar hoje</p>
+          <p className="mt-3 text-4xl font-black text-white">{contactarHoje.length}</p>
+          <p className="mt-2 text-sm text-white/50">Atrasados e contatos do dia.</p>
+        </div>
+        <div className="rounded-[1.75rem] border border-[#c9a227]/20 bg-[linear-gradient(180deg,rgba(201,162,39,0.16),rgba(201,162,39,0.05))] p-5 shadow-lg shadow-black/10">
+          <p className="text-[10px] uppercase tracking-[0.35em] text-[#f5d77a]">Pr?ximos 7 dias</p>
+          <p className="mt-3 text-4xl font-black text-white">{proximos7Dias.length}</p>
+          <p className="mt-2 text-sm text-white/50">Retornos agendados para a semana.</p>
+        </div>
+        <div className="rounded-[1.75rem] border border-white/10 bg-white/[0.03] p-5 shadow-lg shadow-black/10">
+          <p className="text-[10px] uppercase tracking-[0.35em] text-white/35">Em dia</p>
+          <p className="mt-3 text-4xl font-black text-white">{emDiaCount}</p>
+          <p className="mt-2 text-sm text-white/50">Leads ativos sem follow-up pendente.</p>
+        </div>
+        <div className="rounded-[1.75rem] border border-white/10 bg-white/[0.03] p-5 shadow-lg shadow-black/10">
+          <p className="text-[10px] uppercase tracking-[0.35em] text-white/35">Parados</p>
+          <p className="mt-3 text-4xl font-black text-white">{parados.length}</p>
+          <p className="mt-2 text-sm text-white/50">Sem agenda e sem contato recente.</p>
+        </div>
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+        <div className="rounded-[2rem] border border-white/5 bg-[#07111d]/75 p-6 shadow-2xl shadow-black/20 backdrop-blur-md">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.35em] text-white/35">Mini calend?rio</p>
+              <h3 className="mt-1 text-xl font-black text-white">Semana atual</h3>
+            </div>
+            {diaSelecionado && (
+              <button
+                onClick={() => setDiaSelecionado(null)}
+                className="w-fit rounded-full border border-white/10 bg-white/[0.02] px-3 py-1 text-xs font-semibold text-white/60 transition hover:border-white/20 hover:bg-white/[0.05] hover:text-white"
+              >
+                Limpar filtro
+              </button>
+            )}
+          </div>
+
+          <div className="mt-5 grid grid-cols-7 gap-2">
+            {diasSemana.map((day) => {
+              const selected = diaSelecionado ? isSameDay(day, diaSelecionado) : false;
+              const dayCount = agendaCountByDay(day);
+
+              return (
+                <button
+                  key={day.toISOString()}
+                  onClick={() => highlightDay(day)}
+                  className={`group rounded-2xl border p-3 text-left transition duration-300 ${
+                    selected
+                      ? 'border-[#c9a227]/50 bg-[linear-gradient(180deg,rgba(201,162,39,0.16),rgba(201,162,39,0.06))] shadow-[0_0_0_1px_rgba(201,162,39,0.18)]'
+                      : 'border-white/5 bg-white/[0.02] hover:border-white/10 hover:bg-white/[0.03]'
+                  } ${isToday(day) ? 'ring-1 ring-[#f5d77a]/35' : ''}`}
+                >
+                  <p className="text-[10px] uppercase tracking-[0.25em] text-white/35 group-hover:text-white/50">
+                    {format(day, 'EEE', { locale: ptBR })}
+                  </p>
+                  <p className={`mt-2 text-lg font-black ${isToday(day) ? 'text-[#f5d77a]' : 'text-white'}`}>
+                    {format(day, 'd')}
+                  </p>
+                  <p className="mt-1 text-[11px] text-white/45">{dayCount} agend.</p>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="mt-5 rounded-2xl border border-white/5 bg-white/[0.03] p-4 text-sm text-white/60">
+            {diaSelecionado ? (
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <p>
+                  Exibindo o dia <span className="font-semibold text-white">{selectedDayLabel}</span>.
+                </p>
+                <p className="text-white/40">
+                  Hoje seguem vis?veis tamb?m os atrasados.
+                </p>
+              </div>
+            ) : (
+              <p>Clique em um dia para filtrar os blocos de contato da semana.</p>
+            )}
+          </div>
+        </div>
+
+        <div className="rounded-[2rem] border border-white/5 bg-[#07111d]/75 p-6 shadow-2xl shadow-black/20 backdrop-blur-md">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.35em] text-white/35">Atalhos</p>
+          <h3 className="mt-1 text-xl font-black text-white">Operacao rapida</h3>
+
+          <div className="mt-5 space-y-3">
+            <button
+              onClick={onIrParaLeads}
+              className="flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left transition hover:border-[#c9a227]/30 hover:bg-[#c9a227]/10"
+            >
+              <div>
+                <p className="text-sm font-semibold text-white">Ir para Controle de Leads</p>
+                <p className="text-xs text-white/40">Ajuste status, cadastre e edite leads.</p>
+              </div>
+              <span className="text-[#f5d77a]">→</span>
+            </button>
+
+            <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-4">
+              <p className="text-xs uppercase tracking-[0.25em] text-white/35">Resumo r?pido</p>
+              <div className="mt-3 space-y-2 text-sm text-white/65">
+                <div className="flex items-center justify-between">
+                  <span>Urgentes</span>
+                  <span className="font-semibold text-red-300">{contactarHoje.length}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Pr?ximos 7 dias</span>
+                  <span className="font-semibold text-[#f5d77a]">{proximos7Dias.length}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Parados</span>
+                  <span className="font-semibold text-white">{parados.length}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Em dia</span>
+                  <span className="font-semibold text-emerald-300">{emDiaCount}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {contactarHoje.length > 0 && (
+        <section className="space-y-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-bold uppercase tracking-[0.25em] text-red-300">Contatar hoje</span>
+            <span className="rounded-full border border-red-500/20 bg-red-500/10 px-2.5 py-1 text-xs font-semibold text-red-300">
+              {contactarHoje.length}
+            </span>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {contactarHoje.map((lead) => (
+              <LeadCardAgenda
+                key={lead.id}
+                lead={lead}
+                onAgendar={onAgendarRetorno}
+                onMarcarFeito={onMarcarFeito}
+                onAbrirLead={onAbrirLead}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {proximos7Dias.length > 0 && (
+        <section className="space-y-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-bold uppercase tracking-[0.25em] text-[#f5d77a]">Pr?ximos 7 dias</span>
+            <span className="rounded-full border border-[#c9a227]/20 bg-[#c9a227]/10 px-2.5 py-1 text-xs font-semibold text-[#f5d77a]">
+              {proximos7Dias.length}
+            </span>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {proximos7Dias.map((lead) => (
+              <LeadCardAgenda
+                key={lead.id}
+                lead={lead}
+                onAgendar={onAgendarRetorno}
+                onMarcarFeito={onMarcarFeito}
+                onAbrirLead={onAbrirLead}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {parados.length > 0 && (
+        <section className="space-y-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-bold uppercase tracking-[0.25em] text-white/55">Sem atividade h? 3+ dias</span>
+            <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-xs font-semibold text-white/55">
+              {parados.length}
+            </span>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {parados.map((lead) => (
+              <LeadCardAgenda
+                key={lead.id}
+                lead={lead}
+                onAgendar={onAgendarRetorno}
+                onMarcarFeito={onMarcarFeito}
+                onAbrirLead={onAbrirLead}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {sectionsEmpty && (
+        <div className="rounded-[2rem] border border-emerald-500/20 bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.10),transparent_55%),linear-gradient(180deg,rgba(16,185,129,0.06),rgba(16,185,129,0.03))] px-6 py-10 text-center shadow-lg shadow-black/10">
+          <p className="text-2xl font-black text-white">Agenda em dia</p>
+          <p className="mt-2 text-sm text-white/55">Nenhum contato pendente para hoje, pr?ximos dias ou leads parados.</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+interface HistoricoSupabaseProps {
+  leads: Lead[];
+  setActiveTab: (tab: 'dashboard' | 'leads' | 'historico') => void;
+  openCreateModal: (prefill?: Omit<Lead, 'id' | 'createdAt'>) => void;
+}
+
+function HistoricoSupabase({ leads, setActiveTab, openCreateModal }: HistoricoSupabaseProps) {
+  const [history, setHistory] = useState<any[]>([]);
+  const [draft, setDraft] = useState<any | null>(null);
+  const [config, setConfig] = useState<any | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedOrcamento, setSelectedOrcamento] = useState<any | null>(null);
+
+  const filmMap: Record<string, string> = {
+    'densidade': 'Nano Cerâmica',
+    'facilidade': 'Refletiva',
+    'facilidade_v2': 'Carbono',
+  };
+
+  const FILM_TYPE_LABELS: Record<string, string> = {
+    carbono: 'Carbono',
+    refletiva: 'Refletiva',
+    dupla_camada: 'Dupla Camada',
+    nano_ceramica: 'Nano Cerâmica',
+    jateado: 'Jateado',
+  };
+
+  const getFilmLabel = (h: any) => {
+    if (h.selected_film) return FILM_TYPE_LABELS[h.selected_film] || h.selected_film;
+    return filmMap[h.modo_otimizacao] || h.modo_otimizacao || '—';
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!supabase) {
+        setLoading(false);
+        return;
+      }
+
+      const [historyRes, draftRes, configRes] = await Promise.all([
+        supabase.from('calculator_history').select('*').order('created_at', { ascending: false }).limit(100),
+        supabase.from('calculator_draft').select('*').eq('id', 'default').single(),
+        supabase.from('calculator_config').select('*').eq('id', 'default').single(),
+      ]);
+
+      if (historyRes.data) setHistory(historyRes.data);
+      if (draftRes.data) setDraft(draftRes.data);
+      if (configRes.data) setConfig(configRes.data);
+      setLoading(false);
+    };
+
+    fetchData();
+  }, []);
+
+  const filteredHistory = useMemo(() => {
+    if (!searchQuery.trim()) return history;
+    const q = searchQuery.toLowerCase();
+    return history.filter((h: any) =>
+      (h.cliente || '').toLowerCase().includes(q) ||
+      getFilmLabel(h).toLowerCase().includes(q)
+    );
+  }, [history, searchQuery]);
+
+  const stats = useMemo(() => {
+    const total = history.length;
+    const totalValue = history.reduce((s: number, h: any) => s + (h.valor || 0), 0);
+    const avgValue = total > 0 ? totalValue / total : 0;
+    return { total, totalValue, avgValue };
+  }, [history]);
+
+  const exportToCSV = () => {
+    const headers = ['Cliente', 'Película', 'Valor', 'Qtd Vidros', 'Data'];
+    const rows = filteredHistory.map((h: any) => [
+      h.cliente || '',
+      getFilmLabel(h),
+      h.valor || 0,
+      h.qtd || 0,
+      h.created_at ? new Date(h.created_at).toLocaleDateString('pt-BR') : '',
+    ]);
+    const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `historico_lume_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const deleteOrcamento = async (id: string) => {
+    if (!confirm('Excluir este orçamento do histórico?')) return;
+    if (!supabase) return;
+
+    const { error } = await supabase.from('calculator_history').delete().eq('id', id);
+    if (!error) {
+      setHistory(prev => prev.filter(h => h.id !== id));
+    }
+  };
+
+const convertToLead = (orcamento: any) => {
+    const totalM2 = (orcamento.vidros?.reduce((s: number, v: any) => s + (v.h || 0) * (v.w || 0), 0) || 0) / 10000;
+    const prefill: Omit<Lead, 'id' | 'createdAt'> = {
+      name: orcamento.cliente || 'Cliente do Histórico',
+      phone: orcamento.phone || '',
+      email: '',
+      address: '',
+      neighborhood: 'Barra da Tijuca',
+      filmType: getFilmLabel(orcamento),
+      sqm: Math.round(totalM2 * 100) / 100,
+      value: orcamento.valor || 0,
+      status: 'Novo',
+      statusChangedAt: new Date().toISOString().split('T')[0],
+      notes: `Orçamento convertido do Supabase (ID: ${orcamento.id}).\nPelícula: ${getFilmLabel(orcamento)}.\nVidros: ${orcamento.qtd}.`,
+    };
+    setActiveTab('leads');
+    openCreateModal(prefill);
+  };
+
+  const formatCurrency = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#c9a227]" />
+      </div>
+    );
+  }
+
+  if (!supabase) {
+    return (
+      <div className="rounded-3xl border border-red-500/20 bg-red-500/5 p-6 text-center">
+        <p className="text-red-400 font-semibold">Supabase não configurado</p>
+        <p className="text-white/50 text-sm mt-2">Adicione as variáveis NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY no .env.local</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Search & Actions */}
+      <div className="flex flex-col gap-4 rounded-3xl border border-white/5 bg-[#07111d]/50 p-6 backdrop-blur-md shadow-lg sm:flex-row sm:items-center">
+        <div className="relative flex-1">
+          <svg className="absolute left-4 top-3.5 h-4 w-4 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            type="text"
+            placeholder="Buscar por cliente ou película..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full rounded-2xl border border-white/5 bg-white/[0.02] py-3 pl-11 pr-4 text-sm text-white placeholder:text-white/30 focus:border-[#c9a227]/40 focus:outline-none"
+          />
+        </div>
+        <button
+          onClick={exportToCSV}
+          className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#c9a227] to-[#d4ad30] px-6 py-3 text-sm font-bold text-[#04080f] shadow-lg shadow-[#c9a227]/10 hover:brightness-110 transition"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          Exportar CSV
+        </button>
+      </div>
+
+      {/* Stats */}
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="rounded-xl border border-white/5 bg-[#07111d]/50 p-3">
+          <span className="text-[10px] uppercase tracking-wider text-white/50 font-semibold">Total de Orçamentos</span>
+          <p className="mt-1 text-xl font-black text-white">{stats.total}</p>
+        </div>
+        <div className="rounded-xl border border-white/5 bg-[#07111d]/50 p-3">
+          <span className="text-[10px] uppercase tracking-wider text-white/50 font-semibold">Valor Total</span>
+          <p className="mt-1 text-lg font-black text-[#c9a227]">{formatCurrency(stats.totalValue)}</p>
+        </div>
+      </div>
+
+      {/* History Table */}
+      <div className="rounded-3xl border border-white/5 bg-[#07111d]/50 p-6 backdrop-blur-md shadow-lg overflow-x-auto">
+        <table className="w-full border-collapse text-left text-sm text-white/80">
+          <thead>
+            <tr className="border-b border-white/5 text-xs uppercase tracking-widest text-white/40">
+              <th className="pb-3 font-semibold">Cliente</th>
+              <th className="pb-3 font-semibold">Película</th>
+              <th className="pb-3 font-semibold text-right">Valor</th>
+              <th className="pb-3 font-semibold text-center">Qtd</th>
+              <th className="pb-3 font-semibold">Data</th>
+              <th className="pb-3 font-semibold text-right">Ações</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-white/5">
+            {filteredHistory.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="py-10 text-center text-white/30 font-semibold">
+                  {searchQuery ? 'Nenhum resultado encontrado' : 'Nenhum orçamento no histórico'}
+                </td>
+              </tr>
+            ) : (
+              filteredHistory.map((h: any) => (
+                <tr key={h.id} className="hover:bg-white/[0.01] cursor-pointer" onClick={() => setSelectedOrcamento(h)}>
+                  <td className="py-3.5 font-semibold text-white group">
+                    <span className="border-b border-dotted border-white/20 hover:border-[#c9a227]/60 transition">{h.cliente || '—'}</span>
+                  </td>
+                  <td className="py-3.5">
+                    <span className="inline-flex rounded-lg border border-white/5 bg-white/[0.02] px-2.5 py-0.5 text-xs text-white/70">
+                      {getFilmLabel(h)}
+                    </span>
+                  </td>
+                  <td className="py-3.5 text-right font-bold text-[#c9a227]">{formatCurrency(h.valor || 0)}</td>
+                  <td className="py-3.5 text-center font-mono">{h.qtd || 0}</td>
+                  <td className="py-3.5 text-white/50">
+                    {h.created_at ? new Date(h.created_at).toLocaleDateString('pt-BR') : '—'}
+                  </td>
+                  <td className="py-3.5 text-right">
+                    <div className="flex justify-end gap-3">
+                      <button
+                        onClick={() => setSelectedOrcamento(h)}
+                        className="text-white/40 hover:text-white"
+                        title="Ver detalhes"
+                      >
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => convertToLead(h)}
+                        className="text-[#c9a227]/60 hover:text-[#c9a227]"
+                        title="Converter em Lead"
+                      >
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => deleteOrcamento(h.id)}
+                        className="text-white/30 hover:text-red-400"
+                        title="Excluir"
+                      >
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Detalhes Modal */}
+      {selectedOrcamento && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm" onClick={() => setSelectedOrcamento(null)}>
+          <div className="w-full max-w-md rounded-3xl border border-white/10 bg-[#07111d] p-5 text-white shadow-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-display text-lg font-black text-white tracking-tight">
+                {selectedOrcamento.cliente || 'Orçamento'}
+              </h3>
+              <button onClick={() => setSelectedOrcamento(null)} className="text-white/40 hover:text-white">
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
+                <span className="block text-[10px] uppercase tracking-wider text-white/50 font-semibold mb-1">Película</span>
+                <span className="font-bold text-sm text-white">{getFilmLabel(selectedOrcamento)}</span>
+              </div>
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
+                <span className="block text-[10px] uppercase tracking-wider text-white/50 font-semibold mb-1">Valor Total</span>
+                <span className="font-black text-lg text-[#c9a227]">{formatCurrency(selectedOrcamento.valor || 0)}</span>
+              </div>
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
+                <span className="block text-[10px] uppercase tracking-wider text-white/50 font-semibold mb-1">Quantidade</span>
+                <span className="font-bold text-sm text-white">{selectedOrcamento.qtd || 0} vidros</span>
+              </div>
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
+                <span className="block text-[10px] uppercase tracking-wider text-white/50 font-semibold mb-1">Data</span>
+                <span className="font-bold text-sm text-white">
+                  {selectedOrcamento.created_at ? new Date(selectedOrcamento.created_at).toLocaleDateString('pt-BR') : '—'}
+                </span>
+              </div>
+            </div>
+
+            {selectedOrcamento.vidros && selectedOrcamento.vidros.length > 0 && (
+              <div className="mt-3">
+                <h4 className="text-[10px] uppercase tracking-wider text-white/50 font-semibold mb-2">Vidros</h4>
+                <div className="space-y-1 max-h-36 overflow-y-auto">
+                  {selectedOrcamento.vidros.map((v: any, i: number) => (
+                    <div key={i} className="flex justify-between items-center rounded-lg border border-white/5 bg-white/[0.02] px-3 py-1.5 text-sm">
+                      <span className="text-white/70">{v.label || `Vidro ${i + 1}`}</span>
+                      <span className="font-mono text-white text-xs">{v.h || 0} x {v.w || 0} cm</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex gap-3 mt-4 border-t border-white/5 pt-3">
+              <button
+                onClick={() => setSelectedOrcamento(null)}
+                className="flex-1 rounded-xl border border-white/5 bg-white/[0.01] py-2.5 text-sm font-semibold text-white/60 hover:bg-white/5 transition"
+              >
+                Fechar
+              </button>
+              <button
+                onClick={() => { convertToLead(selectedOrcamento); setSelectedOrcamento(null); }}
+                className="flex-1 rounded-xl bg-gradient-to-r from-[#c9a227] to-[#d4ad30] py-2.5 text-sm font-bold text-[#04080f] shadow-lg shadow-[#c9a227]/10 hover:brightness-110 transition"
+              >
+                Converter em Lead
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function HomePage() {
+  // Navigation Tabs
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'leads' | 'historico' | 'extratos' | 'agenda'>('dashboard');
+
+  // Leads Database State
+  const [leads, setLeads] = useState<Lead[]>([]);
+
+  // Filter & Search States
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterNeighborhood, setFilterNeighborhood] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
+  const [viewMode, setViewMode] = useState<'kanban' | 'table'>('kanban');
+  const [collapsedCards, setCollapsedCards] = useState<Set<string>>(new Set());
+  const [sortKey, setSortKey] = useState<string>('');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+
+  // Lead CRUD Form States
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [leadDetail, setLeadDetail] = useState<Lead | null>(null);
+  const [leadForm, setLeadForm] = useState<Omit<Lead, 'id' | 'createdAt'>>({
+    name: '',
+    phone: '',
+    email: '',
+    address: '',
+    neighborhood: 'Barra da Tijuca',
+    filmType: 'Nano Cerâmica',
+    sqm: 0,
+    value: 0,
+    status: 'Novo',
+    statusChangedAt: new Date().toISOString().split('T')[0],
+    notes: '',
+  });
+
+
+
+  // Notification Banner
+  const [notification, setNotification] = useState<string | null>(null);
+
+  // Supabase linked orcamento state (for lead modal)
+  const [linkedOrcamento, setLinkedOrcamento] = useState<any | null>(null);
+
+  // Load database on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('lume_crm_leads');
+    if (saved) {
+      try {
+        setLeads(JSON.parse(saved));
+      } catch {
+        setLeads(INITIAL_LEADS);
+      }
+    } else {
+      setLeads(INITIAL_LEADS);
+      localStorage.setItem('lume_crm_leads', JSON.stringify(INITIAL_LEADS));
+    }
+    if (supabase) {
+      supabase.from('leads').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
+        if (error || !data) return;
+        const cloudLeads: Lead[] = data.map((r: any) => ({
+          id: r.id,
+          name: r.name,
+          phone: r.phone || '',
+          email: r.email || '',
+          address: r.address || '',
+          neighborhood: r.neighborhood || 'Barra da Tijuca',
+          filmType: r.film_type || 'Nano Cerâmica',
+          sqm: r.sqm || 0,
+          value: r.value || 0,
+          status: (r.status as Lead['status']) || 'Novo',
+          createdAt: r.created_at,
+          statusChangedAt: r.status_changed_at || r.created_at || new Date().toISOString().split('T')[0],
+          notes: r.notes || '',
+          proximoContato: r.proximo_contato || null,
+          updatedAt: r.updated_at || r.status_changed_at || r.created_at || new Date().toISOString(),
+        }));
+
+        const cloudById = new Map(cloudLeads.map((lead) => [lead.id, lead]));
+        const saved = JSON.parse(localStorage.getItem('lume_crm_leads') || '[]') as Lead[];
+        const merged = saved.map((lead) => {
+          const cloud = cloudById.get(lead.id);
+          if (!cloud) return lead;
+          return {
+            ...lead,
+            proximoContato: cloud.proximoContato ?? lead.proximoContato ?? null,
+            updatedAt: cloud.updatedAt ?? lead.updatedAt,
+            statusChangedAt: cloud.statusChangedAt || lead.statusChangedAt,
+          };
+        });
+        const localIds = new Set(saved.map((lead) => lead.id));
+        const newFromCloud = cloudLeads.filter((lead) => !localIds.has(lead.id));
+        const nextLeads = [...newFromCloud, ...merged];
+
+        setLeads(nextLeads);
+        localStorage.setItem('lume_crm_leads', JSON.stringify(nextLeads));
+      });
+      supabase.from('configuracoes').select('*').eq('id', 'default').single().then(({ data }) => {
+        if (data?.meta_valor) {
+          setTargetGoal(data.meta_valor);
+          setTargetInput(String(data.meta_valor));
+        }
+      });
+    }
+  }, []);
+
+  const saveTargetGoal = async (valor: number) => {
+    setTargetGoal(valor);
+    setEditingTarget(false);
+    if (!supabase) return;
+    await supabase.from('configuracoes').upsert({ id: 'default', meta_valor: valor }, { onConflict: 'id' });
+  };
+
+  // Save database helper
+  const saveLeads = async (updated: Lead[]) => {
+    setLeads(updated);
+    localStorage.setItem('lume_crm_leads', JSON.stringify(updated));
+    if (supabase) {
+      for (const lead of updated) {
+        const { error } = await supabase.from('leads').upsert({
+          id: lead.id,
+          name: lead.name,
+          phone: lead.phone,
+          email: lead.email,
+          address: lead.address,
+          neighborhood: lead.neighborhood,
+          film_type: lead.filmType,
+          sqm: lead.sqm,
+          value: lead.value,
+          status: lead.status,
+          created_at: lead.createdAt,
+          status_changed_at: lead.statusChangedAt,
+          notes: lead.notes,
+          proximo_contato: lead.proximoContato || null,
+          updated_at: lead.updatedAt || new Date().toISOString(),
+        });
+        if (error) console.error('[CRM] Lead save error:', error.message);
+      }
+    }
+  };
+
+  // Notification helper
+  const notify = (msg: string) => {
+    setNotification(msg);
+    setTimeout(() => setNotification(null), 3000);
+  };
+
+  // Logout action
+  const handleLogout = async () => {
+    try {
+      if (supabase) {
+        await supabase.auth.signOut();
+      }
+      await fetch('/api/auth/logout', { method: 'POST' });
+      window.location.href = '/login';
+    } catch {
+      notify('Erro ao sair. Tente novamente.');
+    }
+  };
+
+  // Lead Modal Submit handler
+  const handleLeadSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!leadForm.name) {
+      notify('Preencha o campo obrigatório (Nome)');
+      return;
+    }
+
+    if (selectedLead) {
+      // Edit
+      const updated = leads.map(l =>
+        l.id === selectedLead.id
+          ? { ...l, ...leadForm, updatedAt: new Date().toISOString() }
+          : l
+      );
+      saveLeads(updated);
+      notify('Lead atualizado com sucesso!');
+    } else {
+      // Create
+      const newLead: Lead = {
+        id: `lead_${Date.now()}`,
+        ...leadForm,
+        createdAt: new Date().toISOString().split('T')[0],
+        updatedAt: new Date().toISOString(),
+      };
+      saveLeads([newLead, ...leads]);
+      notify('Lead criado com sucesso!');
+    }
+
+    setIsModalOpen(false);
+    setSelectedLead(null);
+    setLinkedOrcamento(null);
+  };
+
+  // Open Create Lead Modal
+  const openCreateModal = (prefill?: Omit<Lead, 'id' | 'createdAt'>) => {
+    setSelectedLead(null);
+    setLinkedOrcamento(null);
+    setLeadForm(prefill || {
+      name: '',
+      phone: '',
+      email: '',
+      address: '',
+      neighborhood: 'Barra da Tijuca',
+      filmType: 'Nano Cerâmica',
+      sqm: 0,
+      value: 0,
+      status: 'Novo',
+      statusChangedAt: new Date().toISOString().split('T')[0],
+      notes: '',
+    });
+    setIsModalOpen(true);
+  };
+
+  // Open Edit Lead Modal
+  const openEditModal = async (lead: Lead) => {
+    setSelectedLead(lead);
+    setLeadForm({
+      name: lead.name,
+      phone: lead.phone,
+      email: lead.email,
+      address: lead.address,
+      neighborhood: lead.neighborhood,
+      filmType: lead.filmType,
+      sqm: lead.sqm,
+      value: lead.value,
+      status: lead.status,
+      statusChangedAt: lead.statusChangedAt,
+      notes: lead.notes,
+    });
+    setIsModalOpen(true);
+
+    // Buscar orçamento no Supabase pelo nome do cliente
+    if (supabase && lead.name) {
+      const { data } = await supabase
+        .from('calculator_history')
+        .select('*')
+        .ilike('cliente', `%${lead.name}%`)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+      setLinkedOrcamento(data || null);
+    } else {
+      setLinkedOrcamento(null);
+    }
+  };
+
+  // Delete Lead Handler
+  const handleDeleteLead = async (id: string) => {
+    if (confirm('Tem certeza que deseja excluir este lead?')) {
+      const updated = leads.filter(l => l.id !== id);
+      saveLeads(updated);
+      if (supabase) {
+        await supabase.from('leads').delete().eq('id', id);
+      }
+      notify('Lead removido.');
+    }
+  };
+
+  // Change lead status directly
+  const handleStatusChange = (id: string, newStatus: Lead['status']) => {
+    const today = new Date().toISOString().split('T')[0];
+    const now = new Date().toISOString();
+    const updated = leads.map(l =>
+      l.id === id ? { ...l, status: newStatus, statusChangedAt: today, updatedAt: now } : l
+    );
+    saveLeads(updated);
+    notify(`Status alterado para: ${newStatus}`);
+  };
+
+  const formatCurrency = (v: number) => v.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+  const daysInStatus = (lead: Lead) => Math.floor((Date.now() - new Date(lead.statusChangedAt).getTime()) / 86400000);
+  const agendaUrgentCount = useMemo(() => {
+    return leads.filter((lead) => {
+      if (isClosedLead(lead.status)) return false;
+      const followUpDate = getLeadFollowUpDate(lead);
+      return !!followUpDate && (isToday(followUpDate) || isPast(followUpDate));
+    }).length;
+  }, [leads]);
+
+  const handleAgendaSchedule = async (leadId: string, data: string) => {
+    const nextContact = new Date(`${data}T12:00:00`).toISOString();
+    const now = new Date().toISOString();
+    const updated = leads.map((lead) =>
+      lead.id === leadId
+        ? { ...lead, proximoContato: nextContact, updatedAt: now }
+        : lead
+    );
+    await saveLeads(updated);
+    notify('Retorno agendado com sucesso!');
+  };
+
+  const handleAgendaMarkDone = async (leadId: string) => {
+    const updated = leads.map((lead) =>
+      lead.id === leadId
+        ? { ...lead, proximoContato: null, updatedAt: new Date().toISOString() }
+        : lead
+    );
+    await saveLeads(updated);
+    notify('Follow-up registrado!');
+  };
+
+  // Filtering Logic for Leads Tab
+  const filteredLeads = useMemo(() => {
+    return leads.filter(lead => {
+      const matchesSearch =
+        lead.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        lead.phone.includes(searchQuery) ||
+        (lead.email && lead.email.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        lead.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        lead.notes.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      const matchesNeighborhood = filterNeighborhood ? lead.neighborhood === filterNeighborhood : true;
+      const matchesStatus = filterStatus ? lead.status === filterStatus : true;
+
+      return matchesSearch && matchesNeighborhood && matchesStatus;
+    });
+  }, [leads, searchQuery, filterNeighborhood, filterStatus]);
+
+  const toggleSort = (key: string) => {
+    if (sortKey === key) {
+      setSortDir(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortKey(key);
+      setSortDir('asc');
+    }
+  };
+
+  const sortedFilteredLeads = useMemo(() => {
+    if (!sortKey) return filteredLeads;
+    return [...filteredLeads].sort((a, b) => {
+      const aVal = (a as any)[sortKey];
+      const bVal = (b as any)[sortKey];
+      const aNorm = typeof aVal === 'string' ? aVal.toLowerCase() : aVal;
+      const bNorm = typeof bVal === 'string' ? bVal.toLowerCase() : bVal;
+      if (aNorm < bNorm) return sortDir === 'asc' ? -1 : 1;
+      if (aNorm > bNorm) return sortDir === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [filteredLeads, sortKey, sortDir]);
+
+  // Cumulative Month Data
+  const cumulativeData = useMemo(() => {
+    const now = new Date();
+    const inicio = startOfMonth(now);
+    const fim = now;
+    const dias = eachDayOfInterval({ start: inicio, end: fim });
+    const porDia: Record<string, number> = {};
+    leads.filter(l => l.status === 'Fechado').forEach(l => {
+      if (!l.createdAt) return;
+      const d = new Date(l.createdAt);
+      if (d >= inicio && d <= endOfMonth(now)) {
+        const chave = format(d, 'dd/MM');
+        porDia[chave] = (porDia[chave] || 0) + l.value;
+      }
+    });
+    let acc = 0;
+    return dias.map(dia => {
+      const chave = format(dia, 'dd/MM');
+      acc += porDia[chave] || 0;
+      return { dia: chave, valor: acc };
+    });
+  }, [leads]);
+
+  // Dashboard Stats Calculations
+  const stats = useMemo(() => {
+    const total = leads.length;
+    const activeProposals = leads.filter(l => l.status === 'Proposta Enviada').length;
+    const closed = leads.filter(l => l.status === 'Fechado').length;
+    
+    const revenue = leads
+      .filter(l => l.status === 'Fechado')
+      .reduce((acc, curr) => acc + curr.value, 0);
+
+    const conversionRate = total > 0 ? Math.round((closed / total) * 100) : 0;
+
+    return { total, activeProposals, closed, revenue, conversionRate };
+  }, [leads]);
+
+  // Target values
+  const [targetGoal, setTargetGoal] = useState(10000);
+  const [editingTarget, setEditingTarget] = useState(false);
+  const [targetInput, setTargetInput] = useState('10000');
+  const targetPercent = Math.min(Math.round((stats.revenue / targetGoal) * 100), 100);
+
+  return (
+    <div className="flex min-h-screen flex-col bg-[#04080f] font-sans lg:flex-row">
+      
+      {/* Toast Notification */}
+      {notification && (
+        <div className="fixed top-6 right-6 z-50 animate-bounce rounded-2xl border border-[#c9a227]/40 bg-[#07111d] px-6 py-4 text-sm font-semibold text-white shadow-2xl backdrop-blur-md">
+          <div className="flex items-center gap-3">
+            <span className="h-2.5 w-2.5 rounded-full bg-[#c9a227] animate-ping" />
+            {notification}
+          </div>
+        </div>
+      )}
+
+      {/* BACKGROUND ACCENTS */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute top-10 left-[15%] h-96 w-96 rounded-full bg-[#c9a227]/5 blur-[120px]" />
+        <div className="absolute bottom-10 right-[10%] h-[500px] w-[500px] rounded-full bg-blue-500/5 blur-[150px]" />
+      </div>
+
+      {/* SIDEBAR */}
+      <aside className="relative z-10 flex w-full flex-col border-b border-white/5 bg-[#07111d]/90 p-6 backdrop-blur-xl lg:w-72 lg:border-r lg:border-b-0">
+        <div className="flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-tr from-[#c9a227] to-[#d4ad30] p-0.5 shadow-lg shadow-[#c9a227]/20">
+            <div className="flex h-full w-full items-center justify-center rounded-[14px] bg-[#04080f]">
+              <svg className="h-5 w-5 text-[#c9a227]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <circle cx="12" cy="12" r="10" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+              </svg>
+            </div>
+          </div>
+          <div>
+            <h1 className="font-display text-lg font-black tracking-tight text-white">
+              LUME <span className="text-[#c9a227]">CRM</span>
+            </h1>
+            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40">Painel Comercial</p>
+          </div>
+        </div>
+
+        {/* Dynamic target counter in sidebar */}
+        <div className="mt-8 rounded-2xl border border-white/5 bg-white/[0.02] p-4">
+          <div className="flex justify-between text-xs font-semibold">
+            <span className="text-white/60">Faturamento Mensal</span>
+            <span className="text-[#c9a227]">{targetPercent}%</span>
+          </div>
+          <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-white/5 p-0.5">
+            <div 
+              className="h-full rounded-full bg-gradient-to-r from-[#c9a227] to-[#d4ad30] transition-all duration-1000 shadow-inner" 
+              style={{ width: `${targetPercent}%` }} 
+            />
+          </div>
+          <p className="mt-2 text-[10px] text-white/40 text-right">Meta: R$ {targetGoal.toLocaleString('pt-BR')}</p>
+        </div>
+
+        {/* Sidebar Nav */}
+        <nav className="mt-8 flex flex-col gap-2 flex-1">
+          <button
+            onClick={() => setActiveTab('dashboard')}
+            className={`flex items-center gap-3.5 rounded-2xl px-4 py-3.5 text-sm font-semibold tracking-wide transition-all ${
+              activeTab === 'dashboard'
+                ? 'bg-gradient-to-r from-[#c9a227]/10 to-[#c9a227]/5 text-white border-l-4 border-[#c9a227]'
+                : 'text-white/60 hover:bg-white/[0.02] hover:text-white border-l-4 border-transparent'
+            }`}
+          >
+            <svg className={`h-5 w-5 transition-transform ${activeTab === 'dashboard' ? 'scale-110' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z" />
+            </svg>
+            Painel Geral
+          </button>
+
+          <button
+            onClick={() => setActiveTab('leads')}
+            className={`flex items-center gap-3.5 rounded-2xl px-4 py-3.5 text-sm font-semibold tracking-wide transition-all ${
+              activeTab === 'leads'
+                ? 'bg-gradient-to-r from-[#c9a227]/10 to-[#c9a227]/5 text-white border-l-4 border-[#c9a227]'
+                : 'text-white/60 hover:bg-white/[0.02] hover:text-white border-l-4 border-transparent'
+            }`}
+          >
+            <svg className={`h-5 w-5 transition-transform ${activeTab === 'leads' ? 'scale-110' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            Controle de Leads
+          </button>
+
+          <button
+            onClick={() => setActiveTab('historico')}
+            className={`flex items-center gap-3.5 rounded-2xl px-4 py-3.5 text-sm font-semibold tracking-wide transition-all ${
+              activeTab === 'historico'
+                ? 'bg-gradient-to-r from-[#c9a227]/10 to-[#c9a227]/5 text-white border-l-4 border-[#c9a227]'
+                : 'text-white/60 hover:bg-white/[0.02] hover:text-white border-l-4 border-transparent'
+            }`}
+          >
+            <svg className={`h-5 w-5 transition-transform ${activeTab === 'historico' ? 'scale-110' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
+            </svg>
+            Histórico Supabase
+          </button>
+
+          <button
+            onClick={() => setActiveTab('extratos')}
+            className={`flex items-center gap-3.5 rounded-2xl px-4 py-3.5 text-sm font-semibold tracking-wide transition-all ${
+              activeTab === 'extratos'
+                ? 'bg-gradient-to-r from-[#c9a227]/10 to-[#c9a227]/5 text-white border-l-4 border-[#c9a227]'
+                : 'text-white/60 hover:bg-white/[0.02] hover:text-white border-l-4 border-transparent'
+            }`}
+          >
+            <svg className={`h-5 w-5 transition-transform ${activeTab === 'extratos' ? 'scale-110' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M7 7h10M7 11h10M7 15h6M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z" />
+            </svg>
+            Extratos Mensais
+          </button>
+
+          <button
+            onClick={() => setActiveTab('agenda')}
+            className={`flex items-center gap-3.5 rounded-2xl px-4 py-3.5 text-sm font-semibold tracking-wide transition-all ${
+              activeTab === 'agenda'
+                ? 'bg-gradient-to-r from-red-500/10 to-[#c9a227]/5 text-white border-l-4 border-red-400'
+                : 'text-white/60 hover:bg-white/[0.02] hover:text-white border-l-4 border-transparent'
+            }`}
+          >
+            <svg className={`h-5 w-5 transition-transform ${activeTab === 'agenda' ? 'scale-110' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <span className="flex-1 text-left">Agenda & Follow-up</span>
+            {agendaUrgentCount > 0 && (
+              <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-red-500 px-2 text-[10px] font-black text-white">
+                {agendaUrgentCount}
+              </span>
+            )}
+          </button>
+        </nav>
+
+        {/* Action button at sidebar bottom */}
+        <div className="mt-auto pt-6 border-t border-white/5">
+          <button
+            onClick={() => openCreateModal()}
+            className="w-full flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#c9a227] to-[#d4ad30] py-3 text-sm font-bold text-[#04080f] shadow-lg shadow-[#c9a227]/10 hover:brightness-110 transition active:scale-95"
+          >
+            <svg className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            Novo Lead
+          </button>
+          
+          <button
+            onClick={handleLogout}
+            className="mt-3 w-full flex items-center justify-center gap-2 rounded-2xl border border-white/5 bg-white/[0.01] py-3 text-xs font-semibold text-white/50 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/20 transition duration-300"
+          >
+            <svg className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            Sair do CRM
+          </button>
+        </div>
+      </aside>
+
+      {/* MAIN CONTAINER */}
+      <main className="flex-1 overflow-x-hidden p-6 lg:p-10 relative z-10">
+        
+        {/* TOP NAVBAR */}
+        <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-white/5 pb-6">
+          <div>
+            <span className="text-xs font-semibold uppercase tracking-[0.35em] text-[#c9a227]">LUME Elite</span>
+            <h2 className="font-display mt-1 text-3xl font-black tracking-tight text-white md:text-4xl">
+              {activeTab === 'dashboard' && 'Painel Geral'}
+              {activeTab === 'leads' && 'Gestão de Leads'}
+              {activeTab === 'historico' && 'Histórico Supabase'}
+              {activeTab === 'extratos' && 'Extratos Mensais'}
+              {activeTab === 'agenda' && 'Agenda & Follow-up'}
+            </h2>
+          </div>
+          
+          {/* Quick Stats Summary inside navbar */}
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-white/40">Status da Sessão:</span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
+              Online
+            </span>
+          </div>
+        </header>
+
+        {/* TAB CONTENTS */}
+
+        {/* 1. DASHBOARD TAB */}
+        {activeTab === 'dashboard' && (
+          <div className="space-y-8">
+            
+            {/* KPI STAT CARDS */}
+            <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              
+              <div className="rounded-3xl border border-white/5 bg-[#07111d]/50 p-6 backdrop-blur-md shadow-lg shadow-black/20 hover:border-[#c9a227]/20 transition-all duration-300 group">
+                <div className="flex justify-between items-start">
+                  <span className="text-xs uppercase tracking-[0.2em] text-white/50">Total de Leads</span>
+                  <div className="p-2 rounded-xl bg-white/[0.02] border border-white/5 group-hover:border-[#c9a227]/30 text-[#c9a227] transition">
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="mt-4 flex items-baseline gap-2">
+                  <span className="text-4xl font-black text-white">{stats.total}</span>
+                  <span className="text-xs text-white/40">leads no funil</span>
+                </div>
+              </div>
+
+              <div className="rounded-3xl border border-white/5 bg-[#07111d]/50 p-6 backdrop-blur-md shadow-lg shadow-black/20 hover:border-[#c9a227]/20 transition-all duration-300 group">
+                <div className="flex justify-between items-start">
+                  <span className="text-xs uppercase tracking-[0.2em] text-white/50">Propostas Ativas</span>
+                  <div className="p-2 rounded-xl bg-white/[0.02] border border-white/5 group-hover:border-[#c9a227]/30 text-[#c9a227] transition">
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="mt-4 flex items-baseline gap-2">
+                  <span className="text-4xl font-black text-white">{stats.activeProposals}</span>
+                  <span className="text-xs text-white/40">propostas enviadas</span>
+                </div>
+              </div>
+
+              <div className="rounded-3xl border border-white/5 bg-[#07111d]/50 p-6 backdrop-blur-md shadow-lg shadow-black/20 hover:border-[#c9a227]/20 transition-all duration-300 group">
+                <div className="flex justify-between items-start">
+                  <span className="text-xs uppercase tracking-[0.2em] text-white/50">Conversão Comercial</span>
+                  <div className="p-2 rounded-xl bg-white/[0.02] border border-white/5 group-hover:border-[#c9a227]/30 text-emerald-400 transition">
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="mt-4 flex items-baseline gap-2">
+                  <span className="text-4xl font-black text-white">{stats.conversionRate}%</span>
+                  <span className="text-xs text-white/40">taxa de fechamento</span>
+                </div>
+              </div>
+
+              <div className="rounded-3xl border border-white/5 bg-[#07111d]/50 p-6 backdrop-blur-md shadow-lg shadow-black/20 hover:border-[#c9a227]/20 transition-all duration-300 group">
+                <div className="flex justify-between items-start">
+                  <span className="text-xs uppercase tracking-[0.2em] text-white/50">Faturamento Fechado</span>
+                  <div className="p-2 rounded-xl bg-white/[0.02] border border-white/5 group-hover:border-[#c9a227]/30 text-[#c9a227] transition">
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M12 16V5" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="mt-4 flex flex-col">
+                  <span className="text-2xl font-black text-[#c9a227] tracking-tight">R$ {stats.revenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                  <span className="text-[10px] text-white/40 mt-1 uppercase font-bold">Total fechado no mês</span>
+                </div>
+              </div>
+
+            </section>
+
+            {/* EVOLUÇÃO DO MÊS */}
+            <div className="rounded-3xl border border-white/5 bg-[#07111d]/50 p-6 backdrop-blur-md shadow-lg">
+              <h3 className="font-display text-base font-bold text-white uppercase tracking-wider mb-6">EVOLUÇÃO DO MÊS</h3>
+              {cumulativeData.length === 0 ? (
+                <p className="text-xs text-white/30 text-center py-8">Nenhum fechamento no mês atual</p>
+              ) : (
+                <ResponsiveContainer width="100%" height={180}>
+                  <LineChart data={cumulativeData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                    <XAxis dataKey="dia" tick={{ fontSize: 11, fill: '#rgba(255,255,255,0.4)' }} interval="preserveStartEnd" />
+                    <YAxis tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.4)' }} tickFormatter={v => `R$${(v/1000).toFixed(1)}k`} width={52} />
+                    <Tooltip formatter={(v: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v)} />
+                    <Line type="monotone" dataKey="valor" stroke="#EAB308" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+
+            {/* CHARTS / TARGET & FUNNEL DETAILS */}
+            <div className="grid gap-6 lg:grid-cols-3">
+              
+              {/* Funnel distribution panel */}
+              <div className="rounded-3xl border border-white/5 bg-[#07111d]/50 p-6 backdrop-blur-md shadow-lg lg:col-span-2">
+                <h3 className="font-display text-base font-bold text-white uppercase tracking-wider mb-6">Distribuição Comercial do Funil</h3>
+                
+                <div className="space-y-4">
+                  {[
+                    { label: 'Novos Leads', stage: 'Novo', color: 'bg-blue-500' },
+                    { label: 'Em Atendimento', stage: 'Em Contato', color: 'bg-amber-500' },
+                    { label: 'Orçamentos Enviados', stage: 'Proposta Enviada', color: 'bg-purple-500' },
+                    { label: 'Contratos Fechados', stage: 'Fechado', color: 'bg-emerald-500' },
+                    { label: 'Perdidos / Descartados', stage: 'Perdido', color: 'bg-red-500' },
+                  ].map(item => {
+                    const count = leads.filter(l => l.status === item.stage).length;
+                    const percent = leads.length > 0 ? Math.round((count / leads.length) * 100) : 0;
+                    return (
+                      <div key={item.stage} className="flex flex-col gap-1">
+                        <div className="flex justify-between text-xs font-semibold">
+                          <span className="text-white/60">{item.label}</span>
+                          <span className="text-white">{count} ({percent}%)</span>
+                        </div>
+                        <div className="h-3 w-full bg-white/5 rounded-full overflow-hidden p-0.5">
+                          <div className={`h-full rounded-full ${item.color}`} style={{ width: `${percent}%` }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Targets panel */}
+              <div className="rounded-3xl border border-white/5 bg-[#07111d]/50 p-6 backdrop-blur-md shadow-lg flex flex-col justify-between">
+                <div>
+                  <h3 className="font-display text-base font-bold text-white uppercase tracking-wider mb-1">Meta de Vendas</h3>
+                  <p className="text-xs text-white/50">Progresso do consultor LUME</p>
+                </div>
+                
+                <div className="my-6 flex flex-col items-center">
+                  <div className="relative flex h-32 w-32 items-center justify-center">
+                    {/* Ring background */}
+                    <svg className="absolute top-0 left-0 h-full w-full -rotate-90">
+                      <circle cx="64" cy="64" r="54" className="stroke-white/5" strokeWidth="8" fill="transparent" />
+                      <circle cx="64" cy="64" r="54" className="stroke-[#c9a227]" strokeWidth="8" fill="transparent" 
+                        strokeDasharray={2 * Math.PI * 54}
+                        strokeDashoffset={2 * Math.PI * 54 * (1 - targetPercent / 100)}
+                      />
+                    </svg>
+                    <div className="text-center">
+                      <span className="text-3xl font-black text-white">{targetPercent}%</span>
+                      <p className="text-[10px] text-white/40 uppercase font-semibold">Metas</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2 border-t border-white/5 pt-4 text-xs font-semibold">
+                  <div className="flex justify-between">
+                    <span className="text-white/40">Faturamento Atual:</span>
+                    <span className="text-white">R$ {stats.revenue.toLocaleString('pt-BR')}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-white/40">Meta Estabelecida:</span>
+                    <span className="text-[#c9a227] flex items-center gap-1.5">
+                      {editingTarget ? (
+                        <input
+                          type="number"
+                          value={targetInput}
+                          onChange={(e) => setTargetInput(e.target.value)}
+                          onBlur={() => { const v = parseInt(targetInput); if (v > 0) saveTargetGoal(v); else setEditingTarget(false); }}
+                          onKeyDown={(e) => { if (e.key === 'Enter') { const v = parseInt(targetInput); if (v > 0) saveTargetGoal(v); } if (e.key === 'Escape') setEditingTarget(false); }}
+                          className="w-24 rounded-lg border border-[#c9a227]/40 bg-[#04080f] px-2 py-0.5 text-xs text-white text-right focus:outline-none"
+                          autoFocus
+                        />
+                      ) : (
+                        <>
+                          R$ {targetGoal.toLocaleString('pt-BR')}
+                          <button onClick={() => { setTargetInput(String(targetGoal)); setEditingTarget(true); }} className="text-white/30 hover:text-white/60 transition" title="Editar meta">
+                            <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            </svg>
+                          </button>
+                        </>
+                      )}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+
+
+            {/* RECENT LEADS & ACTIONS */}
+            <div className="rounded-3xl border border-white/5 bg-[#07111d]/50 p-6 backdrop-blur-md shadow-lg">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h3 className="font-display text-base font-bold text-white uppercase tracking-wider">Leads Recentes no Funil</h3>
+                  <p className="text-xs text-white/40">Últimos clientes adicionados ao LUME CRM</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setActiveTab('agenda')}
+                    className="text-xs font-bold text-red-300 hover:underline"
+                  >
+                    Ir para a agenda →
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('leads')}
+                    className="text-xs font-bold text-[#c9a227] hover:underline"
+                  >
+                    Ver todos os leads →
+                  </button>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse text-left text-sm text-white/80">
+                  <thead>
+                    <tr className="border-b border-white/5 text-xs uppercase tracking-widest text-white/40">
+                      <th className="pb-3 font-semibold">Cliente</th>
+                      <th className="pb-3 font-semibold">Bairro</th>
+                      <th className="pb-3 font-semibold">Película</th>
+                      <th className="pb-3 font-semibold">Valor</th>
+                      <th className="pb-3 font-semibold">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {leads.slice(0, 3).map((lead) => (
+                      <tr key={lead.id} className="hover:bg-white/[0.01] cursor-pointer" onClick={() => setLeadDetail(lead)}>
+                        <td className="py-3.5 font-semibold text-white">
+                          <div className="flex flex-col">
+                            <span className="border-b border-dotted border-white/20 hover:border-[#c9a227]/60 transition">{lead.name}</span>
+                            <span className="text-xs font-normal text-white/40">{lead.phone}</span>
+                          </div>
+                        </td>
+                        <td className="py-3.5 text-white/70">{lead.neighborhood}</td>
+                        <td className="py-3.5">
+                          <span className="inline-flex rounded-lg border border-white/5 bg-white/[0.02] px-2 py-0.5 text-xs text-white/70">
+                            {lead.filmType}
+                          </span>
+                        </td>
+                        <td className="py-3.5 font-bold text-[#c9a227]">R$ {formatCurrency(lead.value)}</td>
+                        <td className="py-3.5">
+                          <span className={`inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                            lead.status === 'Fechado' ? 'bg-emerald-500/10 text-emerald-400' :
+                            lead.status === 'Proposta Enviada' ? 'bg-purple-500/10 text-purple-400' :
+                            lead.status === 'Em Contato' ? 'bg-amber-500/10 text-amber-400' :
+                            lead.status === 'Perdido' ? 'bg-red-500/10 text-red-400' :
+                            'bg-blue-500/10 text-blue-400'
+                          }`}>
+                            {lead.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                    {leads.length === 0 && (
+                      <tr>
+                        <td colSpan={5} className="py-8 text-center text-white/40 font-semibold">Nenhum lead registrado no sistema.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        )}
+
+        {/* 2. LEADS TAB */}
+        {activeTab === 'leads' && (
+          <div className="space-y-6">
+            
+            {/* SEARCH & FILTERS BAR */}
+            <div className="flex flex-col gap-4 rounded-3xl border border-white/5 bg-[#07111d]/50 p-6 backdrop-blur-md shadow-lg sm:flex-row sm:items-center">
+              
+              {/* Search Field */}
+              <div className="relative flex-1">
+                <svg className="absolute left-4 top-3.5 h-4 w-4 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input
+                  type="text"
+                  placeholder="Pesquisar por nome, telefone, observações..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full rounded-2xl border border-white/5 bg-white/[0.02] py-3 pl-11 pr-4 text-sm text-white placeholder:text-white/30 focus:border-[#c9a227]/40 focus:outline-none focus:ring-1 focus:ring-[#c9a227]/40"
+                />
+              </div>
+
+              {/* Filters dropdowns */}
+              <div className="flex flex-wrap gap-3">
+                
+                <select
+                  value={filterNeighborhood}
+                  onChange={(e) => setFilterNeighborhood(e.target.value)}
+                  className="rounded-2xl border border-white/5 bg-[#04080f] px-4 py-3 text-sm text-white/70 focus:border-[#c9a227]/40 focus:outline-none"
+                >
+                  <option value="">Todos os Bairros</option>
+                  {RJ_NEIGHBORHOODS.map(n => (
+                    <option key={n} value={n}>{n}</option>
+                  ))}
+                </select>
+
+                <select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                  className="rounded-2xl border border-white/5 bg-[#04080f] px-4 py-3 text-sm text-white/70 focus:border-[#c9a227]/40 focus:outline-none"
+                >
+                  <option value="">Todos os Status</option>
+                  <option value="Novo">Novo</option>
+                  <option value="Em Contato">Em Contato</option>
+                  <option value="Proposta Enviada">Proposta Enviada</option>
+                  <option value="Fechado">Fechado</option>
+                  <option value="Perdido">Perdido</option>
+                </select>
+
+                {/* View Mode Toggles */}
+                <div className="flex rounded-2xl border border-white/5 bg-[#04080f] p-1">
+                  <button
+                    onClick={() => setViewMode('kanban')}
+                    className={`rounded-xl px-3 py-1.5 transition ${viewMode === 'kanban' ? 'bg-[#c9a227] text-[#04080f]' : 'text-white/60 hover:text-white'}`}
+                    title="Visão Kanban"
+                  >
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => setViewMode('table')}
+                    className={`rounded-xl px-3 py-1.5 transition ${viewMode === 'table' ? 'bg-[#c9a227] text-[#04080f]' : 'text-white/60 hover:text-white'}`}
+                    title="Visão Tabela"
+                  >
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                    </svg>
+                  </button>
+                </div>
+
+              </div>
+
+            </div>
+
+            {/* DYNAMIC LEADS VIEWS */}
+
+            {/* A. KANBAN BOARD */}
+            {viewMode === 'kanban' && (() => {
+              const stageStyles: Record<string, { border: string; headerBg: string; badge: string }> = {
+                'Novo': {
+                  border: 'border-blue-500/20 hover:border-blue-500/40',
+                  headerBg: 'bg-blue-500/10 text-blue-400',
+                  badge: 'bg-blue-500/20 text-blue-300'
+                },
+                'Em Contato': {
+                  border: 'border-amber-500/20 hover:border-amber-500/40',
+                  headerBg: 'bg-amber-500/10 text-amber-400',
+                  badge: 'bg-amber-500/20 text-amber-300'
+                },
+                'Proposta Enviada': {
+                  border: 'border-purple-500/20 hover:border-purple-500/40',
+                  headerBg: 'bg-purple-500/10 text-purple-400',
+                  badge: 'bg-purple-500/20 text-purple-300'
+                },
+                'Fechado': {
+                  border: 'border-emerald-500/20 hover:border-emerald-500/40',
+                  headerBg: 'bg-emerald-500/10 text-emerald-400',
+                  badge: 'bg-emerald-500/20 text-emerald-300'
+                },
+                'Perdido': {
+                  border: 'border-red-500/20 hover:border-red-500/40',
+                  headerBg: 'bg-red-500/10 text-red-400',
+                  badge: 'bg-red-500/20 text-red-300'
+                }
+              };
+              
+              return (
+                <div className="grid gap-4 overflow-x-auto pb-4 md:grid-cols-5 min-w-[1000px] md:min-w-0">
+                  {(['Novo', 'Em Contato', 'Proposta Enviada', 'Fechado', 'Perdido'] as const).map(stage => {
+                    const stageLeads = filteredLeads.filter(l => l.status === stage);
+                    const style = stageStyles[stage] || {
+                      border: 'border-white/5',
+                      headerBg: 'bg-white/5 text-white/50',
+                      badge: 'bg-white/5 text-white/80'
+                    };
+                    
+                    return (
+                      <div
+                        key={stage}
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          try {
+                            const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+                            if (data.fromStage !== stage) handleStatusChange(data.id, stage as Lead['status']);
+                          } catch {}
+                        }}
+                        className={`rounded-3xl border ${style.border} bg-[#07111d]/30 p-4 flex flex-col min-h-[500px] transition duration-300`}
+                      >
+                        
+                        {/* Column Header */}
+                        <div className={`flex justify-between items-center mb-4 border-b border-white/5 pb-2 px-2 py-1 rounded-xl ${style.headerBg}`}>
+                          <span className="text-xs font-black uppercase tracking-wider">{stage}</span>
+                          <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${style.badge}`}>{stageLeads.length}</span>
+                        </div>
+
+                      {/* Leads Cards Container */}
+                      <div className="flex-1 space-y-3 overflow-y-auto">
+                        {stageLeads.map(lead => {
+                          const collapsed = collapsedCards.has(lead.id);
+                          return (
+                          <div 
+                            key={lead.id}
+                            draggable
+                            onDragStart={(e) => { e.dataTransfer.setData('text/plain', JSON.stringify({ id: lead.id, fromStage: stage })); e.currentTarget.classList.add('opacity-40') }}
+                            onDragEnd={(e) => e.currentTarget.classList.remove('opacity-40')}
+                            className="rounded-2xl border border-white/5 bg-[#04080f]/90 p-2.5 shadow-md hover:border-[#c9a227]/30 transition group relative cursor-grab active:cursor-grabbing"
+                          >
+                            <div className="flex items-center gap-1.5">
+                              <button
+                                onClick={() => {
+                                  const next = new Set(collapsedCards);
+                                  collapsed ? next.delete(lead.id) : next.add(lead.id);
+                                  setCollapsedCards(next);
+                                }}
+                                className="shrink-0 text-white/30 hover:text-white/60 transition"
+                                title={collapsed ? 'Expandir' : 'Colapsar'}
+                              >
+                                <svg className={`h-3 w-3 transition ${collapsed ? '' : 'rotate-90'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                                </svg>
+                              </button>
+                              <button onClick={() => setLeadDetail(lead)} className="text-left flex-1 min-w-0">
+                                <h4 className="font-bold text-white text-xs border-b border-dotted border-white/20 hover:border-[#c9a227]/60 transition truncate">{lead.name}</h4>
+                              </button>
+                            </div>
+
+                            {collapsed ? (
+                              <div className="flex justify-between items-center mt-1.5">
+                                <span className="text-xs text-white/50 truncate">{lead.phone}</span>
+                                <span className="text-xs font-black text-[#c9a227] shrink-0">R$ {formatCurrency(lead.value)}</span>
+                              </div>
+                            ) : (
+                              <>
+                            <p className="text-[11px] text-white/40 mt-1">{lead.phone}</p>
+                            <p className="text-[11px] text-white/40 mt-0.5 flex items-center gap-1">
+                              <svg className="h-2.5 w-2.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                              </svg>
+                              {lead.sqm.toFixed(2)} m²
+                            </p>
+                            <p className="text-[11px] text-[#c9a227]/70 mt-0.5 font-semibold flex items-center gap-1">
+                              <svg className="h-2.5 w-2.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <circle cx="12" cy="12" r="1.5" />
+                              </svg>
+                              {lead.neighborhood}
+                            </p>
+
+                            <div className="mt-2 flex justify-between items-center border-t border-white/5 pt-1.5">
+                              <span className="text-[10px] font-semibold text-white/60 bg-white/5 rounded px-1.5 py-0.5">{lead.filmType}</span>
+                              <span className="flex items-center gap-2">
+                                <span className="text-[10px] text-white/30 font-mono">{daysInStatus(lead)}d</span>
+                                <span className="text-xs font-black text-[#c9a227]">R$ {formatCurrency(lead.value)}</span>
+                              </span>
+                            </div>
+
+                            {/* Hover Edit/Delete/Action buttons */}
+                            <div className="mt-2 flex justify-between items-center gap-1.5 border-t border-white/5 pt-1.5 opacity-0 group-hover:opacity-100 transition duration-300">
+                              <button
+                                disabled={stage === 'Novo'}
+                                onClick={() => {
+                                  const stages = ['Novo', 'Em Contato', 'Proposta Enviada', 'Fechado', 'Perdido'] as const;
+                                  const idx = stages.indexOf(stage);
+                                  if (idx > 0) handleStatusChange(lead.id, stages[idx - 1]);
+                                }}
+                                className="p-0.5 rounded bg-white/5 text-white/50 hover:text-[#c9a227] disabled:opacity-20 text-[11px] leading-none"
+                                title="Mover para esquerda"
+                              >
+                                &larr;
+                              </button>
+
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => openEditModal(lead)}
+                                  className="text-white/40 hover:text-white"
+                                  title="Editar"
+                                >
+                                  <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                  </svg>
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteLead(lead.id)}
+                                  className="text-white/30 hover:text-red-400"
+                                  title="Excluir"
+                                >
+                                  <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                  </svg>
+                                </button>
+                              </div>
+
+                              <button
+                                disabled={stage === 'Perdido'}
+                                onClick={() => {
+                                  const stages = ['Novo', 'Em Contato', 'Proposta Enviada', 'Fechado', 'Perdido'] as const;
+                                  const idx = stages.indexOf(stage);
+                                  if (idx < stages.length - 1) handleStatusChange(lead.id, stages[idx + 1]);
+                                }}
+                                className="p-0.5 rounded bg-white/5 text-white/50 hover:text-[#c9a227] disabled:opacity-20 text-[11px] leading-none"
+                                title="Mover para direita"
+                              >
+                                &rarr;
+                              </button>
+                            </div>
+                            </>
+                            )}
+
+                          </div>
+                          );
+                        })}
+
+                        {stageLeads.length === 0 && (
+                          <div className="border-2 border-dashed border-white/5 rounded-2xl p-6 text-center text-xs text-white/20 select-none">
+                            Coluna Vazia
+                          </div>
+                        )}
+                      </div>
+
+                    </div>
+                  );
+                })}
+              </div>
+            )})()}
+
+            {/* B. LIST TABLE VIEW */}
+            {viewMode === 'table' && (
+              <div className="rounded-3xl border border-white/5 bg-[#07111d]/50 p-6 backdrop-blur-md shadow-lg overflow-x-auto">
+                <table className="w-full border-collapse text-left text-sm text-white/80">
+                  <thead>
+                    <tr className="border-b border-white/5 text-xs uppercase tracking-widest text-white/40">
+                      <th className="pb-3 font-semibold cursor-pointer hover:text-white select-none" onClick={() => toggleSort('name')}>
+                        Cliente {sortKey === 'name' && <span className="text-[#c9a227] ml-1">{sortDir === 'asc' ? '↑' : '↓'}</span>}
+                      </th>
+                      <th className="pb-3 font-semibold cursor-pointer hover:text-white select-none" onClick={() => toggleSort('neighborhood')}>
+                        Bairro {sortKey === 'neighborhood' && <span className="text-[#c9a227] ml-1">{sortDir === 'asc' ? '↑' : '↓'}</span>}
+                      </th>
+                      <th className="pb-3 font-semibold cursor-pointer hover:text-white select-none" onClick={() => toggleSort('filmType')}>
+                        Película {sortKey === 'filmType' && <span className="text-[#c9a227] ml-1">{sortDir === 'asc' ? '↑' : '↓'}</span>}
+                      </th>
+                      <th className="pb-3 font-semibold text-center cursor-pointer hover:text-white select-none" onClick={() => toggleSort('sqm')}>
+                        Área (m²) {sortKey === 'sqm' && <span className="text-[#c9a227] ml-1">{sortDir === 'asc' ? '↑' : '↓'}</span>}
+                      </th>
+                      <th className="pb-3 font-semibold text-right cursor-pointer hover:text-white select-none" onClick={() => toggleSort('value')}>
+                        Valor {sortKey === 'value' && <span className="text-[#c9a227] ml-1">{sortDir === 'asc' ? '↑' : '↓'}</span>}
+                      </th>
+                      <th className="pb-3 font-semibold text-center cursor-pointer hover:text-white select-none" onClick={() => toggleSort('status')}>
+                        Status {sortKey === 'status' && <span className="text-[#c9a227] ml-1">{sortDir === 'asc' ? '↑' : '↓'}</span>}
+                      </th>
+                      <th className="pb-3 font-semibold text-center">Dias</th>
+                      <th className="pb-3 font-semibold text-right">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {sortedFilteredLeads.map((lead) => (
+                      <tr key={lead.id} className="hover:bg-white/[0.01] group">
+                        <td className="py-3.5 font-semibold text-white cursor-pointer" onClick={() => setLeadDetail(lead)}>
+                          <div className="flex flex-col">
+                            <span className="border-b border-dotted border-white/20 hover:border-[#c9a227]/60 transition">{lead.name}</span>
+                            <span className="text-xs font-normal text-white/40">{lead.phone}</span>
+                          </div>
+                        </td>
+                        <td className="py-3.5 text-white/70">{lead.neighborhood}</td>
+                        <td className="py-3.5">
+                          <span className="inline-flex rounded-lg border border-white/5 bg-white/[0.02] px-2.5 py-0.5 text-xs text-white/70">
+                            {lead.filmType}
+                          </span>
+                        </td>
+                        <td className="py-3.5 text-center font-mono">{lead.sqm.toFixed(2)}m²</td>
+                        <td className="py-3.5 text-right font-bold text-[#c9a227]">R$ {formatCurrency(lead.value)}</td>
+                        <td className="py-3.5 text-center">
+                          <span className={`inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                            lead.status === 'Fechado' ? 'bg-emerald-500/10 text-emerald-400' :
+                            lead.status === 'Proposta Enviada' ? 'bg-purple-500/10 text-purple-400' :
+                            lead.status === 'Em Contato' ? 'bg-amber-500/10 text-amber-400' :
+                            lead.status === 'Perdido' ? 'bg-red-500/10 text-red-400' :
+                            'bg-blue-500/10 text-blue-400'
+                          }`}>
+                            {lead.status}
+                          </span>
+                        </td>
+                        <td className="py-3.5 text-center font-mono text-xs text-white/40">{daysInStatus(lead)}d</td>
+                        <td className="py-3.5 text-right">
+                          <div className="flex justify-end gap-3 opacity-60 group-hover:opacity-100 transition duration-300">
+                            <button
+                              onClick={() => openEditModal(lead)}
+                              className="text-white/40 hover:text-white"
+                              title="Editar"
+                            >
+                              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                              </svg>
+                            </button>
+                            <button
+                              onClick={() => handleDeleteLead(lead.id)}
+                              className="text-white/30 hover:text-red-400"
+                              title="Excluir"
+                            >
+                              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                    {filteredLeads.length === 0 && (
+                      <tr>
+                        <td colSpan={8} className="py-10 text-center text-white/30 font-semibold">Nenhum lead encontrado com estes filtros.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+          </div>
+        )}
+
+        {/* 3. HISTORICO SUPABASE TAB */}
+        {activeTab === 'historico' && <HistoricoSupabase leads={leads} setActiveTab={setActiveTab} openCreateModal={openCreateModal} />}
+
+        {/* 4. EXTRATOS MENSAIS TAB */}
+        {activeTab === 'extratos' && <ExtratosMensaisSupabase />}
+
+        {/* 5. AGENDA & FOLLOW-UP TAB */}
+        {activeTab === 'agenda' && (
+          <AgendaFollowUpSection
+            leads={leads}
+            onAgendarRetorno={handleAgendaSchedule}
+            onMarcarFeito={handleAgendaMarkDone}
+            onAbrirLead={(lead) => setLeadDetail(lead)}
+            onIrParaLeads={() => setActiveTab('leads')}
+          />
+        )}
+
+      </main>
+
+      {/* 4. CRUD ADD/EDIT LEAD MODAL */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm transition duration-300">
+          <div className="w-full max-w-lg rounded-3xl border border-white/10 bg-[#07111d] p-6 text-white shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            
+            {/* Modal Close Button */}
+            <button
+              onClick={() => { setIsModalOpen(false); setSelectedLead(null); setLinkedOrcamento(null); }}
+              className="absolute top-4 right-4 text-white/40 hover:text-white"
+            >
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            {/* Modal Title */}
+            <h3 className="font-display text-xl font-black text-white tracking-tight border-b border-white/5 pb-4">
+              {selectedLead ? 'Editar Informações do Lead' : 'Cadastrar Novo Lead Comercial'}
+            </h3>
+
+            {/* Form */}
+            <form onSubmit={handleLeadSubmit} className="mt-4 space-y-4">
+              
+              <div>
+                <label className="mb-1 block text-[10px] uppercase tracking-widest text-white/50 font-semibold">Nome do Cliente *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Nome completo do lead"
+                  value={leadForm.name}
+                  onChange={(e) => setLeadForm({ ...leadForm, name: e.target.value })}
+                  className="w-full rounded-2xl border border-white/5 bg-[#04080f] px-4 py-3 text-sm text-white placeholder:text-white/20 focus:border-[#c9a227]/40 focus:outline-none"
+                />
+              </div>
+
+              {/* Orcamento Vinculado do Supabase */}
+              {selectedLead && linkedOrcamento && (
+                <div className="rounded-2xl border border-[#c9a227]/20 bg-[#c9a227]/5 p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs uppercase tracking-wider text-[#c9a227] font-semibold flex items-center gap-2">
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      Orçamento do Supabase Encontrado
+                    </h4>
+                    <span className="text-[10px] text-white/40">
+                      {new Date(linkedOrcamento.created_at).toLocaleDateString('pt-BR')}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-white/50">Película:</span>
+                      <span className="text-white font-semibold">{linkedOrcamento.modo_otimizacao || '—'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-white/50">Valor:</span>
+                      <span className="text-[#c9a227] font-bold">
+                        {linkedOrcamento.valor?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-white/50">Qtd Vidros:</span>
+                      <span className="text-white font-semibold">{linkedOrcamento.qtd || 0}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-white/50">Desconto:</span>
+                      <span className="text-emerald-400 font-semibold">
+                        {linkedOrcamento.desconto ? `${linkedOrcamento.desconto}%` : '—'}
+                      </span>
+                    </div>
+                  </div>
+                  {linkedOrcamento.vidros && linkedOrcamento.vidros.length > 0 && (
+                    <div className="border-t border-white/5 pt-3 mt-2">
+                      <p className="text-[10px] text-white/40 uppercase tracking-wider mb-2">Vidros:</p>
+                      <div className="flex flex-wrap gap-1">
+                        {linkedOrcamento.vidros.map((v: any, i: number) => (
+                          <span key={i} className="text-xs bg-white/5 px-2 py-0.5 rounded text-white/70">
+                            {v.h}x{v.w} {v.label && `(${v.label})`}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('historico')}
+                    className="w-full mt-2 text-xs text-[#c9a227] hover:underline font-semibold"
+                  >
+                    Ver todos os orçamentos no Histórico →
+                  </button>
+                </div>
+              )}
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="mb-1 block text-[10px] uppercase tracking-widest text-white/50 font-semibold">Telefone/WhatsApp</label>
+                  <input
+                    type="text"
+                    placeholder="(21) XXXXX-XXXX"
+                    value={leadForm.phone}
+                    onChange={(e) => setLeadForm({ ...leadForm, phone: e.target.value })}
+                    className="w-full rounded-2xl border border-white/5 bg-[#04080f] px-4 py-3 text-sm text-white placeholder:text-white/20 focus:border-[#c9a227]/40 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-[10px] uppercase tracking-widest text-white/50 font-semibold">E-mail (Opcional)</label>
+                  <input
+                    type="email"
+                    placeholder="email@cliente.com"
+                    value={leadForm.email}
+                    onChange={(e) => setLeadForm({ ...leadForm, email: e.target.value })}
+                    className="w-full rounded-2xl border border-white/5 bg-[#04080f] px-4 py-3 text-sm text-white placeholder:text-white/20 focus:border-[#c9a227]/40 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="mb-1 block text-[10px] uppercase tracking-widest text-white/50 font-semibold">Endereço Completo</label>
+                <input
+                  type="text"
+                  placeholder="Av, Rua, Número, Bloco..."
+                  value={leadForm.address}
+                  onChange={(e) => setLeadForm({ ...leadForm, address: e.target.value })}
+                  className="w-full rounded-2xl border border-white/5 bg-[#04080f] px-4 py-3 text-sm text-white placeholder:text-white/20 focus:border-[#c9a227]/40 focus:outline-none"
+                />
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="mb-1 block text-[10px] uppercase tracking-widest text-white/50 font-semibold">Bairro do RJ</label>
+                  <select
+                    value={leadForm.neighborhood}
+                    onChange={(e) => setLeadForm({ ...leadForm, neighborhood: e.target.value })}
+                    className="w-full rounded-2xl border border-white/5 bg-[#04080f] px-4 py-3 text-sm text-white/70 focus:border-[#c9a227]/40 focus:outline-none"
+                  >
+                    {RJ_NEIGHBORHOODS.map(n => (
+                      <option key={n} value={n}>{n}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="mb-1 block text-[10px] uppercase tracking-widest text-white/50 font-semibold">Película Desejada</label>
+                  <select
+                    value={leadForm.filmType}
+                    onChange={(e) => setLeadForm({ ...leadForm, filmType: e.target.value })}
+                    className="w-full rounded-2xl border border-white/5 bg-[#04080f] px-4 py-3 text-sm text-white/70 focus:border-[#c9a227]/40 focus:outline-none"
+                  >
+                    {Object.keys(FILM_PRICES).map(f => (
+                      <option key={f} value={f}>{f}</option>
+                    ))}
+                    <option value="Outro">Outro</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-3">
+                <div>
+                  <label className="mb-1 block text-[10px] uppercase tracking-widest text-white/50 font-semibold">Área (m²)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={leadForm.sqm || ''}
+                    onChange={(e) => setLeadForm({ ...leadForm, sqm: parseFloat(e.target.value) || 0 })}
+                    className="w-full rounded-2xl border border-white/5 bg-[#04080f] px-4 py-3 text-sm text-white focus:border-[#c9a227]/40 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-[10px] uppercase tracking-widest text-white/50 font-semibold">Valor Fechado (R$)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={leadForm.value || ''}
+                    onChange={(e) => setLeadForm({ ...leadForm, value: parseFloat(e.target.value) || 0 })}
+                    className="w-full rounded-2xl border border-white/5 bg-[#04080f] px-4 py-3 text-sm text-white focus:border-[#c9a227]/40 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-[10px] uppercase tracking-widest text-white/50 font-semibold">Status Inicial</label>
+                  <select
+                    value={leadForm.status}
+                    onChange={(e) => setLeadForm({ ...leadForm, status: e.target.value as Lead['status'] })}
+                    className="w-full rounded-2xl border border-white/5 bg-[#04080f] px-4 py-3 text-sm text-white/70 focus:border-[#c9a227]/40 focus:outline-none"
+                  >
+                    <option value="Novo">Novo</option>
+                    <option value="Em Contato">Em Contato</option>
+                    <option value="Proposta Enviada">Proposta Enviada</option>
+                    <option value="Fechado">Fechado</option>
+                    <option value="Perdido">Perdido</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="mb-1 block text-[10px] uppercase tracking-widest text-white/50 font-semibold">Observações Comerciais</label>
+                <textarea
+                  rows={3}
+                  placeholder="Instruções de instalação, preferências, horários..."
+                  value={leadForm.notes}
+                  onChange={(e) => setLeadForm({ ...leadForm, notes: e.target.value })}
+                  className="w-full rounded-2xl border border-white/5 bg-[#04080f] px-4 py-3 text-sm text-white placeholder:text-white/20 focus:border-[#c9a227]/40 focus:outline-none resize-none"
+                />
+              </div>
+
+              <div className="flex gap-3 border-t border-white/5 pt-4">
+                <button
+                  type="button"
+                  onClick={() => { setIsModalOpen(false); setSelectedLead(null); setLinkedOrcamento(null); }}
+                  className="flex-1 rounded-2xl border border-white/5 bg-white/[0.01] py-3 text-sm font-semibold text-white/60 hover:bg-white/5 transition"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 rounded-2xl bg-gradient-to-r from-[#c9a227] to-[#d4ad30] py-3 text-sm font-bold text-[#04080f] shadow-lg shadow-[#c9a227]/10 hover:brightness-110 transition"
+                >
+                  {selectedLead ? 'Salvar Alterações' : 'Criar Novo Lead'}
+                </button>
+              </div>
+
+            </form>
+
+          </div>
+        </div>
+      )}
+
+      {/* Detalhes do Lead */}
+      {leadDetail && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm" onClick={() => setLeadDetail(null)}>
+          <div className="w-full max-w-md rounded-3xl border border-white/10 bg-[#07111d] p-5 text-white shadow-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-display text-lg font-black text-white tracking-tight">{leadDetail.name}</h3>
+              <button onClick={() => setLeadDetail(null)} className="text-white/40 hover:text-white">
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
+                <span className="block text-[10px] uppercase tracking-wider text-white/50 font-semibold mb-1">Telefone</span>
+                <span className="font-bold text-sm text-white">{leadDetail.phone || '—'}</span>
+              </div>
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
+                <span className="block text-[10px] uppercase tracking-wider text-white/50 font-semibold mb-1">Status</span>
+                <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                  leadDetail.status === 'Fechado' ? 'bg-emerald-500/10 text-emerald-400' :
+                  leadDetail.status === 'Proposta Enviada' ? 'bg-purple-500/10 text-purple-400' :
+                  leadDetail.status === 'Em Contato' ? 'bg-amber-500/10 text-amber-400' :
+                  leadDetail.status === 'Perdido' ? 'bg-red-500/10 text-red-400' :
+                  'bg-blue-500/10 text-blue-400'
+                }`}>{leadDetail.status}</span>
+              </div>
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
+                <span className="block text-[10px] uppercase tracking-wider text-white/50 font-semibold mb-1">Película</span>
+                <span className="font-bold text-sm text-white">{leadDetail.filmType}</span>
+              </div>
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
+                <span className="block text-[10px] uppercase tracking-wider text-white/50 font-semibold mb-1">Valor</span>
+                <span className="font-black text-lg text-[#c9a227]">R$ {formatCurrency(leadDetail.value)}</span>
+              </div>
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
+                <span className="block text-[10px] uppercase tracking-wider text-white/50 font-semibold mb-1">Bairro</span>
+                <span className="font-bold text-sm text-white">{leadDetail.neighborhood || '—'}</span>
+              </div>
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
+                <span className="block text-[10px] uppercase tracking-wider text-white/50 font-semibold mb-1">Área</span>
+                <span className="font-bold text-sm text-white">{leadDetail.sqm.toFixed(2)}m²</span>
+              </div>
+            </div>
+            {leadDetail.email && (
+              <div className="mt-3 rounded-xl border border-white/5 bg-white/[0.02] p-3">
+                <span className="block text-[10px] uppercase tracking-wider text-white/50 font-semibold mb-1">Email</span>
+                <span className="font-bold text-sm text-white">{leadDetail.email}</span>
+              </div>
+            )}
+            {leadDetail.notes && (
+              <div className="mt-3 rounded-xl border border-white/5 bg-white/[0.02] p-3">
+                <span className="block text-[10px] uppercase tracking-wider text-white/50 font-semibold mb-1">Observações</span>
+                <span className="text-sm text-white/80 whitespace-pre-wrap">{leadDetail.notes}</span>
+              </div>
+            )}
+            <div className="flex gap-3 mt-4 border-t border-white/5 pt-3">
+              <button
+                onClick={() => setLeadDetail(null)}
+                className="flex-1 rounded-xl border border-white/5 bg-white/[0.01] py-2.5 text-sm font-semibold text-white/60 hover:bg-white/5 transition"
+              >
+                Fechar
+              </button>
+              <button
+                onClick={() => { openEditModal(leadDetail); setLeadDetail(null); }}
+                className="flex-1 rounded-xl bg-gradient-to-r from-[#c9a227] to-[#d4ad30] py-2.5 text-sm font-bold text-[#04080f] shadow-lg shadow-[#c9a227]/10 hover:brightness-110 transition"
+              >
+                Editar Lead
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+}

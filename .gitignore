@@ -35,7 +35,7 @@ next-env.d.ts
 # LUME specific
 Agentic-SEO-Skill/
 .agent/
-CRM/
+/CRM/
 *.html
 *.json
 !package.json
