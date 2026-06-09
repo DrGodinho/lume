@@ -8,6 +8,21 @@ for = "/*.html"
 Cache-Control = "public, max-age=0, must-revalidate"
 
 [[headers]]
+for = "/login/*"
+[headers.values]
+Cache-Control = "no-store"
+
+[[headers]]
+for = "/crm/*"
+[headers.values]
+Cache-Control = "no-store"
+
+[[headers]]
+for = "/api/*"
+[headers.values]
+Cache-Control = "no-store"
+
+[[headers]]
 for = "/*.xml"
 [headers.values]
 Cache-Control = "public, max-age=0, must-revalidate"
