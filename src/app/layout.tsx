@@ -1,22 +1,13 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
-import { Montserrat, Open_Sans } from 'next/font/google';
+import type { CSSProperties } from 'react';
 import './globals.css';
 import { LayoutShell } from './LayoutShell';
 
-const montserrat = Montserrat({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-montserrat',
-  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900']
-});
-
-const openSans = Open_Sans({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-open-sans',
-  weight: ['300', '400', '500', '600', '700', '800']
-});
+const fontVariables: CSSProperties = {
+  '--font-montserrat': '"Montserrat", "Segoe UI", Arial, sans-serif',
+  '--font-open-sans': '"Open Sans", "Segoe UI", Arial, sans-serif',
+} as CSSProperties;
 
 export const metadata: Metadata = {
   title: {
@@ -179,7 +170,7 @@ const jsonLd = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" style={fontVariables}>
       <head>
         <script
           type="application/ld+json"
@@ -210,7 +201,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body className={`${montserrat.variable} ${openSans.variable} font-sans`}>
+      <body className="font-sans">
         <LayoutShell>{children}</LayoutShell>
       </body>
     </html>

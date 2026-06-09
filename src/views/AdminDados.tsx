@@ -46,6 +46,8 @@ interface ConfigRow {
   modo_perdas: string;
   perdas_fixas: number;
   modo_cor_config: string;
+  film_types: Record<string, number> | null;
+  selected_film: string | null;
 }
 
 type TabType = 'history' | 'draft' | 'config';
@@ -416,12 +418,26 @@ export function AdminDados() {
               { label: 'Modo de Perdas', value: config.modo_perdas ?? '—' },
               { label: 'Perdas Fixas', value: config.perdas_fixas != null ? `${config.perdas_fixas} cm` : '—' },
               { label: 'Modo de Cor', value: config.modo_cor_config ?? '—' },
-                                            ].map((f, i) => (
-                                                <div key={i} className="bg-[#060a12] rounded-xl p-4 border border-white/5">
-                                                    <p className="text-[9px] text-gray-500 uppercase font-bold mb-1">{f.label}</p>
-                                                    <p className="font-bold text-sm capitalize">{f.value}</p>
-                                                </div>
-                                            ))}
+                  { label: 'Película Selecionada', value: config.selected_film ?? '—' },
+                  ].map((f, i) => (
+                  <div key={i} className="bg-[#060a12] rounded-xl p-4 border border-white/5">
+                    <p className="text-[9px] text-gray-500 uppercase font-bold mb-1">{f.label}</p>
+                    <p className="font-bold text-sm capitalize">{f.value}</p>
+                  </div>
+                ))}
+                {config.film_types && (
+                  <div className="col-span-full bg-[#060a12] rounded-xl p-4 border border-white/5">
+                    <p className="text-[9px] text-gray-500 uppercase font-bold mb-2">Preços por Película</p>
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                      {Object.entries(config.film_types).map(([key, val]) => (
+                        <div key={key} className="text-center">
+                          <p className="text-[9px] text-gray-600 uppercase font-bold">{key.replace('_', ' ')}</p>
+                          <p className="font-bold text-sm text-[#c9a227]">R${val}/m²</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
                                         </div>
                                     </div>
                                 ) : (

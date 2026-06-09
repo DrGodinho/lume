@@ -1,7 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Output export for static hosting (cPanel/Hostinger/etc)
-  output: 'export',
   trailingSlash: true,
   allowedDevOrigins: ['192.168.0.7', '192.168.0.0/24'],
 

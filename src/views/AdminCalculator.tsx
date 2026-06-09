@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect, useRef, useMemo, useReducer, useCallback } from 'react';
 import {
-    Plus, Trash2, Smartphone, Save, FolderOpen, Scissors,
+Plus, Trash2, Smartphone, Save, FolderOpen, Scissors,
     Calculator, Camera, Layers, RotateCcw, AlignRight, AlignLeft, X,
-    History, Clock, ChevronRight, Undo2, Redo2, FileText, Settings, Cloud, CloudOff, Loader2, Copy, ClipboardPaste
+    History, Clock, ChevronRight, Undo2, Redo2, FileText, Settings, Cloud, CloudOff, Loader2, Copy, ClipboardPaste, User
 } from 'lucide-react';
 import gsap from 'gsap';
 import * as htmlToImage from 'html-to-image';
@@ -26,28 +26,50 @@ import { Capacitor } from '@capacitor/core';
 
 // ─── CONFIGURAÇÕES PADRÃO ─────────────────────────────────────────────────────
 
+type FilmTypeKey = 'carbono' | 'refletiva' | 'dupla_camada' | 'nano_ceramica' | 'jateado';
+
+const FILM_TYPE_LABELS: Record<FilmTypeKey, string> = {
+  carbono: 'Carbono',
+  refletiva: 'Refletiva',
+  dupla_camada: 'Dupla Camada',
+  nano_ceramica: 'Nano Cerâmica',
+  jateado: 'Jateado',
+};
+
 interface AppConfig {
-    rollW: number;
-    price: number;
-    margin: number;
-    modoOtimizacao: 'densidade' | 'facilidade' | 'facilidade_v2';
-    userName: string;
-    modoPerdas: 'dinamico' | 'fixo';
-    perdasFixas: number;
-    modoCorConfig: 'ambiente' | 'tamanho';
-    agressividadeCorte: number;
+  rollW: number;
+  price: number;
+  margin: number;
+  modoOtimizacao: 'densidade' | 'facilidade' | 'facilidade_v2';
+  userName: string;
+  modoPerdas: 'dinamico' | 'fixo';
+  perdasFixas: number;
+  modoCorConfig: 'ambiente' | 'tamanho';
+  agressividadeCorte: number;
+  filmTypes: Record<FilmTypeKey, number>;
+  selectedFilm: FilmTypeKey;
 }
 
+const DEFAULT_FILM_TYPES: Record<FilmTypeKey, number> = {
+  carbono: 80,
+  refletiva: 95,
+  dupla_camada: 120,
+  nano_ceramica: 220,
+  jateado: 90,
+};
+
 const DEFAULT_CONFIG: AppConfig = {
-    rollW: 152,
-    price: 80,
-    margin: 3,
-    modoOtimizacao: 'facilidade_v2',
-    userName: 'MP Godinho',
-    modoPerdas: 'dinamico',
-    perdasFixas: 20,
-    modoCorConfig: 'tamanho',
-    agressividadeCorte: 35,
+  rollW: 152,
+  price: 80,
+  margin: 3,
+  modoOtimizacao: 'facilidade_v2',
+  userName: 'MP Godinho',
+  modoPerdas: 'dinamico',
+  perdasFixas: 20,
+  modoCorConfig: 'tamanho',
+  agressividadeCorte: 35,
+  filmTypes: { ...DEFAULT_FILM_TYPES },
+  selectedFilm: 'carbono',
 };
 
 const DEFAULT_ROOM_COLORS: Record<string, string> = {
@@ -73,7 +95,8 @@ const ROOM_COLOR_SWATCHES = [
   '#e879f9', '#fb7185', '#a3e635', '#f59e0b', '#4ade80',
 ];
 
-const normalizeRoomKey = (label: string) => label.trim().toLowerCase();
+const normalizeRoomKey = (label: string) =>
+  label.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase().replace(/\s+/g, ' ');
 
 const GOLDEN_ANGLE = 137.508;
 const hashColorFromLabel = (label: string) => {
@@ -89,6 +112,75 @@ const hashColorFromLabel = (label: string) => {
   const saturation = 60 + (idx % 20);
   const lightness = 68 + (idx % 12);
   return `hsl(${hue.toFixed(1)}, ${saturation}%, ${lightness}%)`;
+};
+
+const ROOM_PALETTE: Record<string, string> = {
+  sala: '#60a5fa',
+  cozinha: '#eab308',
+  quarto: '#c084fc',
+  banheiro: '#34d399',
+  varanda: '#fb923c',
+  area: '#f87171',
+  escritorio: '#38bdf8',
+  garagem: '#a78bfa',
+  lavanderia: '#2dd4bf',
+  hall: '#fbbf24',
+  suite: '#e879f9',
+  closet: '#fb7185',
+  corredor: '#a3e635',
+  terraco: '#f59e0b',
+  jardim: '#4ade80',
+  lavabo: '#22c55e',
+  sacada: '#f97316',
+  homeoffice: '#0ea5e9',
+  sala_jantar: '#d97706',
+  sala_tv: '#3b82f6',
+  area_gourmet: '#f59e0b',
+  area_servico: '#14b8a6',
+};
+
+const ROOM_ALIAS_RULES: Array<{ test: RegExp; key: string }> = [
+  { test: /\bsala\b.*\b(jantar|tv|estar)?\b/, key: 'sala' },
+  { test: /\bcozinha\b/, key: 'cozinha' },
+  { test: /\bquarto\b|\bdormitorio\b|\bsu[ií]te\b/, key: 'quarto' },
+  { test: /\bbanheiro\b|\blavabo\b|\btoalete\b/, key: 'banheiro' },
+  { test: /\bvaranda\b|\bsacada\b/, key: 'varanda' },
+  { test: /\barea\s+gourmet\b/, key: 'area_gourmet' },
+  { test: /\barea\s+de\s+servico\b|\blavanderia\b/, key: 'lavanderia' },
+  { test: /\bescritorio\b|\bhome\s*office\b/, key: 'escritorio' },
+  { test: /\bgaragem\b/, key: 'garagem' },
+  { test: /\bhall\b/, key: 'hall' },
+  { test: /\bcloset\b/, key: 'closet' },
+  { test: /\bcorredor\b/, key: 'corredor' },
+  { test: /\bterraco\b/, key: 'terraco' },
+  { test: /\bjardim\b/, key: 'jardim' },
+];
+
+const ROOM_SWATCHES = [
+  '#60a5fa', '#eab308', '#c084fc', '#34d399', '#fb923c',
+  '#f87171', '#38bdf8', '#a78bfa', '#2dd4bf', '#fbbf24',
+  '#e879f9', '#fb7185', '#a3e635', '#f59e0b', '#4ade80',
+];
+
+const resolveRoomKey = (label: string) => {
+  const normalized = normalizeRoomKey(label);
+  if (!normalized) return '';
+  for (const rule of ROOM_ALIAS_RULES) {
+    if (rule.test.test(normalized)) return rule.key;
+  }
+  return normalized.replace(/\s+/g, '_');
+};
+
+const stableRoomColor = (label: string) => {
+  const key = resolveRoomKey(label);
+  if (!key) return '#94a3b8';
+  if (ROOM_PALETTE[key]) return ROOM_PALETTE[key];
+  let hash = 0;
+  for (let i = 0; i < key.length; i++) {
+    hash = ((hash << 5) - hash) + key.charCodeAt(i);
+    hash |= 0;
+  }
+  return ROOM_SWATCHES[Math.abs(hash) % ROOM_SWATCHES.length];
 };
 
 function loadConfig(): AppConfig {
@@ -137,13 +229,15 @@ interface Block {
 export interface OrcamentoSalvo {
     id: string;
     cliente: string;
+    phone?: string;
     data: string;
     valor: number;
     qtd: number;
     vidros: GlassItem[];
-    config: { rollW: number; price: number; margin: number };
-    desconto: number;
-    modoOtimizacao: 'densidade' | 'facilidade' | 'facilidade_v2';
+  config: { rollW: number; price: number; margin: number };
+  desconto: number;
+  modoOtimizacao: 'densidade' | 'facilidade' | 'facilidade_v2';
+  selectedFilm?: string;
 }
 
 // ─── UNDO/REDO REDUCER ────────────────────────────────────────────────────────
@@ -271,23 +365,28 @@ const MemoBlock = React.memo(({
 // ─── COMPONENTE PRINCIPAL ─────────────────────────────────────────────────────
 
 export function AdminCalculator() {
-    const [cliente, setCliente] = useState('');
-    const cfg = loadConfig();
-    const [rollW, setRollW] = useState(cfg.rollW);
-    const [margin, setMargin] = useState(cfg.margin);
-    const [price, setPrice] = useState(cfg.price);
-    const [userName, setUserName] = useState(cfg.userName);
-    const [desconto, setDesconto] = useState(0);
-    const [modoOtimizacao, setModoOtimizacao] = useState<'densidade' | 'facilidade' | 'facilidade_v2'>(cfg.modoOtimizacao);
-    const [configAberto, setConfigAberto] = useState(false);
-    const [compensarPerdas, setCompensarPerdas] = useState(false);
-    const [modoPerdas, setModoPerdas] = useState<'dinamico' | 'fixo'>(cfg.modoPerdas);
-    const [perdasFixas, setPerdasFixas] = useState(cfg.perdasFixas);
-    const [agressividadeCorte, setAgressividadeCorte] = useState(cfg.agressividadeCorte);
+  const [cliente, setCliente] = useState('');
+  const [phone, setPhone] = useState('');
+  const cfg = loadConfig();
+  const [rollW, setRollW] = useState(cfg.rollW);
+  const [margin, setMargin] = useState(cfg.margin);
+  const [price, setPrice] = useState(cfg.price);
+  const [userName, setUserName] = useState(cfg.userName);
+  const [desconto, setDesconto] = useState(0);
+  const [modoOtimizacao, setModoOtimizacao] = useState<'densidade' | 'facilidade' | 'facilidade_v2'>(cfg.modoOtimizacao);
+  const [configAberto, setConfigAberto] = useState(false);
+  const [compensarPerdas, setCompensarPerdas] = useState(false);
+  const [modoPerdas, setModoPerdas] = useState<'dinamico' | 'fixo'>(cfg.modoPerdas);
+  const [perdasFixas, setPerdasFixas] = useState(cfg.perdasFixas);
+  const [agressividadeCorte, setAgressividadeCorte] = useState(cfg.agressividadeCorte);
+  const [filmTypes, setFilmTypes] = useState<Record<FilmTypeKey, number>>(cfg.filmTypes || { ...DEFAULT_FILM_TYPES });
+  const [selectedFilm, setSelectedFilm] = useState<FilmTypeKey>(cfg.selectedFilm || 'carbono');
 
+  useEffect(() => {
+    setPrice(filmTypes[selectedFilm] || 0);
+  }, [selectedFilm, filmTypes]);
 
-
-    const [heightIn, setHeightIn] = useState('');
+  const [heightIn, setHeightIn] = useState('');
     const [widthIn, setWidthIn] = useState('');
     const [qtyIn, setQtyIn] = useState('1');
     const [labelIn, setLabelIn] = useState('');
@@ -458,54 +557,55 @@ export function AdminCalculator() {
         return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }, [descontoInput]);
 
-    // ─── AUTO-SAVE DRAFT ──────────────────────────────────────────────────
-    useEffect(() => {
-        const draft = {
-            cliente,
-            vidros,
-            desconto,
-            descontoInput,
-            rollW,
-            price,
-            margin,
-            modoOtimizacao,
-            userName,
-            lastSaved: Date.now()
-        };
-        localStorage.setItem('lume_calculator_draft', JSON.stringify(draft));
-    }, [cliente, vidros, desconto, descontoInput, rollW, price, margin, modoOtimizacao, userName]);
+// ─── AUTO-SAVE DRAFT ──────────────────────────────────────────────────
+  useEffect(() => {
+    const draft = {
+      cliente,
+      phone,
+      vidros,
+      desconto,
+      descontoInput,
+      rollW,
+      price,
+      margin,
+      modoOtimizacao,
+      userName,
+      selectedFilm,
+      lastSaved: Date.now()
+    };
+    localStorage.setItem('lume_calculator_draft', JSON.stringify(draft));
+}, [cliente, phone, vidros, desconto, descontoInput, rollW, price, margin, modoOtimizacao, userName, selectedFilm]);
 
-    // ─── CLOUD AUTO-SAVE (debounced 2s) ──────────────────────────────────────
-    useEffect(() => {
-        if (cloudTimerRef.current) clearTimeout(cloudTimerRef.current);
-        cloudTimerRef.current = setTimeout(async () => {
-            setCloudStatus('syncing');
-            const ok = await saveDraftToCloud({
-                cliente, vidros, desconto, desconto_input: descontoInput,
-                roll_w: rollW, price, margin, modo_otimizacao: modoOtimizacao,
-                user_name: userName,
-            });
-            setCloudStatus(ok ? 'synced' : 'error');
-            if (ok) setTimeout(() => setCloudStatus('idle'), 3000);
-        }, 2000);
-        return () => { if (cloudTimerRef.current) clearTimeout(cloudTimerRef.current); };
-    }, [cliente, vidros, desconto, descontoInput, rollW, price, margin, modoOtimizacao, userName]);
+  // ─── CLOUD AUTO-SAVE (debounced 2s) ──────────────────────────────────────
+  useEffect(() => {
+    if (cloudTimerRef.current) clearTimeout(cloudTimerRef.current);
+    cloudTimerRef.current = setTimeout(async () => {
+      setCloudStatus('syncing');
+      const ok = await saveDraftToCloud({
+        cliente, phone, vidros, desconto, desconto_input: descontoInput,
+        roll_w: rollW, price, margin, modo_otimizacao: modoOtimizacao,
+        user_name: userName, selected_film: selectedFilm,
+      });
+      setCloudStatus(ok ? 'synced' : 'error');
+      if (ok) setTimeout(() => setCloudStatus('idle'), 3000);
+    }, 2000);
+    return () => { if (cloudTimerRef.current) clearTimeout(cloudTimerRef.current); };
+  }, [cliente, phone, vidros, desconto, descontoInput, rollW, price, margin, modoOtimizacao, userName, selectedFilm]);
 
-    // ─── CLOUD CONFIG AUTO-SAVE (debounced 2s) ────────────────────────────────
+// ─── CLOUD CONFIG AUTO-SAVE (debounced 2s) ────────────────────────────────
   const configCloudTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     if (configCloudTimerRef.current) clearTimeout(configCloudTimerRef.current);
     configCloudTimerRef.current = setTimeout(() => {
-      const cfgToSave: AppConfig = {
-        rollW, price, margin, modoOtimizacao, userName,
+      const cfgToSave: AppConfig = { rollW, price, margin, modoOtimizacao, userName,
         modoPerdas, perdasFixas,
         modoCorConfig: usarCoresPorAmbiente ? 'ambiente' : 'tamanho',
-        agressividadeCorte,
+        agressividadeCorte, filmTypes, selectedFilm,
       };
       saveConfigToCloud(cfgToSave);
     }, 2000);
     return () => { if (configCloudTimerRef.current) clearTimeout(configCloudTimerRef.current); };
-  }, [rollW, price, margin, modoOtimizacao, userName, modoPerdas, perdasFixas, usarCoresPorAmbiente, agressividadeCorte]);
+  }, [rollW, price, margin, modoOtimizacao, userName, modoPerdas, perdasFixas, usarCoresPorAmbiente, agressividadeCorte, filmTypes, selectedFilm]);
 
   // RESTORE CONFIG ON MOUNT (cloud-first, localStorage fallback) ────────────
   useEffect(() => {
@@ -521,7 +621,9 @@ export function AdminCalculator() {
         if (cloud.perdasFixas !== undefined) setPerdasFixas(cloud.perdasFixas);
         if (cloud.modoCorConfig) setUsarCoresPorAmbiente(cloud.modoCorConfig === 'ambiente');
         if (cloud.agressividadeCorte !== undefined) setAgressividadeCorte(cloud.agressividadeCorte);
-        const fullCfg: AppConfig = { ...DEFAULT_CONFIG, ...cloud, modoOtimizacao: cloud.modoOtimizacao as AppConfig['modoOtimizacao'], modoPerdas: (cloud.modoPerdas ?? 'dinamico') as AppConfig['modoPerdas'], modoCorConfig: (cloud.modoCorConfig ?? 'tamanho') as AppConfig['modoCorConfig'] };
+        if (cloud.filmTypes) setFilmTypes(cloud.filmTypes as Record<FilmTypeKey, number>);
+        if (cloud.selectedFilm) setSelectedFilm(cloud.selectedFilm as FilmTypeKey);
+        const fullCfg: AppConfig = { ...DEFAULT_CONFIG, ...cloud, modoOtimizacao: cloud.modoOtimizacao as AppConfig['modoOtimizacao'], modoPerdas: (cloud.modoPerdas ?? 'dinamico') as AppConfig['modoPerdas'], modoCorConfig: (cloud.modoCorConfig ?? 'tamanho') as AppConfig['modoCorConfig'], selectedFilm: (cloud.selectedFilm ?? 'carbono') as FilmTypeKey, filmTypes: (cloud.filmTypes ?? DEFAULT_FILM_TYPES) as Record<FilmTypeKey, number> };
         saveConfig(fullCfg);
         return;
       }
@@ -535,6 +637,8 @@ export function AdminCalculator() {
       setPerdasFixas(local.perdasFixas);
       setUsarCoresPorAmbiente(local.modoCorConfig === 'ambiente');
       setAgressividadeCorte(local.agressividadeCorte);
+      if (local.filmTypes) setFilmTypes(local.filmTypes as Record<FilmTypeKey, number>);
+      if (local.selectedFilm) setSelectedFilm(local.selectedFilm as FilmTypeKey);
     };
     restoreConfig();
   }, []);
@@ -547,13 +651,15 @@ export function AdminCalculator() {
             if (cloud && cloud.vidros && (cloud.vidros as any[]).length > 0) {
                 dispatch({ type: 'SET', payload: cloud.vidros as any });
                 if (cloud.cliente) setCliente(cloud.cliente);
+                if (cloud.phone) setPhone(cloud.phone);
                 if (cloud.desconto !== undefined) setDesconto(cloud.desconto);
                 if (cloud.desconto_input !== undefined) setDescontoInput(cloud.desconto_input);
                 if (cloud.roll_w) setRollW(cloud.roll_w);
                 if (cloud.price) setPrice(cloud.price);
                 if (cloud.margin !== undefined) setMargin(cloud.margin);
-                if (cloud.modo_otimizacao) setModoOtimizacao(cloud.modo_otimizacao as any);
-                if (cloud.user_name) setUserName(cloud.user_name);
+    if (cloud.modo_otimizacao) setModoOtimizacao(cloud.modo_otimizacao as any);
+      if (cloud.user_name) setUserName(cloud.user_name);
+      if (cloud.selected_film) setSelectedFilm(cloud.selected_film as FilmTypeKey);
                 setCloudStatus('synced');
                 setTimeout(() => setCloudStatus('idle'), 3000);
                 return;
@@ -566,13 +672,15 @@ export function AdminCalculator() {
                     if (draft.vidros && draft.vidros.length > 0) {
                         dispatch({ type: 'SET', payload: draft.vidros });
                         if (draft.cliente) setCliente(draft.cliente);
+                        if (draft.phone) setPhone(draft.phone);
                         if (draft.desconto !== undefined) setDesconto(draft.desconto);
                         if (draft.descontoInput !== undefined) setDescontoInput(draft.descontoInput);
                         if (draft.rollW) setRollW(draft.rollW);
                         if (draft.price) setPrice(draft.price);
                         if (draft.margin !== undefined) setMargin(draft.margin);
-                        if (draft.modoOtimizacao) setModoOtimizacao(draft.modoOtimizacao);
-                        if (draft.userName) setUserName(draft.userName);
+      if (draft.modoOtimizacao) setModoOtimizacao(draft.modoOtimizacao);
+      if (draft.userName) setUserName(draft.userName);
+      if (draft.selectedFilm) setSelectedFilm(draft.selectedFilm as FilmTypeKey);
                     }
                 } catch (e) {
                     console.error('Erro ao carregar rascunho local', e);
@@ -593,7 +701,7 @@ export function AdminCalculator() {
     if (!useRoomScheme) {
       if (typeof h === 'number' && typeof w === 'number') {
         const area = h * w;
-        const hue = (area * GOLDEN_ANGLE) % 360;
+        const hue = (area * 137.508) % 360;
         const saturation = 60 + (Math.round(area) % 20);
         const lightness = 68 + (Math.round(area * 7) % 12);
         return `hsl(${hue.toFixed(1)}, ${saturation}%, ${lightness}%)`;
@@ -604,15 +712,15 @@ export function AdminCalculator() {
     if (!roomLabel) {
       if (typeof h === 'number' && typeof w === 'number') {
         const area = h * w;
-        const hue = (area * GOLDEN_ANGLE) % 360;
+        const hue = (area * 137.508) % 360;
         const saturation = 60 + (Math.round(area) % 20);
         const lightness = 68 + (Math.round(area * 7) % 12);
         return `hsl(${hue.toFixed(1)}, ${saturation}%, ${lightness}%)`;
       }
       return '#94a3b8';
     }
-    const key = normalizeRoomKey(roomLabel);
-    return DEFAULT_ROOM_COLORS[key] || roomColors[key] || hashColorFromLabel(roomLabel);
+    const key = resolveRoomKey(roomLabel);
+    return roomColors[key] || stableRoomColor(roomLabel);
   }, [usarCoresPorAmbiente, roomColors]);
 
     // ─── AÇÕES DE VIDROS ───────────────────────────────────────────────────────
@@ -665,6 +773,7 @@ export function AdminCalculator() {
             setDesconto(0);
             setDescontoInput('0');
             setCliente('');
+            setPhone('');
             setRollW(DEFAULT_CONFIG.rollW);
             setPrice(DEFAULT_CONFIG.price);
             setMargin(DEFAULT_CONFIG.margin);
@@ -807,13 +916,15 @@ export function AdminCalculator() {
         const novo: OrcamentoSalvo = {
             id: Date.now().toString(),
             cliente: cliente || 'Sem nome',
+            phone,
             data: new Date().toLocaleDateString('pt-BR'),
             valor: finalPrice,
             qtd: vidros.length,
             vidros: [...vidros],
-            config: { rollW, price, margin },
-            desconto,
-            modoOtimizacao
+    config: { rollW, price, margin },
+      desconto,
+      modoOtimizacao,
+      selectedFilm,
         };
         const atualizado = [novo, ...historico].slice(0, 20);
         setHistorico(atualizado);
@@ -821,19 +932,52 @@ export function AdminCalculator() {
         saveHistoryItemToCloud(novo as any);
         setShowSaveToast(true);
         setTimeout(() => setShowSaveToast(false), 3000);
-    }, [vidros, cliente, finalPrice, rollW, price, margin, historico, desconto, modoOtimizacao]);
+    }, [vidros, cliente, phone, finalPrice, rollW, price, margin, historico, desconto, modoOtimizacao, selectedFilm]);
 
-    const carregarDoHistorico = (orc: OrcamentoSalvo) => {
-        setCliente(orc.cliente);
-        setRollW(orc.config.rollW);
+    const criarLead = useCallback(async () => {
+      if (!cliente && !phone) {
+        alert('Preencha o nome ou telefone do cliente.');
+        return;
+      }
+      const totalM2 = vidros.reduce((acc, v) => acc + (v.oh * v.ow), 0) / 10000;
+      const res = await fetch('/api/crm/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: cliente || `Cliente ${phone}`,
+          phone,
+          email: '',
+          address: '',
+          neighborhood: 'Barra da Tijuca',
+          filmType: FILM_TYPE_LABELS[selectedFilm] || 'Nano Cerâmica',
+          sqm: Math.round(totalM2 * 100) / 100,
+          value: finalPrice,
+          status: 'Novo',
+          notes: `Película: ${FILM_TYPE_LABELS[selectedFilm]}.`,
+        }),
+      });
+      if (res.ok) {
+        setShowSaveToast(true);
+        setTimeout(() => setShowSaveToast(false), 3000);
+      } else {
+        const err = await res.json();
+        alert('Erro ao criar lead: ' + (err.error || 'desconhecido'));
+      }
+    }, [cliente, phone, vidros, selectedFilm, finalPrice]);
+
+const carregarDoHistorico = (orc: OrcamentoSalvo) => {
+    setCliente(orc.cliente);
+    setPhone(orc.phone || '');
+    setRollW(orc.config.rollW);
         setPrice(orc.config.price);
         setMargin(orc.config.margin);
         if (orc.desconto !== undefined) {
             setDesconto(orc.desconto);
             setDescontoInput((orc.desconto * 100).toString());
         }
-        if (orc.modoOtimizacao) setModoOtimizacao(orc.modoOtimizacao);
-        dispatch({ type: 'SET', payload: orc.vidros });
+  if (orc.modoOtimizacao) setModoOtimizacao(orc.modoOtimizacao);
+    if (orc.selectedFilm) setSelectedFilm(orc.selectedFilm as FilmTypeKey);
+    dispatch({ type: 'SET', payload: orc.vidros });
         setHistoricoAberto(false);
     };
 
@@ -852,27 +996,30 @@ export function AdminCalculator() {
         try {
             const d = JSON.parse(atob(code));
             setCliente(`${d.n} (${d.b}) - ${d.f}`);
+            if (d.p) setPhone(d.p);
             dispatch({ type: 'SET', payload: d.v.map((v: any) => ({ ...v, id: Math.random().toString(36).substr(2, 9), oh: v.oh ?? v.h, ow: v.ow ?? v.w, forceRotate: undefined, alignRight: false })) });
         } catch (e) { alert("Erro ao importar."); }
     };
 
-    const salvarProjeto = () => {
-        const dados = { config: { cliente, rolo: rollW, preco: price }, vidros: [...vidros] };
-        const blob = new Blob([JSON.stringify(dados)], { type: 'application/json' });
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-        a.download = (cliente || 'projeto') + ".insul"; a.click();
-    };
+const salvarProjeto = () => {
+    const dados = { config: { cliente, phone, rolo: rollW, preco: price, selectedFilm }, vidros: [...vidros] };
+    const blob = new Blob([JSON.stringify(dados)], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = (cliente || 'projeto') + ".insul"; a.click();
+  };
 
-    const abrirProjeto = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0]; if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-            try {
-                const d = JSON.parse(ev.target?.result as string);
-                setCliente(d.config.cliente || ''); setRollW(parseFloat(d.config.rolo) || 152);
-                setPrice(parseFloat(d.config.preco) || 80);
-                dispatch({ type: 'SET', payload: (d.vidros || []).map((v: any) => ({ ...v, oh: v.oh ?? v.h, ow: v.ow ?? v.w })) });
-                setDesconto(0);
+  const abrirProjeto = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const d = JSON.parse(ev.target?.result as string);
+        setCliente(d.config.cliente || ''); setPhone(d.config.phone || '');
+        setRollW(parseFloat(d.config.rolo) || 152);
+        setPrice(parseFloat(d.config.preco) || 80);
+        if (d.config.selectedFilm) setSelectedFilm(d.config.selectedFilm as FilmTypeKey);
+        dispatch({ type: 'SET', payload: (d.vidros || []).map((v: any) => ({ ...v, oh: v.oh ?? v.h, ow: v.ow ?? v.w })) });
+        setDesconto(0);
             } catch (e) { alert("Arquivo inválido"); }
         };
         reader.readAsText(file);
@@ -963,17 +1110,13 @@ export function AdminCalculator() {
         }
     };
 
-  const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: AppConfig[K]) => {
+const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: AppConfig[K]) => {
     const setters: Record<string, React.Dispatch<React.SetStateAction<any>>> = {
-      rollW: setRollW,
-      price: setPrice,
-      margin: setMargin,
-      modoOtimizacao: setModoOtimizacao as any,
-      userName: setUserName,
-      modoPerdas: setModoPerdas as any,
-      perdasFixas: setPerdasFixas,
-      modoCorConfig: null as any,
-      agressividadeCorte: setAgressividadeCorte,
+      rollW: setRollW, price: setPrice, margin: setMargin,
+      modoOtimizacao: setModoOtimizacao as any, userName: setUserName,
+      modoPerdas: setModoPerdas as any, perdasFixas: setPerdasFixas,
+      modoCorConfig: null as any, agressividadeCorte: setAgressividadeCorte,
+      filmTypes: setFilmTypes as any, selectedFilm: setSelectedFilm as any,
     };
     if (key === 'modoCorConfig') {
       setUsarCoresPorAmbiente(value === 'ambiente');
@@ -984,10 +1127,10 @@ export function AdminCalculator() {
     } else if (setters[key]) {
       setters[key](value);
     }
-    const currentCfg: AppConfig = { rollW, price, margin, modoOtimizacao, userName, modoPerdas, perdasFixas, modoCorConfig: usarCoresPorAmbiente ? 'ambiente' : 'tamanho', agressividadeCorte };
+    const currentCfg: AppConfig = { rollW, price, margin, modoOtimizacao, userName, modoPerdas, perdasFixas, modoCorConfig: usarCoresPorAmbiente ? 'ambiente' : 'tamanho', agressividadeCorte, filmTypes, selectedFilm };
     const updated = { ...currentCfg, [key]: value };
     saveConfig(updated);
-  }, [rollW, price, margin, modoOtimizacao, userName, modoPerdas, perdasFixas, usarCoresPorAmbiente, agressividadeCorte, getColorForItem]);
+  }, [rollW, price, margin, modoOtimizacao, userName, modoPerdas, perdasFixas, usarCoresPorAmbiente, agressividadeCorte, filmTypes, selectedFilm, getColorForItem]);
 
     // ─── MEMOS ─────────────────────────────────────────────────────────────────
 
@@ -1023,8 +1166,8 @@ export function AdminCalculator() {
     }, [resumo]);
 
     const currentRoomLabel = labelIn.trim();
-    const currentRoomKey = normalizeRoomKey(currentRoomLabel);
-    const currentRoomColor = currentRoomLabel ? (roomColors[currentRoomKey] || DEFAULT_ROOM_COLORS[currentRoomKey] || hashColorFromLabel(currentRoomLabel)) : '#94a3b8';
+    const currentRoomKey = resolveRoomKey(currentRoomLabel);
+    const currentRoomColor = currentRoomLabel ? (roomColors[currentRoomKey] || stableRoomColor(currentRoomLabel)) : '#94a3b8';
     const hasCurrentRoomPieces = currentRoomLabel ? vidros.some(v => (v.label || '') === currentRoomLabel) : false;
     const getColorForRoom = getColorForItem;
     const aplicarCorNoAmbiente = (ambiente: string) => {
@@ -1046,7 +1189,7 @@ export function AdminCalculator() {
       <ConfigPanel
         aberto={configAberto}
         setAberto={setConfigAberto}
-        config={{ rollW, price, margin, modoOtimizacao, userName, modoPerdas, perdasFixas, modoCorConfig: usarCoresPorAmbiente ? 'ambiente' : 'tamanho', agressividadeCorte }}
+        config={{ rollW, price, margin, modoOtimizacao, userName, modoPerdas, perdasFixas, modoCorConfig: usarCoresPorAmbiente ? 'ambiente' : 'tamanho', agressividadeCorte, filmTypes, selectedFilm }}
         onUpdate={atualizarConfig}
         cloudStatus={cloudStatus}
       />
@@ -1188,7 +1331,9 @@ export function AdminCalculator() {
                 <div className="col-span-1 xl:col-span-4 space-y-6">
                     <div className="admin-entrance bg-[#0a0e17] border-2 border-[#c9a227]/30 rounded-2xl p-5 shadow-2xl">
                         <label className="block text-[10px] uppercase text-[#c9a227] mb-2 font-bold">Cliente</label>
-                        <input type="text" value={cliente} onChange={(e) => setCliente(e.target.value)} className="w-full bg-[#040811] border border-white/10 rounded-xl px-4 py-3 outline-none text-sm mb-4" />
+                        <input type="text" value={cliente} onChange={(e) => setCliente(e.target.value)} className="w-full bg-[#040811] border border-white/10 rounded-xl px-4 py-3 outline-none text-sm mb-3" />
+                        <label className="block text-[10px] uppercase text-gray-500 mb-2 font-bold">Telefone</label>
+                        <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full bg-[#040811] border border-white/10 rounded-xl px-4 py-3 outline-none text-sm mb-4" />
                         <div className="grid grid-cols-1 gap-2">
                             <button onClick={importarZap} className="w-full bg-[#25d366]/20 text-[#25d366] py-3 rounded-xl font-semibold text-xs uppercase tracking-wider flex items-center justify-center gap-2">
                                 <Smartphone size={16} /> Zap
@@ -1201,13 +1346,24 @@ export function AdminCalculator() {
                         </div>
                     </div>
 
-                    <div className="admin-entrance bg-[#070c14] border-2 border-[#c9a227]/25 rounded-2xl p-5 shadow-2xl">
-                        <div className="grid grid-cols-3 gap-2">
-                            <div><label className="block text-[10px] text-gray-400 mb-1 text-center font-bold uppercase">Rolo</label><input type="number" value={rollW} onChange={(e) => setRollW(parseFloat(e.target.value))} onFocus={(e) => e.target.select()} className="w-full bg-[#040811] border border-white/10 rounded-lg p-3 text-sm text-center font-bold" /></div>
-                            <div><label className="block text-[10px] text-gray-400 mb-1 text-center font-bold uppercase">R$/m²</label><input type="number" value={price} onChange={(e) => setPrice(parseFloat(e.target.value))} onFocus={(e) => e.target.select()} className="w-full bg-[#040811] border border-white/10 rounded-lg p-3 text-sm text-center font-bold" /></div>
-                            <div><label className="block text-[10px] text-gray-400 mb-1 text-center font-bold uppercase">Margem</label><input type="number" value={margin} onChange={(e) => setMargin(parseFloat(e.target.value))} onFocus={(e) => e.target.select()} className="w-full bg-[#040811] border border-white/10 rounded-lg p-3 text-sm text-center font-bold" /></div>
-                        </div>
-                    </div>
+<div className="admin-entrance bg-[#070c14] border-2 border-[#c9a227]/25 rounded-2xl p-5 shadow-2xl">
+      <div className="grid grid-cols-3 gap-2">
+        <div><label className="block text-[10px] text-gray-400 mb-1 text-center font-bold uppercase">Rolo</label><input type="number" value={rollW} onChange={(e) => setRollW(parseFloat(e.target.value))} onFocus={(e) => e.target.select()} className="w-full bg-[#040811] border border-white/10 rounded-lg p-3 text-sm text-center font-bold" /></div>
+        <div>
+          <label className="block text-[10px] text-gray-400 mb-1 text-center font-bold uppercase">Película</label>
+          <select value={selectedFilm} onChange={(e) => setSelectedFilm(e.target.value as FilmTypeKey)} className="w-full bg-[#040811] border border-white/10 rounded-lg p-3 text-sm text-center font-bold appearance-none cursor-pointer">
+            {(Object.keys(FILM_TYPE_LABELS) as FilmTypeKey[]).map((key) => (
+              <option key={key} value={key}>{FILM_TYPE_LABELS[key]} — R${filmTypes[key]}/m²</option>
+            ))}
+          </select>
+        </div>
+        <div><label className="block text-[10px] text-gray-400 mb-1 text-center font-bold uppercase">Margem</label><input type="number" value={margin} onChange={(e) => setMargin(parseFloat(e.target.value))} onFocus={(e) => e.target.select()} className="w-full bg-[#040811] border border-white/10 rounded-lg p-3 text-sm text-center font-bold" /></div>
+      </div>
+      <div className="mt-2 text-center">
+        <span className="text-[10px] text-gray-500">R$/m²: </span>
+        <span className="text-[10px] text-[#c9a227] font-bold">{price}</span>
+      </div>
+    </div>
 
                     <div className="admin-entrance bg-[#0d1018] border-2 border-[#c9a227]/35 rounded-2xl p-5 shadow-2xl">
                         <label className="block text-[10px] uppercase text-[#c9a227] mb-4 font-bold flex items-center gap-2"><Layers size={14} /> Medidas</label>
@@ -1473,6 +1629,15 @@ export function AdminCalculator() {
                                     </div>
                                 </div>
                             </div>
+
+<div className="flex items-center justify-end mb-4 w-full">
+                                <button
+                                  onClick={criarLead}
+                                  className="flex items-center gap-2 bg-gradient-to-r from-[#c9a227] to-[#d4ad30] text-black px-4 py-2.5 rounded-xl font-bold text-[10px] uppercase shadow-lg hover:brightness-110 transition-all active:scale-95"
+                                >
+                                  <User size={14} /> Criar Lead
+                                </button>
+                              </div>
 
                             <div className="flex items-center gap-2 mb-4 w-full">
                                 <div className="flex bg-[#04080f] border border-white/10 p-1.5 rounded-xl shadow-2xl flex-1 max-w-sm ml-auto">

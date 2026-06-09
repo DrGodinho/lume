@@ -2,5 +2,7 @@ User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /crm/
+Disallow: /login/
 
 Sitemap: https://lumecontrolesolar.com.br/sitemap.xml

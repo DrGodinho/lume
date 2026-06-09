@@ -11,6 +11,7 @@ type GtagWindow = Window & {
 const navLinks = [
   { name: 'Inicio', href: '/' },
   { name: 'Produtos', href: '#produtos' },
+  { name: 'Portas de Vidro', href: '/insulfilm-para-portas-de-vidro' },
   { name: 'Beneficios', href: '#beneficios' },
   { name: 'Contato', href: '#contato' },
 ];

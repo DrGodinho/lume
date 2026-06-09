@@ -1,6 +1,16 @@
 import React from 'react';
 import { Settings, X, Cloud, CloudOff, Loader2 } from 'lucide-react';
 
+type FilmTypeKey = 'carbono' | 'refletiva' | 'dupla_camada' | 'nano_ceramica' | 'jateado';
+
+const FILM_TYPE_LABELS: Record<FilmTypeKey, string> = {
+  carbono: 'Carbono',
+  refletiva: 'Refletiva',
+  dupla_camada: 'Dupla Camada',
+  nano_ceramica: 'Nano Cerâmica',
+  jateado: 'Jateado',
+};
+
 interface AppConfig {
   rollW: number;
   price: number;
@@ -11,6 +21,8 @@ interface AppConfig {
   perdasFixas: number;
   modoCorConfig: 'ambiente' | 'tamanho';
   agressividadeCorte: number;
+  filmTypes: Record<FilmTypeKey, number>;
+  selectedFilm: FilmTypeKey;
 }
 
 interface ConfigPanelProps {
@@ -75,16 +87,38 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
                 className="w-full bg-[#040811] border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-center outline-none focus:border-[#c9a227]/50 transition-colors"
               />
             </div>
-            <div>
-              <label className="block text-[10px] uppercase text-[#c9a227] font-bold mb-2">Preco por m2 (R$)</label>
-              <input
-                type="number"
-                value={config.price}
-                onChange={(e) => onUpdate('price', parseFloat(e.target.value) || 0)}
-                onFocus={(e) => e.target.select()}
-                className="w-full bg-[#040811] border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-center outline-none focus:border-[#c9a227]/50 transition-colors"
-              />
-            </div>
+<div>
+          <label className="block text-[10px] uppercase text-[#c9a227] font-bold mb-2">Película Padrão</label>
+          <select
+            value={config.selectedFilm}
+            onChange={(e) => onUpdate('selectedFilm', e.target.value as FilmTypeKey)}
+            className="w-full bg-[#040811] border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-center outline-none focus:border-[#c9a227]/50 transition-colors appearance-none cursor-pointer"
+          >
+            {(Object.keys(FILM_TYPE_LABELS) as FilmTypeKey[]).map((key) => (
+              <option key={key} value={key}>{FILM_TYPE_LABELS[key]} — R${config.filmTypes[key]}/m²</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-[10px] uppercase text-[#c9a227] font-bold mb-2">Preços por Película (R$/m²)</label>
+          <div className="space-y-2">
+            {(Object.keys(FILM_TYPE_LABELS) as FilmTypeKey[]).map((key) => (
+              <div key={key} className="flex items-center gap-2">
+                <span className="text-[10px] text-gray-400 font-bold w-24 truncate">{FILM_TYPE_LABELS[key]}</span>
+                <input
+                  type="number"
+                  value={config.filmTypes[key]}
+                  onChange={(e) => {
+                    const updated = { ...config.filmTypes, [key]: parseFloat(e.target.value) || 0 };
+                    onUpdate('filmTypes', updated);
+                  }}
+                  onFocus={(e) => e.target.select()}
+                  className="flex-1 bg-[#040811] border border-white/10 rounded-lg px-3 py-2 text-sm font-bold text-center outline-none focus:border-[#c9a227]/50 transition-colors"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
             <div>
               <label className="block text-[10px] uppercase text-[#c9a227] font-bold mb-2">Margem de Corte (cm)</label>
               <input
