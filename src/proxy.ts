@@ -24,7 +24,7 @@ function redirectToLogin(request: NextRequest, clearToken = false) {
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  if (pathname.startsWith('/crm') || pathname.startsWith('/admin/relatorios')) {
+  if (pathname.startsWith('/crm') || pathname.startsWith('/admin/relatorios') || pathname.startsWith('/admin/blog')) {
     const crmToken = request.cookies.get('crm-token')?.value;
     if (!crmToken) {
       return redirectToLogin(request);
@@ -48,5 +48,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/relatorios/:path*', '/login', '/login/:path*', '/crm/:path*'],
+  matcher: ['/admin/blog/:path*', '/admin/relatorios/:path*', '/login', '/login/:path*', '/crm/:path*'],
 };

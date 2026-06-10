@@ -12,6 +12,7 @@ const navLinks = [
   { name: 'Inicio', href: '/' },
   { name: 'Produtos', href: '#produtos' },
   { name: 'Portas de Vidro', href: '/insulfilm-para-portas-de-vidro' },
+  { name: 'Blog', href: '/blog' },
   { name: 'Beneficios', href: '#beneficios' },
   { name: 'Contato', href: '#contato' },
 ];

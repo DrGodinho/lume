@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 const quickLinks = [
   { name: 'Início', href: '/' },
   { name: 'Produtos', href: '#produtos' },
+  { name: 'Blog', href: '/blog' },
   { name: 'Benefícios', href: '#beneficios' },
   { name: 'Guia: Tudo sobre Insulfilm', href: '/guia-insulfilm' },
   { name: 'Simulador Online', href: '/simulador' },
