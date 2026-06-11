@@ -1,0 +1,71 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Gráfico sobre desgaste de móveis com e sem insulfilm</title>
+  <desc id="desc">Comparação visual entre a curva de desgaste dos móveis sem proteção e com insulfilm de controle solar.</desc>
+  <defs>
+    <linearGradient id="bg" x1="58" y1="58" x2="1542" y2="842" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#081522"/>
+      <stop offset="0.58" stop-color="#04080F"/>
+      <stop offset="1" stop-color="#11100A"/>
+    </linearGradient>
+    <linearGradient id="goldLine" x1="240" y1="0" x2="1380" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F7DC84"/>
+      <stop offset="0.52" stop-color="#C9A227"/>
+      <stop offset="1" stop-color="#7E6413"/>
+    </linearGradient>
+    <linearGradient id="areaGold" x1="0" y1="250" x2="0" y2="670" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#C9A227" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#C9A227" stop-opacity="0"/>
+    </linearGradient>
+    <pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse">
+      <path d="M80 0H0V80" stroke="#FFFFFF" stroke-opacity="0.045" stroke-width="1"/>
+    </pattern>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="22" stdDeviation="24" flood-color="#000000" flood-opacity="0.34"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="900" rx="36" fill="#04080F"/>
+  <rect x="56" y="56" width="1488" height="788" rx="34" fill="url(#bg)" stroke="#C9A227" stroke-opacity="0.22" stroke-width="2"/>
+  <rect x="56" y="56" width="1488" height="788" rx="34" fill="url(#grid)"/>
+
+  <text x="118" y="140" fill="#F7DC84" font-size="44" font-weight="800" font-family="Montserrat, Arial, sans-serif">Desgaste acumulado dos móveis</text>
+  <text x="118" y="186" fill="#AEB8C7" font-size="22" font-family="Inter, Arial, sans-serif">Representação visual: exposição contínua ao sol acelera perda de cor, brilho e resistência.</text>
+
+  <g filter="url(#shadow)">
+    <rect x="118" y="250" width="1324" height="462" rx="28" fill="#08111D" stroke="#FFFFFF" stroke-opacity="0.08"/>
+    <line x1="240" y1="622" x2="1360" y2="622" stroke="#FFFFFF" stroke-opacity="0.16" stroke-width="2"/>
+    <line x1="240" y1="530" x2="1360" y2="530" stroke="#FFFFFF" stroke-opacity="0.08" stroke-width="2"/>
+    <line x1="240" y1="438" x2="1360" y2="438" stroke="#FFFFFF" stroke-opacity="0.08" stroke-width="2"/>
+    <line x1="240" y1="346" x2="1360" y2="346" stroke="#FFFFFF" stroke-opacity="0.08" stroke-width="2"/>
+    <line x1="240" y1="300" x2="240" y2="622" stroke="#FFFFFF" stroke-opacity="0.16" stroke-width="2"/>
+
+    <text x="166" y="628" fill="#AEB8C7" font-size="17" font-family="Inter, Arial, sans-serif">baixo</text>
+    <text x="168" y="350" fill="#AEB8C7" font-size="17" font-family="Inter, Arial, sans-serif">alto</text>
+    <text x="238" y="674" fill="#AEB8C7" font-size="17" font-family="Inter, Arial, sans-serif">0</text>
+    <text x="512" y="674" fill="#AEB8C7" font-size="17" font-family="Inter, Arial, sans-serif">6 meses</text>
+    <text x="778" y="674" fill="#AEB8C7" font-size="17" font-family="Inter, Arial, sans-serif">12 meses</text>
+    <text x="1052" y="674" fill="#AEB8C7" font-size="17" font-family="Inter, Arial, sans-serif">18 meses</text>
+    <text x="1300" y="674" fill="#AEB8C7" font-size="17" font-family="Inter, Arial, sans-serif">24 meses</text>
+
+    <path d="M240 596C430 552 544 486 690 426C846 362 1010 322 1360 294L1360 622H240V596Z" fill="url(#areaGold)"/>
+    <path d="M240 596C430 552 544 486 690 426C846 362 1010 322 1360 294" stroke="url(#goldLine)" stroke-width="8" stroke-linecap="round"/>
+    <path d="M240 596C430 582 568 558 720 532C882 505 1030 478 1360 448" stroke="#D8DEE8" stroke-opacity="0.68" stroke-width="7" stroke-linecap="round" stroke-dasharray="18 18"/>
+
+    <circle cx="240" cy="596" r="10" fill="#F7DC84"/>
+    <circle cx="690" cy="426" r="10" fill="#C9A227"/>
+    <circle cx="1360" cy="294" r="10" fill="#C9A227"/>
+    <circle cx="1360" cy="448" r="10" fill="#D8DEE8"/>
+
+    <rect x="1000" y="296" width="330" height="116" rx="18" fill="#111B29" stroke="#FFFFFF" stroke-opacity="0.08"/>
+    <circle cx="1032" cy="334" r="8" fill="#C9A227"/>
+    <text x="1054" y="341" fill="#FFFFFF" font-size="18" font-weight="700" font-family="Inter, Arial, sans-serif">sem proteção UV constante</text>
+    <circle cx="1032" cy="378" r="8" fill="#D8DEE8"/>
+    <text x="1054" y="385" fill="#D8DEE8" font-size="18" font-weight="700" font-family="Inter, Arial, sans-serif">com insulfilm no vidro</text>
+  </g>
+
+  <g>
+    <rect x="118" y="744" width="1324" height="72" rx="18" fill="#C9A227" fill-opacity="0.09" stroke="#C9A227" stroke-opacity="0.2"/>
+    <text x="152" y="789" fill="#F7DC84" font-size="22" font-weight="800" font-family="Montserrat, Arial, sans-serif">Mensagem principal:</text>
+    <text x="382" y="789" fill="#D8DEE8" font-size="21" font-family="Inter, Arial, sans-serif">quanto antes o bloqueio UV começa, menor a agressão acumulada sobre tecidos, madeira e pisos.</text>
+  </g>
+</svg>

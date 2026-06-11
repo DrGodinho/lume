@@ -2,8 +2,6 @@ import type { Metadata } from 'next';
 import { BlogIndex } from '@/views/BlogIndex';
 import { getPublishedPosts } from '@/lib/blog';
 
-export const revalidate = 300;
-
 export const metadata: Metadata = {
   title: 'Blog sobre Insulfilm, Controle Solar e Conforto Termico',
   description:

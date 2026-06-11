@@ -1,13 +1,19 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { BlogPost } from '@/views/BlogPost';
-import { getBlogUrl, getPublishedPostBySlug, getPublishedPosts } from '@/lib/blog';
-
-export const revalidate = 300;
+import { getBlogUrl, getPublishedPostBySlug, getPublishedPosts, getRelatedPosts } from '@/lib/blog';
 
 type BlogPostPageProps = {
   params: Promise<{ slug: string }>;
 };
+
+export async function generateStaticParams() {
+  const posts = await getPublishedPosts();
+
+  return posts.map((post) => ({
+    slug: post.slug,
+  }));
+}
 
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -62,16 +68,7 @@ export default async function Page({ params }: BlogPostPageProps) {
 
   if (!post) notFound();
 
-  const posts = await getPublishedPosts(4);
-  const relatedPosts = posts
-    .filter((item) => item.id !== post.id)
-    .slice(0, 3)
-    .map((item) => ({
-      id: item.id,
-      title: item.title,
-      slug: item.slug,
-      category: item.category,
-    }));
+  const relatedPosts = await getRelatedPosts(post);
 
   const jsonLd = {
     '@context': 'https://schema.org',

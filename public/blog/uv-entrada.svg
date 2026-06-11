@@ -1,0 +1,87 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Infográfico sobre entrada de radiação UV pela janela</title>
+  <desc id="desc">Visual premium mostrando a radiação UV sendo filtrada pelo insulfilm antes de alcançar móveis internos.</desc>
+  <defs>
+    <linearGradient id="panel" x1="80" y1="60" x2="1520" y2="840" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#091522"/>
+      <stop offset="0.55" stop-color="#050B13"/>
+      <stop offset="1" stop-color="#10100A"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#F7DC84"/>
+      <stop offset="0.52" stop-color="#C9A227"/>
+      <stop offset="1" stop-color="#7E6413"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="660" y1="210" x2="820" y2="690" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F7DC84" stop-opacity="0.56"/>
+      <stop offset="0.5" stop-color="#C9A227" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.08"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="22" stdDeviation="26" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+    <pattern id="grid" width="64" height="64" patternUnits="userSpaceOnUse">
+      <path d="M64 0H0V64" stroke="#FFFFFF" stroke-opacity="0.045" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1600" height="900" rx="36" fill="#04080F"/>
+  <rect x="56" y="56" width="1488" height="788" rx="34" fill="url(#panel)" stroke="#C9A227" stroke-opacity="0.22" stroke-width="2"/>
+  <rect x="56" y="56" width="1488" height="788" rx="34" fill="url(#grid)"/>
+
+  <text x="118" y="140" fill="#F7DC84" font-size="44" font-weight="800" font-family="Montserrat, Arial, sans-serif">Radiação UV: o bloqueio começa no vidro</text>
+  <text x="118" y="186" fill="#AEB8C7" font-size="22" font-family="Inter, Arial, sans-serif">O insulfilm reduz a carga solar antes que ela alcance sofás, madeira, cortinas e pisos.</text>
+
+  <g filter="url(#shadow)">
+    <rect x="116" y="265" width="390" height="392" rx="26" fill="#08111D" stroke="#FFFFFF" stroke-opacity="0.08"/>
+    <text x="158" y="326" fill="#FFFFFF" font-size="26" font-weight="800" font-family="Montserrat, Arial, sans-serif">Sol direto</text>
+    <text x="158" y="361" fill="#AEB8C7" font-size="18" font-family="Inter, Arial, sans-serif">UV + calor atravessando a fachada</text>
+    <circle cx="304" cy="470" r="88" fill="#C9A227" fill-opacity="0.18" stroke="#C9A227" stroke-width="4"/>
+    <circle cx="304" cy="470" r="45" fill="url(#gold)"/>
+    <g stroke="#C9A227" stroke-width="8" stroke-linecap="round">
+      <path d="M304 337V292"/>
+      <path d="M304 648V603"/>
+      <path d="M171 470H126"/>
+      <path d="M482 470H437"/>
+      <path d="M210 376L178 344"/>
+      <path d="M398 376L430 344"/>
+      <path d="M210 564L178 596"/>
+      <path d="M398 564L430 596"/>
+    </g>
+  </g>
+
+  <g filter="url(#shadow)">
+    <path d="M640 226H854L796 674H582L640 226Z" fill="url(#glass)" stroke="#F7DC84" stroke-opacity="0.55" stroke-width="2"/>
+    <path d="M674 268H813L768 632H628L674 268Z" fill="#07111B" fill-opacity="0.48" stroke="#FFFFFF" stroke-opacity="0.16"/>
+    <text x="604" y="730" fill="#F7DC84" font-size="28" font-weight="800" font-family="Montserrat, Arial, sans-serif">Insulfilm</text>
+    <text x="604" y="764" fill="#AEB8C7" font-size="18" font-family="Inter, Arial, sans-serif">barreira aplicada no vidro</text>
+  </g>
+
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M486 424C548 406 594 390 652 372" stroke="#C9A227" stroke-width="10"/>
+    <path d="M486 476C548 462 602 450 666 436" stroke="#C9A227" stroke-width="10" stroke-opacity="0.55"/>
+    <path d="M486 528C548 518 610 512 680 502" stroke="#C9A227" stroke-width="10" stroke-opacity="0.28"/>
+    <path d="M818 386C902 382 972 388 1056 416" stroke="#FFFFFF" stroke-width="8" stroke-opacity="0.14"/>
+    <path d="M804 456C900 456 976 466 1062 496" stroke="#FFFFFF" stroke-width="8" stroke-opacity="0.1"/>
+    <path d="M790 526C896 532 980 548 1068 586" stroke="#FFFFFF" stroke-width="8" stroke-opacity="0.08"/>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="1056" y="265" width="398" height="392" rx="26" fill="#08111D" stroke="#FFFFFF" stroke-opacity="0.08"/>
+    <text x="1098" y="326" fill="#FFFFFF" font-size="26" font-weight="800" font-family="Montserrat, Arial, sans-serif">Ambiente protegido</text>
+    <text x="1098" y="361" fill="#AEB8C7" font-size="18" font-family="Inter, Arial, sans-serif">menos agressão diária aos acabamentos</text>
+    <rect x="1130" y="454" width="230" height="92" rx="18" fill="#162133" stroke="#FFFFFF" stroke-opacity="0.08"/>
+    <rect x="1166" y="410" width="158" height="58" rx="18" fill="#253044"/>
+    <rect x="1188" y="542" width="28" height="62" rx="8" fill="#C9A227"/>
+    <rect x="1282" y="542" width="28" height="62" rx="8" fill="#C9A227"/>
+    <rect x="1376" y="420" width="36" height="184" rx="10" fill="#6D5420"/>
+    <rect x="1092" y="408" width="42" height="196" rx="10" fill="#8A6923"/>
+    <text x="1128" y="620" fill="#F7DC84" font-size="22" font-weight="800" font-family="Montserrat, Arial, sans-serif">móveis preservados</text>
+  </g>
+
+  <g>
+    <rect x="118" y="728" width="1324" height="72" rx="18" fill="#C9A227" fill-opacity="0.09" stroke="#C9A227" stroke-opacity="0.2"/>
+    <text x="152" y="773" fill="#F7DC84" font-size="22" font-weight="800" font-family="Montserrat, Arial, sans-serif">Leitura rápida:</text>
+    <text x="330" y="773" fill="#D8DEE8" font-size="21" font-family="Inter, Arial, sans-serif">o vidro vira o ponto de controle; os móveis deixam de receber a carga UV completa todos os dias.</text>
+  </g>
+</svg>

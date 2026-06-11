@@ -1,7 +1,6 @@
 import type { MetadataRoute } from 'next';
-import { getBlogUrl, getPublishedPosts } from '@/lib/blog';
-
-export const dynamic = 'force-dynamic';
+import { blogPosts } from '@/content/blog';
+import { getBlogUrl } from '@/lib/blog';
 
 const staticRoutes = [
   { path: '/', priority: 1, changeFrequency: 'monthly' as const },
@@ -29,9 +28,8 @@ const staticRoutes = [
   { path: '/insulfilm-para-portas-de-vidro/', priority: 0.8, changeFrequency: 'monthly' as const },
 ];
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
-  const posts = await getPublishedPosts();
 
   return [
     ...staticRoutes.map((route) => ({
@@ -40,7 +38,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: route.changeFrequency,
       priority: route.priority,
     })),
-    ...posts.map((post) => ({
+    ...blogPosts.map((post) => ({
       url: getBlogUrl(post.slug),
       lastModified: new Date(post.updatedAt || post.publishedAt),
       changeFrequency: 'weekly' as const,
