@@ -89,14 +89,12 @@ export function BlogIndex({ posts }: BlogIndexProps) {
                 <BookOpen className="h-5 w-5" />
                 <span className="text-sm font-bold uppercase tracking-[0.22em]">Arquivo do blog</span>
               </div>
-              <h2 className="mt-5 font-montserrat text-3xl font-black">Conteudo organizado para vender com educacao</h2>
+              <h2 className="mt-5 font-montserrat text-3xl font-black">Dicas e Análises de Especialistas</h2>
               <p className="mt-4 leading-relaxed text-gray-400">
-                Cada post pode apontar para paginas importantes do site, como tipos de pelicula,
-                ambientes e regioes atendidas. Isso cria uma malha interna forte para SEO sem
-                sobrecarregar a pagina principal.
+                Aprenda a escolher a película ideal para seu projeto. Nossos artigos trazem análises técnicas sobre redução de calor, proteção UV, durabilidade e privacidade para vidros.
               </p>
               <div className="mt-8 space-y-4">
-                {posts.slice(0, 3).map((post) => (
+                {otherPosts.slice(0, 3).map((post) => (
                   <a
                     key={post.id}
                     href={`/blog/${post.slug}/`}
@@ -114,8 +112,8 @@ export function BlogIndex({ posts }: BlogIndexProps) {
             <p className="text-sm font-bold uppercase tracking-[0.25em] text-[#c9a227]">Blog pronto para receber posts</p>
             <h2 className="mt-4 font-montserrat text-3xl font-black">Nenhum post publicado ainda</h2>
             <p className="mx-auto mt-4 max-w-2xl text-gray-400">
-              Depois que a tabela blog_posts for criada no Supabase e o primeiro post estiver com
-              status published, ele aparecera automaticamente aqui e no sitemap dinamico.
+              Depois que o primeiro post local for adicionado ao projeto e publicado por deploy,
+              ele aparecera automaticamente aqui e no sitemap.
             </p>
           </section>
         )}
