@@ -261,14 +261,14 @@ export function BlogPost({ post, relatedPosts }: BlogPostProps) {
           ))}
         </div>
 
-        <aside className="space-y-6">
-          <div className="sticky top-28 rounded-[1.7rem] border border-[#c9a227]/20 bg-[#09121d]/90 p-6">
-            <h2 className="font-montserrat text-xl font-black">Quer saber qual pelicula usar?</h2>
+        <aside>
+          <div className="rounded-[1.7rem] border border-[#c9a227]/20 bg-[#09121d]/90 p-6 lg:sticky lg:top-28">
+            <h2 className="font-montserrat text-xl font-black">Quer saber qual película usar?</h2>
             <p className="mt-3 text-sm leading-6 text-gray-400">
-              Fale com a LUME e receba uma indicacao pratica para seu vidro, sol e objetivo.
+              Fale com a LUME e receba uma indicação prática para seu vidro, sol e objetivo.
             </p>
             <a
-              href={`https://wa.me/5521965140612?text=${encodeURIComponent(`Ola! Li o artigo ${postUrl} e quero ajuda para escolher uma pelicula.`)}`}
+              href={`https://wa.me/5521965140612?text=${encodeURIComponent(`Olá! Li o artigo ${postUrl} e quero ajuda para escolher uma película.`)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-primary mt-5 inline-flex w-full items-center justify-center gap-2"
@@ -289,27 +289,27 @@ export function BlogPost({ post, relatedPosts }: BlogPostProps) {
                 </div>
               </div>
             )}
-          </div>
 
-          {relatedPosts.length > 0 && (
-            <div className="rounded-[1.7rem] border border-white/10 bg-white/[0.03] p-6">
-              <h2 className="font-montserrat text-xl font-black">Leia tambem</h2>
-              <div className="mt-5 space-y-3">
-                {relatedPosts.map((relatedPost) => (
-                  <a
-                    key={relatedPost.id}
-                    href={`/blog/${relatedPost.slug}/`}
-                    className="block rounded-2xl border border-white/10 bg-black/20 p-4 transition-colors hover:border-[#c9a227]/50"
-                  >
-                    <p className="text-xs font-bold uppercase tracking-widest text-[#c9a227]">
-                      {relatedPost.category}
-                    </p>
-                    <h3 className="mt-2 text-sm font-bold text-white">{relatedPost.title}</h3>
-                  </a>
-                ))}
+            {relatedPosts.length > 0 && (
+              <div className="mt-8 border-t border-white/10 pt-8">
+                <h2 className="font-montserrat text-xl font-black">Leia também</h2>
+                <div className="mt-5 space-y-3">
+                  {relatedPosts.map((relatedPost) => (
+                    <a
+                      key={relatedPost.id}
+                      href={`/blog/${relatedPost.slug}/`}
+                      className="block rounded-2xl border border-white/10 bg-black/20 p-4 transition-colors hover:border-[#c9a227]/50"
+                    >
+                      <p className="text-xs font-bold uppercase tracking-widest text-[#c9a227]">
+                        {relatedPost.category}
+                      </p>
+                      <h3 className="mt-2 text-sm font-bold text-white">{relatedPost.title}</h3>
+                    </a>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </aside>
       </main>
     </article>

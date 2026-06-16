@@ -66,6 +66,16 @@ const roomsData = [
       { film: 'Jateado', tag: 'Para divisórias', desc: 'Privacidade total em divisórias de vidro internas ou janelas com vista para áreas comuns, sem perder a luz.', link: '/jateado/' },
       { film: 'Carbono G20', tag: 'Confortável', desc: 'Reduz o reflexo na tela do computador e deixa a luminosidade confortável para longas jornadas de trabalho.', link: '/carbono/' },
     ]
+  },
+  {
+    icon: '🚪',
+    title: 'Porta de Vidro',
+    titleLink: '/insulfilm-para-portas-de-vidro/',
+    recs: [
+      { film: 'Espelhado', tag: 'Controle solar', desc: 'Boa opção para portas que recebem muito sol direto, com redução de calor e mais privacidade durante o dia.', link: '/refletiva/' },
+      { film: 'Jateado', tag: 'Privacidade total', desc: 'Ideal para portas de vidro de banheiros, consultórios e áreas internas onde a prioridade é bloquear a visão sem escurecer.', link: '/jateado/' },
+      { film: 'Carbono', tag: 'Visual moderno', desc: 'Entrega um acabamento mais escuro e sofisticado, ajudando no conforto visual e na privacidade com um aspecto mais discreto.', link: '/carbono/' },
+    ]
   }
 ];
 

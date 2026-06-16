@@ -1,7 +1,11 @@
 import React from 'react';
-import { Settings, X, Cloud, CloudOff, Loader2 } from 'lucide-react';
+import { Cloud, CloudOff, Loader2, Settings, X } from 'lucide-react';
 
 type FilmTypeKey = 'carbono' | 'refletiva' | 'dupla_camada' | 'nano_ceramica' | 'jateado';
+type OptimizationMode = 'densidade' | 'facilidade' | 'facilidade_v2';
+type LossMode = 'dinamico' | 'fixo';
+type ColorMode = 'ambiente' | 'tamanho';
+type CloudStatus = 'idle' | 'syncing' | 'synced' | 'error';
 
 const FILM_TYPE_LABELS: Record<FilmTypeKey, string> = {
   carbono: 'Carbono',
@@ -11,15 +15,19 @@ const FILM_TYPE_LABELS: Record<FilmTypeKey, string> = {
   jateado: 'Jateado',
 };
 
+const FILM_TYPE_KEYS = Object.keys(FILM_TYPE_LABELS) as FilmTypeKey[];
+const inputClass = 'w-full bg-[#040811] border border-white/10 rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-[#c9a227]/50 transition-colors';
+const centeredInputClass = `${inputClass} text-center`;
+
 interface AppConfig {
   rollW: number;
   price: number;
   margin: number;
-  modoOtimizacao: 'densidade' | 'facilidade' | 'facilidade_v2';
+  modoOtimizacao: OptimizationMode;
   userName: string;
-  modoPerdas: 'dinamico' | 'fixo';
+  modoPerdas: LossMode;
   perdasFixas: number;
-  modoCorConfig: 'ambiente' | 'tamanho';
+  modoCorConfig: ColorMode;
   agressividadeCorte: number;
   filmTypes: Record<FilmTypeKey, number>;
   selectedFilm: FilmTypeKey;
@@ -30,7 +38,92 @@ interface ConfigPanelProps {
   setAberto: (v: boolean) => void;
   config: AppConfig;
   onUpdate: <K extends keyof AppConfig>(key: K, value: AppConfig[K]) => void;
-  cloudStatus: 'idle' | 'syncing' | 'synced' | 'error';
+  cloudStatus: CloudStatus;
+}
+
+function FieldLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <label className="block text-[10px] uppercase text-[#c9a227] font-bold mb-2">
+      {children}
+    </label>
+  );
+}
+
+function HelpText({ children }: { children: React.ReactNode }) {
+  return <p className="text-[9px] text-gray-600 mt-2 leading-relaxed">{children}</p>;
+}
+
+function NumberField({
+  value,
+  onChange,
+  min,
+  max,
+  step,
+}: {
+  value: number;
+  onChange: (value: number) => void;
+  min?: number;
+  max?: number;
+  step?: number;
+}) {
+  return (
+    <input
+      type="number"
+      value={value}
+      onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+      onFocus={(e) => e.target.select()}
+      min={min}
+      max={max}
+      step={step}
+      className={centeredInputClass}
+    />
+  );
+}
+
+function SegmentGroup<T extends string>({
+  value,
+  options,
+  onChange,
+}: {
+  value: T;
+  options: Array<{ label: string; value: T }>;
+  onChange: (value: T) => void;
+}) {
+  return (
+    <div className="flex bg-[#040811] border border-white/10 p-1 rounded-xl">
+      {options.map((option) => (
+        <button
+          key={option.value}
+          onClick={() => onChange(option.value)}
+          className={`flex-1 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${
+            value === option.value ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function CloudIndicator({ status }: { status: CloudStatus }) {
+  const title =
+    status === 'synced'
+      ? 'Sincronizado'
+      : status === 'syncing'
+        ? 'Sincronizando...'
+        : status === 'error'
+          ? 'Erro de sincronização'
+          : 'Auto-save';
+
+  return (
+    <div className="flex items-center gap-1" title={title}>
+      {status === 'syncing' && <Loader2 size={12} className="text-[#c9a227] animate-spin" />}
+      {status === 'synced' && <Cloud size={12} className="text-green-400" />}
+      {status === 'error' && <CloudOff size={12} className="text-red-400" />}
+      {status === 'idle' && <Cloud size={12} className="text-gray-600" />}
+    </div>
+  );
 }
 
 export const ConfigPanel: React.FC<ConfigPanelProps> = ({
@@ -46,173 +139,155 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
         <div className="flex items-center justify-between p-5 border-b border-white/10">
           <div className="flex items-center gap-3">
             <Settings size={18} className="text-[#c9a227]" />
-            <span className="font-bold text-sm uppercase tracking-wider">Configuracoes Padrao</span>
+            <span className="font-bold text-sm uppercase tracking-wider">Configurações Padrão</span>
           </div>
+
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1" title={cloudStatus === 'synced' ? 'Sincronizado' : cloudStatus === 'syncing' ? 'Sincronizando...' : cloudStatus === 'error' ? 'Erro de sincronizacao' : 'Auto-save'}>
-              {cloudStatus === 'syncing' && <Loader2 size={12} className="text-[#c9a227] animate-spin" />}
-              {cloudStatus === 'synced' && <Cloud size={12} className="text-green-400" />}
-              {cloudStatus === 'error' && <CloudOff size={12} className="text-red-400" />}
-              {cloudStatus === 'idle' && <Cloud size={12} className="text-gray-600" />}
-            </div>
+            <CloudIndicator status={cloudStatus} />
             <button onClick={() => setAberto(false)} className="p-1.5 hover:bg-white/10 rounded-lg transition-colors">
               <X size={18} />
             </button>
           </div>
         </div>
+
         <div className="flex-1 overflow-y-auto p-5 space-y-6">
-          <div>
-            <p className="text-[10px] text-gray-500 mb-4 leading-relaxed">
-              Alteracoes sao salvas automaticamente na nuvem.
-            </p>
-          </div>
+          <p className="text-[10px] text-gray-500 mb-4 leading-relaxed">
+            Alterações são salvas automaticamente na nuvem.
+          </p>
+
           <div className="space-y-4">
             <div>
-              <label className="block text-[10px] uppercase text-[#c9a227] font-bold mb-2">Nome do Responsavel</label>
+              <FieldLabel>Nome do Responsável</FieldLabel>
               <input
                 type="text"
                 value={config.userName}
                 onChange={(e) => onUpdate('userName', e.target.value)}
                 placeholder="Seu Nome"
-                className="w-full bg-[#040811] border border-white/10 rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-[#c9a227]/50 transition-colors"
+                className={inputClass}
               />
             </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <FieldLabel>Largura do Rolo (cm)</FieldLabel>
+                <NumberField value={config.rollW} onChange={(value) => onUpdate('rollW', value)} />
+              </div>
+
+              <div>
+                <FieldLabel>Margem de Corte (cm)</FieldLabel>
+                <NumberField value={config.margin} onChange={(value) => onUpdate('margin', value)} />
+              </div>
+            </div>
+
             <div>
-              <label className="block text-[10px] uppercase text-[#c9a227] font-bold mb-2">Largura do Rolo (cm)</label>
-              <input
-                type="number"
-                value={config.rollW}
-                onChange={(e) => onUpdate('rollW', parseFloat(e.target.value) || 0)}
-                onFocus={(e) => e.target.select()}
-                className="w-full bg-[#040811] border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-center outline-none focus:border-[#c9a227]/50 transition-colors"
+              <FieldLabel>Película Padrão</FieldLabel>
+              <select
+                value={config.selectedFilm}
+                onChange={(e) => onUpdate('selectedFilm', e.target.value as FilmTypeKey)}
+                className={`${centeredInputClass} appearance-none cursor-pointer`}
+              >
+                {FILM_TYPE_KEYS.map((key) => (
+                  <option key={key} value={key}>
+                    {FILM_TYPE_LABELS[key]} - R${config.filmTypes[key]}/m²
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <FieldLabel>Preços por Película (R$/m²)</FieldLabel>
+              <div className="space-y-2">
+                {FILM_TYPE_KEYS.map((key) => (
+                  <div key={key} className="flex items-center gap-2">
+                    <span className="text-[10px] text-gray-400 font-bold w-24 truncate">
+                      {FILM_TYPE_LABELS[key]}
+                    </span>
+                    <input
+                      type="number"
+                      value={config.filmTypes[key]}
+                      onChange={(e) => {
+                        const updated = { ...config.filmTypes, [key]: parseFloat(e.target.value) || 0 };
+                        onUpdate('filmTypes', updated);
+                      }}
+                      onFocus={(e) => e.target.select()}
+                      className="flex-1 bg-[#040811] border border-white/10 rounded-lg px-3 py-2 text-sm font-bold text-center outline-none focus:border-[#c9a227]/50 transition-colors"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <FieldLabel>Algoritmo Padrão</FieldLabel>
+              <SegmentGroup
+                value={config.modoOtimizacao}
+                onChange={(value) => onUpdate('modoOtimizacao', value)}
+                options={[
+                  { label: 'Densidade', value: 'densidade' },
+                  { label: 'Fácil v1', value: 'facilidade' },
+                  { label: 'Fácil v2', value: 'facilidade_v2' },
+                ]}
               />
             </div>
-<div>
-          <label className="block text-[10px] uppercase text-[#c9a227] font-bold mb-2">Película Padrão</label>
-          <select
-            value={config.selectedFilm}
-            onChange={(e) => onUpdate('selectedFilm', e.target.value as FilmTypeKey)}
-            className="w-full bg-[#040811] border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-center outline-none focus:border-[#c9a227]/50 transition-colors appearance-none cursor-pointer"
-          >
-            {(Object.keys(FILM_TYPE_LABELS) as FilmTypeKey[]).map((key) => (
-              <option key={key} value={key}>{FILM_TYPE_LABELS[key]} — R${config.filmTypes[key]}/m²</option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label className="block text-[10px] uppercase text-[#c9a227] font-bold mb-2">Preços por Película (R$/m²)</label>
-          <div className="space-y-2">
-            {(Object.keys(FILM_TYPE_LABELS) as FilmTypeKey[]).map((key) => (
-              <div key={key} className="flex items-center gap-2">
-                <span className="text-[10px] text-gray-400 font-bold w-24 truncate">{FILM_TYPE_LABELS[key]}</span>
-                <input
-                  type="number"
-                  value={config.filmTypes[key]}
-                  onChange={(e) => {
-                    const updated = { ...config.filmTypes, [key]: parseFloat(e.target.value) || 0 };
-                    onUpdate('filmTypes', updated);
-                  }}
-                  onFocus={(e) => e.target.select()}
-                  className="flex-1 bg-[#040811] border border-white/10 rounded-lg px-3 py-2 text-sm font-bold text-center outline-none focus:border-[#c9a227]/50 transition-colors"
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-            <div>
-              <label className="block text-[10px] uppercase text-[#c9a227] font-bold mb-2">Margem de Corte (cm)</label>
-              <input
-                type="number"
-                value={config.margin}
-                onChange={(e) => onUpdate('margin', parseFloat(e.target.value) || 0)}
-                onFocus={(e) => e.target.select()}
-                className="w-full bg-[#040811] border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-center outline-none focus:border-[#c9a227]/50 transition-colors"
+
+            <div className="rounded-2xl border border-[#c9a227]/20 bg-[#c9a227]/[0.04] p-4">
+              <FieldLabel>Comportamento do Botao de Perdas</FieldLabel>
+              <SegmentGroup
+                value={config.modoPerdas}
+                onChange={(value) => onUpdate('modoPerdas', value)}
+                options={[
+                  { label: 'Dinâmico', value: 'dinamico' },
+                  { label: 'Fixo', value: 'fixo' },
+                ]}
               />
-            </div>
-            <div>
-              <label className="block text-[10px] uppercase text-[#c9a227] font-bold mb-2">Algoritmo Padrao</label>
-              <div className="flex bg-[#040811] border border-white/10 p-1 rounded-xl">
-                <button
-                  onClick={() => onUpdate('modoOtimizacao', 'densidade')}
-                  className={`flex-1 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${config.modoOtimizacao === 'densidade' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}
-                >
-                  Densidade
-                </button>
-                <button
-                  onClick={() => onUpdate('modoOtimizacao', 'facilidade')}
-                  className={`flex-1 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${config.modoOtimizacao === 'facilidade' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}
-                >
-                  Facil v1
-                </button>
-                <button
-                  onClick={() => onUpdate('modoOtimizacao', 'facilidade_v2')}
-                  className={`flex-1 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${config.modoOtimizacao === 'facilidade_v2' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}
-                >
-                  Facil v2
-                </button>
-              </div>
-            </div>
-            <div>
-              <label className="block text-[10px] uppercase text-[#c9a227] font-bold mb-2">Modo de Perdas</label>
-              <div className="flex bg-[#040811] border border-white/10 p-1 rounded-xl">
-                <button
-                  onClick={() => onUpdate('modoPerdas', 'dinamico')}
-                  className={`flex-1 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${config.modoPerdas === 'dinamico' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}
-                >
-                  Dinamico
-                </button>
-                <button
-                  onClick={() => onUpdate('modoPerdas', 'fixo')}
-                  className={`flex-1 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${config.modoPerdas === 'fixo' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}
-                >
-                  Fixo
-                </button>
-              </div>
-              <p className="text-[9px] text-gray-600 mt-2 leading-relaxed">
+              <HelpText>
                 {config.modoPerdas === 'dinamico'
-                  ? 'Calcula a perda automaticamente com base na eficiencia do corte.'
-                  : 'Aplica uma porcentagem fixa de perda sobre o subtotal.'}
-              </p>
-              {config.modoPerdas === 'fixo' && (
-                <div className="mt-3">
-                  <label className="block text-[9px] uppercase text-gray-400 font-bold mb-1">Porcentagem Fixa (%)</label>
-                  <input
-                    type="number"
-                    value={config.perdasFixas}
-                    onChange={(e) => onUpdate('perdasFixas', parseFloat(e.target.value) || 0)}
-                    onFocus={(e) => e.target.select()}
-                    min={0}
-                    max={100}
-                    className="w-full bg-[#040811] border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-center outline-none focus:border-[#c9a227]/50 transition-colors"
-                  />
+                  ? 'O botao usa a eficiencia do corte atual para calcular a perda automaticamente.'
+                  : 'O botao aplica sempre a porcentagem fixa configurada abaixo.'}
+              </HelpText>
+
+              <div className="mt-3">
+                <div className="flex items-center justify-between gap-3 mb-1">
+                  <label className="block text-[9px] uppercase text-gray-400 font-bold">
+                    Porcentagem fixa (%)
+                  </label>
+                  <span className={`text-[9px] font-black uppercase ${config.modoPerdas === 'fixo' ? 'text-[#f5d77a]' : 'text-gray-600'}`}>
+                    {config.modoPerdas === 'fixo' ? 'ativa' : 'reserva'}
+                  </span>
                 </div>
-              )}
-            </div>
-            <div>
-              <label className="block text-[10px] uppercase text-[#c9a227] font-bold mb-2">Modo de Cor</label>
-              <div className="flex bg-[#040811] border border-white/10 p-1 rounded-xl">
-                <button
-                  onClick={() => onUpdate('modoCorConfig', 'ambiente')}
-                  className={`flex-1 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${config.modoCorConfig === 'ambiente' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}
-                >
-                  Ambiente
-                </button>
-                <button
-                  onClick={() => onUpdate('modoCorConfig', 'tamanho')}
-                  className={`flex-1 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${config.modoCorConfig === 'tamanho' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}
-                >
-                  Tamanho
-                </button>
+                <NumberField
+                  value={config.perdasFixas}
+                  onChange={(value) => onUpdate('perdasFixas', value)}
+                  min={0}
+                  max={100}
+                  step={0.5}
+                />
+                <HelpText>
+                  Padrao recomendado: 20%. Este valor fica salvo mesmo quando o modo dinamico esta ativo.
+                </HelpText>
               </div>
-              <p className="text-[9px] text-gray-600 mt-2 leading-relaxed">
-                {config.modoCorConfig === 'ambiente'
-                  ? 'Usa uma cor unica por ambiente/identificacao.'
-                  : 'Usa cores baseadas no tamanho de cada peca.'}
-              </p>
             </div>
+
+            <div>
+              <FieldLabel>Modo de Cor</FieldLabel>
+              <SegmentGroup
+                value={config.modoCorConfig}
+                onChange={(value) => onUpdate('modoCorConfig', value)}
+                options={[
+                  { label: 'Ambiente', value: 'ambiente' },
+                  { label: 'Tamanho', value: 'tamanho' },
+                ]}
+              />
+              <HelpText>
+                {config.modoCorConfig === 'ambiente'
+                  ? 'Usa uma cor única por ambiente/identificação.'
+                  : 'Usa cores baseadas no tamanho de cada peça.'}
+              </HelpText>
+            </div>
+
             <div>
               <div className="flex items-center justify-between gap-3 mb-2">
-                <label className="block text-[10px] uppercase text-[#c9a227] font-bold">Agressividade do Corte Facil v2</label>
+                <FieldLabel>Agressividade do Corte Fácil v2</FieldLabel>
                 <span className="text-[10px] text-white font-black bg-[#040811] border border-white/10 rounded-lg px-2 py-1">
                   {config.agressividadeCorte}%
                 </span>
@@ -228,15 +303,16 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
               />
               <div className="flex justify-between text-[9px] text-gray-600 mt-1 font-bold uppercase">
                 <span>Mais linhas de corte</span>
-                <span>Mais economico</span>
+                <span>Mais econômico</span>
               </div>
-              <p className="text-[9px] text-gray-600 mt-2 leading-relaxed">
-                Valores menores aproximam bordas em linhas horizontais. Valores maiores apertam mais as pecas para economizar rolo.
-              </p>
+              <HelpText>
+                Valores menores aproximam bordas em linhas horizontais. Valores maiores apertam mais as peças para economizar rolo.
+              </HelpText>
             </div>
           </div>
         </div>
       </div>
+
       {aberto && (
         <div onClick={() => setAberto(false)} className="fixed inset-0 bg-black/40 z-40 backdrop-blur-sm" />
       )}

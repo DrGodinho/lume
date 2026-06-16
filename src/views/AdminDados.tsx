@@ -3,10 +3,24 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
     Database, ArrowLeft, Search, Trash2, Eye, ChevronDown, ChevronUp,
-    Calendar, DollarSign, Package, User, Clock, RefreshCw, Download,
+    DollarSign, Package, User, Clock, RefreshCw, Download,
     BarChart3, TrendingUp, Layers
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+
+interface GlassItem {
+    label?: string;
+    h?: number;
+    w?: number;
+    oh?: number;
+    ow?: number;
+    cor?: string;
+}
+
+interface HistoryConfig {
+    rollW?: number;
+    price?: number;
+}
 
 interface HistoryRow {
     id: string;
@@ -14,8 +28,8 @@ interface HistoryRow {
     data: string;
     valor: number;
     qtd: number;
-    vidros: any[];
-    config: any;
+    vidros: GlassItem[];
+    config: HistoryConfig | null;
     desconto: number;
     modo_otimizacao: string;
     created_at: string;
@@ -24,7 +38,7 @@ interface HistoryRow {
 interface DraftRow {
     id: string;
     cliente: string;
-    vidros: any[];
+    vidros: GlassItem[];
     desconto: number;
     desconto_input: string;
     roll_w: number;
@@ -75,9 +89,9 @@ export function AdminDados() {
         } catch { return iso; }
     };
 
-    const loadData = async () => {
+    const loadData = async (showLoading = true) => {
         if (!supabase) return;
-        setLoading(true);
+        if (showLoading) setLoading(true);
 
         const [histRes, draftRes, cfgRes] = await Promise.all([
             supabase.from('calculator_history').select('*').order('created_at', { ascending: false }),
@@ -91,7 +105,31 @@ export function AdminDados() {
         setLoading(false);
     };
 
-    useEffect(() => { loadData(); }, []);
+    useEffect(() => {
+        let active = true;
+
+        const loadInitialData = async () => {
+            if (!supabase) return;
+
+            const [histRes, draftRes, cfgRes] = await Promise.all([
+                supabase.from('calculator_history').select('*').order('created_at', { ascending: false }),
+                supabase.from('calculator_draft').select('*').eq('id', 'default').single(),
+                supabase.from('calculator_config').select('*').eq('id', 'default').single(),
+            ]);
+
+            if (!active) return;
+            if (histRes.data) setHistory(histRes.data as HistoryRow[]);
+            if (draftRes.data) setDraft(draftRes.data as DraftRow);
+            if (cfgRes.data) setConfig(cfgRes.data as ConfigRow);
+            setLoading(false);
+        };
+
+        void loadInitialData();
+
+        return () => {
+            active = false;
+        };
+    }, []);
 
     const deleteHistoryItem = async (id: string) => {
         if (!supabase) return;
@@ -145,7 +183,7 @@ export function AdminDados() {
         else { setSortField(field); setSortDir('desc'); }
     };
 
-    const SortIcon = ({ field }: { field: typeof sortField }) => (
+    const renderSortIcon = (field: typeof sortField) => (
         sortField === field
             ? (sortDir === 'desc' ? <ChevronDown size={12} /> : <ChevronUp size={12} />)
             : <ChevronDown size={12} className="opacity-30" />
@@ -179,7 +217,7 @@ export function AdminDados() {
                             </div>
                         </div>
                     </div>
-                    <button onClick={loadData} className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-xs font-bold uppercase hover:bg-white/10 transition-colors">
+                    <button onClick={() => loadData()} className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-xs font-bold uppercase hover:bg-white/10 transition-colors">
                         <RefreshCw size={14} className={loading ? 'animate-spin' : ''} /> Atualizar
                     </button>
                 </div>
@@ -258,13 +296,13 @@ export function AdminDados() {
                                 <div className="hidden sm:grid grid-cols-12 gap-2 px-4 py-2 text-[9px] uppercase font-bold text-gray-500 tracking-wider">
                                     <div className="col-span-4">Cliente</div>
                                     <button onClick={() => toggleSort('created_at')} className="col-span-2 flex items-center gap-1 hover:text-white transition-colors">
-                                        Data <SortIcon field="created_at" />
+                                        Data {renderSortIcon('created_at')}
                                     </button>
                                     <button onClick={() => toggleSort('valor')} className="col-span-2 flex items-center gap-1 hover:text-white transition-colors">
-                                        Valor <SortIcon field="valor" />
+                                        Valor {renderSortIcon('valor')}
                                     </button>
                                     <button onClick={() => toggleSort('qtd')} className="col-span-2 flex items-center gap-1 hover:text-white transition-colors">
-                                        Peças <SortIcon field="qtd" />
+                                        Peças {renderSortIcon('qtd')}
                                     </button>
                                     <div className="col-span-2 text-right">Ações</div>
                                 </div>
@@ -337,7 +375,7 @@ export function AdminDados() {
                                                         </div>
                                                         <p className="text-[9px] text-gray-500 uppercase font-bold mb-2">Vidros ({h.vidros?.length || 0})</p>
                                                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 max-h-48 overflow-y-auto">
-                                                            {(h.vidros || []).map((v: any, i: number) => (
+                                                            {(h.vidros || []).map((v, i) => (
                                                                 <div key={i} className="bg-white/5 rounded-lg px-3 py-2 text-xs flex items-center justify-between">
                                                                     <span className="text-gray-400">{v.label ? <span className="text-[#c9a227] mr-1">{v.label}</span> : ''}{v.oh || v.h}×{v.ow || v.w}</span>
                                                                     <div className="w-3 h-3 rounded-sm shrink-0 ml-2" style={{ background: v.cor }} />
@@ -365,7 +403,7 @@ export function AdminDados() {
                                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
                                             {[
                                                 { label: 'Cliente', value: draft.cliente || '—', icon: User },
-                                                { label: 'Peças', value: (draft.vidros as any[])?.length || 0, icon: Package },
+                                                { label: 'Peças', value: draft.vidros?.length || 0, icon: Package },
                                                 { label: 'Rolo', value: `${draft.roll_w}cm`, icon: Layers },
                                                 { label: 'R$/m²', value: draft.price, icon: DollarSign },
                                             ].map((f, i) => (
@@ -376,11 +414,11 @@ export function AdminDados() {
                                                 </div>
                                             ))}
                                         </div>
-                                        {draft.vidros && (draft.vidros as any[]).length > 0 && (
+                                        {draft.vidros && draft.vidros.length > 0 && (
                                             <>
                                                 <p className="text-[9px] text-gray-500 uppercase font-bold mb-2">Vidros no Rascunho</p>
                                                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 max-h-60 overflow-y-auto">
-                                                    {(draft.vidros as any[]).map((v: any, i: number) => (
+                                                    {draft.vidros.map((v, i) => (
                                                         <div key={i} className="bg-white/5 rounded-lg px-3 py-2 text-xs flex items-center justify-between">
                                                             <span className="text-gray-400">{v.label ? <span className="text-[#c9a227] mr-1">{v.label}</span> : ''}{v.oh || v.h}×{v.ow || v.w}</span>
                                                             <div className="w-3 h-3 rounded-sm shrink-0 ml-2" style={{ background: v.cor }} />
@@ -416,7 +454,7 @@ export function AdminDados() {
               { label: 'Margem de Corte', value: `${config.margin} cm` },
               { label: 'Modo de Otimização', value: config.modo_otimizacao },
               { label: 'Modo de Perdas', value: config.modo_perdas ?? '—' },
-              { label: 'Perdas Fixas', value: config.perdas_fixas != null ? `${config.perdas_fixas} cm` : '—' },
+              { label: 'Perdas Fixas', value: config.perdas_fixas != null ? `${config.perdas_fixas}%` : '—' },
               { label: 'Modo de Cor', value: config.modo_cor_config ?? '—' },
                   { label: 'Película Selecionada', value: config.selected_film ?? '—' },
                   ].map((f, i) => (

@@ -1,15 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Menu, X, Phone } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 
-type GtagWindow = Window & {
-  gtag?: (...args: unknown[]) => void;
-};
-
 const navLinks = [
-  { name: 'Inicio', href: '/' },
   { name: 'Produtos', href: '#produtos' },
   { name: 'Portas de Vidro', href: '/insulfilm-para-portas-de-vidro' },
   { name: 'Blog', href: '/blog' },
@@ -51,13 +46,6 @@ export function Navbar() {
       }
     }
     setIsMobileMenuOpen(false);
-  };
-
-  const trackContact = () => {
-    const w = window as GtagWindow;
-    if (typeof w.gtag === 'function') {
-      w.gtag('event', 'conversion_event_contact');
-    }
   };
 
   return (
@@ -109,26 +97,10 @@ export function Navbar() {
 
           <div className="hidden lg:flex items-center gap-4">
             <a
-              href="/guia-insulfilm/"
-              className="btn-secondary flex items-center gap-2 text-xs py-2 px-4 transition-transform hover:scale-105 active:scale-95"
-            >
-              Guia de Peliculas
-            </a>
-            <a
               href="/calculadora-economia-energia-insulfilm/"
               className="btn-secondary flex items-center gap-2 text-xs py-2 px-4 transition-transform hover:scale-105 active:scale-95"
             >
               Economia de Energia
-            </a>
-            <a
-              href="https://wa.me/5521965140612"
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={trackContact}
-              className="btn-primary flex items-center gap-2 text-xs py-2 px-4 transition-transform hover:scale-105 active:scale-95"
-            >
-              <Phone className="w-4 h-4" />
-              Especialista
             </a>
           </div>
 
@@ -174,28 +146,11 @@ export function Navbar() {
               )
             ))}
             <a
-              href="/guia-insulfilm/"
-              className="btn-secondary flex items-center justify-center gap-2 mt-2"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Guia de Peliculas
-            </a>
-            <a
               href="/calculadora-economia-energia-insulfilm/"
               className="btn-secondary flex items-center justify-center gap-2 mt-2"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Economia de Energia
-            </a>
-            <a
-              href="https://wa.me/5521965140612"
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={trackContact}
-              className="btn-primary flex items-center justify-center gap-2 mt-4"
-            >
-              <Phone className="w-4 h-4" />
-              Falar com Especialista
             </a>
           </div>
         </div>

@@ -113,8 +113,7 @@ const jsonLd = {
           '@type': 'Product',
           name: 'Insulfilm Nano Cerâmica',
           description: 'Alta redução de calor e proteção UV extrema.',
-          brand: { '@type': 'Brand', name: 'LUME' },
-          aggregateRating: { '@type': 'AggregateRating', ratingValue: '5.0', reviewCount: '38' }
+          brand: { '@type': 'Brand', name: 'LUME' }
         },
       },
       {
@@ -124,8 +123,7 @@ const jsonLd = {
           '@type': 'Product',
           name: 'Insulfilm Carbono',
           description: 'Estética premium e durabilidade superior.',
-          brand: { '@type': 'Brand', name: 'LUME' },
-          aggregateRating: { '@type': 'AggregateRating', ratingValue: '5.0', reviewCount: '38' }
+          brand: { '@type': 'Brand', name: 'LUME' }
         },
       },
       {
@@ -135,18 +133,10 @@ const jsonLd = {
           '@type': 'Product',
           name: 'Insulfilm Refletivo',
           description: 'Privacidade total e redução de calor eficiente.',
-          brand: { '@type': 'Brand', name: 'LUME' },
-          aggregateRating: { '@type': 'AggregateRating', ratingValue: '5.0', reviewCount: '38' }
+          brand: { '@type': 'Brand', name: 'LUME' }
         },
       },
     ],
-  },
-  aggregateRating: {
-    '@type': 'AggregateRating',
-    ratingValue: '5.0',
-    reviewCount: '38',
-    bestRating: '5',
-    worstRating: '1'
   },
   review: [
     {

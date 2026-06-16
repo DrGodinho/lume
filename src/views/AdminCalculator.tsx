@@ -2,14 +2,11 @@
 
 import React, { useState, useEffect, useRef, useMemo, useReducer, useCallback } from 'react';
 import {
-Plus, Trash2, Smartphone, Save, FolderOpen, Scissors,
+    Plus, Trash2, Smartphone, Save, FolderOpen, Scissors,
     Calculator, Camera, Layers, RotateCcw, AlignRight, AlignLeft, X,
-    History, Clock, ChevronRight, Undo2, Redo2, FileText, Settings, Cloud, CloudOff, Loader2, Copy, ClipboardPaste, User
+    History, Undo2, Redo2, FileText, Settings, Cloud, CloudOff, Loader2, Copy, ClipboardPaste, User
 } from 'lucide-react';
 import gsap from 'gsap';
-import * as htmlToImage from 'html-to-image';
-import { pdf } from '@react-pdf/renderer';
-import { InvoicePDF } from '../components/InvoicePDF';
 import { InvoicePNG } from '../components/InvoicePNG';
 import { ConfigPanel } from '../components/ConfigPanel';
 import { HistoryPanel } from '../components/HistoryPanel';
@@ -18,15 +15,19 @@ import {
     saveHistoryItemToCloud, loadHistoryFromCloud, deleteHistoryItemFromCloud,
     saveConfigToCloud, loadConfigFromCloud,
 } from '../lib/cloudSync';
-
-// CAPACITOR NATIVE
-import { Share } from '@capacitor/share';
-import { Filesystem, Directory } from '@capacitor/filesystem';
-import { Capacitor } from '@capacitor/core';
+import { roundCurrency, roundMeasure } from '../lib/numberPrecision';
 
 // ─── CONFIGURAÇÕES PADRÃO ─────────────────────────────────────────────────────
 
 type FilmTypeKey = 'carbono' | 'refletiva' | 'dupla_camada' | 'nano_ceramica' | 'jateado';
+type OptimizationMode = 'densidade' | 'facilidade' | 'facilidade_v2';
+type LossMode = 'dinamico' | 'fixo';
+type ColorMode = 'ambiente' | 'tamanho';
+
+const OPTIMIZATION_MODES: OptimizationMode[] = ['densidade', 'facilidade', 'facilidade_v2'];
+const LOSS_MODES: LossMode[] = ['dinamico', 'fixo'];
+const COLOR_MODES: ColorMode[] = ['ambiente', 'tamanho'];
+const FILM_TYPE_KEYS: FilmTypeKey[] = ['carbono', 'refletiva', 'dupla_camada', 'nano_ceramica', 'jateado'];
 
 const FILM_TYPE_LABELS: Record<FilmTypeKey, string> = {
   carbono: 'Carbono',
@@ -40,11 +41,11 @@ interface AppConfig {
   rollW: number;
   price: number;
   margin: number;
-  modoOtimizacao: 'densidade' | 'facilidade' | 'facilidade_v2';
+  modoOtimizacao: OptimizationMode;
   userName: string;
-  modoPerdas: 'dinamico' | 'fixo';
+  modoPerdas: LossMode;
   perdasFixas: number;
-  modoCorConfig: 'ambiente' | 'tamanho';
+  modoCorConfig: ColorMode;
   agressividadeCorte: number;
   filmTypes: Record<FilmTypeKey, number>;
   selectedFilm: FilmTypeKey;
@@ -98,19 +99,29 @@ const ROOM_COLOR_SWATCHES = [
 const normalizeRoomKey = (label: string) =>
   label.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase().replace(/\s+/g, ' ');
 
-const GOLDEN_ANGLE = 137.508;
-const hashColorFromLabel = (label: string) => {
-  const l = label.trim();
-  if (!l) return '#94a3b8';
-  let hash = 0;
-  for (let i = 0; i < l.length; i++) {
-    hash = ((hash << 5) - hash) + l.charCodeAt(i);
-    hash = hash & hash;
-  }
-  const idx = Math.abs(hash);
-  const hue = (idx * GOLDEN_ANGLE) % 360;
-  const saturation = 60 + (idx % 20);
-  const lightness = 68 + (idx % 12);
+const createGlassId = () =>
+  typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+    ? crypto.randomUUID()
+    : Math.random().toString(36).slice(2, 11);
+
+const isOptimizationMode = (value: unknown): value is OptimizationMode =>
+  OPTIMIZATION_MODES.includes(value as OptimizationMode);
+
+const isLossMode = (value: unknown): value is LossMode =>
+  LOSS_MODES.includes(value as LossMode);
+
+const isColorMode = (value: unknown): value is ColorMode =>
+  COLOR_MODES.includes(value as ColorMode);
+
+const isFilmTypeKey = (value: unknown): value is FilmTypeKey =>
+  FILM_TYPE_KEYS.includes(value as FilmTypeKey);
+
+const getSizeColor = (h?: number, w?: number) => {
+  if (typeof h !== 'number' || typeof w !== 'number') return '#94a3b8';
+  const area = h * w;
+  const hue = (area * 137.508) % 360;
+  const saturation = 60 + (Math.round(area) % 20);
+  const lightness = 68 + (Math.round(area * 7) % 12);
   return `hsl(${hue.toFixed(1)}, ${saturation}%, ${lightness}%)`;
 };
 
@@ -187,7 +198,9 @@ function loadConfig(): AppConfig {
     try {
         const saved = localStorage.getItem('lume_config');
         if (saved) return { ...DEFAULT_CONFIG, ...JSON.parse(saved) };
-    } catch (e) { }
+    } catch {
+        return DEFAULT_CONFIG;
+    }
     return DEFAULT_CONFIG;
 }
 
@@ -240,6 +253,30 @@ export interface OrcamentoSalvo {
   selectedFilm?: string;
 }
 
+type ImportedGlass = Partial<GlassItem> & {
+  h?: number;
+  w?: number;
+};
+
+interface ImportedZapPayload {
+  n?: string;
+  b?: string;
+  f?: string;
+  p?: string;
+  v?: ImportedGlass[];
+}
+
+interface SavedProjectPayload {
+  config?: {
+    cliente?: string;
+    phone?: string;
+    rolo?: number | string;
+    preco?: number | string;
+    selectedFilm?: string;
+  };
+  vidros?: ImportedGlass[];
+}
+
 // ─── UNDO/REDO REDUCER ────────────────────────────────────────────────────────
 
 interface HistoryState {
@@ -268,7 +305,7 @@ function historyReducer(state: HistoryState, action: HistoryAction): HistoryStat
                 present: action.payload(state.present),
                 future: []
             };
-        case 'UNDO':
+        case 'UNDO': {
             if (state.past.length === 0) return state;
             const previous = state.past[state.past.length - 1];
             return {
@@ -276,7 +313,8 @@ function historyReducer(state: HistoryState, action: HistoryAction): HistoryStat
                 present: previous,
                 future: [state.present, ...state.future]
             };
-        case 'REDO':
+        }
+        case 'REDO': {
             if (state.future.length === 0) return state;
             const next = state.future[0];
             return {
@@ -284,6 +322,7 @@ function historyReducer(state: HistoryState, action: HistoryAction): HistoryStat
                 present: next,
                 future: state.future.slice(1)
             };
+        }
         default:
             return state;
     }
@@ -294,14 +333,12 @@ function historyReducer(state: HistoryState, action: HistoryAction): HistoryStat
 const MemoBlock = React.memo(({
   b,
   scale,
-  margin,
   isSelected,
   toggleSelection,
   selectSameSize,
 }: {
   b: Block,
   scale: number,
-  margin: number,
   isSelected: boolean,
   toggleSelection: (id: string) => void,
   selectSameSize: (oh: number, ow: number, label?: string) => void,
@@ -336,8 +373,8 @@ const MemoBlock = React.memo(({
             style={{
                 left: pos.x * scale,
                 top: pos.y * scale,
-                width: (b.w - margin) * scale,
-                height: ((b.h_visual || b.h) - margin) * scale,
+                width: b.rw * scale,
+                height: b.rh * scale,
                 background: b.cor,
                 fontSize: '12px',
                 border: isSelected
@@ -373,14 +410,16 @@ export function AdminCalculator() {
   const [price, setPrice] = useState(cfg.price);
   const [userName, setUserName] = useState(cfg.userName);
   const [desconto, setDesconto] = useState(0);
-  const [modoOtimizacao, setModoOtimizacao] = useState<'densidade' | 'facilidade' | 'facilidade_v2'>(cfg.modoOtimizacao);
+  const [modoOtimizacao, setModoOtimizacao] = useState<OptimizationMode>(cfg.modoOtimizacao);
   const [configAberto, setConfigAberto] = useState(false);
   const [compensarPerdas, setCompensarPerdas] = useState(false);
-  const [modoPerdas, setModoPerdas] = useState<'dinamico' | 'fixo'>(cfg.modoPerdas);
+  const [modoPerdas, setModoPerdas] = useState<LossMode>(cfg.modoPerdas);
   const [perdasFixas, setPerdasFixas] = useState(cfg.perdasFixas);
   const [agressividadeCorte, setAgressividadeCorte] = useState(cfg.agressividadeCorte);
   const [filmTypes, setFilmTypes] = useState<Record<FilmTypeKey, number>>(cfg.filmTypes || { ...DEFAULT_FILM_TYPES });
   const [selectedFilm, setSelectedFilm] = useState<FilmTypeKey>(cfg.selectedFilm || 'carbono');
+  const [configRestored, setConfigRestored] = useState(false);
+  const [draftRestored, setDraftRestored] = useState(false);
 
   useEffect(() => {
     setPrice(filmTypes[selectedFilm] || 0);
@@ -392,6 +431,32 @@ export function AdminCalculator() {
     const [labelIn, setLabelIn] = useState('');
     const [usarCoresPorAmbiente, setUsarCoresPorAmbiente] = useState(cfg.modoCorConfig === 'ambiente');
     const [roomColors, setRoomColors] = useState<Record<string, string>>(DEFAULT_ROOM_COLORS);
+
+    const currentConfig = useMemo<AppConfig>(() => ({
+        rollW,
+        price,
+        margin,
+        modoOtimizacao,
+        userName,
+        modoPerdas,
+        perdasFixas,
+        modoCorConfig: usarCoresPorAmbiente ? 'ambiente' : 'tamanho',
+        agressividadeCorte,
+        filmTypes,
+        selectedFilm,
+    }), [
+        rollW,
+        price,
+        margin,
+        modoOtimizacao,
+        userName,
+        modoPerdas,
+        perdasFixas,
+        usarCoresPorAmbiente,
+        agressividadeCorte,
+        filmTypes,
+        selectedFilm,
+    ]);
 
     const [vidrosState, dispatch] = useReducer(historyReducer, {
         past: [],
@@ -474,7 +539,9 @@ export function AdminCalculator() {
             try {
                 const saved = localStorage.getItem('lume_historico');
                 if (saved) setHistorico(JSON.parse(saved));
-            } catch (e) { }
+            } catch {
+                setHistorico([]);
+            }
         };
         load();
     }, []);
@@ -547,7 +614,7 @@ export function AdminCalculator() {
     }, [desconto]);
 
     const handleDescontoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        let valor = e.target.value.replace(/\D/g, '');
+        const valor = e.target.value.replace(/\D/g, '');
         setDescontoInput(valor);
         setDesconto(parseInt(valor, 10) / 100 || 0);
     };
@@ -559,6 +626,7 @@ export function AdminCalculator() {
 
 // ─── AUTO-SAVE DRAFT ──────────────────────────────────────────────────
   useEffect(() => {
+    if (!draftRestored) return;
     const draft = {
       cliente,
       phone,
@@ -574,10 +642,11 @@ export function AdminCalculator() {
       lastSaved: Date.now()
     };
     localStorage.setItem('lume_calculator_draft', JSON.stringify(draft));
-}, [cliente, phone, vidros, desconto, descontoInput, rollW, price, margin, modoOtimizacao, userName, selectedFilm]);
+}, [draftRestored, cliente, phone, vidros, desconto, descontoInput, rollW, price, margin, modoOtimizacao, userName, selectedFilm]);
 
   // ─── CLOUD AUTO-SAVE (debounced 2s) ──────────────────────────────────────
   useEffect(() => {
+    if (!draftRestored) return;
     if (cloudTimerRef.current) clearTimeout(cloudTimerRef.current);
     cloudTimerRef.current = setTimeout(async () => {
       setCloudStatus('syncing');
@@ -590,55 +659,52 @@ export function AdminCalculator() {
       if (ok) setTimeout(() => setCloudStatus('idle'), 3000);
     }, 2000);
     return () => { if (cloudTimerRef.current) clearTimeout(cloudTimerRef.current); };
-  }, [cliente, phone, vidros, desconto, descontoInput, rollW, price, margin, modoOtimizacao, userName, selectedFilm]);
+  }, [draftRestored, cliente, phone, vidros, desconto, descontoInput, rollW, price, margin, modoOtimizacao, userName, selectedFilm]);
 
 // ─── CLOUD CONFIG AUTO-SAVE (debounced 2s) ────────────────────────────────
   const configCloudTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
+    if (!configRestored) return;
     if (configCloudTimerRef.current) clearTimeout(configCloudTimerRef.current);
     configCloudTimerRef.current = setTimeout(() => {
-      const cfgToSave: AppConfig = { rollW, price, margin, modoOtimizacao, userName,
-        modoPerdas, perdasFixas,
-        modoCorConfig: usarCoresPorAmbiente ? 'ambiente' : 'tamanho',
-        agressividadeCorte, filmTypes, selectedFilm,
-      };
-      saveConfigToCloud(cfgToSave);
+      saveConfigToCloud(currentConfig);
     }, 2000);
     return () => { if (configCloudTimerRef.current) clearTimeout(configCloudTimerRef.current); };
-  }, [rollW, price, margin, modoOtimizacao, userName, modoPerdas, perdasFixas, usarCoresPorAmbiente, agressividadeCorte, filmTypes, selectedFilm]);
+  }, [configRestored, currentConfig]);
 
   // RESTORE CONFIG ON MOUNT (cloud-first, localStorage fallback) ────────────
   useEffect(() => {
     const restoreConfig = async () => {
-      const cloud = await loadConfigFromCloud();
-      if (cloud) {
-        if (cloud.rollW) setRollW(cloud.rollW);
-        if (cloud.price) setPrice(cloud.price);
-        if (cloud.margin !== undefined) setMargin(cloud.margin);
-        if (cloud.modoOtimizacao) setModoOtimizacao(cloud.modoOtimizacao as any);
-        if (cloud.userName) setUserName(cloud.userName);
-        if (cloud.modoPerdas) setModoPerdas(cloud.modoPerdas as any);
-        if (cloud.perdasFixas !== undefined) setPerdasFixas(cloud.perdasFixas);
-        if (cloud.modoCorConfig) setUsarCoresPorAmbiente(cloud.modoCorConfig === 'ambiente');
-        if (cloud.agressividadeCorte !== undefined) setAgressividadeCorte(cloud.agressividadeCorte);
-        if (cloud.filmTypes) setFilmTypes(cloud.filmTypes as Record<FilmTypeKey, number>);
-        if (cloud.selectedFilm) setSelectedFilm(cloud.selectedFilm as FilmTypeKey);
-        const fullCfg: AppConfig = { ...DEFAULT_CONFIG, ...cloud, modoOtimizacao: cloud.modoOtimizacao as AppConfig['modoOtimizacao'], modoPerdas: (cloud.modoPerdas ?? 'dinamico') as AppConfig['modoPerdas'], modoCorConfig: (cloud.modoCorConfig ?? 'tamanho') as AppConfig['modoCorConfig'], selectedFilm: (cloud.selectedFilm ?? 'carbono') as FilmTypeKey, filmTypes: (cloud.filmTypes ?? DEFAULT_FILM_TYPES) as Record<FilmTypeKey, number> };
-        saveConfig(fullCfg);
-        return;
+      try {
+        const cloud = await loadConfigFromCloud();
+        const source = cloud || loadConfig();
+
+        if (source.rollW) setRollW(source.rollW);
+        if (source.price) setPrice(source.price);
+        if (source.margin !== undefined) setMargin(source.margin);
+        if (isOptimizationMode(source.modoOtimizacao)) setModoOtimizacao(source.modoOtimizacao);
+        if (source.userName) setUserName(source.userName);
+        if (isLossMode(source.modoPerdas)) setModoPerdas(source.modoPerdas);
+        if (source.perdasFixas !== undefined) setPerdasFixas(source.perdasFixas);
+        if (isColorMode(source.modoCorConfig)) setUsarCoresPorAmbiente(source.modoCorConfig === 'ambiente');
+        if (source.agressividadeCorte !== undefined) setAgressividadeCorte(source.agressividadeCorte);
+        if (source.filmTypes) setFilmTypes({ ...DEFAULT_FILM_TYPES, ...source.filmTypes });
+        if (isFilmTypeKey(source.selectedFilm)) setSelectedFilm(source.selectedFilm);
+
+        if (cloud) {
+          saveConfig({
+            ...DEFAULT_CONFIG,
+            ...source,
+            modoOtimizacao: isOptimizationMode(source.modoOtimizacao) ? source.modoOtimizacao : DEFAULT_CONFIG.modoOtimizacao,
+            modoPerdas: isLossMode(source.modoPerdas) ? source.modoPerdas : DEFAULT_CONFIG.modoPerdas,
+            modoCorConfig: isColorMode(source.modoCorConfig) ? source.modoCorConfig : DEFAULT_CONFIG.modoCorConfig,
+            selectedFilm: isFilmTypeKey(source.selectedFilm) ? source.selectedFilm : DEFAULT_CONFIG.selectedFilm,
+            filmTypes: source.filmTypes ? { ...DEFAULT_FILM_TYPES, ...source.filmTypes } : { ...DEFAULT_FILM_TYPES },
+          });
+        }
+      } finally {
+        setConfigRestored(true);
       }
-      const local = loadConfig();
-      setRollW(local.rollW);
-      setPrice(local.price);
-      setMargin(local.margin);
-      setModoOtimizacao(local.modoOtimizacao);
-      setUserName(local.userName);
-      setModoPerdas(local.modoPerdas);
-      setPerdasFixas(local.perdasFixas);
-      setUsarCoresPorAmbiente(local.modoCorConfig === 'ambiente');
-      setAgressividadeCorte(local.agressividadeCorte);
-      if (local.filmTypes) setFilmTypes(local.filmTypes as Record<FilmTypeKey, number>);
-      if (local.selectedFilm) setSelectedFilm(local.selectedFilm as FilmTypeKey);
     };
     restoreConfig();
   }, []);
@@ -646,10 +712,11 @@ export function AdminCalculator() {
   // RESTORE DRAFT ON MOUNT (cloud-first, localStorage fallback)
     useEffect(() => {
         const restoreDraft = async () => {
+          try {
             // Try cloud first
             const cloud = await loadDraftFromCloud();
-            if (cloud && cloud.vidros && (cloud.vidros as any[]).length > 0) {
-                dispatch({ type: 'SET', payload: cloud.vidros as any });
+            if (cloud && Array.isArray(cloud.vidros) && cloud.vidros.length > 0) {
+                dispatch({ type: 'SET', payload: cloud.vidros as GlassItem[] });
                 if (cloud.cliente) setCliente(cloud.cliente);
                 if (cloud.phone) setPhone(cloud.phone);
                 if (cloud.desconto !== undefined) setDesconto(cloud.desconto);
@@ -657,9 +724,9 @@ export function AdminCalculator() {
                 if (cloud.roll_w) setRollW(cloud.roll_w);
                 if (cloud.price) setPrice(cloud.price);
                 if (cloud.margin !== undefined) setMargin(cloud.margin);
-    if (cloud.modo_otimizacao) setModoOtimizacao(cloud.modo_otimizacao as any);
+    if (isOptimizationMode(cloud.modo_otimizacao)) setModoOtimizacao(cloud.modo_otimizacao);
       if (cloud.user_name) setUserName(cloud.user_name);
-      if (cloud.selected_film) setSelectedFilm(cloud.selected_film as FilmTypeKey);
+      if (isFilmTypeKey(cloud.selected_film)) setSelectedFilm(cloud.selected_film);
                 setCloudStatus('synced');
                 setTimeout(() => setCloudStatus('idle'), 3000);
                 return;
@@ -678,14 +745,17 @@ export function AdminCalculator() {
                         if (draft.rollW) setRollW(draft.rollW);
                         if (draft.price) setPrice(draft.price);
                         if (draft.margin !== undefined) setMargin(draft.margin);
-      if (draft.modoOtimizacao) setModoOtimizacao(draft.modoOtimizacao);
+      if (isOptimizationMode(draft.modoOtimizacao)) setModoOtimizacao(draft.modoOtimizacao);
       if (draft.userName) setUserName(draft.userName);
-      if (draft.selectedFilm) setSelectedFilm(draft.selectedFilm as FilmTypeKey);
+      if (isFilmTypeKey(draft.selectedFilm)) setSelectedFilm(draft.selectedFilm);
                     }
                 } catch (e) {
                     console.error('Erro ao carregar rascunho local', e);
                 }
             }
+          } finally {
+            setDraftRestored(true);
+          }
         };
         restoreDraft();
     }, []); 
@@ -699,25 +769,11 @@ export function AdminCalculator() {
   const getColorForItem = useCallback((label?: string, h?: number, w?: number, forceRoomScheme?: boolean) => {
     const useRoomScheme = forceRoomScheme ?? usarCoresPorAmbiente;
     if (!useRoomScheme) {
-      if (typeof h === 'number' && typeof w === 'number') {
-        const area = h * w;
-        const hue = (area * 137.508) % 360;
-        const saturation = 60 + (Math.round(area) % 20);
-        const lightness = 68 + (Math.round(area * 7) % 12);
-        return `hsl(${hue.toFixed(1)}, ${saturation}%, ${lightness}%)`;
-      }
-      return '#94a3b8';
+      return getSizeColor(h, w);
     }
     const roomLabel = (label || '').trim();
     if (!roomLabel) {
-      if (typeof h === 'number' && typeof w === 'number') {
-        const area = h * w;
-        const hue = (area * 137.508) % 360;
-        const saturation = 60 + (Math.round(area) % 20);
-        const lightness = 68 + (Math.round(area * 7) % 12);
-        return `hsl(${hue.toFixed(1)}, ${saturation}%, ${lightness}%)`;
-      }
-      return '#94a3b8';
+      return getSizeColor(h, w);
     }
     const key = resolveRoomKey(roomLabel);
     return roomColors[key] || stableRoomColor(roomLabel);
@@ -748,7 +804,7 @@ export function AdminCalculator() {
         const novos: GlassItem[] = [];
         for (let i = 0; i < q; i++) {
             novos.push({
-                id: Math.random().toString(36).substr(2, 9),
+                id: createGlassId(),
                 h, w, oh: h, ow: w,
                 label: label || undefined,
                 cor: roomColor,
@@ -865,12 +921,11 @@ export function AdminCalculator() {
 
     const colarItens = (labelDestino: string) => {
         if (!itensCopiados || itensCopiados.length === 0) return;
-        const roomColor = getColorForItem(labelDestino);
         const novos = itensCopiados.map(item => ({
             ...item,
-            id: Math.random().toString(36).substr(2, 9),
+            id: createGlassId(),
             label: labelDestino || undefined,
-            cor: roomColor,
+            cor: getColorForItem(labelDestino, item.oh, item.ow),
         }));
         setVidros(prev => [...prev, ...novos]);
         setSelectedIds([]);
@@ -909,7 +964,7 @@ export function AdminCalculator() {
         return subtotalBruto * ((100 - eficiencia) / 100);
     }, [compensarPerdas, modoPerdas, perdasFixas, eficiencia, subtotalBruto]);
 
-    const finalPrice = subtotalBruto + compensacaoPerda - desconto;
+    const finalPrice = roundCurrency(subtotalBruto + compensacaoPerda - desconto);
 
     const salvarNoHistorico = useCallback(() => {
         if (vidros.length === 0) return;
@@ -929,7 +984,7 @@ export function AdminCalculator() {
         const atualizado = [novo, ...historico].slice(0, 20);
         setHistorico(atualizado);
         localStorage.setItem('lume_historico', JSON.stringify(atualizado));
-        saveHistoryItemToCloud(novo as any);
+        saveHistoryItemToCloud(novo);
         setShowSaveToast(true);
         setTimeout(() => setShowSaveToast(false), 3000);
     }, [vidros, cliente, phone, finalPrice, rollW, price, margin, historico, desconto, modoOtimizacao, selectedFilm]);
@@ -939,7 +994,7 @@ export function AdminCalculator() {
         alert('Preencha o nome ou telefone do cliente.');
         return;
       }
-      const totalM2 = vidros.reduce((acc, v) => acc + (v.oh * v.ow), 0) / 10000;
+      const totalM2 = roundMeasure(vidros.reduce((acc, v) => acc + (v.oh * v.ow), 0) / 10000);
       const res = await fetch('/api/crm/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -950,8 +1005,8 @@ export function AdminCalculator() {
           address: '',
           neighborhood: 'Barra da Tijuca',
           filmType: FILM_TYPE_LABELS[selectedFilm] || 'Nano Cerâmica',
-          sqm: Math.round(totalM2 * 100) / 100,
-          value: finalPrice,
+            sqm: totalM2,
+            value: finalPrice,
           status: 'Novo',
           notes: `Película: ${FILM_TYPE_LABELS[selectedFilm]}.`,
         }),
@@ -976,7 +1031,7 @@ const carregarDoHistorico = (orc: OrcamentoSalvo) => {
             setDescontoInput((orc.desconto * 100).toString());
         }
   if (orc.modoOtimizacao) setModoOtimizacao(orc.modoOtimizacao);
-    if (orc.selectedFilm) setSelectedFilm(orc.selectedFilm as FilmTypeKey);
+    if (isFilmTypeKey(orc.selectedFilm)) setSelectedFilm(orc.selectedFilm);
     dispatch({ type: 'SET', payload: orc.vidros });
         setHistoricoAberto(false);
     };
@@ -994,42 +1049,68 @@ const carregarDoHistorico = (orc: OrcamentoSalvo) => {
         const code = prompt("Cole o CÓDIGO DE IMPORTAÇÃO:");
         if (!code) return;
         try {
-            const d = JSON.parse(atob(code));
+            const d = JSON.parse(atob(code)) as ImportedZapPayload;
+            if (!Array.isArray(d.v)) throw new Error('Payload sem vidros');
             setCliente(`${d.n} (${d.b}) - ${d.f}`);
             if (d.p) setPhone(d.p);
-            dispatch({ type: 'SET', payload: d.v.map((v: any) => ({ ...v, id: Math.random().toString(36).substr(2, 9), oh: v.oh ?? v.h, ow: v.ow ?? v.w, forceRotate: undefined, alignRight: false })) });
-        } catch (e) { alert("Erro ao importar."); }
+            dispatch({ type: 'SET', payload: d.v.map((v) => ({ ...v, id: createGlassId(), oh: v.oh ?? v.h ?? 0, ow: v.ow ?? v.w ?? 0, forceRotate: undefined, alignRight: false })) as GlassItem[] });
+        } catch {
+            alert("Erro ao importar.");
+        }
     };
 
-const salvarProjeto = () => {
-    const dados = { config: { cliente, phone, rolo: rollW, preco: price, selectedFilm }, vidros: [...vidros] };
-    const blob = new Blob([JSON.stringify(dados)], { type: 'application/json' });
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-    a.download = (cliente || 'projeto') + ".insul"; a.click();
-  };
+    const salvarProjeto = () => {
+        const dados = {
+            config: { cliente, phone, rolo: rollW, preco: price, selectedFilm },
+            vidros: [...vidros],
+        };
+        const blob = new Blob([JSON.stringify(dados)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `${cliente || 'projeto'}.insul`;
+        a.click();
+    };
 
-  const abrirProjeto = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]; if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      try {
-        const d = JSON.parse(ev.target?.result as string);
-        setCliente(d.config.cliente || ''); setPhone(d.config.phone || '');
-        setRollW(parseFloat(d.config.rolo) || 152);
-        setPrice(parseFloat(d.config.preco) || 80);
-        if (d.config.selectedFilm) setSelectedFilm(d.config.selectedFilm as FilmTypeKey);
-        dispatch({ type: 'SET', payload: (d.vidros || []).map((v: any) => ({ ...v, oh: v.oh ?? v.h, ow: v.ow ?? v.w })) });
-        setDesconto(0);
-            } catch (e) { alert("Arquivo inválido"); }
+    const abrirProjeto = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            try {
+                const d = JSON.parse(ev.target?.result as string) as SavedProjectPayload;
+                setCliente(d.config?.cliente || '');
+                setPhone(d.config?.phone || '');
+                setRollW(parseFloat(String(d.config?.rolo ?? '')) || 152);
+                setPrice(parseFloat(String(d.config?.preco ?? '')) || 80);
+                if (isFilmTypeKey(d.config?.selectedFilm)) setSelectedFilm(d.config.selectedFilm);
+                dispatch({ type: 'SET', payload: (d.vidros || []).map((v) => ({ ...v, oh: v.oh ?? v.h ?? 0, ow: v.ow ?? v.w ?? 0 })) as GlassItem[] });
+                setDesconto(0);
+            } catch {
+                alert("Arquivo inválido");
+            }
         };
         reader.readAsText(file);
+    };
+
+    const getNativeShareContext = async () => {
+        const { Capacitor } = await import('@capacitor/core');
+        if (!Capacitor.isNativePlatform()) return null;
+
+        const [{ Filesystem, Directory }, { Share }] = await Promise.all([
+            import('@capacitor/filesystem'),
+            import('@capacitor/share'),
+        ]);
+
+        return { Filesystem, Directory, Share };
     };
 
     const gerarImagem = async () => {
         if (!invoiceRef.current) return;
         setIsCalculating(true);
         try {
-            const dataUrl = await htmlToImage.toPng(invoiceRef.current, {
+            const { toPng } = await import('html-to-image');
+            const dataUrl = await toPng(invoiceRef.current, {
                 pixelRatio: 2,
                 backgroundColor: "#0a0f1e",
                 style: {
@@ -1038,15 +1119,16 @@ const salvarProjeto = () => {
                 }
             });
 
-            if (Capacitor.isNativePlatform()) {
+            const nativeShare = await getNativeShareContext();
+            if (nativeShare) {
                 const fileName = `Orcamento_${cliente.replace(/\W+/g, '_') || 'LUME'}.png`;
                 const base64Data = dataUrl.split(',')[1];
-                const savedFile = await Filesystem.writeFile({
+                const savedFile = await nativeShare.Filesystem.writeFile({
                     path: fileName,
                     data: base64Data,
-                    directory: Directory.Cache
+                    directory: nativeShare.Directory.Cache
                 });
-                await Share.share({
+                await nativeShare.Share.share({
                     title: 'Compartilhar Orçamento (PNG)',
                     url: savedFile.uri,
                 });
@@ -1066,6 +1148,11 @@ const salvarProjeto = () => {
     const gerarPDF = async () => {
         setIsCalculating(true);
         try {
+            const [{ pdf }, { InvoicePDF }] = await Promise.all([
+                import('@react-pdf/renderer'),
+                import('../components/InvoicePDF'),
+            ]);
+
             const blob = await pdf(
                 <InvoicePDF
                     cliente={cliente}
@@ -1079,18 +1166,19 @@ const salvarProjeto = () => {
                 />
             ).toBlob();
 
-            if (Capacitor.isNativePlatform()) {
+            const nativeShare = await getNativeShareContext();
+            if (nativeShare) {
                 const fileName = `Orcamento_${cliente.replace(/\W+/g, '_') || 'LUME'}.pdf`;
                 const reader = new FileReader();
                 reader.readAsDataURL(blob); 
                 reader.onloadend = async () => {
                     const base64data = (reader.result as string).split(',')[1];
-                    const savedFile = await Filesystem.writeFile({
+                    const savedFile = await nativeShare.Filesystem.writeFile({
                         path: fileName,
                         data: base64data,
-                        directory: Directory.Cache
+                        directory: nativeShare.Directory.Cache
                     });
-                    await Share.share({
+                    await nativeShare.Share.share({
                         title: 'Compartilhar Orçamento (PDF)',
                         url: savedFile.uri,
                     });
@@ -1111,26 +1199,51 @@ const salvarProjeto = () => {
     };
 
 const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: AppConfig[K]) => {
-    const setters: Record<string, React.Dispatch<React.SetStateAction<any>>> = {
-      rollW: setRollW, price: setPrice, margin: setMargin,
-      modoOtimizacao: setModoOtimizacao as any, userName: setUserName,
-      modoPerdas: setModoPerdas as any, perdasFixas: setPerdasFixas,
-      modoCorConfig: null as any, agressividadeCorte: setAgressividadeCorte,
-      filmTypes: setFilmTypes as any, selectedFilm: setSelectedFilm as any,
-    };
     if (key === 'modoCorConfig') {
-      setUsarCoresPorAmbiente(value === 'ambiente');
+      const nextMode = value as ColorMode;
+      setUsarCoresPorAmbiente(nextMode === 'ambiente');
       setVidros(prev => prev.map(v => ({
         ...v,
-        cor: getColorForItem(v.label, v.oh, v.ow, value === 'ambiente'),
+        cor: getColorForItem(v.label, v.oh, v.ow, nextMode === 'ambiente'),
       })));
-    } else if (setters[key]) {
-      setters[key](value);
+    } else {
+      switch (key) {
+        case 'rollW':
+          setRollW(value as number);
+          break;
+        case 'price':
+          setPrice(value as number);
+          break;
+        case 'margin':
+          setMargin(value as number);
+          break;
+        case 'modoOtimizacao':
+          setModoOtimizacao(value as OptimizationMode);
+          break;
+        case 'userName':
+          setUserName(value as string);
+          break;
+        case 'modoPerdas':
+          setModoPerdas(value as LossMode);
+          break;
+        case 'perdasFixas':
+          setPerdasFixas(Math.min(100, Math.max(0, value as number)));
+          break;
+        case 'agressividadeCorte':
+          setAgressividadeCorte(value as number);
+          break;
+        case 'filmTypes':
+          setFilmTypes(value as Record<FilmTypeKey, number>);
+          break;
+        case 'selectedFilm':
+          setSelectedFilm(value as FilmTypeKey);
+          break;
+      }
     }
-    const currentCfg: AppConfig = { rollW, price, margin, modoOtimizacao, userName, modoPerdas, perdasFixas, modoCorConfig: usarCoresPorAmbiente ? 'ambiente' : 'tamanho', agressividadeCorte, filmTypes, selectedFilm };
-    const updated = { ...currentCfg, [key]: value };
+    const normalizedValue = key === 'perdasFixas' ? Math.min(100, Math.max(0, value as number)) : value;
+    const updated = { ...currentConfig, [key]: normalizedValue };
     saveConfig(updated);
-  }, [rollW, price, margin, modoOtimizacao, userName, modoPerdas, perdasFixas, usarCoresPorAmbiente, agressividadeCorte, filmTypes, selectedFilm, getColorForItem]);
+  }, [currentConfig, getColorForItem, setVidros]);
 
     // ─── MEMOS ─────────────────────────────────────────────────────────────────
 
@@ -1169,7 +1282,6 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
     const currentRoomKey = resolveRoomKey(currentRoomLabel);
     const currentRoomColor = currentRoomLabel ? (roomColors[currentRoomKey] || stableRoomColor(currentRoomLabel)) : '#94a3b8';
     const hasCurrentRoomPieces = currentRoomLabel ? vidros.some(v => (v.label || '') === currentRoomLabel) : false;
-    const getColorForRoom = getColorForItem;
     const aplicarCorNoAmbiente = (ambiente: string) => {
         const trimmed = ambiente.trim();
         if (!trimmed) return;
@@ -1609,10 +1721,7 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
                                         >
                                             <Scissors size={14} />
                                             <span className="text-[9px] font-bold uppercase whitespace-nowrap">
-                                                {compensarPerdas
-                                                    ? (modoPerdas === 'fixo' ? `+${perdasFixas}%` : `+${100 - eficiencia}%`)
-                                                    : (modoPerdas === 'fixo' ? `${perdasFixas}%` : 'Perdas')
-                                                }
+                                                Perdas
                                             </span>
                                         </button>
                                     </div>
@@ -1675,7 +1784,6 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
                 key={b.id}
                 b={b}
                 scale={scale}
-                margin={margin}
                 isSelected={selectedIds.includes(b.id)}
                 toggleSelection={toggleSelection}
                 selectSameSize={selectSameSize}
@@ -1736,7 +1844,7 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
                                     acc[lbl].push(item);
                                     return acc;
                                 }, {} as globalThis.Record<string, typeof resumo>)
-                            ).map(([ambiente, _]) => (
+                            ).map(([ambiente]) => (
                                 <button
                                     key={ambiente}
                                     onClick={() => colarItens(ambiente === 'Sem Ambiente' ? '' : ambiente)}

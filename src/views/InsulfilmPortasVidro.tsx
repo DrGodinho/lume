@@ -29,56 +29,56 @@ import { NavigationBreadcrumbs } from '../components/NavigationBreadcrumbs';
 import { GoogleReviews } from '../components/GoogleReviews';
 
 const whatsapp =
-  'https://wa.me/5521965140612?text=Ola! Quero um orcamento de insulfilm para porta de vidro.';
+  'https://wa.me/5521965140612?text=Olá! Quero um orçamento de insulfilm para porta de vidro.';
 
 const painPoints = [
   'Muito calor entrando pela porta de vidro',
   'Falta de privacidade em portas voltadas para rua ou vizinhos',
   'Claridade excessiva durante o dia',
   'Reflexo em TV, computador e vitrines',
-  'Moveis, pisos e cortinas desbotando com o sol',
+  'Móveis, pisos e cortinas desbotando com o sol',
   'Vidros comerciais muito expostos',
 ];
 
 const benefits = [
   {
-    title: 'Mais conforto termico',
-    text: 'A pelicula reduz a entrada de calor pela porta de vidro e deixa sala, varanda, loja ou escritorio mais agradavel.',
+    title: 'Mais conforto térmico',
+    text: 'A película reduz a entrada de calor pela porta de vidro e deixa sala, varanda, loja ou escritório mais agradável.',
     icon: Thermometer,
   },
   {
     title: 'Mais privacidade',
-    text: 'Modelos como jateado, carbono e refletiva ajudam a controlar a visao de fora para dentro conforme o objetivo do ambiente.',
+    text: 'Modelos como jateado, carbono e refletiva ajudam a controlar a visão de fora para dentro conforme o objetivo do ambiente.',
     icon: Eye,
   },
   {
-    title: 'Protecao UV',
-    text: 'Peliculas de qualidade ajudam a bloquear raios UV e proteger moveis, sofas, cortinas, pisos e objetos decorativos.',
+    title: 'Proteção UV',
+    text: 'Películas de qualidade ajudam a bloquear raios UV e proteger móveis, sofás, cortinas, pisos e objetos decorativos.',
     icon: Shield,
   },
   {
     title: 'Acabamento moderno',
-    text: 'A porta fica mais sofisticada: discreta, espelhada, fume, fosca ou com visual decorativo sob medida.',
+    text: 'A porta fica mais sofisticada: discreta, espelhada, fumê, fosca ou com visual decorativo sob medida.',
     icon: Sparkles,
   },
   {
-    title: 'Mais seguranca',
-    text: 'Peliculas de seguranca ajudam a manter fragmentos unidos em caso de quebra e reduzem riscos em areas vulneraveis.',
+    title: 'Mais segurança',
+    text: 'Películas de segurança ajudam a manter fragmentos unidos em caso de quebra e reduzem riscos em áreas vulneráveis.',
     icon: Lock,
   },
   {
     title: 'Sem obra',
-    text: 'A aplicacao e feita sobre o vidro existente, sem trocar porta, esquadria ou fazer sujeira pesada no imovel.',
+    text: 'A aplicação é feita sobre o vidro existente, sem trocar porta, esquadria ou fazer sujeira pesada no imóvel.',
     icon: Clock,
   },
 ];
 
 const filmTypes = [
   {
-    title: 'Nano ceramica',
-    subtitle: 'Conforto termico sem escurecer demais',
-    text: 'Indicada para portas de varanda, salas, areas gourmet e fachadas modernas onde a claridade natural precisa continuar entrando.',
-    summary: 'Melhor opcao premium para calor sem escurecer demais.',
+    title: 'Nano cerâmica',
+    subtitle: 'Conforto térmico sem escurecer demais',
+    text: 'Indicada para portas de varanda, salas, áreas gourmet e fachadas modernas onde a claridade natural precisa continuar entrando.',
+    summary: 'Melhor opção premium para calor sem escurecer demais.',
     image: '/product-nano-ceramica.webp',
     href: '/nano-ceramica/',
     tags: ['porta de varanda', 'porta de sala', 'sol forte', 'ambiente claro'],
@@ -86,16 +86,16 @@ const filmTypes = [
   {
     title: 'Jateada',
     subtitle: 'Privacidade total com passagem de luz',
-    text: 'Ideal para banheiro, cozinha, lavanderia, escritorio, consultorio, portas internas e divisorias que precisam bloquear a visao direta.',
+    text: 'Ideal para banheiro, cozinha, lavanderia, escritório, consultório, portas internas e divisórias que precisam bloquear a visão direta.',
     summary: 'Melhor escolha para privacidade 24 horas.',
     image: '/product-jateado-v2.webp',
     href: '/jateado/',
-    tags: ['banheiro', 'consultorio', 'cozinha', 'divisoria'],
+    tags: ['banheiro', 'consultório', 'cozinha', 'divisória'],
   },
   {
     title: 'Refletiva',
-    subtitle: 'Reducao forte de calor e privacidade diurna',
-    text: 'Cria efeito espelhado quando ha mais luz do lado de fora. Funciona muito bem em portas externas, fachadas e lojas.',
+    subtitle: 'Redução forte de calor e privacidade diurna',
+    text: 'Cria efeito espelhado quando há mais luz do lado de fora. Funciona muito bem em portas externas, fachadas e lojas.',
     summary: 'Boa escolha para sol forte, fachada e privacidade durante o dia.',
     image: '/product-refletiva.webp',
     href: '/refletiva/',
@@ -103,37 +103,37 @@ const filmTypes = [
   },
   {
     title: 'Carbono',
-    subtitle: 'Visual escuro, moderno e confortavel',
-    text: 'Boa opcao para quem quer tom grafite, menor luminosidade e mais conforto visual em salas, quartos e escritorios.',
-    summary: 'Boa opcao para escurecimento, privacidade diurna e custo-beneficio.',
+    subtitle: 'Visual escuro, moderno e confortável',
+    text: 'Boa opção para quem quer tom grafite, menor luminosidade e mais conforto visual em salas, quartos e escritórios.',
+    summary: 'Boa opção para escurecimento, privacidade diurna e custo-benefício.',
     image: '/product-carbono.webp',
     href: '/carbono/',
-    tags: ['sala', 'quarto', 'escritorio', 'visual grafite'],
+    tags: ['sala', 'quarto', 'escritório', 'visual grafite'],
   },
   {
-    title: 'Seguranca',
-    subtitle: 'Mais protecao para portas de vidro',
-    text: 'Indicada para lojas, recepcoes, portas externas e acessos vulneraveis. Nao torna o vidro inquebravel, mas dificulta a ruptura imediata.',
-    summary: 'Melhor opcao quando a prioridade e reforco e protecao.',
+    title: 'Segurança',
+    subtitle: 'Mais proteção para portas de vidro',
+    text: 'Indicada para lojas, recepções, portas externas e acessos vulneráveis. Não torna o vidro inquebrável, mas dificulta a ruptura imediata.',
+    summary: 'Melhor opção quando a prioridade é reforço e proteção.',
     image: '/product-smoke.webp',
     href: whatsapp,
-    tags: ['porta comercial', 'recepcao', 'acesso externo', 'blindex'],
+    tags: ['porta comercial', 'recepção', 'acesso externo', 'blindex'],
   },
 ];
 
 const environments = [
-  ['Porta de varanda', 'Nano ceramica, refletiva ou carbono para reduzir calor sem perder a vista.'],
-  ['Porta de sala', 'Controle de calor, reflexo na TV e desbotamento de moveis.'],
+  ['Porta de varanda', 'Nano cerâmica, refletiva ou carbono para reduzir calor sem perder a vista.'],
+  ['Porta de sala', 'Controle de calor, reflexo na TV e desbotamento de móveis.'],
   ['Porta de banheiro', 'Jateado para privacidade total sem deixar o ambiente escuro.'],
-  ['Cozinha ou lavanderia', 'Jateado para privacidade ou nano ceramica quando o problema principal e calor.'],
-  ['Porta de loja', 'Refletiva, seguranca ou jateado parcial conforme fachada e exposicao.'],
-  ['Escritorio ou consultorio', 'Jateado para privacidade e nano ceramica para sol forte com visual profissional.'],
+  ['Cozinha ou lavanderia', 'Jateado para privacidade ou nano cerâmica quando o problema principal é calor.'],
+  ['Porta de loja', 'Refletiva, segurança ou jateado parcial conforme fachada e exposição.'],
+  ['Escritório ou consultório', 'Jateado para privacidade e nano cerâmica para sol forte com visual profissional.'],
 ];
 
 const comparison = [
   {
     need: 'Reduzir calor sem escurecer muito',
-    options: [{ label: 'Nano ceramica', href: '/nano-ceramica/' }],
+    options: [{ label: 'Nano cerâmica', href: '/nano-ceramica/' }],
   },
   {
     need: 'Privacidade total',
@@ -149,7 +149,7 @@ const comparison = [
   },
   {
     need: 'Porta comercial mais protegida',
-    options: [{ label: 'Seguranca / antivandalismo', href: whatsapp }],
+    options: [{ label: 'Segurança / antivandalismo', href: whatsapp }],
   },
   {
     need: 'Porta de banheiro',
@@ -158,7 +158,7 @@ const comparison = [
   {
     need: 'Porta de varanda',
     options: [
-      { label: 'Nano ceramica', href: '/nano-ceramica/' },
+      { label: 'Nano cerâmica', href: '/nano-ceramica/' },
       { label: 'Refletiva', href: '/refletiva/' },
       { label: 'Carbono', href: '/carbono/' },
     ],
@@ -167,21 +167,21 @@ const comparison = [
     need: 'Porta de loja',
     options: [
       { label: 'Refletiva', href: '/refletiva/' },
-      { label: 'Seguranca', href: whatsapp },
+      { label: 'Segurança', href: whatsapp },
       { label: 'Jateado parcial', href: '/jateado/' },
     ],
   },
 ];
 
 const faqs = [
-  ['Pode colocar insulfilm em qualquer porta de vidro?', 'Na maioria dos casos, sim. O ideal e avaliar tipo de vidro, estado da superficie, tamanho da porta e exposicao ao sol.'],
-  ['Qual a melhor pelicula para porta de vidro?', 'Depende do objetivo. Nano ceramica e excelente para calor sem escurecer; jateada para privacidade total; refletiva para fachada com sol forte; carbono para visual escuro e moderno.'],
-  ['Insulfilm em porta de vidro da privacidade a noite?', 'Peliculas refletivas e carbono dao mais privacidade durante o dia. Para privacidade 24 horas, a jateada e a opcao mais segura.'],
-  ['A pelicula jateada deixa o ambiente escuro?', 'Nao. Ela bloqueia a visao direta, mas mantem a entrada de luz difusa.'],
-  ['Insulfilm reduz o calor da porta de vidro?', 'Sim. Peliculas de controle solar reduzem a entrada de calor, principalmente quando a porta recebe sol direto.'],
-  ['A instalacao faz sujeira?', 'A instalacao e limpa e feita diretamente no vidro, sem obra e sem trocar a porta.'],
-  ['Quanto custa insulfilm para porta de vidro?', 'O valor depende do tamanho da porta, tipo de pelicula e dificuldade. Envie uma foto ou medidas para receber uma estimativa.'],
-  ['A LUME atende quais bairros?', 'Atendemos principalmente a Zona Oeste do Rio, incluindo Bangu, Campo Grande, Realengo, Jacarepagua, Barra da Tijuca, Recreio e regioes proximas.'],
+  ['Pode colocar insulfilm em qualquer porta de vidro?', 'Na maioria dos casos, sim. O ideal é avaliar tipo de vidro, estado da superfície, tamanho da porta e exposição ao sol.'],
+  ['Qual a melhor película para porta de vidro?', 'Depende do objetivo. Nano cerâmica é excelente para calor sem escurecer; jateada para privacidade total; refletiva para fachada com sol forte; carbono para visual escuro e moderno.'],
+  ['Insulfilm em porta de vidro dá privacidade à noite?', 'Películas refletivas e carbono dão mais privacidade durante o dia. Para privacidade 24 horas, a jateada é a opção mais segura.'],
+  ['A película jateada deixa o ambiente escuro?', 'Não. Ela bloqueia a visão direta, mas mantém a entrada de luz difusa.'],
+  ['Insulfilm reduz o calor da porta de vidro?', 'Sim. Películas de controle solar reduzem a entrada de calor, principalmente quando a porta recebe sol direto.'],
+  ['A instalação faz sujeira?', 'A instalação é limpa e feita diretamente no vidro, sem obra e sem trocar a porta.'],
+  ['Quanto custa insulfilm para porta de vidro?', 'O valor depende do tamanho da porta, tipo de película e dificuldade. Envie uma foto ou medidas para receber uma estimativa.'],
+  ['A LUME atende quais bairros?', 'Atendemos principalmente a Zona Oeste do Rio, incluindo Bangu, Campo Grande, Realengo, Jacarepaguá, Barra da Tijuca, Recreio e regiões próximas.'],
 ];
 
 function SectionHeader({
@@ -278,7 +278,7 @@ export function InsulfilmPortasVidro() {
         <div className="absolute inset-0 z-0">
           <Image
             src="/hero-bg-v2.png"
-            alt="Porta de vidro com pelicula de controle solar instalada pela LUME"
+            alt="Porta de vidro com película de controle solar instalada pela LUME"
             fill
             priority
             sizes="100vw"
@@ -293,7 +293,7 @@ export function InsulfilmPortasVidro() {
           <div className="max-w-4xl">
             <NavigationBreadcrumbs
               showVisualTrail={false}
-              items={[{ label: 'Inicio', href: '/' }, { label: 'Portas de vidro' }]}
+              items={[{ label: 'Início', href: '/' }, { label: 'Portas de vidro' }]}
             />
             <div className="animate-hero mb-6 inline-flex items-center gap-2 rounded-full border border-[#c9a227]/30 bg-[#c9a227]/10 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[#c9a227] shadow-[0_0_25px_rgba(201,162,39,0.2)] sm:px-4 sm:text-xs sm:tracking-[0.28em]">
               <Sun size={16} />
@@ -303,23 +303,23 @@ export function InsulfilmPortasVidro() {
               Insulfilm para <span className="text-gradient-gold">Portas de Vidro</span>
             </h1>
             <p className="animate-hero mt-6 max-w-3xl text-base leading-relaxed text-gray-300 sm:mt-7 sm:text-lg md:text-xl">
-              Mais privacidade, conforto termico e protecao solar para portas de vidro
-              residenciais e comerciais, com instalacao profissional no Rio de Janeiro.
+              Mais privacidade, conforto térmico e proteção solar para portas de vidro
+              residenciais e comerciais, com instalação profissional no Rio de Janeiro.
             </p>
             <p className="animate-hero mt-5 max-w-3xl text-sm leading-relaxed text-gray-400 sm:text-base md:text-lg">
-              Transforme sua porta de vidro sem trocar o vidro: peliculas de controle solar,
-              privacidade, seguranca e acabamento decorativo com aplicacao limpa e precisa.
+              Transforme sua porta de vidro sem trocar o vidro: películas de controle solar,
+              privacidade, segurança e acabamento decorativo com aplicação limpa e precisa.
             </p>
             <div className="animate-hero mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:gap-4">
               <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="btn-primary inline-flex w-full items-center justify-center gap-3 sm:w-auto">
-                Solicitar orcamento <MessageCircle size={19} />
+                Solicitar orçamento <MessageCircle size={19} />
               </a>
               <a href="#tipos" className="btn-secondary inline-flex w-full items-center justify-center gap-3 sm:w-auto">
-                Ver tipos de pelicula <ArrowRight size={18} />
+                Ver tipos de película <ArrowRight size={18} />
               </a>
             </div>
             <div className="animate-hero mt-8 grid gap-3 sm:mt-10 sm:grid-cols-2 lg:grid-cols-4">
-              {['Garantia de 5 anos', 'Zona Oeste do Rio', 'Instalacao limpa', 'Orcamento gratuito'].map((item) => (
+              {['Garantia de 5 anos', 'Zona Oeste do Rio', 'Instalação limpa', 'Orçamento gratuito'].map((item) => (
                 <div key={item} className="flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-3 text-xs text-gray-200 backdrop-blur sm:justify-start sm:px-4 sm:text-sm">
                   <CheckCircle size={16} className="shrink-0 text-[#c9a227]" />
                   {item}
@@ -333,7 +333,7 @@ export function InsulfilmPortasVidro() {
       <section className="border-y border-white/5 bg-[#070f1a] py-5">
         <div className="container-lume">
           <div className="flex flex-wrap items-center justify-center gap-3 text-center text-[10px] font-bold uppercase tracking-[0.12em] text-gray-300 sm:gap-4 sm:text-xs sm:tracking-[0.18em] md:justify-between">
-            <span className="animated-card flex w-full items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-2 sm:w-auto"><Shield size={16} className="text-[#c9a227]" /> Protecao UV</span>
+            <span className="animated-card flex w-full items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-2 sm:w-auto"><Shield size={16} className="text-[#c9a227]" /> Proteção UV</span>
             <span className="animated-card flex w-full items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-2 sm:w-auto"><Thermometer size={16} className="text-[#c9a227]" /> Controle de calor</span>
             <span className="animated-card flex w-full items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-2 sm:w-auto"><Eye size={16} className="text-[#c9a227]" /> Privacidade sob medida</span>
             <span className="animated-card flex w-full items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-2 sm:w-auto"><Sparkles size={16} className="text-[#c9a227]" /> Acabamento premium</span>
@@ -348,17 +348,17 @@ export function InsulfilmPortasVidro() {
               Problema comum
             </p>
             <h2 className="font-montserrat text-2xl font-black leading-tight sm:text-3xl md:text-5xl">
-              Sua porta de vidro esta deixando entrar calor, claridade ou olhares demais?
+              Sua porta de vidro está deixando entrar calor, claridade ou olhares demais?
             </h2>
             <div className="mt-6 space-y-4 text-base leading-relaxed text-gray-400 sm:mt-7 sm:space-y-5 sm:text-lg">
               <p>
-                Portas de vidro sao lindas, modernas e valorizam o imovel. O problema aparece
-                quando recebem sol direto, ficam voltadas para rua, corredor, varanda, area comum
-                do predio ou fachada comercial.
+                Portas de vidro são lindas, modernas e valorizam o imóvel. O problema aparece
+                quando recebem sol direto, ficam voltadas para rua, corredor, varanda, área comum
+                do prédio ou fachada comercial.
               </p>
               <p>
                 O vidro pode transformar o ambiente em uma estufa, causar reflexo em telas,
-                desbotar moveis e tirar a privacidade. O insulfilm resolve isso sem obra, sem
+                desbotar móveis e tirar a privacidade. O insulfilm resolve isso sem obra, sem
                 sujeira pesada e sem mudar a estrutura da porta.
               </p>
             </div>
@@ -385,7 +385,7 @@ export function InsulfilmPortasVidro() {
           <SectionHeader
             eyebrow="Vantagens"
             title="Vantagens do insulfilm em portas de vidro"
-            text="A pelicula certa muda a sensacao do ambiente, melhora a privacidade e protege o que esta dentro, mantendo o vidro existente."
+            text="A película certa muda a sensação do ambiente, melhora a privacidade e protege o que está dentro, mantendo o vidro existente."
           />
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {benefits.map((benefit) => (
@@ -404,9 +404,9 @@ export function InsulfilmPortasVidro() {
       <section id="tipos" className="section-padding overflow-hidden border-y border-white/5 bg-[#070f1a] px-4">
         <div className="container-lume">
           <SectionHeader
-            eyebrow="Tipos de pelicula"
+            eyebrow="Tipos de película"
             title="Qual o melhor tipo de insulfilm para porta de vidro?"
-            text="A melhor escolha depende do objetivo: reduzir calor, ganhar privacidade, escurecer, manter transparencia, decorar ou reforcar a seguranca."
+            text="A melhor escolha depende do objetivo: reduzir calor, ganhar privacidade, escurecer, manter transparência, decorar ou reforçar a segurança."
           />
           <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-5">
             {filmTypes.map((film) => (
@@ -446,8 +446,8 @@ export function InsulfilmPortasVidro() {
               Onde instalar insulfilm em portas de vidro?
             </h2>
             <p className="mt-6 text-base leading-relaxed text-gray-400 sm:text-lg">
-              Em cada ambiente a prioridade muda. Algumas portas precisam de conforto termico,
-              outras de privacidade total, outras de seguranca ou acabamento decorativo.
+              Em cada ambiente a prioridade muda. Algumas portas precisam de conforto térmico,
+              outras de privacidade total, outras de segurança ou acabamento decorativo.
             </p>
             <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="btn-primary mt-8 inline-flex w-full items-center justify-center gap-3 sm:w-auto">
               Enviar foto da porta <ArrowRight size={18} />
@@ -472,7 +472,7 @@ export function InsulfilmPortasVidro() {
         <div className="container-lume">
           <SectionHeader
             eyebrow="Comparativo"
-            title="Comparativo rapido: qual pelicula escolher?"
+            title="Comparativo rápido: qual película escolher?"
           />
           <div className="mx-auto max-w-4xl overflow-hidden rounded-lg border border-white/10 page-entrance">
             {comparison.map(({ need, options }, index) => (
@@ -508,19 +508,19 @@ export function InsulfilmPortasVidro() {
               Por que instalar com a LUME?
             </h2>
             <p className="mt-6 text-base leading-relaxed text-gray-400 sm:text-lg">
-              A LUME e especializada em peliculas de controle solar para residencias e
-              comercios no Rio de Janeiro. Avaliamos o ambiente, entendemos o problema
-              e indicamos a pelicula que faz sentido para seu vidro, seu sol e seu bolso.
+              A LUME é especializada em películas de controle solar para residências e
+              comércios no Rio de Janeiro. Avaliamos o ambiente, entendemos o problema
+              e indicamos a película que faz sentido para seu vidro, seu sol e seu bolso.
             </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 page-entrance">
             {[
-              '8 anos de experiencia',
-              'Mais de 500 residencias atendidas',
+              '8 anos de experiência',
+              'Mais de 500 residências atendidas',
               'Garantia de 5 anos',
               'Atendimento na Zona Oeste',
-              'Orcamento gratuito',
-              'Instalacao limpa e cuidadosa',
+              'Orçamento gratuito',
+              'Instalação limpa e cuidadosa',
             ].map((item) => (
               <div key={item} className="animated-card group flex items-center gap-3 rounded-lg border border-white/10 bg-white/[0.035] p-4 transition duration-500 hover:-translate-y-2 hover:border-[#c9a227]/45 hover:bg-white/[0.06]">
                 <CheckCircle size={18} className="shrink-0 text-[#c9a227]" />
@@ -534,12 +534,12 @@ export function InsulfilmPortasVidro() {
       <section className="section-padding bg-[#04080f] px-4">
         <div className="container-lume">
           <SectionHeader
-            eyebrow="Regioes atendidas"
-            title="Instalacao de insulfilm para portas de vidro na Zona Oeste do Rio"
-            text="Atendemos residencias, apartamentos, lojas, escritorios e comercios em diversos bairros do Rio de Janeiro."
+            eyebrow="Regiões atendidas"
+            title="Instalação de insulfilm para portas de vidro na Zona Oeste do Rio"
+            text="Atendemos residências, apartamentos, lojas, escritórios e comércios em diversos bairros do Rio de Janeiro."
           />
           <div className="mx-auto flex max-w-5xl flex-wrap justify-center gap-3 page-entrance">
-            {['Bangu', 'Campo Grande', 'Realengo', 'Padre Miguel', 'Sulacap', 'Jacarepagua', 'Barra da Tijuca', 'Recreio', 'Vargem Grande', 'Vargem Pequena', 'Guaratiba', 'Santa Cruz', 'Regioes proximas'].map((area) => (
+            {['Bangu', 'Campo Grande', 'Realengo', 'Padre Miguel', 'Sulacap', 'Jacarepaguá', 'Barra da Tijuca', 'Recreio', 'Vargem Grande', 'Vargem Pequena', 'Guaratiba', 'Santa Cruz', 'Regiões próximas'].map((area) => (
               <span key={area} className="animated-card inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.035] px-4 py-3 text-sm font-semibold text-gray-300 transition hover:-translate-y-1 hover:border-[#c9a227]/40">
                 <MapPin size={16} className="text-[#c9a227]" />
                 {area}
@@ -553,11 +553,11 @@ export function InsulfilmPortasVidro() {
         <div className="container-lume grid items-center gap-8 lg:grid-cols-[1fr_auto]">
           <div className="page-entrance">
             <h2 className="font-montserrat text-2xl font-black leading-tight sm:text-3xl md:text-5xl">
-              Quer saber qual pelicula combina com sua porta de vidro?
+              Quer saber qual película combina com sua porta de vidro?
             </h2>
             <p className="mt-5 max-w-3xl text-base leading-relaxed text-[#04080f]/80 sm:text-lg">
-              Mande uma foto pelo WhatsApp. A gente avalia tipo de vidro, posicao do sol
-              e nivel de privacidade desejado para indicar a melhor opcao.
+              Mande uma foto pelo WhatsApp. A gente avalia tipo de vidro, posição do sol
+              e nível de privacidade desejado para indicar a melhor opção.
             </p>
           </div>
           <a

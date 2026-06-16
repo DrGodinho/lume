@@ -2,21 +2,21 @@ import type { Metadata } from 'next';
 import { JateadoPage } from '../../views/Jateado';
 
 export const metadata: Metadata = {
-  title: 'PelÃ­cula Jateada Fosca | Privacidade Decorativa - LUME',
-  description: 'PelÃ­cula jateada fosca para privacidade total em banheiros e divisÃ³rias. Efeito vidro jateado com custo acessÃ­vel. OrÃ§amento grÃ¡tis via WhatsApp.',
+  title: 'Película Jateada Fosca | Privacidade Decorativa - LUME',
+  description: 'Película jateada fosca para privacidade total em banheiros e divisórias. Efeito vidro jateado com custo acessível. Orçamento grátis via WhatsApp.',
   alternates: { canonical: 'https://lumecontrolesolar.com.br/jateado' },
   openGraph: {
-    title: 'PelÃ­cula Jateada Fosca | Privacidade Decorativa - LUME',
-    description: 'Privacidade total em banheiros e divisÃ³rias sem escurecer o ambiente. Efeito vidro jateado com acabamento sofisticado e fÃ¡cil limpeza.',
+    title: 'Película Jateada Fosca | Privacidade Decorativa - LUME',
+    description: 'Privacidade total em banheiros e divisórias sem escurecer o ambiente. Efeito vidro jateado com acabamento sofisticado e fácil limpeza.',
     url: 'https://lumecontrolesolar.com.br/jateado',
     type: 'website',
     siteName: 'LUME Controle Solar',
-    images: [{ url: 'https://lumecontrolesolar.com.br/product-jateado-v2.webp', width: 1200, height: 630, alt: 'PelÃ­cula Jateada Fosca LUME' }],
+    images: [{ url: 'https://lumecontrolesolar.com.br/product-jateado-v2.webp', width: 1200, height: 630, alt: 'Película Jateada Fosca LUME' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'PelÃ­cula Jateada Fosca | LUME Controle Solar',
-    description: 'Privacidade total sem escurecer o ambiente. Ideal para banheiros e divisÃ³rias. OrÃ§amento grÃ¡tis.',
+    title: 'Película Jateada Fosca | LUME Controle Solar',
+    description: 'Privacidade total sem escurecer o ambiente. Ideal para banheiros e divisórias. Orçamento grátis.',
     images: ['https://lumecontrolesolar.com.br/product-jateado-v2.webp'],
   },
 };
@@ -24,9 +24,9 @@ export const metadata: Metadata = {
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Product',
-  name: 'PelÃ­cula Jateada Fosca LUME',
+  name: 'Película Jateada Fosca LUME',
   image: 'https://lumecontrolesolar.com.br/product-jateado-v2.webp',
-  description: 'PelÃ­cula jateada fosca profissional para privacidade total sem escurecer o ambiente. Ideal para boxes de banheiro e divisÃ³rias de escritÃ³rio.',
+  description: 'Película jateada fosca profissional para privacidade total sem escurecer o ambiente. Ideal para boxes de banheiro e divisórias de escritório.',
   brand: {
     '@type': 'Brand',
     name: 'LUME Controle Solar',
@@ -40,7 +40,7 @@ const jsonLd = {
       '@type': 'UnitPriceSpecification',
       price: '90.00',
       priceCurrency: 'BRL',
-      unitText: 'mÂ²',
+      unitText: 'm²',
     },
     availability: 'https://schema.org/InStock',
     hasMerchantReturnPolicy: {

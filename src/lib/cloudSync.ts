@@ -1,9 +1,12 @@
 import { supabase } from './supabase';
 
+type CloudGlass = object;
+type CloudConfig = object;
+
 interface DraftData {
   cliente: string;
   phone: string;
-  vidros: any[];
+  vidros: CloudGlass[];
   desconto: number;
   desconto_input: string;
   roll_w: number;
@@ -40,11 +43,24 @@ interface HistoryItem {
   data: string;
   valor: number;
   qtd: number;
-  vidros: any[];
-  config: any;
+  vidros: CloudGlass[];
+  config: CloudConfig;
   desconto: number;
   modoOtimizacao: string;
-  selectedFilm: string;
+  selectedFilm?: string;
+}
+
+interface CalculatorHistoryRow {
+  id: string;
+  cliente: string;
+  data: string;
+  valor: number;
+  qtd: number;
+  vidros: CloudGlass[];
+  config: CloudConfig;
+  desconto: number;
+  modo_otimizacao: string;
+  selected_film?: string | null;
 }
 
 export async function saveHistoryItemToCloud(item: HistoryItem): Promise<boolean> {
@@ -61,7 +77,7 @@ export async function saveHistoryItemToCloud(item: HistoryItem): Promise<boolean
       config: item.config,
       desconto: item.desconto,
       modo_otimizacao: item.modoOtimizacao,
-      selected_film: item.selectedFilm,
+      selected_film: item.selectedFilm || null,
     });
   if (error) console.error('[Cloud] History save failed:', error.message);
   return !error;
@@ -75,7 +91,7 @@ export async function loadHistoryFromCloud(): Promise<HistoryItem[]> {
     .order('created_at', { ascending: false })
     .limit(20);
   if (error || !data) return [];
-  return data.map((row: any) => ({
+  return (data as CalculatorHistoryRow[]).map((row) => ({
     id: row.id,
     cliente: row.cliente,
     data: row.data,
@@ -85,7 +101,7 @@ export async function loadHistoryFromCloud(): Promise<HistoryItem[]> {
     config: row.config,
     desconto: row.desconto,
     modoOtimizacao: row.modo_otimizacao,
-    selectedFilm: row.selected_film,
+    selectedFilm: row.selected_film || undefined,
   }));
 }
 
@@ -125,7 +141,7 @@ const CONFIG_OPTIONAL_COLUMNS = {
 export async function saveConfigToCloud(config: ConfigData): Promise<boolean> {
   if (!supabase) return false;
 
-  const row: Record<string, any> = {
+  const row: Record<string, unknown> = {
     id: 'default',
     roll_w: config.rollW,
     price: config.price,

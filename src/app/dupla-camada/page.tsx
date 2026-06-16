@@ -2,21 +2,21 @@ import type { Metadata } from 'next';
 import { DuplaCamadaPage } from '../../views/DuplaCamada';
 
 export const metadata: Metadata = {
-  title: 'PelÃ­cula Dupla Camada G5 | MÃ¡xima RejeiÃ§Ã£o de Calor - LUME',
-  description: 'PelÃ­cula Dupla Camada com camada refletiva externa e fumÃª interna. MÃ¡xima rejeiÃ§Ã£o de calor sem reflexo interno noturno. OrÃ§amento grÃ¡tis via WhatsApp.',
+  title: 'Película Dupla Camada G5 | Máxima Rejeição de Calor - LUME',
+  description: 'Película Dupla Camada com camada refletiva externa e fumê interna. Máxima rejeição de calor sem reflexo interno noturno. Orçamento grátis via WhatsApp.',
   alternates: { canonical: 'https://lumecontrolesolar.com.br/dupla-camada' },
   openGraph: {
-    title: 'PelÃ­cula Dupla Camada G5 | MÃ¡xima RejeiÃ§Ã£o de Calor - LUME',
-    description: 'Camada refletiva + fumÃª interna: o melhor dos dois mundos. MÃ¡xima rejeiÃ§Ã£o de calor sem reflexo interno Ã  noite. InstalaÃ§Ã£o no Rio de Janeiro.',
+    title: 'Película Dupla Camada G5 | Máxima Rejeição de Calor - LUME',
+    description: 'Camada refletiva + fumê interna: o melhor dos dois mundos. Máxima rejeição de calor sem reflexo interno à noite. Instalação no Rio de Janeiro.',
     url: 'https://lumecontrolesolar.com.br/dupla-camada',
     type: 'website',
     siteName: 'LUME Controle Solar',
-    images: [{ url: 'https://lumecontrolesolar.com.br/product-smoke.webp', width: 1200, height: 630, alt: 'PelÃ­cula Dupla Camada G5 LUME' }],
+    images: [{ url: 'https://lumecontrolesolar.com.br/product-smoke.webp', width: 1200, height: 630, alt: 'Película Dupla Camada G5 LUME' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'PelÃ­cula Dupla Camada G5 | LUME Controle Solar',
-    description: 'MÃ¡xima rejeiÃ§Ã£o de calor sem reflexo interno Ã  noite. OrÃ§amento grÃ¡tis.',
+    title: 'Película Dupla Camada G5 | LUME Controle Solar',
+    description: 'Máxima rejeição de calor sem reflexo interno à noite. Orçamento grátis.',
     images: ['https://lumecontrolesolar.com.br/product-smoke.webp'],
   },
 };
@@ -24,9 +24,9 @@ export const metadata: Metadata = {
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Product',
-  name: 'PelÃ­cula Dupla Camada G5/G20 LUME',
+  name: 'Película Dupla Camada G5/G20 LUME',
   image: 'https://lumecontrolesolar.com.br/product-smoke.webp',
-  description: 'PelÃ­cula dupla camada profissional com tecnologia de deposiÃ§Ã£o a vÃ¡cuo. Camada refletiva externa para mÃ¡xima rejeiÃ§Ã£o de calor e camada fumÃª interna para eliminar o reflexo noturno.',
+  description: 'Película dupla camada profissional com tecnologia de deposição a vácuo. Camada refletiva externa para máxima rejeição de calor e camada fumê interna para eliminar o reflexo noturno.',
   brand: {
     '@type': 'Brand',
     name: 'LUME Controle Solar',
@@ -40,7 +40,7 @@ const jsonLd = {
       '@type': 'UnitPriceSpecification',
       price: '120.00',
       priceCurrency: 'BRL',
-      unitText: 'mÂ²',
+      unitText: 'm²',
     },
     availability: 'https://schema.org/InStock',
     hasMerchantReturnPolicy: {

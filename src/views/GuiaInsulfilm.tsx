@@ -1,7 +1,7 @@
 'use client';
 
 import { ContactCTA } from '../sections/ContactCTA';
-import { ArrowRight, Zap, Target, Shield, CheckCircle } from 'lucide-react';
+import { ArrowRight, Zap, Target, Shield } from 'lucide-react';
 import { HeroEntrance } from '../components/HeroEntrance';
 
 // Reusable Accordion Component for FAQs
@@ -66,6 +66,16 @@ const roomsData = [
             { film: 'Nano Cerâmica', tag: 'Premium', desc: 'Evita o calor que causa sonolência e mantém a claridade para leitura e tela sem glare excessivo.', link: '/nano-ceramica/' },
             { film: 'Jateado', tag: 'Para divisórias', desc: 'Privacidade total em divisórias de vidro internas ou janelas com vista para áreas comuns, sem perder a luz.', link: '/jateado/' },
             { film: 'Carbono G20', tag: 'Confortável', desc: 'Reduz o reflexo na tela do computador e deixa a luminosidade confortável para longas jornadas de trabalho.', link: '/carbono/' },
+        ]
+    },
+    {
+        icon: '🚪',
+        title: 'Porta de Vidro',
+        titleLink: '/insulfilm-para-portas-de-vidro/',
+        recs: [
+            { film: 'Nano Cerâmica', tag: 'Conforto térmico', desc: 'Reduz o calor da porta de vidro sem escurecer demais o ambiente, ideal para salas e varandas.', link: '/nano-ceramica/' },
+            { film: 'Jateado', tag: 'Privacidade total', desc: 'Bloqueia a visão direta com visual limpo e luminosidade difusa, ótimo para banheiro, escritório e divisórias.', link: '/jateado/' },
+            { film: 'Refletiva', tag: 'Fachada e sol forte', desc: 'Ajuda a controlar calor e privacidade durante o dia quando a porta pega muita incidência solar.', link: '/refletiva/' },
         ]
     }
 ];

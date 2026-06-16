@@ -30,16 +30,16 @@ export function BlogIndex({ posts }: BlogIndexProps) {
           <div className="max-w-4xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-[#c9a227]/30 bg-[#c9a227]/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.28em] text-[#c9a227]">
               <Sparkles className="h-4 w-4" />
-              Conteudo LUME
+              Curadoria LUME
             </div>
 
             <h1 className="mt-7 max-w-4xl font-montserrat text-4xl font-black leading-tight md:text-6xl lg:text-7xl">
-              Blog sobre insulfilm, conforto termico e protecao solar
+              Insulfilm com critério: conforto, proteção e elegância para cada vidro
             </h1>
 
             <p className="mt-6 max-w-3xl text-lg leading-relaxed text-gray-300 md:text-xl">
-              Guias praticos para escolher a pelicula certa, reduzir calor, proteger moveis e
-              entender as melhores solucoes para casas, apartamentos e empresas no Rio de Janeiro.
+              Guias técnicos e recomendações refinadas para escolher a película ideal, controlar o calor,
+              preservar móveis e valorizar casas, apartamentos e empresas no Rio de Janeiro.
             </p>
           </div>
 

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { Sun, Loader2 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -25,14 +26,33 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       });
 
+      const data = await response.json().catch(() => null);
+
       if (!response.ok) {
-        const data = await response.json().catch(() => null);
         toast.error(data?.error || 'Credenciais invalidas. Tente novamente.');
         setLoading(false);
         return;
       }
 
-      window.location.href = '/crm/';
+      if (supabase && data?.session?.accessToken && data?.session?.refreshToken) {
+        const { error } = await supabase.auth.setSession({
+          access_token: data.session.accessToken,
+          refresh_token: data.session.refreshToken,
+        });
+
+        if (error) {
+          await fetch('/api/auth/logout', { method: 'POST' }).catch(() => null);
+          toast.error('Login realizado, mas a sessao do Supabase nao foi restaurada.');
+          setLoading(false);
+          return;
+        }
+      }
+
+      const redirectTo = new URLSearchParams(window.location.search).get('redirectTo');
+      const nextPath = redirectTo && redirectTo.startsWith('/') && !redirectTo.startsWith('//')
+        ? redirectTo
+        : '/crm/';
+      window.location.href = nextPath;
     } catch {
       toast.error('Erro inesperado. Tente novamente.');
       setLoading(false);
@@ -63,13 +83,14 @@ export default function LoginPage() {
             <p className="text-sm text-white/50">Controle Solar - CRM</p>
           </div>
 
-          <form onSubmit={handleLogin} className="flex flex-col gap-5">
+          <form action="/api/auth/login/" method="post" onSubmit={handleLogin} className="flex flex-col gap-5">
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-semibold text-white/60 uppercase tracking-wider">
                 E-mail
               </label>
               <input
                 type="email"
+                name="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="seu@email.com"
@@ -83,6 +104,7 @@ export default function LoginPage() {
               </label>
               <input
                 type="password"
+                name="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="********"

@@ -1,11 +1,24 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
-import { addDays, differenceInDays, eachDayOfInterval, endOfMonth, format, isPast, isSameDay, isToday, isWithinInterval, parseISO, startOfMonth, startOfWeek } from 'date-fns';
+import { addDays, differenceInDays, eachDayOfInterval, endOfMonth, format, isPast, isSameDay, isToday, isWithinInterval, parseISO, startOfMonth, startOfWeek, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+import { ResponsiveContainer, ComposedChart, Area, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { ExtratosMensaisSupabase } from './ExtratosMensaisSupabase';
+import { roundCurrency, roundMeasure } from '@/lib/numberPrecision';
+
+type LeadStatus = 'Novo' | 'Em Contato' | 'Agendado' | 'Fechado' | 'Perdido';
+type MonthlyEvolutionSeries = 'atualDia' | 'atual' | 'anterior' | 'previsto';
+type LeadSortKey = '' | 'name' | 'neighborhood' | 'filmType' | 'sqm' | 'value' | 'status' | 'dataServico';
+
+const LEAD_STAGES: LeadStatus[] = ['Novo', 'Em Contato', 'Agendado', 'Fechado', 'Perdido'];
+const MONTHLY_EVOLUTION_SERIES: Record<MonthlyEvolutionSeries, boolean> = {
+  atualDia: true,
+  atual: true,
+  anterior: true,
+  previsto: true,
+};
 
 // Interfaces
 interface Lead {
@@ -18,13 +31,30 @@ interface Lead {
   filmType: string;
   sqm: number;
   value: number;
-  status: 'Novo' | 'Em Contato' | 'Proposta Enviada' | 'Fechado' | 'Perdido';
+  status: LeadStatus;
   createdAt: string;
   statusChangedAt: string;
   notes: string;
   proximoContato?: string | null;
+  dataServico?: string | null;
   updatedAt?: string;
 }
+
+const normalizeLeadStatus = (status: unknown): LeadStatus => {
+  if (status === 'Proposta Enviada') return 'Agendado';
+  if (status === 'Novo' || status === 'Em Contato' || status === 'Agendado' || status === 'Fechado' || status === 'Perdido') {
+    return status;
+  }
+  return 'Novo';
+};
+
+const getLeadStatusClasses = (status: LeadStatus) => {
+  if (status === 'Fechado') return 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400';
+  if (status === 'Agendado') return 'border-sky-500/20 bg-sky-500/10 text-sky-400';
+  if (status === 'Em Contato') return 'border-amber-500/20 bg-amber-500/10 text-amber-400';
+  if (status === 'Perdido') return 'border-red-500/20 bg-red-500/10 text-red-400';
+  return 'border-blue-500/20 bg-blue-500/10 text-blue-400';
+};
 
 // Initial Mock Data
 const INITIAL_LEADS: Lead[] = [
@@ -53,9 +83,10 @@ const INITIAL_LEADS: Lead[] = [
     filmType: 'Refletiva',
     sqm: 8.2,
     value: 738,
-    status: 'Proposta Enviada',
+    status: 'Agendado',
     createdAt: '2026-06-02',
     statusChangedAt: '2026-06-02',
+    dataServico: '2026-06-08',
     notes: 'Orçamento enviado por WhatsApp. Aguardando retorno sobre película de privacidade.'
   },
   {
@@ -71,6 +102,7 @@ const INITIAL_LEADS: Lead[] = [
     status: 'Fechado',
     createdAt: '2026-05-28',
     statusChangedAt: '2026-05-30',
+    dataServico: '2026-06-06',
     notes: 'Contrato assinado. Instalação agendada para sábado de manhã. Película Carbono 20%.'
   },
   {
@@ -89,6 +121,8 @@ const INITIAL_LEADS: Lead[] = [
     notes: 'Interesse na película de alto desempenho térmico para consultório.'
   }
 ];
+
+const CRM_COLLAPSED_CARDS_STORAGE_KEY = 'lume_crm_collapsed_cards';
 
 const FILM_PRICES: Record<string, number> = {
   'Nano Cerâmica': 150,
@@ -121,6 +155,127 @@ const getLeadActivityDate = (lead: Lead) => parseAgendaDate(lead.updatedAt || le
 
 const getLeadFollowUpDate = (lead: Lead) => parseAgendaDate(lead.proximoContato || null);
 
+const getLeadServiceDate = (lead: Lead) => parseAgendaDate(lead.dataServico || null);
+
+const formatDateInputValue = (value?: string | null) => {
+  const date = parseAgendaDate(value);
+  return date ? format(date, 'yyyy-MM-dd') : '';
+};
+
+type LeadRow = Record<string, unknown> & { film_type?: string };
+
+const asString = (value: unknown, fallback = '') => (typeof value === 'string' ? value : fallback);
+
+const asNullableString = (value: unknown) => (typeof value === 'string' && value ? value : null);
+
+interface CalculatorGlass {
+  label?: string;
+  h?: number;
+  w?: number;
+  oh?: number;
+  ow?: number;
+  cor?: string;
+}
+
+interface CalculatorHistoryRow {
+  id: string;
+  cliente?: string;
+  phone?: string;
+  selected_film?: string;
+  modo_otimizacao?: string;
+  valor?: number;
+  qtd?: number;
+  created_at?: string;
+  vidros?: CalculatorGlass[];
+  desconto?: number;
+}
+
+interface MonthlyTooltipPayload {
+  payload?: {
+    diaAnterior: string;
+    atual: number | null;
+    atualDia: number | null;
+    anterior: number | null;
+    anteriorDia: number | null;
+    previsto: number | null;
+    previstoDia: number | null;
+  };
+}
+
+const mapLeadRow = (r: LeadRow): Lead => ({
+  id: asString(r.id, 'lead_sem_id'),
+  name: asString(r.name),
+  phone: asString(r.phone),
+  email: asString(r.email),
+  address: asString(r.address),
+  neighborhood: asString(r.neighborhood, 'Barra da Tijuca'),
+  filmType: asString(r.film_type, 'Nano Ceramica'),
+  sqm: roundMeasure(r.sqm),
+  value: roundCurrency(r.value),
+  status: normalizeLeadStatus(r.status),
+  createdAt: asString(r.created_at, new Date().toISOString().split('T')[0]),
+  statusChangedAt: asString(r.status_changed_at, asString(r.created_at, new Date().toISOString().split('T')[0])),
+  notes: asString(r.notes),
+  proximoContato: asNullableString(r.proximo_contato),
+  dataServico: asNullableString(r.data_servico),
+  updatedAt: asString(r.updated_at, asString(r.status_changed_at, asString(r.created_at, new Date().toISOString()))),
+});
+
+const mergeCloudLeadsWithLocal = (cloudLeads: Lead[], savedLeads: Lead[]) => {
+  const cloudById = new Map(cloudLeads.map((lead) => [lead.id, lead]));
+  const merged = savedLeads.map((lead) => {
+    const cloud = cloudById.get(lead.id);
+    if (!cloud) return lead;
+    return {
+      ...lead,
+      ...cloud,
+      proximoContato: cloud.proximoContato ?? lead.proximoContato ?? null,
+      dataServico: cloud.dataServico ?? lead.dataServico ?? null,
+      updatedAt: cloud.updatedAt ?? lead.updatedAt,
+      statusChangedAt: cloud.statusChangedAt || lead.statusChangedAt,
+    };
+  });
+
+  const localIds = new Set(savedLeads.map((lead) => lead.id));
+  const newFromCloud = cloudLeads.filter((lead) => !localIds.has(lead.id));
+  return [...newFromCloud, ...merged];
+};
+
+const normalizeLeadAmounts = (lead: Lead): Lead => ({
+  ...lead,
+  sqm: roundMeasure(lead.sqm),
+  value: roundCurrency(lead.value),
+  status: normalizeLeadStatus(lead.status),
+});
+
+const getInitialLeads = () => {
+  if (typeof window === 'undefined') return INITIAL_LEADS;
+  const saved = localStorage.getItem('lume_crm_leads');
+  if (!saved) return INITIAL_LEADS;
+
+  try {
+    return (JSON.parse(saved) as Lead[]).map(normalizeLeadAmounts);
+  } catch {
+    return INITIAL_LEADS;
+  }
+};
+
+const getInitialCollapsedCards = () => {
+  if (typeof window === 'undefined') return new Set<string>();
+  const savedCollapsed = localStorage.getItem(CRM_COLLAPSED_CARDS_STORAGE_KEY);
+  if (!savedCollapsed) return new Set<string>();
+
+  try {
+    const parsed = JSON.parse(savedCollapsed);
+    return Array.isArray(parsed)
+      ? new Set(parsed.filter((value): value is string => typeof value === 'string'))
+      : new Set<string>();
+  } catch {
+    localStorage.removeItem(CRM_COLLAPSED_CARDS_STORAGE_KEY);
+    return new Set<string>();
+  }
+};
+
 function LeadCardAgenda({
   lead,
   onAgendar,
@@ -137,6 +292,7 @@ function LeadCardAgenda({
   const [salvando, setSalvando] = useState(false);
 
   const followUpDate = getLeadFollowUpDate(lead);
+  const serviceDate = getLeadServiceDate(lead);
   const activityDate = getLeadActivityDate(lead);
   const inactivityDays = activityDate ? differenceInDays(new Date(), activityDate) : null;
   const atrasado = !!followUpDate && isPast(followUpDate) && !isToday(followUpDate);
@@ -173,17 +329,7 @@ function LeadCardAgenda({
         </button>
 
         <span
-          className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${
-            lead.status === 'Fechado'
-              ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-300'
-              : lead.status === 'Proposta Enviada'
-                ? 'border-purple-500/20 bg-purple-500/10 text-purple-300'
-                : lead.status === 'Em Contato'
-                  ? 'border-amber-500/20 bg-amber-500/10 text-amber-300'
-                  : lead.status === 'Perdido'
-                    ? 'border-red-500/20 bg-red-500/10 text-red-300'
-                    : 'border-white/10 bg-white/[0.03] text-white/60'
-          }`}
+          className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${getLeadStatusClasses(lead.status)}`}
         >
           {lead.status}
         </span>
@@ -203,6 +349,11 @@ function LeadCardAgenda({
         {hasFollowUp && followUpDate && (
           <span className="rounded-full border border-[#c9a227]/20 bg-[#c9a227]/10 px-2.5 py-1 text-[#f2d98a]">
             {atrasado ? 'Contato hoje' : format(followUpDate, "d 'de' MMM", { locale: ptBR })}
+          </span>
+        )}
+        {serviceDate && (
+          <span className="rounded-full border border-sky-500/20 bg-sky-500/10 px-2.5 py-1 text-sky-300">
+            Serviço {format(serviceDate, "d 'de' MMM", { locale: ptBR })}
           </span>
         )}
       </div>
@@ -297,12 +448,13 @@ function AgendaFollowUpSection({
 }) {
   const [diaSelecionado, setDiaSelecionado] = useState<Date | null>(null);
 
-  const hoje = new Date();
+  const hoje = useMemo(() => new Date(), []);
   const inicioSemana = startOfWeek(hoje, { weekStartsOn: 1 });
   const diasSemana = Array.from({ length: 7 }, (_, index) => addDays(inicioSemana, index));
 
   const leadsAtivos = useMemo(() => leads.filter((lead) => !isClosedLead(lead.status)), [leads]);
   const leadsComRetorno = useMemo(() => leadsAtivos.filter((lead) => !!lead.proximoContato), [leadsAtivos]);
+  const leadsComServico = useMemo(() => leadsAtivos.filter((lead) => !!lead.dataServico), [leadsAtivos]);
 
   const contactarHoje = useMemo(() => {
     return leadsAtivos.filter((lead) => {
@@ -352,15 +504,33 @@ function AgendaFollowUpSection({
     }).length;
   }, [hoje, leadsAtivos]);
 
+  const servicosAgendados = useMemo(() => {
+    return leadsComServico
+      .filter((lead) => {
+        const serviceDate = getLeadServiceDate(lead);
+        if (!serviceDate) return false;
+        return diaSelecionado ? isSameDay(serviceDate, diaSelecionado) : true;
+      })
+      .sort((a, b) => {
+        const aDate = getLeadServiceDate(a)?.getTime() || 0;
+        const bDate = getLeadServiceDate(b)?.getTime() || 0;
+        return aDate - bDate;
+      });
+  }, [diaSelecionado, leadsComServico]);
+
   const agendaCountByDay = (day: Date) =>
     leadsComRetorno.filter((lead) => {
       const followUpDate = getLeadFollowUpDate(lead);
       return followUpDate ? isSameDay(followUpDate, day) : false;
+    }).length +
+    leadsComServico.filter((lead) => {
+      const serviceDate = getLeadServiceDate(lead);
+      return serviceDate ? isSameDay(serviceDate, day) : false;
     }).length;
 
   const selectedDayLabel = diaSelecionado ? format(diaSelecionado, "EEEE, d 'de' MMMM", { locale: ptBR }) : '';
 
-  const sectionsEmpty = contactarHoje.length === 0 && proximos7Dias.length === 0 && parados.length === 0;
+  const sectionsEmpty = contactarHoje.length === 0 && proximos7Dias.length === 0 && parados.length === 0 && servicosAgendados.length === 0;
 
   const highlightDay = (day: Date) => {
     if (diaSelecionado && isSameDay(day, diaSelecionado)) {
@@ -399,6 +569,9 @@ function AgendaFollowUpSection({
               <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-white/60">
                 {emDiaCount} em dia
               </span>
+              <span className="rounded-full border border-sky-500/20 bg-sky-500/10 px-3 py-1 text-sky-300">
+                {servicosAgendados.length} serviços
+              </span>
             </div>
           </div>
         </div>
@@ -416,9 +589,9 @@ function AgendaFollowUpSection({
           <p className="mt-2 text-sm text-white/50">Retornos agendados para a semana.</p>
         </div>
         <div className="rounded-[1.75rem] border border-white/10 bg-white/[0.03] p-5 shadow-lg shadow-black/10">
-          <p className="text-[10px] uppercase tracking-[0.35em] text-white/35">Em dia</p>
-          <p className="mt-3 text-4xl font-black text-white">{emDiaCount}</p>
-          <p className="mt-2 text-sm text-white/50">Leads ativos sem follow-up pendente.</p>
+          <p className="text-[10px] uppercase tracking-[0.35em] text-sky-300/80">Serviços</p>
+          <p className="mt-3 text-4xl font-black text-white">{servicosAgendados.length}</p>
+          <p className="mt-2 text-sm text-white/50">Datas de serviço marcadas.</p>
         </div>
         <div className="rounded-[1.75rem] border border-white/10 bg-white/[0.03] p-5 shadow-lg shadow-black/10">
           <p className="text-[10px] uppercase tracking-[0.35em] text-white/35">Parados</p>
@@ -515,6 +688,10 @@ function AgendaFollowUpSection({
                   <span className="font-semibold text-[#f5d77a]">{proximos7Dias.length}</span>
                 </div>
                 <div className="flex items-center justify-between">
+                  <span>Serviços marcados</span>
+                  <span className="font-semibold text-sky-300">{servicosAgendados.length}</span>
+                </div>
+                <div className="flex items-center justify-between">
                   <span>Parados</span>
                   <span className="font-semibold text-white">{parados.length}</span>
                 </div>
@@ -527,6 +704,28 @@ function AgendaFollowUpSection({
           </div>
         </div>
       </section>
+
+      {servicosAgendados.length > 0 && (
+        <section className="space-y-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-bold uppercase tracking-[0.25em] text-sky-300">Serviços agendados</span>
+            <span className="rounded-full border border-sky-500/20 bg-sky-500/10 px-2.5 py-1 text-xs font-semibold text-sky-300">
+              {servicosAgendados.length}
+            </span>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {servicosAgendados.map((lead) => (
+              <LeadCardAgenda
+                key={lead.id}
+                lead={lead}
+                onAgendar={onAgendarRetorno}
+                onMarcarFeito={onMarcarFeito}
+                onAbrirLead={onAbrirLead}
+              />
+            ))}
+          </div>
+        </section>
+      )}
 
       {contactarHoje.length > 0 && (
         <section className="space-y-4">
@@ -605,37 +804,34 @@ function AgendaFollowUpSection({
 }
 
 interface HistoricoSupabaseProps {
-  leads: Lead[];
   setActiveTab: (tab: 'dashboard' | 'leads' | 'historico') => void;
   openCreateModal: (prefill?: Omit<Lead, 'id' | 'createdAt'>) => void;
 }
 
-function HistoricoSupabase({ leads, setActiveTab, openCreateModal }: HistoricoSupabaseProps) {
-  const [history, setHistory] = useState<any[]>([]);
-  const [draft, setDraft] = useState<any | null>(null);
-  const [config, setConfig] = useState<any | null>(null);
+function HistoricoSupabase({ setActiveTab, openCreateModal }: HistoricoSupabaseProps) {
+  const [history, setHistory] = useState<CalculatorHistoryRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedOrcamento, setSelectedOrcamento] = useState<any | null>(null);
+  const [selectedOrcamento, setSelectedOrcamento] = useState<CalculatorHistoryRow | null>(null);
 
-  const filmMap: Record<string, string> = {
+  const legacyFilmMap = useMemo<Record<string, string>>(() => ({
     'densidade': 'Nano Cerâmica',
     'facilidade': 'Refletiva',
     'facilidade_v2': 'Carbono',
-  };
+  }), []);
 
-  const FILM_TYPE_LABELS: Record<string, string> = {
+  const FILM_TYPE_LABELS = useMemo<Record<string, string>>(() => ({
     carbono: 'Carbono',
     refletiva: 'Refletiva',
     dupla_camada: 'Dupla Camada',
     nano_ceramica: 'Nano Cerâmica',
     jateado: 'Jateado',
-  };
+  }), []);
 
-  const getFilmLabel = (h: any) => {
+  const getFilmLabel = useCallback((h: CalculatorHistoryRow) => {
     if (h.selected_film) return FILM_TYPE_LABELS[h.selected_film] || h.selected_film;
-    return filmMap[h.modo_otimizacao] || h.modo_otimizacao || '—';
-  };
+    return legacyFilmMap[h.modo_otimizacao || ''] || h.modo_otimizacao || '—';
+  }, [FILM_TYPE_LABELS, legacyFilmMap]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -644,15 +840,9 @@ function HistoricoSupabase({ leads, setActiveTab, openCreateModal }: HistoricoSu
         return;
       }
 
-      const [historyRes, draftRes, configRes] = await Promise.all([
-        supabase.from('calculator_history').select('*').order('created_at', { ascending: false }).limit(100),
-        supabase.from('calculator_draft').select('*').eq('id', 'default').single(),
-        supabase.from('calculator_config').select('*').eq('id', 'default').single(),
-      ]);
+      const { data } = await supabase.from('calculator_history').select('*').order('created_at', { ascending: false }).limit(100);
 
-      if (historyRes.data) setHistory(historyRes.data);
-      if (draftRes.data) setDraft(draftRes.data);
-      if (configRes.data) setConfig(configRes.data);
+      if (data) setHistory(data as CalculatorHistoryRow[]);
       setLoading(false);
     };
 
@@ -662,22 +852,22 @@ function HistoricoSupabase({ leads, setActiveTab, openCreateModal }: HistoricoSu
   const filteredHistory = useMemo(() => {
     if (!searchQuery.trim()) return history;
     const q = searchQuery.toLowerCase();
-    return history.filter((h: any) =>
+    return history.filter((h) =>
       (h.cliente || '').toLowerCase().includes(q) ||
       getFilmLabel(h).toLowerCase().includes(q)
     );
-  }, [history, searchQuery]);
+  }, [getFilmLabel, history, searchQuery]);
 
   const stats = useMemo(() => {
     const total = history.length;
-    const totalValue = history.reduce((s: number, h: any) => s + (h.valor || 0), 0);
+    const totalValue = history.reduce((s, h) => s + (h.valor || 0), 0);
     const avgValue = total > 0 ? totalValue / total : 0;
     return { total, totalValue, avgValue };
   }, [history]);
 
   const exportToCSV = () => {
     const headers = ['Cliente', 'Película', 'Valor', 'Qtd Vidros', 'Data'];
-    const rows = filteredHistory.map((h: any) => [
+    const rows = filteredHistory.map((h) => [
       h.cliente || '',
       getFilmLabel(h),
       h.valor || 0,
@@ -704,8 +894,8 @@ function HistoricoSupabase({ leads, setActiveTab, openCreateModal }: HistoricoSu
     }
   };
 
-const convertToLead = (orcamento: any) => {
-    const totalM2 = (orcamento.vidros?.reduce((s: number, v: any) => s + (v.h || 0) * (v.w || 0), 0) || 0) / 10000;
+const convertToLead = (orcamento: CalculatorHistoryRow) => {
+    const totalM2 = roundMeasure((orcamento.vidros?.reduce((s, v) => s + (v.h || 0) * (v.w || 0), 0) || 0) / 10000);
     const prefill: Omit<Lead, 'id' | 'createdAt'> = {
       name: orcamento.cliente || 'Cliente do Histórico',
       phone: orcamento.phone || '',
@@ -713,10 +903,11 @@ const convertToLead = (orcamento: any) => {
       address: '',
       neighborhood: 'Barra da Tijuca',
       filmType: getFilmLabel(orcamento),
-      sqm: Math.round(totalM2 * 100) / 100,
-      value: orcamento.valor || 0,
+      sqm: totalM2,
+      value: roundCurrency(orcamento.valor),
       status: 'Novo',
       statusChangedAt: new Date().toISOString().split('T')[0],
+      dataServico: null,
       notes: `Orçamento convertido do Supabase (ID: ${orcamento.id}).\nPelícula: ${getFilmLabel(orcamento)}.\nVidros: ${orcamento.qtd}.`,
     };
     setActiveTab('leads');
@@ -802,7 +993,7 @@ const convertToLead = (orcamento: any) => {
                 </td>
               </tr>
             ) : (
-              filteredHistory.map((h: any) => (
+              filteredHistory.map((h) => (
                 <tr key={h.id} className="hover:bg-white/[0.01] cursor-pointer" onClick={() => setSelectedOrcamento(h)}>
                   <td className="py-3.5 font-semibold text-white group">
                     <span className="border-b border-dotted border-white/20 hover:border-[#c9a227]/60 transition">{h.cliente || '—'}</span>
@@ -896,7 +1087,7 @@ const convertToLead = (orcamento: any) => {
               <div className="mt-3">
                 <h4 className="text-[10px] uppercase tracking-wider text-white/50 font-semibold mb-2">Vidros</h4>
                 <div className="space-y-1 max-h-36 overflow-y-auto">
-                  {selectedOrcamento.vidros.map((v: any, i: number) => (
+                  {selectedOrcamento.vidros.map((v, i) => (
                     <div key={i} className="flex justify-between items-center rounded-lg border border-white/5 bg-white/[0.02] px-3 py-1.5 text-sm">
                       <span className="text-white/70">{v.label || `Vidro ${i + 1}`}</span>
                       <span className="font-mono text-white text-xs">{v.h || 0} x {v.w || 0} cm</span>
@@ -932,15 +1123,16 @@ export default function HomePage() {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'leads' | 'historico' | 'extratos' | 'agenda'>('dashboard');
 
   // Leads Database State
-  const [leads, setLeads] = useState<Lead[]>([]);
+  const [leads, setLeads] = useState<Lead[]>(getInitialLeads);
 
   // Filter & Search States
   const [searchQuery, setSearchQuery] = useState('');
   const [filterNeighborhood, setFilterNeighborhood] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [viewMode, setViewMode] = useState<'kanban' | 'table'>('kanban');
-  const [collapsedCards, setCollapsedCards] = useState<Set<string>>(new Set());
-  const [sortKey, setSortKey] = useState<string>('');
+  const [collapsedCards, setCollapsedCards] = useState<Set<string>>(getInitialCollapsedCards);
+  const [visibleMonthlySeries, setVisibleMonthlySeries] = useState(MONTHLY_EVOLUTION_SERIES);
+  const [sortKey, setSortKey] = useState<LeadSortKey>('');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
   // Lead CRUD Form States
@@ -958,6 +1150,7 @@ export default function HomePage() {
     value: 0,
     status: 'Novo',
     statusChangedAt: new Date().toISOString().split('T')[0],
+    dataServico: null,
     notes: '',
   });
 
@@ -967,40 +1160,53 @@ export default function HomePage() {
   const [notification, setNotification] = useState<string | null>(null);
 
   // Supabase linked orcamento state (for lead modal)
-  const [linkedOrcamento, setLinkedOrcamento] = useState<any | null>(null);
+  const [linkedOrcamento, setLinkedOrcamento] = useState<CalculatorHistoryRow | null>(null);
+  const [targetGoal, setTargetGoal] = useState(10000);
+  const [editingTarget, setEditingTarget] = useState(false);
+  const [targetInput, setTargetInput] = useState('10000');
+  const [renderTime] = useState(() => Date.now());
 
   // Load database on mount
   useEffect(() => {
-    const saved = localStorage.getItem('lume_crm_leads');
-    if (saved) {
+    const savedLeads = getInitialLeads();
+    localStorage.setItem('lume_crm_leads', JSON.stringify(savedLeads));
+
+    const loadCloudLeads = async () => {
       try {
-        setLeads(JSON.parse(saved));
+        const response = await fetch('/api/crm/leads', { credentials: 'same-origin' });
+        const payload = await response.json().catch(() => null);
+        if (!response.ok || !Array.isArray(payload)) return;
+
+        const cloudLeads = payload.map(mapLeadRow);
+        const nextLeads = mergeCloudLeadsWithLocal(cloudLeads, savedLeads);
+        setLeads(nextLeads);
+        localStorage.setItem('lume_crm_leads', JSON.stringify(nextLeads));
       } catch {
-        setLeads(INITIAL_LEADS);
+        // Keep local cache visible if the protected API is temporarily unavailable.
       }
-    } else {
-      setLeads(INITIAL_LEADS);
-      localStorage.setItem('lume_crm_leads', JSON.stringify(INITIAL_LEADS));
-    }
+    };
+
+    void loadCloudLeads();
     if (supabase) {
       supabase.from('leads').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
         if (error || !data) return;
-        const cloudLeads: Lead[] = data.map((r: any) => ({
-          id: r.id,
-          name: r.name,
-          phone: r.phone || '',
-          email: r.email || '',
-          address: r.address || '',
-          neighborhood: r.neighborhood || 'Barra da Tijuca',
+        const cloudLeads: Lead[] = data.map((r: LeadRow): Lead => ({
+          id: asString(r.id, 'lead_sem_id'),
+          name: asString(r.name),
+          phone: asString(r.phone),
+          email: asString(r.email),
+          address: asString(r.address),
+          neighborhood: asString(r.neighborhood, 'Barra da Tijuca'),
           filmType: r.film_type || 'Nano Cerâmica',
-          sqm: r.sqm || 0,
-          value: r.value || 0,
-          status: (r.status as Lead['status']) || 'Novo',
-          createdAt: r.created_at,
-          statusChangedAt: r.status_changed_at || r.created_at || new Date().toISOString().split('T')[0],
-          notes: r.notes || '',
-          proximoContato: r.proximo_contato || null,
-          updatedAt: r.updated_at || r.status_changed_at || r.created_at || new Date().toISOString(),
+          sqm: roundMeasure(r.sqm),
+          value: roundCurrency(r.value),
+          status: normalizeLeadStatus(r.status),
+          createdAt: asString(r.created_at, new Date().toISOString().split('T')[0]),
+          statusChangedAt: asString(r.status_changed_at, asString(r.created_at, new Date().toISOString().split('T')[0])),
+          notes: asString(r.notes),
+          proximoContato: asNullableString(r.proximo_contato),
+          dataServico: asNullableString(r.data_servico),
+          updatedAt: asString(r.updated_at, asString(r.status_changed_at, asString(r.created_at, new Date().toISOString()))),
         }));
 
         const cloudById = new Map(cloudLeads.map((lead) => [lead.id, lead]));
@@ -1011,6 +1217,7 @@ export default function HomePage() {
           return {
             ...lead,
             proximoContato: cloud.proximoContato ?? lead.proximoContato ?? null,
+            dataServico: cloud.dataServico ?? lead.dataServico ?? null,
             updatedAt: cloud.updatedAt ?? lead.updatedAt,
             statusChangedAt: cloud.statusChangedAt || lead.statusChangedAt,
           };
@@ -1031,6 +1238,10 @@ export default function HomePage() {
     }
   }, []);
 
+  useEffect(() => {
+    localStorage.setItem(CRM_COLLAPSED_CARDS_STORAGE_KEY, JSON.stringify([...collapsedCards]));
+  }, [collapsedCards]);
+
   const saveTargetGoal = async (valor: number) => {
     setTargetGoal(valor);
     setEditingTarget(false);
@@ -1040,28 +1251,20 @@ export default function HomePage() {
 
   // Save database helper
   const saveLeads = async (updated: Lead[]) => {
-    setLeads(updated);
-    localStorage.setItem('lume_crm_leads', JSON.stringify(updated));
-    if (supabase) {
-      for (const lead of updated) {
-        const { error } = await supabase.from('leads').upsert({
-          id: lead.id,
-          name: lead.name,
-          phone: lead.phone,
-          email: lead.email,
-          address: lead.address,
-          neighborhood: lead.neighborhood,
-          film_type: lead.filmType,
-          sqm: lead.sqm,
-          value: lead.value,
-          status: lead.status,
-          created_at: lead.createdAt,
-          status_changed_at: lead.statusChangedAt,
-          notes: lead.notes,
-          proximo_contato: lead.proximoContato || null,
-          updated_at: lead.updatedAt || new Date().toISOString(),
-        });
-        if (error) console.error('[CRM] Lead save error:', error.message);
+    const normalized = updated.map(normalizeLeadAmounts);
+    setLeads(normalized);
+    localStorage.setItem('lume_crm_leads', JSON.stringify(normalized));
+    for (const lead of normalized) {
+      const response = await fetch('/api/crm/leads', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify(lead),
+      });
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null);
+        console.error('[CRM] Lead save error:', payload?.error || response.statusText);
       }
     }
   };
@@ -1070,6 +1273,10 @@ export default function HomePage() {
   const notify = (msg: string) => {
     setNotification(msg);
     setTimeout(() => setNotification(null), 3000);
+  };
+
+  const setCollapsedStateForAllLeads = (collapsed: boolean) => {
+    setCollapsedCards(new Set(collapsed ? leads.map((lead) => lead.id) : []));
   };
 
   // Logout action
@@ -1134,6 +1341,7 @@ export default function HomePage() {
       value: 0,
       status: 'Novo',
       statusChangedAt: new Date().toISOString().split('T')[0],
+      dataServico: null,
       notes: '',
     });
     setIsModalOpen(true);
@@ -1149,10 +1357,11 @@ export default function HomePage() {
       address: lead.address,
       neighborhood: lead.neighborhood,
       filmType: lead.filmType,
-      sqm: lead.sqm,
-      value: lead.value,
+      sqm: roundMeasure(lead.sqm),
+      value: roundCurrency(lead.value),
       status: lead.status,
       statusChangedAt: lead.statusChangedAt,
+      dataServico: formatDateInputValue(lead.dataServico),
       notes: lead.notes,
     });
     setIsModalOpen(true);
@@ -1177,9 +1386,10 @@ export default function HomePage() {
     if (confirm('Tem certeza que deseja excluir este lead?')) {
       const updated = leads.filter(l => l.id !== id);
       saveLeads(updated);
-      if (supabase) {
-        await supabase.from('leads').delete().eq('id', id);
-      }
+      await fetch(`/api/crm/leads?id=${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+        credentials: 'same-origin',
+      });
       notify('Lead removido.');
     }
   };
@@ -1196,7 +1406,7 @@ export default function HomePage() {
   };
 
   const formatCurrency = (v: number) => v.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-  const daysInStatus = (lead: Lead) => Math.floor((Date.now() - new Date(lead.statusChangedAt).getTime()) / 86400000);
+  const daysInStatus = (lead: Lead) => Math.floor((renderTime - new Date(lead.statusChangedAt).getTime()) / 86400000);
   const agendaUrgentCount = useMemo(() => {
     return leads.filter((lead) => {
       if (isClosedLead(lead.status)) return false;
@@ -1244,7 +1454,7 @@ export default function HomePage() {
     });
   }, [leads, searchQuery, filterNeighborhood, filterStatus]);
 
-  const toggleSort = (key: string) => {
+  const toggleSort = (key: LeadSortKey) => {
     if (sortKey === key) {
       setSortDir(prev => prev === 'asc' ? 'desc' : 'asc');
     } else {
@@ -1256,10 +1466,13 @@ export default function HomePage() {
   const sortedFilteredLeads = useMemo(() => {
     if (!sortKey) return filteredLeads;
     return [...filteredLeads].sort((a, b) => {
-      const aVal = (a as any)[sortKey];
-      const bVal = (b as any)[sortKey];
+      const aVal = a[sortKey];
+      const bVal = b[sortKey];
       const aNorm = typeof aVal === 'string' ? aVal.toLowerCase() : aVal;
       const bNorm = typeof bVal === 'string' ? bVal.toLowerCase() : bVal;
+      if (aNorm == null && bNorm == null) return 0;
+      if (aNorm == null) return sortDir === 'asc' ? -1 : 1;
+      if (bNorm == null) return sortDir === 'asc' ? 1 : -1;
       if (aNorm < bNorm) return sortDir === 'asc' ? -1 : 1;
       if (aNorm > bNorm) return sortDir === 'asc' ? 1 : -1;
       return 0;
@@ -1267,32 +1480,152 @@ export default function HomePage() {
   }, [filteredLeads, sortKey, sortDir]);
 
   // Cumulative Month Data
-  const cumulativeData = useMemo(() => {
+  const monthlyEvolution = useMemo(() => {
     const now = new Date();
-    const inicio = startOfMonth(now);
-    const fim = now;
-    const dias = eachDayOfInterval({ start: inicio, end: fim });
-    const porDia: Record<string, number> = {};
+    const currentStart = startOfMonth(now);
+    const currentEnd = now;
+    const currentMonthEnd = endOfMonth(now);
+    const previousReference = subMonths(now, 1);
+    const previousStart = startOfMonth(previousReference);
+    const previousEnd = endOfMonth(previousReference);
+    let chartEnd = currentMonthEnd;
+    const currentByDay: Record<string, { value: number; count: number }> = {};
+    const previousByDay: Record<string, { value: number; count: number }> = {};
+    const futureByDay: Record<string, { value: number; count: number }> = {};
+
     leads.filter(l => l.status === 'Fechado').forEach(l => {
-      if (!l.createdAt) return;
-      const d = new Date(l.createdAt);
-      if (d >= inicio && d <= endOfMonth(now)) {
-        const chave = format(d, 'dd/MM');
-        porDia[chave] = (porDia[chave] || 0) + l.value;
+      const d = parseAgendaDate(l.statusChangedAt || l.createdAt);
+      if (!d) return;
+      const bucket =
+        d >= currentStart && d <= currentEnd
+          ? currentByDay
+          : d >= previousStart && d <= previousEnd
+            ? previousByDay
+            : null;
+
+      if (bucket) {
+        const key = format(d, 'yyyy-MM-dd');
+        bucket[key] = {
+          value: (bucket[key]?.value || 0) + l.value,
+          count: (bucket[key]?.count || 0) + 1,
+        };
       }
     });
-    let acc = 0;
-    return dias.map(dia => {
-      const chave = format(dia, 'dd/MM');
-      acc += porDia[chave] || 0;
-      return { dia: chave, valor: acc };
+
+    let futureTotal = 0;
+    let futureCount = 0;
+
+    leads.filter(l => !isClosedLead(l.status)).forEach(l => {
+      const serviceDate = getLeadServiceDate(l);
+      if (!serviceDate || serviceDate <= currentEnd) return;
+
+      futureTotal += l.value;
+      futureCount += 1;
+      if (serviceDate > chartEnd) chartEnd = serviceDate;
+
+      if (serviceDate >= currentStart) {
+        const key = format(serviceDate, 'yyyy-MM-dd');
+        futureByDay[key] = {
+          value: (futureByDay[key]?.value || 0) + l.value,
+          count: (futureByDay[key]?.count || 0) + 1,
+        };
+      }
     });
+
+    const days = eachDayOfInterval({ start: currentStart, end: chartEnd });
+
+    const monthlyTotals = days.reduce(
+      (acc, day, index) => {
+        const currentKey = format(day, 'yyyy-MM-dd');
+        const previousDay = addDays(previousStart, index);
+        const previousKey = format(previousDay, 'yyyy-MM-dd');
+        const isCurrentPeriod = day <= currentEnd;
+        const currentDay = isCurrentPeriod ? currentByDay[currentKey] || { value: 0, count: 0 } : { value: 0, count: 0 };
+        const previousDayData =
+          isCurrentPeriod && previousDay <= previousEnd ? previousByDay[previousKey] || { value: 0, count: 0 } : { value: 0, count: 0 };
+        const futureDay = futureByDay[currentKey] || { value: 0, count: 0 };
+        const currentAcc = acc.currentAcc + currentDay.value;
+        const previousAcc = acc.previousAcc + previousDayData.value;
+        const currentCount = acc.currentCount + currentDay.count;
+        const previousCount = acc.previousCount + previousDayData.count;
+        const bestDay =
+          isCurrentPeriod && currentDay.value > acc.bestDay.value
+            ? { label: format(day, 'dd/MM'), value: currentDay.value }
+            : acc.bestDay;
+
+        return {
+          currentAcc,
+          previousAcc,
+          currentCount,
+          previousCount,
+          bestDay,
+          chartData: [
+            ...acc.chartData,
+            {
+              dia: format(day, 'dd/MM'),
+              diaAnterior: previousDay <= previousEnd ? format(previousDay, 'dd/MM') : '--',
+              atual: isCurrentPeriod ? currentAcc : null,
+              anterior: isCurrentPeriod ? previousAcc : null,
+              previsto: futureTotal > 0 && !isCurrentPeriod ? futureDay.value : null,
+              atualDia: isCurrentPeriod ? currentDay.value : null,
+              anteriorDia: isCurrentPeriod ? previousDayData.value : null,
+              previstoDia: !isCurrentPeriod ? futureDay.value : 0,
+            },
+          ],
+        };
+      },
+      {
+        chartData: [] as Array<{
+          dia: string;
+          diaAnterior: string;
+          atual: number | null;
+          anterior: number | null;
+          previsto: number | null;
+          atualDia: number | null;
+          anteriorDia: number | null;
+          previstoDia: number;
+        }>,
+        currentAcc: 0,
+        previousAcc: 0,
+        currentCount: 0,
+        previousCount: 0,
+        bestDay: { label: '--', value: 0 },
+      }
+    );
+
+    return {
+      chartData: monthlyTotals.chartData,
+      currentTotal: monthlyTotals.currentAcc,
+      previousTotal: monthlyTotals.previousAcc,
+      currentCount: monthlyTotals.currentCount,
+      previousCount: monthlyTotals.previousCount,
+      bestDay: monthlyTotals.bestDay,
+      futureTotal,
+      futureCount,
+    };
   }, [leads]);
+  const cumulativeData = monthlyEvolution.chartData;
+  const monthDifference = monthlyEvolution.currentTotal - monthlyEvolution.previousTotal;
+  const monthDifferencePercent =
+    monthlyEvolution.previousTotal > 0
+      ? (monthDifference / monthlyEvolution.previousTotal) * 100
+      : monthlyEvolution.currentTotal > 0
+        ? 100
+        : 0;
+  const monthTrendIsPositive = monthDifference >= 0;
+  const formatDashboardCurrency = (value: number) =>
+    new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+  const toggleMonthlySeries = (series: MonthlyEvolutionSeries) => {
+    setVisibleMonthlySeries((current) => ({
+      ...current,
+      [series]: !current[series],
+    }));
+  };
 
   // Dashboard Stats Calculations
   const stats = useMemo(() => {
     const total = leads.length;
-    const activeProposals = leads.filter(l => l.status === 'Proposta Enviada').length;
+    const activeProposals = leads.filter(l => l.status === 'Agendado').length;
     const closed = leads.filter(l => l.status === 'Fechado').length;
     
     const revenue = leads
@@ -1304,14 +1637,10 @@ export default function HomePage() {
     return { total, activeProposals, closed, revenue, conversionRate };
   }, [leads]);
 
-  // Target values
-  const [targetGoal, setTargetGoal] = useState(10000);
-  const [editingTarget, setEditingTarget] = useState(false);
-  const [targetInput, setTargetInput] = useState('10000');
   const targetPercent = Math.min(Math.round((stats.revenue / targetGoal) * 100), 100);
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#04080f] font-sans lg:flex-row">
+    <div className="flex min-h-screen flex-col overflow-x-hidden bg-[#04080f] font-sans lg:flex-row">
       
       {/* Toast Notification */}
       {notification && (
@@ -1324,14 +1653,15 @@ export default function HomePage() {
       )}
 
       {/* BACKGROUND ACCENTS */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 hidden overflow-hidden lg:block">
         <div className="absolute top-10 left-[15%] h-96 w-96 rounded-full bg-[#c9a227]/5 blur-[120px]" />
         <div className="absolute bottom-10 right-[10%] h-[500px] w-[500px] rounded-full bg-blue-500/5 blur-[150px]" />
       </div>
 
       {/* SIDEBAR */}
-      <aside className="relative z-10 flex w-full flex-col border-b border-white/5 bg-[#07111d]/90 p-6 backdrop-blur-xl lg:w-72 lg:border-r lg:border-b-0">
-        <div className="flex items-center gap-3">
+      <aside className="sticky top-0 z-40 flex w-full flex-col border-b border-white/5 bg-[#07111d]/95 p-4 backdrop-blur-xl lg:relative lg:z-10 lg:w-72 lg:border-r lg:border-b-0 lg:p-6">
+        <div className="flex items-center justify-between gap-3 lg:justify-start">
+          <div className="flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-tr from-[#c9a227] to-[#d4ad30] p-0.5 shadow-lg shadow-[#c9a227]/20">
             <div className="flex h-full w-full items-center justify-center rounded-[14px] bg-[#04080f]">
               <svg className="h-5 w-5 text-[#c9a227]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
@@ -1346,10 +1676,31 @@ export default function HomePage() {
             </h1>
             <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40">Painel Comercial</p>
           </div>
+          </div>
+          <div className="flex items-center gap-2 lg:hidden">
+            <button
+              onClick={() => openCreateModal()}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#c9a227] text-[#04080f] shadow-lg shadow-[#c9a227]/10 transition active:scale-95"
+              title="Novo Lead"
+            >
+              <svg className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+            </button>
+            <button
+              onClick={handleLogout}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-white/5 bg-white/[0.03] text-white/45 transition hover:text-red-300 active:scale-95"
+              title="Sair do CRM"
+            >
+              <svg className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         {/* Dynamic target counter in sidebar */}
-        <div className="mt-8 rounded-2xl border border-white/5 bg-white/[0.02] p-4">
+        <div className="mt-8 hidden rounded-2xl border border-white/5 bg-white/[0.02] p-4 lg:block">
           <div className="flex justify-between text-xs font-semibold">
             <span className="text-white/60">Faturamento Mensal</span>
             <span className="text-[#c9a227]">{targetPercent}%</span>
@@ -1364,10 +1715,10 @@ export default function HomePage() {
         </div>
 
         {/* Sidebar Nav */}
-        <nav className="mt-8 flex flex-col gap-2 flex-1">
+        <nav className="mt-4 flex flex-1 gap-2 overflow-x-auto pb-1 lg:mt-8 lg:flex-none lg:flex-col lg:overflow-visible lg:pb-0">
           <button
             onClick={() => setActiveTab('dashboard')}
-            className={`flex items-center gap-3.5 rounded-2xl px-4 py-3.5 text-sm font-semibold tracking-wide transition-all ${
+            className={`flex shrink-0 items-center gap-3.5 rounded-2xl px-4 py-3.5 text-sm font-semibold tracking-wide transition-all lg:shrink ${
               activeTab === 'dashboard'
                 ? 'bg-gradient-to-r from-[#c9a227]/10 to-[#c9a227]/5 text-white border-l-4 border-[#c9a227]'
                 : 'text-white/60 hover:bg-white/[0.02] hover:text-white border-l-4 border-transparent'
@@ -1381,7 +1732,7 @@ export default function HomePage() {
 
           <button
             onClick={() => setActiveTab('leads')}
-            className={`flex items-center gap-3.5 rounded-2xl px-4 py-3.5 text-sm font-semibold tracking-wide transition-all ${
+            className={`flex shrink-0 items-center gap-3.5 rounded-2xl px-4 py-3.5 text-sm font-semibold tracking-wide transition-all lg:shrink ${
               activeTab === 'leads'
                 ? 'bg-gradient-to-r from-[#c9a227]/10 to-[#c9a227]/5 text-white border-l-4 border-[#c9a227]'
                 : 'text-white/60 hover:bg-white/[0.02] hover:text-white border-l-4 border-transparent'
@@ -1395,7 +1746,7 @@ export default function HomePage() {
 
           <button
             onClick={() => setActiveTab('historico')}
-            className={`flex items-center gap-3.5 rounded-2xl px-4 py-3.5 text-sm font-semibold tracking-wide transition-all ${
+            className={`flex shrink-0 items-center gap-3.5 rounded-2xl px-4 py-3.5 text-sm font-semibold tracking-wide transition-all lg:shrink ${
               activeTab === 'historico'
                 ? 'bg-gradient-to-r from-[#c9a227]/10 to-[#c9a227]/5 text-white border-l-4 border-[#c9a227]'
                 : 'text-white/60 hover:bg-white/[0.02] hover:text-white border-l-4 border-transparent'
@@ -1409,7 +1760,7 @@ export default function HomePage() {
 
           <button
             onClick={() => setActiveTab('extratos')}
-            className={`flex items-center gap-3.5 rounded-2xl px-4 py-3.5 text-sm font-semibold tracking-wide transition-all ${
+            className={`flex shrink-0 items-center gap-3.5 rounded-2xl px-4 py-3.5 text-sm font-semibold tracking-wide transition-all lg:shrink ${
               activeTab === 'extratos'
                 ? 'bg-gradient-to-r from-[#c9a227]/10 to-[#c9a227]/5 text-white border-l-4 border-[#c9a227]'
                 : 'text-white/60 hover:bg-white/[0.02] hover:text-white border-l-4 border-transparent'
@@ -1423,7 +1774,7 @@ export default function HomePage() {
 
           <button
             onClick={() => setActiveTab('agenda')}
-            className={`flex items-center gap-3.5 rounded-2xl px-4 py-3.5 text-sm font-semibold tracking-wide transition-all ${
+            className={`flex shrink-0 items-center gap-3.5 rounded-2xl px-4 py-3.5 text-sm font-semibold tracking-wide transition-all lg:shrink ${
               activeTab === 'agenda'
                 ? 'bg-gradient-to-r from-red-500/10 to-[#c9a227]/5 text-white border-l-4 border-red-400'
                 : 'text-white/60 hover:bg-white/[0.02] hover:text-white border-l-4 border-transparent'
@@ -1442,12 +1793,12 @@ export default function HomePage() {
         </nav>
 
         {/* Action button at sidebar bottom */}
-        <div className="mt-auto pt-6 border-t border-white/5">
+        <div className="hidden lg:mt-4 lg:block lg:space-y-2 lg:border-t lg:border-white/5 lg:pt-4">
           <button
             onClick={() => openCreateModal()}
-            className="w-full flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#c9a227] to-[#d4ad30] py-3 text-sm font-bold text-[#04080f] shadow-lg shadow-[#c9a227]/10 hover:brightness-110 transition active:scale-95"
+            className="flex w-full items-center gap-3.5 rounded-2xl border-l-4 border-transparent bg-[#c9a227]/10 px-4 py-3.5 text-sm font-semibold tracking-wide text-[#f5d77a] transition-all hover:bg-[#c9a227]/15 hover:text-white active:scale-95"
           >
-            <svg className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
             </svg>
             Novo Lead
@@ -1455,9 +1806,9 @@ export default function HomePage() {
           
           <button
             onClick={handleLogout}
-            className="mt-3 w-full flex items-center justify-center gap-2 rounded-2xl border border-white/5 bg-white/[0.01] py-3 text-xs font-semibold text-white/50 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/20 transition duration-300"
+            className="flex w-full items-center gap-3.5 rounded-2xl border-l-4 border-transparent px-4 py-3.5 text-sm font-semibold tracking-wide text-white/60 transition-all hover:bg-red-500/10 hover:text-red-300 active:scale-95"
           >
-            <svg className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
             Sair do CRM
@@ -1466,13 +1817,13 @@ export default function HomePage() {
       </aside>
 
       {/* MAIN CONTAINER */}
-      <main className="flex-1 overflow-x-hidden p-6 lg:p-10 relative z-10">
+      <main className="relative z-10 flex-1 overflow-x-hidden p-4 sm:p-6 lg:p-10">
         
         {/* TOP NAVBAR */}
-        <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-white/5 pb-6">
+        <header className="mb-6 flex flex-col gap-3 border-b border-white/5 pb-4 sm:flex-row sm:items-center sm:justify-between lg:mb-8 lg:pb-6">
           <div>
-            <span className="text-xs font-semibold uppercase tracking-[0.35em] text-[#c9a227]">LUME Elite</span>
-            <h2 className="font-display mt-1 text-3xl font-black tracking-tight text-white md:text-4xl">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#c9a227] sm:text-xs sm:tracking-[0.35em]">LUME Elite</span>
+            <h2 className="font-display mt-1 text-2xl font-black tracking-tight text-white sm:text-3xl md:text-4xl">
               {activeTab === 'dashboard' && 'Painel Geral'}
               {activeTab === 'leads' && 'Gestão de Leads'}
               {activeTab === 'historico' && 'Histórico Supabase'}
@@ -1482,7 +1833,7 @@ export default function HomePage() {
           </div>
           
           {/* Quick Stats Summary inside navbar */}
-          <div className="flex items-center gap-2">
+          <div className="hidden items-center gap-2 sm:flex">
             <span className="text-xs text-white/40">Status da Sessão:</span>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
@@ -1517,7 +1868,7 @@ export default function HomePage() {
 
               <div className="rounded-3xl border border-white/5 bg-[#07111d]/50 p-6 backdrop-blur-md shadow-lg shadow-black/20 hover:border-[#c9a227]/20 transition-all duration-300 group">
                 <div className="flex justify-between items-start">
-                  <span className="text-xs uppercase tracking-[0.2em] text-white/50">Propostas Ativas</span>
+                  <span className="text-xs uppercase tracking-[0.2em] text-white/50">Serviços Agendados</span>
                   <div className="p-2 rounded-xl bg-white/[0.02] border border-white/5 group-hover:border-[#c9a227]/30 text-[#c9a227] transition">
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -1526,7 +1877,7 @@ export default function HomePage() {
                 </div>
                 <div className="mt-4 flex items-baseline gap-2">
                   <span className="text-4xl font-black text-white">{stats.activeProposals}</span>
-                  <span className="text-xs text-white/40">propostas enviadas</span>
+                  <span className="text-xs text-white/40">datas marcadas</span>
                 </div>
               </div>
 
@@ -1563,20 +1914,180 @@ export default function HomePage() {
             </section>
 
             {/* EVOLUÇÃO DO MÊS */}
-            <div className="rounded-3xl border border-white/5 bg-[#07111d]/50 p-6 backdrop-blur-md shadow-lg">
-              <h3 className="font-display text-base font-bold text-white uppercase tracking-wider mb-6">EVOLUÇÃO DO MÊS</h3>
-              {cumulativeData.length === 0 ? (
-                <p className="text-xs text-white/30 text-center py-8">Nenhum fechamento no mês atual</p>
+            <div className="overflow-hidden rounded-3xl border border-[#c9a227]/15 bg-[radial-gradient(circle_at_top_right,rgba(201,162,39,0.16),transparent_34%),linear-gradient(180deg,rgba(7,17,29,0.92),rgba(4,8,15,0.86))] p-5 shadow-2xl shadow-black/25 backdrop-blur-md sm:p-6">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.32em] text-[#f5d77a]/80">Fechamentos acumulados</span>
+                  <h3 className="font-display mt-1 text-xl font-black uppercase tracking-wider text-white">EVOLUCAO DO MES</h3>
+                  <p className="mt-2 max-w-2xl text-xs leading-5 text-white/45">
+                    Comparativo acumulado contra o mes anterior no mesmo intervalo, com previsao separada para servicos futuros.
+                  </p>
+                </div>
+
+                <div
+                  className={`w-fit rounded-2xl border px-4 py-3 text-left shadow-lg ${
+                    monthTrendIsPositive
+                      ? 'border-emerald-500/25 bg-emerald-500/10 shadow-emerald-950/20'
+                      : 'border-red-500/25 bg-red-500/10 shadow-red-950/20'
+                  }`}
+                >
+                  <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/40">Vs. mes anterior</p>
+                  <p className={`mt-1 text-2xl font-black ${monthTrendIsPositive ? 'text-emerald-300' : 'text-red-300'}`}>
+                    {monthTrendIsPositive ? '+' : '-'}
+                    {Math.abs(monthDifferencePercent).toFixed(1)}%
+                  </p>
+                  <p className="text-[11px] text-white/50">
+                    {monthTrendIsPositive ? '+' : '-'}
+                    {formatDashboardCurrency(Math.abs(monthDifference))}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                <div className="rounded-2xl border border-white/5 bg-white/[0.035] p-4">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/35">Mes atual</p>
+                  <p className="mt-2 text-xl font-black text-[#f5d77a]">{formatDashboardCurrency(monthlyEvolution.currentTotal)}</p>
+                  <p className="mt-1 text-[11px] text-white/40">{monthlyEvolution.currentCount} fechamentos ate hoje</p>
+                </div>
+                <div className="rounded-2xl border border-white/5 bg-white/[0.025] p-4">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/35">Mes anterior</p>
+                  <p className="mt-2 text-xl font-black text-white/75">{formatDashboardCurrency(monthlyEvolution.previousTotal)}</p>
+                  <p className="mt-1 text-[11px] text-white/40">{monthlyEvolution.previousCount} fechamentos no mesmo periodo</p>
+                </div>
+                <div className="rounded-2xl border border-sky-400/15 bg-sky-400/[0.045] p-4">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-sky-200/60">Ganhos futuros</p>
+                  <p className="mt-2 text-xl font-black text-sky-200">{formatDashboardCurrency(monthlyEvolution.futureTotal)}</p>
+                  <p className="mt-1 text-[11px] text-white/40">{monthlyEvolution.futureCount} servicos agendados</p>
+                </div>
+                <div className="rounded-2xl border border-white/5 bg-white/[0.025] p-4">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/35">Diferenca</p>
+                  <p className={`mt-2 text-xl font-black ${monthTrendIsPositive ? 'text-emerald-300' : 'text-red-300'}`}>
+                    {formatDashboardCurrency(Math.abs(monthDifference))}
+                  </p>
+                  <p className="mt-1 text-[11px] text-white/40">{monthTrendIsPositive ? 'acima do periodo anterior' : 'abaixo do periodo anterior'}</p>
+                </div>
+              </div>
+
+              <div className="mt-5 flex flex-wrap items-center gap-3 text-[11px] font-semibold text-white/55">
+                <button
+                  type="button"
+                  onClick={() => toggleMonthlySeries('atualDia')}
+                  aria-pressed={visibleMonthlySeries.atualDia}
+                  className={`inline-flex items-center gap-2 rounded-full transition hover:text-white focus:outline-none focus:ring-2 focus:ring-sky-300/40 ${visibleMonthlySeries.atualDia ? 'text-white/55' : 'text-white/25'}`}
+                  title="Mostrar ou ocultar Valor do dia"
+                >
+                  <span className="h-2 w-8 rounded-full bg-[#38bdf8] shadow-[0_0_18px_rgba(56,189,248,0.5)]" />
+                  Valor do dia
+                </button>
+                <button
+                  type="button"
+                  onClick={() => toggleMonthlySeries('atual')}
+                  aria-pressed={visibleMonthlySeries.atual}
+                  className={`inline-flex items-center gap-2 rounded-full transition hover:text-white focus:outline-none focus:ring-2 focus:ring-[#f5d77a]/35 ${visibleMonthlySeries.atual ? 'text-white/55' : 'text-white/25'}`}
+                  title="Mostrar ou ocultar Mes atual acumulado"
+                >
+                  <span className="h-2 w-8 rounded-full bg-[#f5d77a] shadow-[0_0_18px_rgba(245,215,122,0.45)]" />
+                  Mes atual acumulado
+                </button>
+                <button
+                  type="button"
+                  onClick={() => toggleMonthlySeries('anterior')}
+                  aria-pressed={visibleMonthlySeries.anterior}
+                  className={`inline-flex items-center gap-2 rounded-full transition hover:text-white focus:outline-none focus:ring-2 focus:ring-white/25 ${visibleMonthlySeries.anterior ? 'text-white/55' : 'text-white/25'}`}
+                  title="Mostrar ou ocultar Mes anterior"
+                >
+                  <span className="h-0 w-8 border-t border-dashed border-white/35" />
+                  Mes anterior
+                </button>
+                <button
+                  type="button"
+                  onClick={() => toggleMonthlySeries('previsto')}
+                  aria-pressed={visibleMonthlySeries.previsto}
+                  className={`inline-flex items-center gap-2 rounded-full transition hover:text-white focus:outline-none focus:ring-2 focus:ring-sky-300/40 ${visibleMonthlySeries.previsto ? 'text-white/55' : 'text-white/25'}`}
+                  title="Mostrar ou ocultar Ganhos previstos"
+                >
+                  <span className="h-0 w-8 border-t-2 border-dashed border-sky-300" />
+                  Ganhos previstos
+                </button>
+              </div>
+
+              {monthlyEvolution.currentTotal === 0 && monthlyEvolution.previousTotal === 0 && monthlyEvolution.futureTotal === 0 ? (
+                <p className="mt-6 rounded-2xl border border-white/5 bg-white/[0.02] py-10 text-center text-xs text-white/30">
+                  Nenhum fechamento ou servico futuro registrado nos periodos comparados
+                </p>
               ) : (
-                <ResponsiveContainer width="100%" height={180}>
-                  <LineChart data={cumulativeData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                    <XAxis dataKey="dia" tick={{ fontSize: 11, fill: '#rgba(255,255,255,0.4)' }} interval="preserveStartEnd" />
-                    <YAxis tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.4)' }} tickFormatter={v => `R$${(v/1000).toFixed(1)}k`} width={52} />
-                    <Tooltip formatter={(v: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v)} />
-                    <Line type="monotone" dataKey="valor" stroke="#EAB308" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
-                  </LineChart>
-                </ResponsiveContainer>
+                <div className="mt-3 h-[280px] rounded-2xl border border-white/5 bg-[#04080f]/35 px-2 py-4 sm:px-3">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <ComposedChart data={cumulativeData} margin={{ top: 12, right: 12, left: 0, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="currentMonthRevenue" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#f5d77a" stopOpacity={0.28} />
+                          <stop offset="95%" stopColor="#f5d77a" stopOpacity={0.02} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="4 6" stroke="rgba(255,255,255,0.06)" vertical={false} />
+                      <XAxis dataKey="dia" tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.45)' }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
+                      <YAxis
+                        tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.42)' }}
+                        tickFormatter={(v: number) => `R$${(v / 1000).toFixed(1)}k`}
+                        width={56}
+                        axisLine={false}
+                        tickLine={false}
+                      />
+                      <Tooltip
+                        cursor={{ stroke: 'rgba(245,215,122,0.25)', strokeWidth: 1 }}
+                        content={({ active, payload, label }: { active?: boolean; payload?: MonthlyTooltipPayload[]; label?: string }) => {
+                          const point = payload?.[0]?.payload;
+                          if (!active || !point) return null;
+                          return (
+                            <div className="min-w-52 rounded-2xl border border-white/10 bg-[#07111d]/95 p-4 text-xs shadow-2xl shadow-black/30 backdrop-blur-xl">
+                              <p className="font-bold uppercase tracking-[0.2em] text-white/40">Dia {label}</p>
+                              <div className="mt-3 space-y-2">
+                                {visibleMonthlySeries.atual && (
+                                  <div className="flex items-center justify-between gap-5">
+                                    <span className="text-[#f5d77a]">Atual acumulado</span>
+                                    <span className="font-bold text-white">{point.atual === null ? '--' : formatDashboardCurrency(point.atual)}</span>
+                                  </div>
+                                )}
+                                {visibleMonthlySeries.atualDia && (
+                                  <div className="flex items-center justify-between gap-5">
+                                    <span className="text-[#38bdf8]">Atual no dia</span>
+                                    <span className="font-bold text-white">{point.atualDia === null ? '--' : formatDashboardCurrency(point.atualDia)}</span>
+                                  </div>
+                                )}
+                                {visibleMonthlySeries.previsto && point.previsto !== null && (
+                                  <div className="border-t border-sky-300/15 pt-2">
+                                    <div className="flex items-center justify-between gap-5">
+                                      <span className="text-sky-200">Ganhos futuros</span>
+                                      <span className="font-bold text-white">{formatDashboardCurrency(point.previsto)}</span>
+                                    </div>
+                                  </div>
+                                )}
+                                {visibleMonthlySeries.anterior && (
+                                  <div className="border-t border-white/10 pt-2">
+                                    <div className="flex items-center justify-between gap-5">
+                                      <span className="text-white/45">Anterior acumulado</span>
+                                      <span className="font-bold text-white/70">{point.anterior === null ? '--' : formatDashboardCurrency(point.anterior)}</span>
+                                    </div>
+                                    <div className="mt-2 flex items-center justify-between gap-5">
+                                      <span className="text-white/35">Anterior em {point.diaAnterior}</span>
+                                      <span className="font-semibold text-white/55">{point.anteriorDia === null ? '--' : formatDashboardCurrency(point.anteriorDia)}</span>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        }}
+                      />
+                      {visibleMonthlySeries.atual && <Area type="monotone" dataKey="atual" stroke="none" fill="url(#currentMonthRevenue)" />}
+                      {visibleMonthlySeries.anterior && <Line type="monotone" dataKey="anterior" stroke="rgba(255,255,255,0.34)" strokeWidth={2} strokeDasharray="6 7" dot={false} activeDot={{ r: 4, fill: '#ffffff' }} />}
+                      {visibleMonthlySeries.previsto && <Line type="monotone" dataKey="previsto" stroke="#7dd3fc" strokeWidth={3} strokeDasharray="5 7" dot={false} activeDot={{ r: 6, fill: '#7dd3fc', stroke: '#07111d', strokeWidth: 3 }} />}
+                      {visibleMonthlySeries.atual && <Line type="monotone" dataKey="atual" stroke="#f5d77a" strokeWidth={2} strokeOpacity={0.88} dot={false} activeDot={{ r: 5, fill: '#f5d77a', stroke: '#07111d', strokeWidth: 3 }} />}
+                      {visibleMonthlySeries.atualDia && <Line type="monotone" dataKey="atualDia" stroke="#38bdf8" strokeWidth={4} dot={false} activeDot={{ r: 7, fill: '#38bdf8', stroke: '#07111d', strokeWidth: 3 }} />}
+                    </ComposedChart>
+                  </ResponsiveContainer>
+                </div>
               )}
             </div>
 
@@ -1591,7 +2102,7 @@ export default function HomePage() {
                   {[
                     { label: 'Novos Leads', stage: 'Novo', color: 'bg-blue-500' },
                     { label: 'Em Atendimento', stage: 'Em Contato', color: 'bg-amber-500' },
-                    { label: 'Orçamentos Enviados', stage: 'Proposta Enviada', color: 'bg-purple-500' },
+                    { label: 'Agendados', stage: 'Agendado', color: 'bg-sky-500' },
                     { label: 'Contratos Fechados', stage: 'Fechado', color: 'bg-emerald-500' },
                     { label: 'Perdidos / Descartados', stage: 'Perdido', color: 'bg-red-500' },
                   ].map(item => {
@@ -1724,13 +2235,7 @@ export default function HomePage() {
                         </td>
                         <td className="py-3.5 font-bold text-[#c9a227]">R$ {formatCurrency(lead.value)}</td>
                         <td className="py-3.5">
-                          <span className={`inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-                            lead.status === 'Fechado' ? 'bg-emerald-500/10 text-emerald-400' :
-                            lead.status === 'Proposta Enviada' ? 'bg-purple-500/10 text-purple-400' :
-                            lead.status === 'Em Contato' ? 'bg-amber-500/10 text-amber-400' :
-                            lead.status === 'Perdido' ? 'bg-red-500/10 text-red-400' :
-                            'bg-blue-500/10 text-blue-400'
-                          }`}>
+                          <span className={`inline-flex rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${getLeadStatusClasses(lead.status)}`}>
                             {lead.status}
                           </span>
                         </td>
@@ -1754,7 +2259,7 @@ export default function HomePage() {
           <div className="space-y-6">
             
             {/* SEARCH & FILTERS BAR */}
-            <div className="flex flex-col gap-4 rounded-3xl border border-white/5 bg-[#07111d]/50 p-6 backdrop-blur-md shadow-lg sm:flex-row sm:items-center">
+            <div className="flex flex-col gap-4 rounded-2xl border border-white/5 bg-[#07111d]/50 p-4 backdrop-blur-md shadow-lg sm:rounded-3xl sm:p-6 lg:flex-row lg:items-center">
               
               {/* Search Field */}
               <div className="relative flex-1">
@@ -1771,12 +2276,12 @@ export default function HomePage() {
               </div>
 
               {/* Filters dropdowns */}
-              <div className="flex flex-wrap gap-3">
+              <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:gap-3 lg:w-auto">
                 
                 <select
                   value={filterNeighborhood}
                   onChange={(e) => setFilterNeighborhood(e.target.value)}
-                  className="rounded-2xl border border-white/5 bg-[#04080f] px-4 py-3 text-sm text-white/70 focus:border-[#c9a227]/40 focus:outline-none"
+                  className="min-w-0 rounded-2xl border border-white/5 bg-[#04080f] px-3 py-3 text-sm text-white/70 focus:border-[#c9a227]/40 focus:outline-none sm:px-4"
                 >
                   <option value="">Todos os Bairros</option>
                   {RJ_NEIGHBORHOODS.map(n => (
@@ -1787,21 +2292,21 @@ export default function HomePage() {
                 <select
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value)}
-                  className="rounded-2xl border border-white/5 bg-[#04080f] px-4 py-3 text-sm text-white/70 focus:border-[#c9a227]/40 focus:outline-none"
+                  className="min-w-0 rounded-2xl border border-white/5 bg-[#04080f] px-3 py-3 text-sm text-white/70 focus:border-[#c9a227]/40 focus:outline-none sm:px-4"
                 >
                   <option value="">Todos os Status</option>
                   <option value="Novo">Novo</option>
                   <option value="Em Contato">Em Contato</option>
-                  <option value="Proposta Enviada">Proposta Enviada</option>
+                  <option value="Agendado">Agendado</option>
                   <option value="Fechado">Fechado</option>
                   <option value="Perdido">Perdido</option>
                 </select>
 
                 {/* View Mode Toggles */}
-                <div className="flex rounded-2xl border border-white/5 bg-[#04080f] p-1">
+                <div className="col-span-2 flex rounded-2xl border border-white/5 bg-[#04080f] p-1 sm:col-span-1">
                   <button
                     onClick={() => setViewMode('kanban')}
-                    className={`rounded-xl px-3 py-1.5 transition ${viewMode === 'kanban' ? 'bg-[#c9a227] text-[#04080f]' : 'text-white/60 hover:text-white'}`}
+                    className={`flex-1 rounded-xl px-3 py-2 transition sm:flex-none sm:py-1.5 ${viewMode === 'kanban' ? 'bg-[#c9a227] text-[#04080f]' : 'text-white/60 hover:text-white'}`}
                     title="Visão Kanban"
                   >
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
@@ -1810,7 +2315,7 @@ export default function HomePage() {
                   </button>
                   <button
                     onClick={() => setViewMode('table')}
-                    className={`rounded-xl px-3 py-1.5 transition ${viewMode === 'table' ? 'bg-[#c9a227] text-[#04080f]' : 'text-white/60 hover:text-white'}`}
+                    className={`flex-1 rounded-xl px-3 py-2 transition sm:flex-none sm:py-1.5 ${viewMode === 'table' ? 'bg-[#c9a227] text-[#04080f]' : 'text-white/60 hover:text-white'}`}
                     title="Visão Tabela"
                   >
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
@@ -1818,6 +2323,25 @@ export default function HomePage() {
                     </svg>
                   </button>
                 </div>
+
+                {viewMode === 'kanban' && (
+                  <div className="col-span-2 flex rounded-2xl border border-white/5 bg-[#04080f] p-1 sm:col-span-1">
+                    <button
+                      onClick={() => setCollapsedStateForAllLeads(true)}
+                      className="flex-1 rounded-xl px-3 py-2 text-xs font-semibold text-white/60 transition hover:text-white sm:flex-none sm:py-1.5"
+                      title="Colapsar todos os cards"
+                    >
+                      Collapse all
+                    </button>
+                    <button
+                      onClick={() => setCollapsedStateForAllLeads(false)}
+                      className="flex-1 rounded-xl px-3 py-2 text-xs font-semibold text-white/60 transition hover:text-white sm:flex-none sm:py-1.5"
+                      title="Expandir todos os cards"
+                    >
+                      Expand all
+                    </button>
+                  </div>
+                )}
 
               </div>
 
@@ -1838,7 +2362,7 @@ export default function HomePage() {
                   headerBg: 'bg-amber-500/10 text-amber-400',
                   badge: 'bg-amber-500/20 text-amber-300'
                 },
-                'Proposta Enviada': {
+                'Agendado': {
                   border: 'border-purple-500/20 hover:border-purple-500/40',
                   headerBg: 'bg-purple-500/10 text-purple-400',
                   badge: 'bg-purple-500/20 text-purple-300'
@@ -1856,8 +2380,8 @@ export default function HomePage() {
               };
               
               return (
-                <div className="grid gap-4 overflow-x-auto pb-4 md:grid-cols-5 min-w-[1000px] md:min-w-0">
-                  {(['Novo', 'Em Contato', 'Proposta Enviada', 'Fechado', 'Perdido'] as const).map(stage => {
+                <div className="grid gap-3 pb-4 md:grid-cols-5 md:gap-4">
+                  {LEAD_STAGES.map(stage => {
                     const stageLeads = filteredLeads.filter(l => l.status === stage);
                     const style = stageStyles[stage] || {
                       border: 'border-white/5',
@@ -1874,9 +2398,11 @@ export default function HomePage() {
                           try {
                             const data = JSON.parse(e.dataTransfer.getData('text/plain'));
                             if (data.fromStage !== stage) handleStatusChange(data.id, stage as Lead['status']);
-                          } catch {}
+                          } catch {
+                            return;
+                          }
                         }}
-                        className={`rounded-3xl border ${style.border} bg-[#07111d]/30 p-4 flex flex-col min-h-[500px] transition duration-300`}
+                        className={`flex min-h-0 flex-col rounded-2xl border ${style.border} bg-[#07111d]/30 p-3 transition duration-300 md:min-h-[500px] md:rounded-3xl md:p-4`}
                       >
                         
                         {/* Column Header */}
@@ -1889,19 +2415,24 @@ export default function HomePage() {
                       <div className="flex-1 space-y-3 overflow-y-auto">
                         {stageLeads.map(lead => {
                           const collapsed = collapsedCards.has(lead.id);
+                          const serviceDate = getLeadServiceDate(lead);
                           return (
                           <div 
                             key={lead.id}
                             draggable
-                            onDragStart={(e) => { e.dataTransfer.setData('text/plain', JSON.stringify({ id: lead.id, fromStage: stage })); e.currentTarget.classList.add('opacity-40') }}
+                            onDragStart={(e) => { e.dataTransfer.setData('text/plain', JSON.stringify({ id: lead.id, fromStage: stage })); e.currentTarget.classList.add('opacity-40'); }}
                             onDragEnd={(e) => e.currentTarget.classList.remove('opacity-40')}
-                            className="rounded-2xl border border-white/5 bg-[#04080f]/90 p-2.5 shadow-md hover:border-[#c9a227]/30 transition group relative cursor-grab active:cursor-grabbing"
+                            className="group relative rounded-2xl border border-white/5 bg-[#04080f]/90 p-3 shadow-md transition hover:border-[#c9a227]/30 md:p-2.5 md:cursor-grab md:active:cursor-grabbing"
                           >
                             <div className="flex items-center gap-1.5">
                               <button
                                 onClick={() => {
                                   const next = new Set(collapsedCards);
-                                  collapsed ? next.delete(lead.id) : next.add(lead.id);
+                                  if (collapsed) {
+                                    next.delete(lead.id);
+                                  } else {
+                                    next.add(lead.id);
+                                  }
                                   setCollapsedCards(next);
                                 }}
                                 className="shrink-0 text-white/30 hover:text-white/60 transition"
@@ -1937,6 +2468,14 @@ export default function HomePage() {
                               </svg>
                               {lead.neighborhood}
                             </p>
+                            {serviceDate && (
+                              <p className="mt-0.5 flex items-center gap-1 text-[11px] font-semibold text-sky-300/80">
+                                <svg className="h-2.5 w-2.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                Serviço {format(serviceDate, 'dd/MM')}
+                              </p>
+                            )}
 
                             <div className="mt-2 flex justify-between items-center border-t border-white/5 pt-1.5">
                               <span className="text-[10px] font-semibold text-white/60 bg-white/5 rounded px-1.5 py-0.5">{lead.filmType}</span>
@@ -1947,11 +2486,11 @@ export default function HomePage() {
                             </div>
 
                             {/* Hover Edit/Delete/Action buttons */}
-                            <div className="mt-2 flex justify-between items-center gap-1.5 border-t border-white/5 pt-1.5 opacity-0 group-hover:opacity-100 transition duration-300">
+                            <div className="mt-2 flex justify-between items-center gap-1.5 border-t border-white/5 pt-1.5 opacity-100 transition duration-300 md:opacity-0 md:group-hover:opacity-100">
                               <button
                                 disabled={stage === 'Novo'}
                                 onClick={() => {
-                                  const stages = ['Novo', 'Em Contato', 'Proposta Enviada', 'Fechado', 'Perdido'] as const;
+                                  const stages = LEAD_STAGES;
                                   const idx = stages.indexOf(stage);
                                   if (idx > 0) handleStatusChange(lead.id, stages[idx - 1]);
                                 }}
@@ -1985,7 +2524,7 @@ export default function HomePage() {
                               <button
                                 disabled={stage === 'Perdido'}
                                 onClick={() => {
-                                  const stages = ['Novo', 'Em Contato', 'Proposta Enviada', 'Fechado', 'Perdido'] as const;
+                                  const stages = LEAD_STAGES;
                                   const idx = stages.indexOf(stage);
                                   if (idx < stages.length - 1) handleStatusChange(lead.id, stages[idx + 1]);
                                 }}
@@ -2017,8 +2556,48 @@ export default function HomePage() {
 
             {/* B. LIST TABLE VIEW */}
             {viewMode === 'table' && (
-              <div className="rounded-3xl border border-white/5 bg-[#07111d]/50 p-6 backdrop-blur-md shadow-lg overflow-x-auto">
-                <table className="w-full border-collapse text-left text-sm text-white/80">
+              <div className="rounded-2xl border border-white/5 bg-[#07111d]/50 p-4 backdrop-blur-md shadow-lg sm:rounded-3xl sm:p-6 md:overflow-x-auto">
+                <div className="space-y-3 md:hidden">
+                  {sortedFilteredLeads.map((lead) => (
+                    <article key={lead.id} className="rounded-2xl border border-white/5 bg-[#04080f]/85 p-4">
+                      <button onClick={() => setLeadDetail(lead)} className="w-full text-left">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <h3 className="truncate text-sm font-bold text-white">{lead.name}</h3>
+                            <p className="mt-1 text-xs text-white/40">{lead.phone || 'Sem telefone'}</p>
+                          </div>
+                          <span className="shrink-0 text-sm font-black text-[#c9a227]">R$ {formatCurrency(lead.value)}</span>
+                        </div>
+                      </button>
+
+                      <div className="mt-3 flex flex-wrap gap-2 text-[11px]">
+                        <span className="rounded-full border border-white/5 bg-white/[0.03] px-2.5 py-1 text-white/60">{lead.neighborhood}</span>
+                        <span className="rounded-full border border-white/5 bg-white/[0.03] px-2.5 py-1 text-white/60">{lead.filmType}</span>
+                        {getLeadServiceDate(lead) && (
+                          <span className="rounded-full border border-sky-500/20 bg-sky-500/10 px-2.5 py-1 font-semibold text-sky-300">
+                            Serviço {format(getLeadServiceDate(lead)!, 'dd/MM')}
+                          </span>
+                        )}
+                        <span className={`rounded-full border px-2.5 py-1 font-bold uppercase tracking-wider ${getLeadStatusClasses(lead.status)}`}>{lead.status}</span>
+                      </div>
+
+                      <div className="mt-4 flex items-center justify-between border-t border-white/5 pt-3">
+                        <span className="text-xs text-white/40">{lead.sqm.toFixed(2)}m² · {daysInStatus(lead)}d no status</span>
+                        <div className="flex gap-3">
+                          <button onClick={() => openEditModal(lead)} className="text-xs font-semibold text-white/60 hover:text-white">Editar</button>
+                          <button onClick={() => handleDeleteLead(lead.id)} className="text-xs font-semibold text-red-300/70 hover:text-red-300">Excluir</button>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                  {filteredLeads.length === 0 && (
+                    <div className="rounded-2xl border border-dashed border-white/10 p-6 text-center text-sm font-semibold text-white/30">
+                      Nenhum lead encontrado com estes filtros.
+                    </div>
+                  )}
+                </div>
+
+                <table className="hidden w-full border-collapse text-left text-sm text-white/80 md:table">
                   <thead>
                     <tr className="border-b border-white/5 text-xs uppercase tracking-widest text-white/40">
                       <th className="pb-3 font-semibold cursor-pointer hover:text-white select-none" onClick={() => toggleSort('name')}>
@@ -2038,6 +2617,9 @@ export default function HomePage() {
                       </th>
                       <th className="pb-3 font-semibold text-center cursor-pointer hover:text-white select-none" onClick={() => toggleSort('status')}>
                         Status {sortKey === 'status' && <span className="text-[#c9a227] ml-1">{sortDir === 'asc' ? '↑' : '↓'}</span>}
+                      </th>
+                      <th className="pb-3 font-semibold text-center cursor-pointer hover:text-white select-none" onClick={() => toggleSort('dataServico')}>
+                        Serviço {sortKey === 'dataServico' && <span className="text-[#c9a227] ml-1">{sortDir === 'asc' ? '↑' : '↓'}</span>}
                       </th>
                       <th className="pb-3 font-semibold text-center">Dias</th>
                       <th className="pb-3 font-semibold text-right">Ações</th>
@@ -2061,15 +2643,12 @@ export default function HomePage() {
                         <td className="py-3.5 text-center font-mono">{lead.sqm.toFixed(2)}m²</td>
                         <td className="py-3.5 text-right font-bold text-[#c9a227]">R$ {formatCurrency(lead.value)}</td>
                         <td className="py-3.5 text-center">
-                          <span className={`inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-                            lead.status === 'Fechado' ? 'bg-emerald-500/10 text-emerald-400' :
-                            lead.status === 'Proposta Enviada' ? 'bg-purple-500/10 text-purple-400' :
-                            lead.status === 'Em Contato' ? 'bg-amber-500/10 text-amber-400' :
-                            lead.status === 'Perdido' ? 'bg-red-500/10 text-red-400' :
-                            'bg-blue-500/10 text-blue-400'
-                          }`}>
+                          <span className={`inline-flex rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${getLeadStatusClasses(lead.status)}`}>
                             {lead.status}
                           </span>
+                        </td>
+                        <td className="py-3.5 text-center text-xs font-semibold text-sky-300">
+                          {getLeadServiceDate(lead) ? format(getLeadServiceDate(lead)!, 'dd/MM/yyyy') : '—'}
                         </td>
                         <td className="py-3.5 text-center font-mono text-xs text-white/40">{daysInStatus(lead)}d</td>
                         <td className="py-3.5 text-right">
@@ -2098,7 +2677,7 @@ export default function HomePage() {
                     ))}
                     {filteredLeads.length === 0 && (
                       <tr>
-                        <td colSpan={8} className="py-10 text-center text-white/30 font-semibold">Nenhum lead encontrado com estes filtros.</td>
+                        <td colSpan={9} className="py-10 text-center text-white/30 font-semibold">Nenhum lead encontrado com estes filtros.</td>
                       </tr>
                     )}
                   </tbody>
@@ -2110,7 +2689,7 @@ export default function HomePage() {
         )}
 
         {/* 3. HISTORICO SUPABASE TAB */}
-        {activeTab === 'historico' && <HistoricoSupabase leads={leads} setActiveTab={setActiveTab} openCreateModal={openCreateModal} />}
+        {activeTab === 'historico' && <HistoricoSupabase setActiveTab={setActiveTab} openCreateModal={openCreateModal} />}
 
         {/* 4. EXTRATOS MENSAIS TAB */}
         {activeTab === 'extratos' && <ExtratosMensaisSupabase />}
@@ -2174,7 +2753,7 @@ export default function HomePage() {
                       Orçamento do Supabase Encontrado
                     </h4>
                     <span className="text-[10px] text-white/40">
-                      {new Date(linkedOrcamento.created_at).toLocaleDateString('pt-BR')}
+                      {linkedOrcamento.created_at ? new Date(linkedOrcamento.created_at).toLocaleDateString('pt-BR') : '—'}
                     </span>
                   </div>
                   <div className="grid grid-cols-2 gap-2 text-sm">
@@ -2203,7 +2782,7 @@ export default function HomePage() {
                     <div className="border-t border-white/5 pt-3 mt-2">
                       <p className="text-[10px] text-white/40 uppercase tracking-wider mb-2">Vidros:</p>
                       <div className="flex flex-wrap gap-1">
-                        {linkedOrcamento.vidros.map((v: any, i: number) => (
+                        {linkedOrcamento.vidros.map((v, i) => (
                           <span key={i} className="text-xs bg-white/5 px-2 py-0.5 rounded text-white/70">
                             {v.h}x{v.w} {v.label && `(${v.label})`}
                           </span>
@@ -2284,7 +2863,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-3">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label className="mb-1 block text-[10px] uppercase tracking-widest text-white/50 font-semibold">Área (m²)</label>
                   <input
@@ -2314,10 +2893,19 @@ export default function HomePage() {
                   >
                     <option value="Novo">Novo</option>
                     <option value="Em Contato">Em Contato</option>
-                    <option value="Proposta Enviada">Proposta Enviada</option>
+                    <option value="Agendado">Agendado</option>
                     <option value="Fechado">Fechado</option>
                     <option value="Perdido">Perdido</option>
                   </select>
+                </div>
+                <div>
+                  <label className="mb-1 block text-[10px] uppercase tracking-widest text-white/50 font-semibold">Data do Serviço</label>
+                  <input
+                    type="date"
+                    value={formatDateInputValue(leadForm.dataServico)}
+                    onChange={(e) => setLeadForm({ ...leadForm, dataServico: e.target.value || null })}
+                    className="w-full rounded-2xl border border-white/5 bg-[#04080f] px-4 py-3 text-sm text-white focus:border-[#c9a227]/40 focus:outline-none"
+                  />
                 </div>
               </div>
 
@@ -2374,13 +2962,15 @@ export default function HomePage() {
               </div>
               <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
                 <span className="block text-[10px] uppercase tracking-wider text-white/50 font-semibold mb-1">Status</span>
-                <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-                  leadDetail.status === 'Fechado' ? 'bg-emerald-500/10 text-emerald-400' :
-                  leadDetail.status === 'Proposta Enviada' ? 'bg-purple-500/10 text-purple-400' :
-                  leadDetail.status === 'Em Contato' ? 'bg-amber-500/10 text-amber-400' :
-                  leadDetail.status === 'Perdido' ? 'bg-red-500/10 text-red-400' :
-                  'bg-blue-500/10 text-blue-400'
-                }`}>{leadDetail.status}</span>
+                <span className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${getLeadStatusClasses(leadDetail.status)}`}>{leadDetail.status}</span>
+              </div>
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
+                <span className="block text-[10px] uppercase tracking-wider text-white/50 font-semibold mb-1">Serviço</span>
+                <span className="font-bold text-sm text-sky-300">
+                  {getLeadServiceDate(leadDetail)
+                    ? format(getLeadServiceDate(leadDetail)!, 'dd/MM/yyyy')
+                    : 'Sem data'}
+                </span>
               </div>
               <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
                 <span className="block text-[10px] uppercase tracking-wider text-white/50 font-semibold mb-1">Película</span>

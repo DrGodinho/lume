@@ -9,9 +9,16 @@ async function hasValidCrmToken(request: NextRequest) {
   return !!payload;
 }
 
+function getSafeRedirectPath(pathname: string, search: string) {
+  const candidate = `${pathname}${search}`;
+  if (!candidate.startsWith('/') || candidate.startsWith('//')) return '/crm/';
+  return candidate;
+}
+
 function redirectToLogin(request: NextRequest, clearToken = false) {
   const url = request.nextUrl.clone();
   url.pathname = '/login/';
+  url.searchParams.set('redirectTo', getSafeRedirectPath(request.nextUrl.pathname, request.nextUrl.search));
 
   const response = NextResponse.redirect(url);
   if (clearToken) {
@@ -24,7 +31,7 @@ function redirectToLogin(request: NextRequest, clearToken = false) {
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  if (pathname.startsWith('/crm') || pathname.startsWith('/admin/relatorios') || pathname.startsWith('/admin/blog')) {
+  if (pathname.startsWith('/crm') || pathname.startsWith('/admin')) {
     const crmToken = request.cookies.get('crm-token')?.value;
     if (!crmToken) {
       return redirectToLogin(request);
@@ -40,7 +47,11 @@ export async function proxy(request: NextRequest) {
 
   if ((pathname === '/login' || pathname === '/login/') && await hasValidCrmToken(request)) {
     const url = request.nextUrl.clone();
-    url.pathname = '/crm/';
+    const redirectTo = request.nextUrl.searchParams.get('redirectTo');
+    url.pathname = redirectTo && redirectTo.startsWith('/') && !redirectTo.startsWith('//')
+      ? redirectTo
+      : '/crm/';
+    url.search = '';
     return NextResponse.redirect(url);
   }
 
@@ -48,5 +59,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/blog/:path*', '/admin/relatorios/:path*', '/login', '/login/:path*', '/crm/:path*'],
+  matcher: ['/admin/:path*', '/login', '/login/:path*', '/crm/:path*'],
 };

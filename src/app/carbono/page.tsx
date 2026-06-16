@@ -2,21 +2,21 @@ import type { Metadata } from 'next';
 import { CarbonoPage } from '../../views/Carbono';
 
 export const metadata: Metadata = {
-  title: 'PelÃ­cula de Carbono Premium | Privacidade e Controle Solar',
-  description: 'PelÃ­cula de Carbono Premium com visual grafite sofisticado, rejeiÃ§Ã£o tÃ©rmica de atÃ© 80% e estabilidade de cor garantida. OrÃ§amento grÃ¡tis via WhatsApp.',
+  title: 'Película de Carbono Premium | Privacidade e Controle Solar',
+  description: 'Película de Carbono Premium com visual grafite sofisticado, rejeição térmica de até 80% e estabilidade de cor garantida. Orçamento grátis via WhatsApp.',
   alternates: { canonical: 'https://lumecontrolesolar.com.br/carbono' },
   openGraph: {
-    title: 'PelÃ­cula de Carbono Premium | Privacidade e ReduÃ§Ã£o de Calor - LUME',
-    description: 'Visual grafite sofisticado com rejeiÃ§Ã£o tÃ©rmica de atÃ© 80%. A pelÃ­cula que une estÃ©tica e performance no Rio de Janeiro.',
+    title: 'Película de Carbono Premium | Privacidade e Redução de Calor - LUME',
+    description: 'Visual grafite sofisticado com rejeição térmica de até 80%. A película que une estética e performance no Rio de Janeiro.',
     url: 'https://lumecontrolesolar.com.br/carbono',
     type: 'website',
     siteName: 'LUME Controle Solar',
-    images: [{ url: 'https://lumecontrolesolar.com.br/carbono-hero.webp', width: 1200, height: 630, alt: 'PelÃ­cula de Carbono Premium LUME' }],
+    images: [{ url: 'https://lumecontrolesolar.com.br/carbono-hero.webp', width: 1200, height: 630, alt: 'Película de Carbono Premium LUME' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'PelÃ­cula de Carbono Premium | LUME Controle Solar',
-    description: 'Visual grafite sofisticado com rejeiÃ§Ã£o tÃ©rmica de atÃ© 80%. OrÃ§amento grÃ¡tis.',
+    title: 'Película de Carbono Premium | LUME Controle Solar',
+    description: 'Visual grafite sofisticado com rejeição térmica de até 80%. Orçamento grátis.',
     images: ['https://lumecontrolesolar.com.br/carbono-hero.webp'],
   },
 };
@@ -24,9 +24,9 @@ export const metadata: Metadata = {
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Product',
-  name: 'PelÃ­cula de Carbono Premium LUME',
+  name: 'Película de Carbono Premium LUME',
   image: 'https://lumecontrolesolar.com.br/carbono-hero.webp',
-  description: 'PelÃ­cula de carbono profissional com visual grafite sofisticado, rejeiÃ§Ã£o tÃ©rmica de atÃ© 80% e bloqueio de 99% dos raios UV. Garantia de 5 anos.',
+  description: 'Película de carbono profissional com visual grafite sofisticado, rejeição térmica de até 80% e bloqueio de 99% dos raios UV. Garantia de 5 anos.',
   brand: {
     '@type': 'Brand',
     name: 'LUME Controle Solar',
@@ -40,7 +40,7 @@ const jsonLd = {
       '@type': 'UnitPriceSpecification',
       price: '80.00',
       priceCurrency: 'BRL',
-      unitText: 'mÂ²',
+      unitText: 'm²',
     },
     availability: 'https://schema.org/InStock',
     hasMerchantReturnPolicy: {
