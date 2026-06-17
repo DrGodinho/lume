@@ -1,16 +1,25 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { addDays, differenceInDays, eachDayOfInterval, endOfMonth, format, isPast, isSameDay, isToday, isWithinInterval, parseISO, startOfMonth, startOfWeek, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ResponsiveContainer, ComposedChart, Area, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+import { Calendar } from 'lucide-react';
 import { ExtratosMensaisSupabase } from './ExtratosMensaisSupabase';
 import { roundCurrency, roundMeasure } from '@/lib/numberPrecision';
 
 type LeadStatus = 'Novo' | 'Em Contato' | 'Agendado' | 'Fechado' | 'Perdido';
+type ServiceStatus = 'Marcado' | 'Confirmado' | 'Em Execucao' | 'Concluido' | 'Reagendar';
 type MonthlyEvolutionSeries = 'atualDia' | 'atual' | 'anterior' | 'previsto';
-type LeadSortKey = '' | 'name' | 'neighborhood' | 'filmType' | 'sqm' | 'value' | 'status' | 'dataServico';
+type LeadSortKey = '' | 'name' | 'neighborhood' | 'filmType' | 'sqm' | 'value' | 'status' | 'dataServico' | 'serviceStatus';
+type AgendaView = 'hoje' | 'semana' | 'servicos' | 'sem_acao';
+type CommercialActionType = 'retorno' | 'servico' | 'fechado' | 'perdido';
+type CrmSyncState = {
+  status: 'ok' | 'warning' | 'error';
+  message: string;
+  details?: string;
+};
 
 const LEAD_STAGES: LeadStatus[] = ['Novo', 'Em Contato', 'Agendado', 'Fechado', 'Perdido'];
 const MONTHLY_EVOLUTION_SERIES: Record<MonthlyEvolutionSeries, boolean> = {
@@ -37,7 +46,16 @@ interface Lead {
   notes: string;
   proximoContato?: string | null;
   dataServico?: string | null;
+  serviceStatus?: ServiceStatus | null;
   updatedAt?: string;
+}
+
+interface CommercialActionDraft {
+  lead: Lead;
+  action: CommercialActionType;
+  followUpDate: string;
+  serviceDate: string;
+  note: string;
 }
 
 const normalizeLeadStatus = (status: unknown): LeadStatus => {
@@ -48,12 +66,48 @@ const normalizeLeadStatus = (status: unknown): LeadStatus => {
   return 'Novo';
 };
 
+const normalizeServiceStatus = (status: unknown): ServiceStatus | null => {
+  if (status === 'Marcado' || status === 'Confirmado' || status === 'Em Execucao' || status === 'Concluido' || status === 'Reagendar') {
+    return status;
+  }
+  if (status === 'Em execução') return 'Em Execucao';
+  return null;
+};
+
 const getLeadStatusClasses = (status: LeadStatus) => {
   if (status === 'Fechado') return 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400';
   if (status === 'Agendado') return 'border-sky-500/20 bg-sky-500/10 text-sky-400';
   if (status === 'Em Contato') return 'border-amber-500/20 bg-amber-500/10 text-amber-400';
   if (status === 'Perdido') return 'border-red-500/20 bg-red-500/10 text-red-400';
   return 'border-blue-500/20 bg-blue-500/10 text-blue-400';
+};
+
+const SERVICE_STATUS_META: Record<ServiceStatus, { label: string; badge: string; button: string }> = {
+  Marcado: {
+    label: 'Marcado',
+    badge: 'border-slate-400/20 bg-slate-400/10 text-slate-200',
+    button: 'border-slate-400/20 bg-slate-400/10 text-slate-200 hover:bg-slate-400/15',
+  },
+  Confirmado: {
+    label: 'Confirmado',
+    badge: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-300',
+    button: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/15',
+  },
+  'Em Execucao': {
+    label: 'Em execução',
+    badge: 'border-amber-500/20 bg-amber-500/10 text-amber-300',
+    button: 'border-amber-500/20 bg-amber-500/10 text-amber-300 hover:bg-amber-500/15',
+  },
+  Concluido: {
+    label: 'Concluído',
+    badge: 'border-sky-500/20 bg-sky-500/10 text-sky-300',
+    button: 'border-sky-500/20 bg-sky-500/10 text-sky-300 hover:bg-sky-500/15',
+  },
+  Reagendar: {
+    label: 'Reagendar',
+    badge: 'border-red-500/20 bg-red-500/10 text-red-300',
+    button: 'border-red-500/20 bg-red-500/10 text-red-300 hover:bg-red-500/15',
+  },
 };
 
 // Initial Mock Data
@@ -87,6 +141,7 @@ const INITIAL_LEADS: Lead[] = [
     createdAt: '2026-06-02',
     statusChangedAt: '2026-06-02',
     dataServico: '2026-06-08',
+    serviceStatus: 'Confirmado',
     notes: 'Orçamento enviado por WhatsApp. Aguardando retorno sobre película de privacidade.'
   },
   {
@@ -103,6 +158,7 @@ const INITIAL_LEADS: Lead[] = [
     createdAt: '2026-05-28',
     statusChangedAt: '2026-05-30',
     dataServico: '2026-06-06',
+    serviceStatus: 'Concluido',
     notes: 'Contrato assinado. Instalação agendada para sábado de manhã. Película Carbono 20%.'
   },
   {
@@ -157,10 +213,65 @@ const getLeadFollowUpDate = (lead: Lead) => parseAgendaDate(lead.proximoContato 
 
 const getLeadServiceDate = (lead: Lead) => parseAgendaDate(lead.dataServico || null);
 
+const getLeadServiceStatus = (lead: Lead): ServiceStatus => {
+  const normalized = normalizeServiceStatus(lead.serviceStatus);
+  if (normalized) return normalized;
+  return lead.dataServico ? 'Marcado' : 'Reagendar';
+};
+
+const formatCurrencyBRL = (value: number) =>
+  new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+
 const formatDateInputValue = (value?: string | null) => {
   const date = parseAgendaDate(value);
   return date ? format(date, 'yyyy-MM-dd') : '';
 };
+
+interface DateFieldWithPickerProps {
+  className: string;
+  ariaLabel: string;
+  onChange: (value: string) => void;
+  required?: boolean;
+  value: string;
+}
+
+function DateFieldWithPicker({ ariaLabel, className, onChange, required = false, value }: DateFieldWithPickerProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const openPicker = () => {
+    const input = inputRef.current;
+    if (!input) return;
+
+    if (typeof input.showPicker === 'function') {
+      input.showPicker();
+      return;
+    }
+
+    input.focus();
+    input.click();
+  };
+
+  return (
+    <div className="relative">
+      <input
+        ref={inputRef}
+        type="date"
+        required={required}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={`${className} pr-12`}
+      />
+      <button
+        type="button"
+        onClick={openPicker}
+        aria-label={ariaLabel}
+        className="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-white/45 transition hover:text-[#f5d77a] focus:outline-none"
+      >
+        <Calendar className="h-4 w-4" />
+      </button>
+    </div>
+  );
+}
 
 type LeadRow = Record<string, unknown> & { film_type?: string };
 
@@ -218,6 +329,7 @@ const mapLeadRow = (r: LeadRow): Lead => ({
   notes: asString(r.notes),
   proximoContato: asNullableString(r.proximo_contato),
   dataServico: asNullableString(r.data_servico),
+  serviceStatus: normalizeServiceStatus(r.service_status),
   updatedAt: asString(r.updated_at, asString(r.status_changed_at, asString(r.created_at, new Date().toISOString()))),
 });
 
@@ -231,6 +343,7 @@ const mergeCloudLeadsWithLocal = (cloudLeads: Lead[], savedLeads: Lead[]) => {
       ...cloud,
       proximoContato: cloud.proximoContato ?? lead.proximoContato ?? null,
       dataServico: cloud.dataServico ?? lead.dataServico ?? null,
+      serviceStatus: cloud.serviceStatus ?? lead.serviceStatus ?? null,
       updatedAt: cloud.updatedAt ?? lead.updatedAt,
       statusChangedAt: cloud.statusChangedAt || lead.statusChangedAt,
     };
@@ -246,9 +359,10 @@ const normalizeLeadAmounts = (lead: Lead): Lead => ({
   sqm: roundMeasure(lead.sqm),
   value: roundCurrency(lead.value),
   status: normalizeLeadStatus(lead.status),
+  serviceStatus: normalizeServiceStatus(lead.serviceStatus) || (lead.dataServico ? 'Marcado' : null),
 });
 
-const getInitialLeads = () => {
+const getStoredLeads = () => {
   if (typeof window === 'undefined') return INITIAL_LEADS;
   const saved = localStorage.getItem('lume_crm_leads');
   if (!saved) return INITIAL_LEADS;
@@ -276,15 +390,84 @@ const getInitialCollapsedCards = () => {
   }
 };
 
+const getCrmApiHeaders = async () => {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (!supabase) return headers;
+
+  const { data } = await supabase.auth.getSession();
+  const accessToken = data.session?.access_token;
+  if (accessToken) {
+    headers.Authorization = `Bearer ${accessToken}`;
+  }
+
+  return headers;
+};
+
+const getCrmApiErrorMessage = (payload: unknown, fallback: string) => {
+  if (!payload || typeof payload !== 'object') return fallback;
+  const data = payload as { error?: unknown; message?: unknown; hint?: unknown; code?: unknown };
+  const message = typeof data.error === 'string'
+    ? data.error
+    : typeof data.message === 'string'
+      ? data.message
+      : fallback;
+  const hint = typeof data.hint === 'string' ? data.hint : '';
+  const code = typeof data.code === 'string' ? ` (${data.code})` : '';
+  return `${message}${code}${hint ? ` - ${hint}` : ''}`;
+};
+
+const getLeadComparisonSnapshot = (lead: Lead) => {
+  const normalized = normalizeLeadAmounts(lead);
+  return JSON.stringify({
+    id: normalized.id,
+    name: normalized.name,
+    phone: normalized.phone,
+    email: normalized.email,
+    address: normalized.address,
+    neighborhood: normalized.neighborhood,
+    filmType: normalized.filmType,
+    sqm: normalized.sqm,
+    value: normalized.value,
+    status: normalized.status,
+    statusChangedAt: normalized.statusChangedAt,
+    dataServico: normalized.dataServico ?? null,
+    proximoContato: normalized.proximoContato ?? null,
+    serviceStatus: normalized.serviceStatus ?? null,
+    notes: normalized.notes,
+    updatedAt: normalized.updatedAt ?? null,
+    createdAt: normalized.createdAt,
+  });
+};
+
+const areLeadCollectionsEquivalent = (left: Lead[], right: Lead[]) => {
+  if (left.length !== right.length) return false;
+
+  const leftSnapshots = left
+    .map((lead) => ({ id: lead.id, snapshot: getLeadComparisonSnapshot(lead) }))
+    .sort((a, b) => a.id.localeCompare(b.id));
+  const rightSnapshots = right
+    .map((lead) => ({ id: lead.id, snapshot: getLeadComparisonSnapshot(lead) }))
+    .sort((a, b) => a.id.localeCompare(b.id));
+
+  return leftSnapshots.every((entry, index) => (
+    entry.id === rightSnapshots[index]?.id
+    && entry.snapshot === rightSnapshots[index]?.snapshot
+  ));
+};
+
 function LeadCardAgenda({
   lead,
+  kind = 'followup',
   onAgendar,
   onMarcarFeito,
+  onUpdateServiceStatus,
   onAbrirLead,
 }: {
   lead: Lead;
+  kind?: 'followup' | 'service' | 'idle';
   onAgendar: (leadId: string, data: string) => Promise<void>;
   onMarcarFeito: (leadId: string) => Promise<void>;
+  onUpdateServiceStatus: (leadId: string, serviceStatus: ServiceStatus) => Promise<void>;
   onAbrirLead: (lead: Lead) => void;
 }) {
   const [agendando, setAgendando] = useState(false);
@@ -297,6 +480,18 @@ function LeadCardAgenda({
   const inactivityDays = activityDate ? differenceInDays(new Date(), activityDate) : null;
   const atrasado = !!followUpDate && isPast(followUpDate) && !isToday(followUpDate);
   const hasFollowUp = !!followUpDate;
+  const isServiceCard = kind === 'service';
+  const isIdleCard = kind === 'idle';
+  const serviceStatus = getLeadServiceStatus(lead);
+  const serviceMeta = SERVICE_STATUS_META[serviceStatus];
+  const cardLabel = isServiceCard ? 'Serviço' : isIdleCard ? 'Sem próxima ação' : 'Follow-up';
+  const cardClasses = atrasado
+    ? 'border-red-500/20 bg-red-500/[0.06] hover:border-red-500/35'
+    : isServiceCard
+      ? 'border-sky-500/15 bg-sky-500/[0.05] hover:border-sky-500/30'
+      : isIdleCard
+        ? 'border-white/10 bg-white/[0.025] hover:border-[#c9a227]/20'
+        : 'border-white/5 bg-[#04080f]/90 hover:border-[#c9a227]/20';
 
   const salvarAgendamento = async () => {
     if (!novaData) return;
@@ -312,14 +507,19 @@ function LeadCardAgenda({
 
   return (
     <article
-      className={`group rounded-3xl border p-5 shadow-lg transition duration-300 ${
-        atrasado
-          ? 'border-red-500/20 bg-red-500/[0.06] hover:border-red-500/35'
-          : 'border-white/5 bg-[#04080f]/90 hover:border-[#c9a227]/20'
-      }`}
+      className={`group rounded-3xl border p-5 shadow-lg transition duration-300 ${cardClasses}`}
     >
       <div className="flex items-start justify-between gap-3">
         <button onClick={() => onAbrirLead(lead)} className="min-w-0 text-left">
+          <span className={`mb-2 inline-flex rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] ${
+            isServiceCard
+              ? 'border-sky-500/20 bg-sky-500/10 text-sky-300'
+              : isIdleCard
+                ? 'border-white/10 bg-white/[0.03] text-white/45'
+                : 'border-[#c9a227]/20 bg-[#c9a227]/10 text-[#f5d77a]'
+          }`}>
+            {cardLabel}
+          </span>
           <p className="truncate text-sm font-bold text-white transition group-hover:text-[#f5d77a]">
             {lead.name}
           </p>
@@ -328,11 +528,18 @@ function LeadCardAgenda({
           </p>
         </button>
 
-        <span
-          className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${getLeadStatusClasses(lead.status)}`}
-        >
-          {lead.status}
-        </span>
+        <div className="flex shrink-0 flex-col items-end gap-2">
+          <span
+            className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${getLeadStatusClasses(lead.status)}`}
+          >
+            {lead.status}
+          </span>
+          {isServiceCard && (
+            <span className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${serviceMeta.badge}`}>
+              {serviceMeta.label}
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2 text-[11px]">
@@ -348,7 +555,7 @@ function LeadCardAgenda({
         )}
         {hasFollowUp && followUpDate && (
           <span className="rounded-full border border-[#c9a227]/20 bg-[#c9a227]/10 px-2.5 py-1 text-[#f2d98a]">
-            {atrasado ? 'Contato hoje' : format(followUpDate, "d 'de' MMM", { locale: ptBR })}
+            {atrasado ? `Atrasado há ${differenceInDays(new Date(), followUpDate)}d` : `Retorno ${format(followUpDate, "d 'de' MMM", { locale: ptBR })}`}
           </span>
         )}
         {serviceDate && (
@@ -358,10 +565,14 @@ function LeadCardAgenda({
         )}
       </div>
 
-      <div className="mt-4 grid grid-cols-2 gap-3 text-xs text-white/55">
+      <div className={`mt-4 grid gap-3 text-xs text-white/55 ${isServiceCard ? 'grid-cols-2 xl:grid-cols-3' : 'grid-cols-2'}`}>
         <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-3">
           <p className="text-[10px] uppercase tracking-[0.25em] text-white/35 group-hover:text-white/50">Telefone</p>
           <p className="mt-1 font-medium text-white">{lead.phone || 'Sem telefone'}</p>
+        </div>
+        <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-3">
+          <p className="text-[10px] uppercase tracking-[0.25em] text-white/35 group-hover:text-white/50">Bairro</p>
+          <p className="mt-1 font-medium text-white">{lead.neighborhood || 'Sem bairro'}</p>
         </div>
         <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-3">
           <p className="text-[10px] uppercase tracking-[0.25em] text-white/35 group-hover:text-white/50">Valor</p>
@@ -369,6 +580,22 @@ function LeadCardAgenda({
             R$ {lead.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
           </p>
         </div>
+        {isServiceCard && (
+          <>
+            <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-3">
+              <p className="text-[10px] uppercase tracking-[0.25em] text-white/35 group-hover:text-white/50">Endereço</p>
+              <p className="mt-1 line-clamp-2 font-medium text-white">{lead.address || 'Sem endereço'}</p>
+            </div>
+            <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-3">
+              <p className="text-[10px] uppercase tracking-[0.25em] text-white/35 group-hover:text-white/50">Película</p>
+              <p className="mt-1 font-medium text-white">{lead.filmType}</p>
+            </div>
+            <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-3">
+              <p className="text-[10px] uppercase tracking-[0.25em] text-white/35 group-hover:text-white/50">Metragem</p>
+              <p className="mt-1 font-medium text-white">{lead.sqm.toFixed(2)} m²</p>
+            </div>
+          </>
+        )}
       </div>
 
       {agendando ? (
@@ -403,7 +630,7 @@ function LeadCardAgenda({
             onClick={() => setAgendando(true)}
             className="rounded-2xl border border-white/10 px-4 py-2 text-xs font-semibold text-white/70 transition hover:border-[#c9a227]/40 hover:text-[#f5d77a]"
           >
-            {hasFollowUp ? 'Re-agendar' : 'Agendar retorno'}
+            {hasFollowUp ? 'Reagendar retorno' : 'Agendar retorno'}
           </button>
           {hasFollowUp && (
             <button
@@ -429,28 +656,59 @@ function LeadCardAgenda({
           </button>
         </div>
       )}
+      {isServiceCard && (
+        <div className="mt-4 rounded-2xl border border-white/5 bg-white/[0.02] p-3">
+          <p className="text-[10px] uppercase tracking-[0.25em] text-white/35">Status do serviço</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {(Object.keys(SERVICE_STATUS_META) as ServiceStatus[]).map((statusOption) => (
+              <button
+                key={statusOption}
+                type="button"
+                onClick={() => onUpdateServiceStatus(lead.id, statusOption)}
+                className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold transition ${
+                  statusOption === serviceStatus
+                    ? SERVICE_STATUS_META[statusOption].button
+                    : 'border-white/10 bg-white/[0.02] text-white/55 hover:border-white/20 hover:text-white'
+                }`}
+              >
+                {SERVICE_STATUS_META[statusOption].label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </article>
   );
 }
 
 function AgendaFollowUpSection({
   leads,
+  initialView = 'hoje',
   onAgendarRetorno,
   onMarcarFeito,
+  onUpdateServiceStatus,
   onAbrirLead,
   onIrParaLeads,
 }: {
   leads: Lead[];
+  initialView?: AgendaView;
   onAgendarRetorno: (leadId: string, data: string) => Promise<void>;
   onMarcarFeito: (leadId: string) => Promise<void>;
+  onUpdateServiceStatus: (leadId: string, serviceStatus: ServiceStatus) => Promise<void>;
   onAbrirLead: (lead: Lead) => void;
   onIrParaLeads: () => void;
 }) {
   const [diaSelecionado, setDiaSelecionado] = useState<Date | null>(null);
+  const [agendaView, setAgendaView] = useState<AgendaView>('hoje');
+
+  useEffect(() => {
+    setAgendaView(initialView);
+  }, [initialView]);
 
   const hoje = useMemo(() => new Date(), []);
   const inicioSemana = startOfWeek(hoje, { weekStartsOn: 1 });
   const diasSemana = Array.from({ length: 7 }, (_, index) => addDays(inicioSemana, index));
+  const agendaViews: Array<{ id: AgendaView; label: string; count: number }> = [];
 
   const leadsAtivos = useMemo(() => leads.filter((lead) => !isClosedLead(lead.status)), [leads]);
   const leadsComRetorno = useMemo(() => leadsAtivos.filter((lead) => !!lead.proximoContato), [leadsAtivos]);
@@ -488,7 +746,7 @@ function AgendaFollowUpSection({
 
   const parados = useMemo(() => {
     return leadsAtivos.filter((lead) => {
-      if (lead.proximoContato) return false;
+      if (lead.proximoContato || lead.dataServico) return false;
       const activityDate = getLeadActivityDate(lead);
       if (!activityDate) return false;
       return differenceInDays(hoje, activityDate) >= 3;
@@ -518,19 +776,97 @@ function AgendaFollowUpSection({
       });
   }, [diaSelecionado, leadsComServico]);
 
-  const agendaCountByDay = (day: Date) =>
+  const servicosHoje = useMemo(() => {
+    return leadsComServico.filter((lead) => {
+      const serviceDate = getLeadServiceDate(lead);
+      return serviceDate ? isSameDay(serviceDate, diaSelecionado || hoje) : false;
+    });
+  }, [diaSelecionado, hoje, leadsComServico]);
+
+  const serviceStatusCounts = useMemo(() => {
+    return servicosAgendados.reduce<Record<ServiceStatus, number>>((acc, lead) => {
+      const status = getLeadServiceStatus(lead);
+      acc[status] += 1;
+      return acc;
+    }, {
+      Marcado: 0,
+      Confirmado: 0,
+      'Em Execucao': 0,
+      Concluido: 0,
+      Reagendar: 0,
+    });
+  }, [servicosAgendados]);
+
+  const serviceRouteGroups = useMemo(() => {
+    const grouped = servicosAgendados.reduce<Record<string, Lead[]>>((acc, lead) => {
+      const key = lead.neighborhood || 'Sem bairro';
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(lead);
+      return acc;
+    }, {});
+
+    return Object.entries(grouped)
+      .map(([neighborhood, items]) => ({
+        neighborhood,
+        items: items.sort((a, b) => {
+          const aDate = getLeadServiceDate(a)?.getTime() || 0;
+          const bDate = getLeadServiceDate(b)?.getTime() || 0;
+          return aDate - bDate;
+        }),
+        totalValue: items.reduce((sum, lead) => sum + lead.value, 0),
+      }))
+      .sort((a, b) => b.items.length - a.items.length || b.totalValue - a.totalValue);
+  }, [servicosAgendados]);
+
+  const topServiceNeighborhood = serviceRouteGroups[0]?.neighborhood || 'Sem rota definida';
+  const servicePipelineValue = servicosAgendados.reduce((sum, lead) => sum + lead.value, 0);
+
+  const followUpCountByDay = (day: Date) =>
     leadsComRetorno.filter((lead) => {
       const followUpDate = getLeadFollowUpDate(lead);
       return followUpDate ? isSameDay(followUpDate, day) : false;
-    }).length +
+    }).length;
+
+  const serviceCountByDay = (day: Date) =>
     leadsComServico.filter((lead) => {
       const serviceDate = getLeadServiceDate(lead);
       return serviceDate ? isSameDay(serviceDate, day) : false;
     }).length;
 
+  const agendaCountByDay = (day: Date) => followUpCountByDay(day) + serviceCountByDay(day);
+
+  const weeklyActionDays = diasSemana.map((day) => {
+    const followUps = followUpCountByDay(day);
+    const services = serviceCountByDay(day);
+    const dayServices = leadsComServico.filter((lead) => {
+      const serviceDate = getLeadServiceDate(lead);
+      return serviceDate ? isSameDay(serviceDate, day) : false;
+    });
+    return {
+      day,
+      followUps,
+      services,
+      total: followUps + services,
+      forecastValue: dayServices.reduce((sum, lead) => sum + lead.value, 0),
+    };
+  });
+
   const selectedDayLabel = diaSelecionado ? format(diaSelecionado, "EEEE, d 'de' MMMM", { locale: ptBR }) : '';
 
   const sectionsEmpty = contactarHoje.length === 0 && proximos7Dias.length === 0 && parados.length === 0 && servicosAgendados.length === 0;
+
+  agendaViews.push(
+    { id: 'hoje', label: diaSelecionado ? 'Dia selecionado' : 'Hoje', count: contactarHoje.length + servicosHoje.length },
+    { id: 'semana', label: 'Próximos 7 dias', count: proximos7Dias.length },
+    { id: 'servicos', label: 'Serviços', count: servicosAgendados.length },
+    { id: 'sem_acao', label: 'Sem ação', count: parados.length },
+  );
+
+  const activeAgendaEmpty =
+    (agendaView === 'hoje' && contactarHoje.length === 0 && servicosHoje.length === 0) ||
+    (agendaView === 'semana' && proximos7Dias.length === 0) ||
+    (agendaView === 'servicos' && servicosAgendados.length === 0) ||
+    (agendaView === 'sem_acao' && parados.length === 0);
 
   const highlightDay = (day: Date) => {
     if (diaSelecionado && isSameDay(day, diaSelecionado)) {
@@ -540,6 +876,55 @@ function AgendaFollowUpSection({
     setDiaSelecionado(day);
   };
 
+  const renderAgendaSection = (
+    title: string,
+    count: number,
+    tone: 'red' | 'gold' | 'sky' | 'muted',
+    items: Lead[],
+    kind: 'followup' | 'service' | 'idle',
+    emptyMessage: string,
+  ) => {
+    const toneClasses = {
+      red: 'text-red-300 border-red-500/20 bg-red-500/10',
+      gold: 'text-[#f5d77a] border-[#c9a227]/20 bg-[#c9a227]/10',
+      sky: 'text-sky-300 border-sky-500/20 bg-sky-500/10',
+      muted: 'text-white/55 border-white/10 bg-white/[0.03]',
+    }[tone];
+
+    if (items.length === 0) {
+      return (
+        <section className="rounded-[2rem] border border-white/5 bg-white/[0.02] px-6 py-10 text-center">
+          <p className="text-lg font-black text-white">{title}</p>
+          <p className="mt-2 text-sm text-white/45">{emptyMessage}</p>
+        </section>
+      );
+    }
+
+    return (
+      <section className="space-y-4">
+        <div className="flex items-center gap-2">
+          <span className={`text-sm font-bold uppercase tracking-[0.25em] ${toneClasses.split(' ')[0]}`}>{title}</span>
+          <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${toneClasses}`}>
+            {count}
+          </span>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {items.map((lead) => (
+            <LeadCardAgenda
+              key={`${kind}-${lead.id}`}
+              lead={lead}
+              kind={kind}
+              onAgendar={onAgendarRetorno}
+              onMarcarFeito={onMarcarFeito}
+              onUpdateServiceStatus={onUpdateServiceStatus}
+              onAbrirLead={onAbrirLead}
+            />
+          ))}
+        </div>
+      </section>
+    );
+  };
+
   return (
     <div className="space-y-8">
       <section className="overflow-hidden rounded-[2.25rem] border border-white/5 bg-[radial-gradient(circle_at_top_left,_rgba(201,162,39,0.18),_transparent_28%),radial-gradient(circle_at_bottom_right,_rgba(255,255,255,0.04),_transparent_25%),linear-gradient(180deg,#0a1320_0%,#050a11_100%)] p-6 shadow-2xl shadow-black/25 sm:p-8">
@@ -547,10 +932,10 @@ function AgendaFollowUpSection({
           <div className="max-w-3xl">
             <p className="text-[10px] font-bold uppercase tracking-[0.45em] text-[#f5d77a]">LUME ELITE</p>
             <h2 className="mt-2 font-display text-3xl font-black tracking-tight text-white sm:text-4xl">
-              Agenda & Follow-up
+              Central de Agenda
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-white/60">
-              Organize contatos por urg?ncia, acompanhe retornos da semana e destaque quem est? parado para n?o deixar lead esfriar.
+              Separe retornos comerciais, serviços marcados e leads sem próxima ação para decidir o que fazer primeiro.
             </p>
           </div>
 
@@ -564,7 +949,7 @@ function AgendaFollowUpSection({
                 {contactarHoje.length} urgentes
               </span>
               <span className="rounded-full border border-[#c9a227]/20 bg-[#c9a227]/10 px-3 py-1 text-[#f5d77a] shadow-[0_0_0_1px_rgba(201,162,39,0.1)]">
-                {proximos7Dias.length} proximos 7 dias
+                {proximos7Dias.length} próximos 7 dias
               </span>
               <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-white/60">
                 {emDiaCount} em dia
@@ -584,7 +969,7 @@ function AgendaFollowUpSection({
           <p className="mt-2 text-sm text-white/50">Atrasados e contatos do dia.</p>
         </div>
         <div className="rounded-[1.75rem] border border-[#c9a227]/20 bg-[linear-gradient(180deg,rgba(201,162,39,0.16),rgba(201,162,39,0.05))] p-5 shadow-lg shadow-black/10">
-          <p className="text-[10px] uppercase tracking-[0.35em] text-[#f5d77a]">Pr?ximos 7 dias</p>
+          <p className="text-[10px] uppercase tracking-[0.35em] text-[#f5d77a]">Próximos 7 dias</p>
           <p className="mt-3 text-4xl font-black text-white">{proximos7Dias.length}</p>
           <p className="mt-2 text-sm text-white/50">Retornos agendados para a semana.</p>
         </div>
@@ -600,12 +985,32 @@ function AgendaFollowUpSection({
         </div>
       </section>
 
+      <section className="flex flex-wrap gap-2 rounded-[1.5rem] border border-white/5 bg-[#07111d]/70 p-2">
+        {agendaViews.map((view) => (
+          <button
+            key={view.id}
+            type="button"
+            onClick={() => setAgendaView(view.id)}
+            className={`flex items-center gap-2 rounded-2xl px-4 py-2.5 text-xs font-bold uppercase tracking-[0.18em] transition ${
+              agendaView === view.id
+                ? 'bg-[#c9a227] text-[#04080f]'
+                : 'border border-white/5 bg-white/[0.02] text-white/50 hover:border-[#c9a227]/25 hover:text-white'
+            }`}
+          >
+            <span>{view.label}</span>
+            <span className={`rounded-full px-2 py-0.5 text-[10px] ${agendaView === view.id ? 'bg-[#04080f]/15' : 'bg-white/[0.06]'}`}>
+              {view.count}
+            </span>
+          </button>
+        ))}
+      </section>
+
       <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         <div className="rounded-[2rem] border border-white/5 bg-[#07111d]/75 p-6 shadow-2xl shadow-black/20 backdrop-blur-md">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.35em] text-white/35">Mini calend?rio</p>
-              <h3 className="mt-1 text-xl font-black text-white">Semana atual</h3>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.35em] text-white/35">Ações da semana</p>
+              <h3 className="mt-1 text-xl font-black text-white">Capacidade diária</h3>
             </div>
             {diaSelecionado && (
               <button
@@ -617,14 +1022,54 @@ function AgendaFollowUpSection({
             )}
           </div>
 
-          <div className="mt-5 grid grid-cols-7 gap-2">
-            {diasSemana.map((day) => {
+          <div className="mt-5 space-y-2 sm:hidden">
+            {weeklyActionDays.map(({ day, followUps, services, total, forecastValue }) => {
               const selected = diaSelecionado ? isSameDay(day, diaSelecionado) : false;
-              const dayCount = agendaCountByDay(day);
 
               return (
                 <button
                   key={day.toISOString()}
+                  type="button"
+                  onClick={() => highlightDay(day)}
+                  className={`flex w-full items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-left transition ${
+                    selected
+                      ? 'border-[#c9a227]/50 bg-[#c9a227]/10 text-white'
+                      : 'border-white/5 bg-white/[0.02] text-white/70'
+                  } ${isToday(day) ? 'ring-1 ring-[#f5d77a]/30' : ''}`}
+                >
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/35">
+                      {format(day, 'EEE', { locale: ptBR })}
+                    </p>
+                    <p className={`mt-1 text-base font-black ${isToday(day) ? 'text-[#f5d77a]' : 'text-white'}`}>
+                      {format(day, "d 'de' MMM", { locale: ptBR })}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-black text-white">{total} ações</p>
+                    <p className="mt-0.5 text-[11px] text-white/45">
+                      {services} serviços · {followUps} retornos
+                    </p>
+                    <p className="mt-0.5 text-[11px] font-semibold text-[#f5d77a]">
+                      {formatCurrencyBRL(forecastValue)}
+                    </p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="mt-5 hidden grid-cols-7 gap-2 sm:grid">
+            {diasSemana.map((day) => {
+              const selected = diaSelecionado ? isSameDay(day, diaSelecionado) : false;
+              const dayCount = agendaCountByDay(day);
+              const followUps = followUpCountByDay(day);
+              const services = serviceCountByDay(day);
+
+              return (
+                <button
+                  key={day.toISOString()}
+                  type="button"
                   onClick={() => highlightDay(day)}
                   className={`group rounded-2xl border p-3 text-left transition duration-300 ${
                     selected
@@ -638,7 +1083,14 @@ function AgendaFollowUpSection({
                   <p className={`mt-2 text-lg font-black ${isToday(day) ? 'text-[#f5d77a]' : 'text-white'}`}>
                     {format(day, 'd')}
                   </p>
-                  <p className="mt-1 text-[11px] text-white/45">{dayCount} agend.</p>
+                  <p className="mt-1 text-[11px] text-white/45">{dayCount} itens</p>
+                  <p className="mt-1 truncate text-[10px] font-semibold text-[#f5d77a]">
+                    {formatCurrencyBRL(weeklyActionDays.find((item) => isSameDay(item.day, day))?.forecastValue || 0)}
+                  </p>
+                  <div className="mt-2 flex gap-1">
+                    <span className="h-1.5 flex-1 rounded-full bg-[#c9a227]/40" style={{ opacity: followUps > 0 ? 1 : 0.18 }} />
+                    <span className="h-1.5 flex-1 rounded-full bg-sky-400/50" style={{ opacity: services > 0 ? 1 : 0.18 }} />
+                  </div>
                 </button>
               );
             })}
@@ -651,7 +1103,7 @@ function AgendaFollowUpSection({
                   Exibindo o dia <span className="font-semibold text-white">{selectedDayLabel}</span>.
                 </p>
                 <p className="text-white/40">
-                  Hoje seguem vis?veis tamb?m os atrasados.
+                  Hoje seguem visíveis também os atrasados.
                 </p>
               </div>
             ) : (
@@ -662,7 +1114,7 @@ function AgendaFollowUpSection({
 
         <div className="rounded-[2rem] border border-white/5 bg-[#07111d]/75 p-6 shadow-2xl shadow-black/20 backdrop-blur-md">
           <p className="text-[10px] font-semibold uppercase tracking-[0.35em] text-white/35">Atalhos</p>
-          <h3 className="mt-1 text-xl font-black text-white">Operacao rapida</h3>
+          <h3 className="mt-1 text-xl font-black text-white">Operação rápida</h3>
 
           <div className="mt-5 space-y-3">
             <button
@@ -677,19 +1129,27 @@ function AgendaFollowUpSection({
             </button>
 
             <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-4">
-              <p className="text-xs uppercase tracking-[0.25em] text-white/35">Resumo r?pido</p>
+              <p className="text-xs uppercase tracking-[0.25em] text-white/35">Resumo rápido</p>
               <div className="mt-3 space-y-2 text-sm text-white/65">
                 <div className="flex items-center justify-between">
                   <span>Urgentes</span>
                   <span className="font-semibold text-red-300">{contactarHoje.length}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span>Pr?ximos 7 dias</span>
+                  <span>Próximos 7 dias</span>
                   <span className="font-semibold text-[#f5d77a]">{proximos7Dias.length}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span>Serviços marcados</span>
                   <span className="font-semibold text-sky-300">{servicosAgendados.length}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Confirmados</span>
+                  <span className="font-semibold text-emerald-300">{serviceStatusCounts.Confirmado}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Reagendar</span>
+                  <span className="font-semibold text-red-300">{serviceStatusCounts.Reagendar}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span>Parados</span>
@@ -701,11 +1161,23 @@ function AgendaFollowUpSection({
                 </div>
               </div>
             </div>
+            <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-4">
+              <p className="text-xs uppercase tracking-[0.25em] text-white/35">Rota sugerida</p>
+              <p className="mt-2 text-lg font-black text-white">{topServiceNeighborhood}</p>
+              <div className="mt-3 flex items-center justify-between text-sm text-white/60">
+                <span>Serviços na rota</span>
+                <span className="font-semibold text-sky-300">{serviceRouteGroups[0]?.items.length || 0}</span>
+              </div>
+              <div className="mt-2 flex items-center justify-between text-sm text-white/60">
+                <span>Valor da agenda</span>
+                <span className="font-semibold text-[#f5d77a]">{formatCurrencyBRL(servicePipelineValue)}</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {servicosAgendados.length > 0 && (
+      {agendaView === 'servicos' && servicosAgendados.length > 0 && (
         <section className="space-y-4">
           <div className="flex items-center gap-2">
             <span className="text-sm font-bold uppercase tracking-[0.25em] text-sky-300">Serviços agendados</span>
@@ -713,21 +1185,57 @@ function AgendaFollowUpSection({
               {servicosAgendados.length}
             </span>
           </div>
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {servicosAgendados.map((lead) => (
-              <LeadCardAgenda
-                key={lead.id}
-                lead={lead}
-                onAgendar={onAgendarRetorno}
-                onMarcarFeito={onMarcarFeito}
-                onAbrirLead={onAbrirLead}
-              />
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+            {([
+              ['Marcado', serviceStatusCounts.Marcado],
+              ['Confirmado', serviceStatusCounts.Confirmado],
+              ['Em execução', serviceStatusCounts['Em Execucao']],
+              ['Concluído', serviceStatusCounts.Concluido],
+              ['Reagendar', serviceStatusCounts.Reagendar],
+            ] as const).map(([label, count]) => (
+              <div key={label} className="rounded-2xl border border-white/5 bg-white/[0.02] p-4">
+                <p className="text-[10px] uppercase tracking-[0.25em] text-white/35">{label}</p>
+                <p className="mt-2 text-2xl font-black text-white">{count}</p>
+              </div>
+            ))}
+          </div>
+          <div className="space-y-5">
+            {serviceRouteGroups.map((group) => (
+              <section key={group.neighborhood} className="rounded-[2rem] border border-white/5 bg-white/[0.02] p-5">
+                <div className="flex flex-col gap-3 border-b border-white/5 pb-4 sm:flex-row sm:items-end sm:justify-between">
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-sky-300/80">Rota</p>
+                    <h3 className="mt-1 text-xl font-black text-white">{group.neighborhood}</h3>
+                  </div>
+                  <div className="flex flex-wrap gap-2 text-xs">
+                    <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-white/60">
+                      {group.items.length} serviços
+                    </span>
+                    <span className="rounded-full border border-[#c9a227]/20 bg-[#c9a227]/10 px-3 py-1 text-[#f5d77a]">
+                      {formatCurrencyBRL(group.totalValue)}
+                    </span>
+                  </div>
+                </div>
+                <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  {group.items.map((lead) => (
+                    <LeadCardAgenda
+                      key={lead.id}
+                      lead={lead}
+                      kind="service"
+                      onAgendar={onAgendarRetorno}
+                      onMarcarFeito={onMarcarFeito}
+                      onUpdateServiceStatus={onUpdateServiceStatus}
+                      onAbrirLead={onAbrirLead}
+                    />
+                  ))}
+                </div>
+              </section>
             ))}
           </div>
         </section>
       )}
 
-      {contactarHoje.length > 0 && (
+      {agendaView === 'hoje' && contactarHoje.length > 0 && (
         <section className="space-y-4">
           <div className="flex items-center gap-2">
             <span className="text-sm font-bold uppercase tracking-[0.25em] text-red-300">Contatar hoje</span>
@@ -740,8 +1248,10 @@ function AgendaFollowUpSection({
               <LeadCardAgenda
                 key={lead.id}
                 lead={lead}
+                kind="followup"
                 onAgendar={onAgendarRetorno}
                 onMarcarFeito={onMarcarFeito}
+                onUpdateServiceStatus={onUpdateServiceStatus}
                 onAbrirLead={onAbrirLead}
               />
             ))}
@@ -749,10 +1259,19 @@ function AgendaFollowUpSection({
         </section>
       )}
 
-      {proximos7Dias.length > 0 && (
+      {agendaView === 'hoje' && servicosHoje.length > 0 && renderAgendaSection(
+        diaSelecionado ? 'Serviços do dia' : 'Serviços de hoje',
+        servicosHoje.length,
+        'sky',
+        servicosHoje,
+        'service',
+        diaSelecionado ? 'Nenhum serviço marcado neste dia.' : 'Nenhum serviço marcado para hoje.',
+      )}
+
+      {agendaView === 'semana' && proximos7Dias.length > 0 && (
         <section className="space-y-4">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-bold uppercase tracking-[0.25em] text-[#f5d77a]">Pr?ximos 7 dias</span>
+            <span className="text-sm font-bold uppercase tracking-[0.25em] text-[#f5d77a]">Próximos 7 dias</span>
             <span className="rounded-full border border-[#c9a227]/20 bg-[#c9a227]/10 px-2.5 py-1 text-xs font-semibold text-[#f5d77a]">
               {proximos7Dias.length}
             </span>
@@ -762,8 +1281,10 @@ function AgendaFollowUpSection({
               <LeadCardAgenda
                 key={lead.id}
                 lead={lead}
+                kind="followup"
                 onAgendar={onAgendarRetorno}
                 onMarcarFeito={onMarcarFeito}
+                onUpdateServiceStatus={onUpdateServiceStatus}
                 onAbrirLead={onAbrirLead}
               />
             ))}
@@ -771,10 +1292,10 @@ function AgendaFollowUpSection({
         </section>
       )}
 
-      {parados.length > 0 && (
+      {agendaView === 'sem_acao' && parados.length > 0 && (
         <section className="space-y-4">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-bold uppercase tracking-[0.25em] text-white/55">Sem atividade h? 3+ dias</span>
+            <span className="text-sm font-bold uppercase tracking-[0.25em] text-white/55">Sem atividade há 3+ dias</span>
             <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-xs font-semibold text-white/55">
               {parados.length}
             </span>
@@ -784,8 +1305,10 @@ function AgendaFollowUpSection({
               <LeadCardAgenda
                 key={lead.id}
                 lead={lead}
+                kind="idle"
                 onAgendar={onAgendarRetorno}
                 onMarcarFeito={onMarcarFeito}
+                onUpdateServiceStatus={onUpdateServiceStatus}
                 onAbrirLead={onAbrirLead}
               />
             ))}
@@ -793,10 +1316,17 @@ function AgendaFollowUpSection({
         </section>
       )}
 
+      {!sectionsEmpty && activeAgendaEmpty && (
+        <div className="rounded-[2rem] border border-white/5 bg-white/[0.02] px-6 py-10 text-center shadow-lg shadow-black/10">
+          <p className="text-xl font-black text-white">Nada neste filtro</p>
+          <p className="mt-2 text-sm text-white/45">Escolha outro trilho da agenda ou selecione outro dia no calendário.</p>
+        </div>
+      )}
+
       {sectionsEmpty && (
         <div className="rounded-[2rem] border border-emerald-500/20 bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.10),transparent_55%),linear-gradient(180deg,rgba(16,185,129,0.06),rgba(16,185,129,0.03))] px-6 py-10 text-center shadow-lg shadow-black/10">
           <p className="text-2xl font-black text-white">Agenda em dia</p>
-          <p className="mt-2 text-sm text-white/55">Nenhum contato pendente para hoje, pr?ximos dias ou leads parados.</p>
+          <p className="mt-2 text-sm text-white/55">Nenhum contato pendente para hoje, próximos dias ou leads parados.</p>
         </div>
       )}
     </div>
@@ -1123,15 +1653,17 @@ export default function HomePage() {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'leads' | 'historico' | 'extratos' | 'agenda'>('dashboard');
 
   // Leads Database State
-  const [leads, setLeads] = useState<Lead[]>(getInitialLeads);
+  const [leads, setLeads] = useState<Lead[]>(() => INITIAL_LEADS.map(normalizeLeadAmounts));
 
   // Filter & Search States
   const [searchQuery, setSearchQuery] = useState('');
   const [filterNeighborhood, setFilterNeighborhood] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [viewMode, setViewMode] = useState<'kanban' | 'table'>('kanban');
-  const [collapsedCards, setCollapsedCards] = useState<Set<string>>(getInitialCollapsedCards);
+  const [collapsedCards, setCollapsedCards] = useState<Set<string>>(new Set());
+  const [collapsedCardsLoaded, setCollapsedCardsLoaded] = useState(false);
   const [visibleMonthlySeries, setVisibleMonthlySeries] = useState(MONTHLY_EVOLUTION_SERIES);
+  const [agendaInitialView, setAgendaInitialView] = useState<AgendaView>('hoje');
   const [sortKey, setSortKey] = useState<LeadSortKey>('');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
@@ -1139,6 +1671,7 @@ export default function HomePage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [leadDetail, setLeadDetail] = useState<Lead | null>(null);
+  const [commercialAction, setCommercialAction] = useState<CommercialActionDraft | null>(null);
   const [leadForm, setLeadForm] = useState<Omit<Lead, 'id' | 'createdAt'>>({
     name: '',
     phone: '',
@@ -1151,6 +1684,8 @@ export default function HomePage() {
     status: 'Novo',
     statusChangedAt: new Date().toISOString().split('T')[0],
     dataServico: null,
+    serviceStatus: null,
+    proximoContato: null,
     notes: '',
   });
 
@@ -1158,77 +1693,86 @@ export default function HomePage() {
 
   // Notification Banner
   const [notification, setNotification] = useState<string | null>(null);
+  const [crmSync, setCrmSync] = useState<CrmSyncState>({
+    status: 'warning',
+    message: 'Carregando cache local enquanto o Supabase confirma os dados.',
+  });
 
   // Supabase linked orcamento state (for lead modal)
   const [linkedOrcamento, setLinkedOrcamento] = useState<CalculatorHistoryRow | null>(null);
   const [targetGoal, setTargetGoal] = useState(10000);
   const [editingTarget, setEditingTarget] = useState(false);
   const [targetInput, setTargetInput] = useState('10000');
+  const [isVerifyingCloud, setIsVerifyingCloud] = useState(false);
+  const [lastCloudCheckAt, setLastCloudCheckAt] = useState<string | null>(null);
   const [renderTime] = useState(() => Date.now());
+  const leadTableClickTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => () => {
+    if (leadTableClickTimeoutRef.current) {
+      clearTimeout(leadTableClickTimeoutRef.current);
+    }
+  }, []);
+
+  const fetchCloudLeadsSnapshot = useCallback(async () => {
+    const response = await fetch('/api/crm/leads', {
+      headers: await getCrmApiHeaders(),
+      credentials: 'same-origin',
+      cache: 'no-store',
+    });
+    const payload = await response.json().catch(() => null);
+
+    if (!response.ok || !Array.isArray(payload)) {
+      return {
+        ok: false as const,
+        details: getCrmApiErrorMessage(payload, response.statusText),
+      };
+    }
+
+    return {
+      ok: true as const,
+      leads: payload.map(mapLeadRow),
+    };
+  }, []);
 
   // Load database on mount
   useEffect(() => {
-    const savedLeads = getInitialLeads();
+    const savedLeads = getStoredLeads();
+    queueMicrotask(() => setLeads(savedLeads));
     localStorage.setItem('lume_crm_leads', JSON.stringify(savedLeads));
 
     const loadCloudLeads = async () => {
       try {
-        const response = await fetch('/api/crm/leads', { credentials: 'same-origin' });
-        const payload = await response.json().catch(() => null);
-        if (!response.ok || !Array.isArray(payload)) return;
+        const result = await fetchCloudLeadsSnapshot();
+        if (!result.ok) {
+          setCrmSync({
+            status: 'error',
+            message: 'Supabase não carregou os leads. O CRM está exibindo o cache local.',
+            details: result.details,
+          });
+          return;
+        }
 
-        const cloudLeads = payload.map(mapLeadRow);
+        const cloudLeads = result.leads;
         const nextLeads = mergeCloudLeadsWithLocal(cloudLeads, savedLeads);
         setLeads(nextLeads);
         localStorage.setItem('lume_crm_leads', JSON.stringify(nextLeads));
-      } catch {
-        // Keep local cache visible if the protected API is temporarily unavailable.
+        setLastCloudCheckAt(new Date().toISOString());
+        setCrmSync({
+          status: 'ok',
+          message: 'Leads sincronizados com o Supabase.',
+        });
+      } catch (error) {
+        setCrmSync({
+          status: 'error',
+          message: 'Falha de conexão com o Supabase. O CRM está exibindo o cache local.',
+          details: error instanceof Error ? error.message : 'Erro desconhecido ao carregar leads.',
+        });
       }
     };
 
     void loadCloudLeads();
     if (supabase) {
-      supabase.from('leads').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
-        if (error || !data) return;
-        const cloudLeads: Lead[] = data.map((r: LeadRow): Lead => ({
-          id: asString(r.id, 'lead_sem_id'),
-          name: asString(r.name),
-          phone: asString(r.phone),
-          email: asString(r.email),
-          address: asString(r.address),
-          neighborhood: asString(r.neighborhood, 'Barra da Tijuca'),
-          filmType: r.film_type || 'Nano Cerâmica',
-          sqm: roundMeasure(r.sqm),
-          value: roundCurrency(r.value),
-          status: normalizeLeadStatus(r.status),
-          createdAt: asString(r.created_at, new Date().toISOString().split('T')[0]),
-          statusChangedAt: asString(r.status_changed_at, asString(r.created_at, new Date().toISOString().split('T')[0])),
-          notes: asString(r.notes),
-          proximoContato: asNullableString(r.proximo_contato),
-          dataServico: asNullableString(r.data_servico),
-          updatedAt: asString(r.updated_at, asString(r.status_changed_at, asString(r.created_at, new Date().toISOString()))),
-        }));
-
-        const cloudById = new Map(cloudLeads.map((lead) => [lead.id, lead]));
-        const saved = JSON.parse(localStorage.getItem('lume_crm_leads') || '[]') as Lead[];
-        const merged = saved.map((lead) => {
-          const cloud = cloudById.get(lead.id);
-          if (!cloud) return lead;
-          return {
-            ...lead,
-            proximoContato: cloud.proximoContato ?? lead.proximoContato ?? null,
-            dataServico: cloud.dataServico ?? lead.dataServico ?? null,
-            updatedAt: cloud.updatedAt ?? lead.updatedAt,
-            statusChangedAt: cloud.statusChangedAt || lead.statusChangedAt,
-          };
-        });
-        const localIds = new Set(saved.map((lead) => lead.id));
-        const newFromCloud = cloudLeads.filter((lead) => !localIds.has(lead.id));
-        const nextLeads = [...newFromCloud, ...merged];
-
-        setLeads(nextLeads);
-        localStorage.setItem('lume_crm_leads', JSON.stringify(nextLeads));
-      });
       supabase.from('configuracoes').select('*').eq('id', 'default').single().then(({ data }) => {
         if (data?.meta_valor) {
           setTargetGoal(data.meta_valor);
@@ -1236,11 +1780,62 @@ export default function HomePage() {
         }
       });
     }
+  }, [fetchCloudLeadsSnapshot]);
+
+  useEffect(() => {
+    queueMicrotask(() => {
+      setCollapsedCards(getInitialCollapsedCards());
+      setCollapsedCardsLoaded(true);
+    });
   }, []);
 
   useEffect(() => {
+    if (!collapsedCardsLoaded) return;
     localStorage.setItem(CRM_COLLAPSED_CARDS_STORAGE_KEY, JSON.stringify([...collapsedCards]));
-  }, [collapsedCards]);
+  }, [collapsedCards, collapsedCardsLoaded]);
+
+  const handleVerifyCloudLeads = useCallback(async () => {
+    setIsVerifyingCloud(true);
+    setCrmSync({
+      status: 'warning',
+      message: 'Conferindo os dados reais no Supabase...',
+    });
+
+    try {
+      const result = await fetchCloudLeadsSnapshot();
+      if (!result.ok) {
+        setCrmSync({
+          status: 'error',
+          message: 'Nao foi possivel confirmar os dados no Supabase.',
+          details: result.details,
+        });
+        return;
+      }
+
+      const cloudLeads = result.leads.map(normalizeLeadAmounts);
+      const currentLeads = leads.map(normalizeLeadAmounts);
+      const isExactMatch = areLeadCollectionsEquivalent(currentLeads, cloudLeads);
+      const checkedAt = new Date().toISOString();
+
+      setLeads(cloudLeads);
+      localStorage.setItem('lume_crm_leads', JSON.stringify(cloudLeads));
+      setLastCloudCheckAt(checkedAt);
+      setCrmSync({
+        status: 'ok',
+        message: isExactMatch
+          ? `Dados conferidos no Supabase as ${format(new Date(checkedAt), 'HH:mm:ss')}.`
+          : `Havia divergencia com o cache local. A tela foi atualizada com os dados reais do Supabase as ${format(new Date(checkedAt), 'HH:mm:ss')}.`,
+      });
+    } catch (error) {
+      setCrmSync({
+        status: 'error',
+        message: 'Falha ao conferir os dados reais no Supabase.',
+        details: error instanceof Error ? error.message : 'Erro desconhecido ao verificar os dados.',
+      });
+    } finally {
+      setIsVerifyingCloud(false);
+    }
+  }, [fetchCloudLeadsSnapshot, leads]);
 
   const saveTargetGoal = async (valor: number) => {
     setTargetGoal(valor);
@@ -1249,30 +1844,156 @@ export default function HomePage() {
     await supabase.from('configuracoes').upsert({ id: 'default', meta_valor: valor }, { onConflict: 'id' });
   };
 
-  // Save database helper
-  const saveLeads = async (updated: Lead[]) => {
+  const persistLeadsLocally = (updated: Lead[]) => {
     const normalized = updated.map(normalizeLeadAmounts);
     setLeads(normalized);
     localStorage.setItem('lume_crm_leads', JSON.stringify(normalized));
-    for (const lead of normalized) {
-      const response = await fetch('/api/crm/leads', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'same-origin',
-        body: JSON.stringify(lead),
-      });
+    return normalized;
+  };
 
-      if (!response.ok) {
-        const payload = await response.json().catch(() => null);
-        console.error('[CRM] Lead save error:', payload?.error || response.statusText);
-      }
+  const syncLeadToCloud = async (lead: Lead) => {
+    setCrmSync({
+      status: 'warning',
+      message: 'Salvando alteracao no Supabase...',
+    });
+
+    const headers = await getCrmApiHeaders();
+    const response = await fetch('/api/crm/leads', {
+      method: 'PUT',
+      headers,
+      credentials: 'same-origin',
+      body: JSON.stringify(normalizeLeadAmounts(lead)),
+    });
+
+    if (!response.ok) {
+      const payload = await response.json().catch(() => null);
+      const details = getCrmApiErrorMessage(payload, response.statusText);
+      console.error('[CRM] Lead save error:', details);
+      setCrmSync({
+        status: 'error',
+        message: 'Supabase recusou a última sincronização. A alteração ficou apenas no cache local.',
+        details,
+      });
+      return false;
     }
+
+    setCrmSync({
+      status: 'ok',
+      message: 'Última alteração sincronizada com o Supabase.',
+    });
+    return true;
+  };
+
+  const updateSingleLead = async (leadId: string, updater: (lead: Lead) => Lead) => {
+    let leadToSync: Lead | null = null;
+    const updated = leads.map((lead) => {
+      if (lead.id !== leadId) return lead;
+      leadToSync = normalizeLeadAmounts(updater(lead));
+      return leadToSync;
+    });
+
+    persistLeadsLocally(updated);
+    const synced = leadToSync ? await syncLeadToCloud(leadToSync) : false;
+    return { synced, lead: leadToSync };
+  };
+
+  const appendCommercialNote = (currentNotes: string, note: string) => {
+    const cleanNote = note.trim();
+    if (!cleanNote) return currentNotes;
+    const stamp = format(new Date(), 'dd/MM/yyyy');
+    const entry = `[${stamp}] ${cleanNote}`;
+    return currentNotes ? `${currentNotes}\n${entry}` : entry;
+  };
+
+  const getWhatsAppHref = (lead: Lead) => {
+    const digits = lead.phone.replace(/\D/g, '');
+    if (!digits) return '';
+    const phone = digits.startsWith('55') ? digits : `55${digits}`;
+    const text = encodeURIComponent(`Olá, ${lead.name}! Aqui é da LUME. Posso falar sobre seu atendimento?`);
+    return `https://wa.me/${phone}?text=${text}`;
   };
 
   // Notification helper
   const notify = (msg: string) => {
     setNotification(msg);
     setTimeout(() => setNotification(null), 3000);
+  };
+
+  const openCommercialAction = (lead: Lead, action: CommercialActionType) => {
+    setCommercialAction({
+      lead,
+      action,
+      followUpDate: formatDateInputValue(lead.proximoContato) || new Date().toISOString().split('T')[0],
+      serviceDate: formatDateInputValue(lead.dataServico) || new Date().toISOString().split('T')[0],
+      note: action === 'servico' && getLeadServiceStatus(lead) === 'Reagendar' ? 'Reagendado a pedido do cliente.' : '',
+    });
+  };
+
+  const applyCommercialAction = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!commercialAction) return;
+
+    const { lead, action, followUpDate, serviceDate, note } = commercialAction;
+    if (action === 'retorno' && !followUpDate) {
+      notify('Escolha a data do próximo retorno.');
+      return;
+    }
+    if (action === 'servico' && !serviceDate) {
+      notify('Escolha a data do serviço.');
+      return;
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+    const now = new Date().toISOString();
+    const nextContact = followUpDate ? new Date(`${followUpDate}T12:00:00`).toISOString() : null;
+    const nextService = serviceDate || null;
+
+    const { synced, lead: updatedLead } = await updateSingleLead(lead.id, (currentLead) => {
+      const baseLead = {
+        ...currentLead,
+        updatedAt: now,
+        notes: appendCommercialNote(currentLead.notes, note),
+      };
+
+      if (action === 'retorno') {
+        return {
+          ...baseLead,
+          status: currentLead.status === 'Novo' ? 'Em Contato' : currentLead.status,
+          statusChangedAt: currentLead.status === 'Novo' ? today : currentLead.statusChangedAt,
+          proximoContato: nextContact,
+        };
+      }
+
+      if (action === 'servico') {
+        return {
+          ...baseLead,
+          status: 'Agendado',
+          statusChangedAt: currentLead.status === 'Agendado' ? currentLead.statusChangedAt : today,
+          dataServico: nextService,
+          serviceStatus: currentLead.serviceStatus === 'Reagendar' ? 'Reagendar' : 'Marcado',
+          proximoContato: null,
+        };
+      }
+
+      return {
+        ...baseLead,
+        status: action === 'fechado' ? 'Fechado' : 'Perdido',
+        statusChangedAt: today,
+        proximoContato: null,
+      };
+    });
+
+    setCommercialAction(null);
+    setLeadDetail(updatedLead);
+
+    const actionLabel = {
+      retorno: 'Retorno comercial agendado',
+      servico: 'Serviço agendado',
+      fechado: 'Lead marcado como fechado',
+      perdido: 'Lead marcado como perdido',
+    }[action];
+
+    notify(synced ? `${actionLabel}.` : `${actionLabel} localmente; falha ao sincronizar.`);
   };
 
   const setCollapsedStateForAllLeads = (collapsed: boolean) => {
@@ -1293,7 +2014,7 @@ export default function HomePage() {
   };
 
   // Lead Modal Submit handler
-  const handleLeadSubmit = (e: React.FormEvent) => {
+  const handleLeadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!leadForm.name) {
       notify('Preencha o campo obrigatório (Nome)');
@@ -1301,24 +2022,24 @@ export default function HomePage() {
     }
 
     if (selectedLead) {
-      // Edit
-      const updated = leads.map(l =>
-        l.id === selectedLead.id
-          ? { ...l, ...leadForm, updatedAt: new Date().toISOString() }
-          : l
-      );
-      saveLeads(updated);
-      notify('Lead atualizado com sucesso!');
+      const updatedLead = normalizeLeadAmounts({
+        ...selectedLead,
+        ...leadForm,
+        updatedAt: new Date().toISOString(),
+      });
+      persistLeadsLocally(leads.map((lead) => (lead.id === selectedLead.id ? updatedLead : lead)));
+      const synced = await syncLeadToCloud(updatedLead);
+      notify(synced ? 'Lead atualizado com sucesso!' : 'Lead atualizado localmente; falha ao sincronizar.');
     } else {
-      // Create
-      const newLead: Lead = {
+      const newLead = normalizeLeadAmounts({
         id: `lead_${Date.now()}`,
         ...leadForm,
         createdAt: new Date().toISOString().split('T')[0],
         updatedAt: new Date().toISOString(),
-      };
-      saveLeads([newLead, ...leads]);
-      notify('Lead criado com sucesso!');
+      });
+      persistLeadsLocally([newLead, ...leads]);
+      const synced = await syncLeadToCloud(newLead);
+      notify(synced ? 'Lead criado com sucesso!' : 'Lead criado localmente; falha ao sincronizar.');
     }
 
     setIsModalOpen(false);
@@ -1342,6 +2063,8 @@ export default function HomePage() {
       status: 'Novo',
       statusChangedAt: new Date().toISOString().split('T')[0],
       dataServico: null,
+      serviceStatus: null,
+      proximoContato: null,
       notes: '',
     });
     setIsModalOpen(true);
@@ -1362,6 +2085,8 @@ export default function HomePage() {
       status: lead.status,
       statusChangedAt: lead.statusChangedAt,
       dataServico: formatDateInputValue(lead.dataServico),
+      serviceStatus: lead.serviceStatus || null,
+      proximoContato: formatDateInputValue(lead.proximoContato),
       notes: lead.notes,
     });
     setIsModalOpen(true);
@@ -1381,28 +2106,81 @@ export default function HomePage() {
     }
   };
 
+  const handleLeadTableRowClick = (lead: Lead) => {
+    if (leadTableClickTimeoutRef.current) {
+      clearTimeout(leadTableClickTimeoutRef.current);
+    }
+
+    leadTableClickTimeoutRef.current = setTimeout(() => {
+      setLeadDetail(lead);
+      leadTableClickTimeoutRef.current = null;
+    }, 220);
+  };
+
+  const handleLeadTableRowDoubleClick = (lead: Lead) => {
+    if (leadTableClickTimeoutRef.current) {
+      clearTimeout(leadTableClickTimeoutRef.current);
+      leadTableClickTimeoutRef.current = null;
+    }
+
+    void openEditModal(lead);
+  };
+
   // Delete Lead Handler
   const handleDeleteLead = async (id: string) => {
     if (confirm('Tem certeza que deseja excluir este lead?')) {
-      const updated = leads.filter(l => l.id !== id);
-      saveLeads(updated);
-      await fetch(`/api/crm/leads?id=${encodeURIComponent(id)}`, {
+      persistLeadsLocally(leads.filter((lead) => lead.id !== id));
+      setCrmSync({
+        status: 'warning',
+        message: 'Excluindo lead no Supabase...',
+      });
+      const response = await fetch(`/api/crm/leads?id=${encodeURIComponent(id)}`, {
         method: 'DELETE',
+        headers: await getCrmApiHeaders(),
         credentials: 'same-origin',
       });
-      notify('Lead removido.');
+      if (response.ok) {
+        setCrmSync({ status: 'ok', message: 'Lead removido no Supabase.' });
+        notify('Lead removido.');
+        return;
+      }
+      const payload = await response.json().catch(() => null);
+      const details = getCrmApiErrorMessage(payload, response.statusText);
+      setCrmSync({
+        status: 'error',
+        message: 'Supabase não confirmou a exclusão. O lead saiu apenas do cache local.',
+        details,
+      });
+      notify('Lead removido localmente; falha ao sincronizar.');
     }
   };
 
   // Change lead status directly
-  const handleStatusChange = (id: string, newStatus: Lead['status']) => {
+  const handleStatusChange = async (id: string, newStatus: Lead['status']) => {
+    const lead = leads.find((item) => item.id === id);
+    if (!lead) return;
+    if (newStatus === 'Agendado') {
+      openCommercialAction(lead, 'servico');
+      return;
+    }
+    if (newStatus === 'Fechado') {
+      openCommercialAction(lead, 'fechado');
+      return;
+    }
+    if (newStatus === 'Perdido') {
+      openCommercialAction(lead, 'perdido');
+      return;
+    }
+
     const today = new Date().toISOString().split('T')[0];
     const now = new Date().toISOString();
-    const updated = leads.map(l =>
-      l.id === id ? { ...l, status: newStatus, statusChangedAt: today, updatedAt: now } : l
-    );
-    saveLeads(updated);
-    notify(`Status alterado para: ${newStatus}`);
+    const { synced } = await updateSingleLead(id, (currentLead) => ({
+      ...currentLead,
+      status: newStatus,
+      statusChangedAt: currentLead.status === newStatus ? currentLead.statusChangedAt : today,
+      updatedAt: now,
+    }));
+    notify(synced ? `Status alterado para: ${newStatus}` : `Status alterado localmente para: ${newStatus}`);
   };
 
   const formatCurrency = (v: number) => v.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
@@ -1414,27 +2192,52 @@ export default function HomePage() {
       return !!followUpDate && (isToday(followUpDate) || isPast(followUpDate));
     }).length;
   }, [leads]);
+  const commercialActionTitle = commercialAction ? {
+    retorno: 'Agendar retorno comercial',
+    servico: 'Agendar serviço',
+    fechado: 'Fechar venda',
+    perdido: 'Marcar como perdido',
+  }[commercialAction.action] : '';
+  const commercialActionLabel = commercialAction ? {
+    retorno: 'Salvar retorno',
+    servico: 'Salvar serviço',
+    fechado: 'Confirmar fechamento',
+    perdido: 'Confirmar perda',
+  }[commercialAction.action] : '';
 
   const handleAgendaSchedule = async (leadId: string, data: string) => {
     const nextContact = new Date(`${data}T12:00:00`).toISOString();
     const now = new Date().toISOString();
-    const updated = leads.map((lead) =>
-      lead.id === leadId
-        ? { ...lead, proximoContato: nextContact, updatedAt: now }
-        : lead
-    );
-    await saveLeads(updated);
-    notify('Retorno agendado com sucesso!');
+    const { synced } = await updateSingleLead(leadId, (lead) => ({
+      ...lead,
+      proximoContato: nextContact,
+      updatedAt: now,
+    }));
+    notify(synced ? 'Retorno agendado com sucesso!' : 'Retorno agendado localmente; falha ao sincronizar.');
+  };
+
+  const handleServiceStatusChange = async (leadId: string, serviceStatus: ServiceStatus) => {
+    const now = new Date().toISOString();
+    const today = new Date().toISOString().split('T')[0];
+    const { synced } = await updateSingleLead(leadId, (lead) => ({
+      ...lead,
+      status: lead.status === 'Novo' && serviceStatus !== 'Concluido' ? 'Agendado' : lead.status,
+      statusChangedAt: lead.status === 'Novo' && serviceStatus !== 'Concluido' ? today : lead.statusChangedAt,
+      serviceStatus,
+      updatedAt: now,
+    }));
+
+    const label = SERVICE_STATUS_META[serviceStatus].label;
+    notify(synced ? `Serviço atualizado para ${label}.` : `Serviço atualizado localmente para ${label}.`);
   };
 
   const handleAgendaMarkDone = async (leadId: string) => {
-    const updated = leads.map((lead) =>
-      lead.id === leadId
-        ? { ...lead, proximoContato: null, updatedAt: new Date().toISOString() }
-        : lead
-    );
-    await saveLeads(updated);
-    notify('Follow-up registrado!');
+    const { synced } = await updateSingleLead(leadId, (lead) => ({
+      ...lead,
+      proximoContato: null,
+      updatedAt: new Date().toISOString(),
+    }));
+    notify(synced ? 'Follow-up registrado!' : 'Follow-up registrado localmente; falha ao sincronizar.');
   };
 
   // Filtering Logic for Leads Tab
@@ -1613,8 +2416,7 @@ export default function HomePage() {
         ? 100
         : 0;
   const monthTrendIsPositive = monthDifference >= 0;
-  const formatDashboardCurrency = (value: number) =>
-    new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+  const formatDashboardCurrency = (value: number) => formatCurrencyBRL(value);
   const toggleMonthlySeries = (series: MonthlyEvolutionSeries) => {
     setVisibleMonthlySeries((current) => ({
       ...current,
@@ -1624,17 +2426,102 @@ export default function HomePage() {
 
   // Dashboard Stats Calculations
   const stats = useMemo(() => {
+    const today = new Date();
+    const todayStart = parseAgendaDate(format(today, 'yyyy-MM-dd')) || today;
+    const weekStart = startOfWeek(today, { weekStartsOn: 1 });
+    const weekDays = Array.from({ length: 7 }, (_, index) => addDays(weekStart, index));
     const total = leads.length;
     const activeProposals = leads.filter(l => l.status === 'Agendado').length;
     const closed = leads.filter(l => l.status === 'Fechado').length;
-    
+    const activeLeads = leads.filter((lead) => !isClosedLead(lead.status));
+    const overdueFollowUpsList = leads.filter((lead) => {
+      if (isClosedLead(lead.status)) return false;
+      const followUpDate = getLeadFollowUpDate(lead);
+      return !!followUpDate && isPast(followUpDate) && !isToday(followUpDate);
+    });
+    const dueFollowUpsToday = leads.filter((lead) => {
+      if (isClosedLead(lead.status)) return false;
+      const followUpDate = getLeadFollowUpDate(lead);
+      return !!followUpDate && isToday(followUpDate);
+    }).length;
+    const noNextActionLeads = activeLeads.filter((lead) => !lead.proximoContato && !lead.dataServico);
+    const staleNoAgendaLeads = noNextActionLeads.filter((lead) => {
+      const activityDate = getLeadActivityDate(lead);
+      return activityDate ? differenceInDays(today, activityDate) >= 3 : false;
+    });
+    const futureServices = leads.filter((lead) => {
+      if (isClosedLead(lead.status) || getLeadServiceStatus(lead) === 'Concluido') return false;
+      const serviceDate = getLeadServiceDate(lead);
+      return !!serviceDate && serviceDate >= todayStart;
+    });
+    const servicesToday = futureServices.filter((lead) => {
+      const serviceDate = getLeadServiceDate(lead);
+      return serviceDate ? isSameDay(serviceDate, today) : false;
+    }).length;
+    const servicePipelineValue = futureServices
+      .reduce((acc, curr) => acc + curr.value, 0);
+    const weeklyCapacity = weekDays.map((day) => {
+      const services = futureServices.filter((lead) => {
+        const serviceDate = getLeadServiceDate(lead);
+        return serviceDate ? isSameDay(serviceDate, day) : false;
+      });
+      return {
+        label: format(day, 'EEE', { locale: ptBR }),
+        day: format(day, 'dd/MM'),
+        count: services.length,
+        value: services.reduce((sum, lead) => sum + lead.value, 0),
+      };
+    });
+    const serviceStatusCounts = leads.reduce<Record<ServiceStatus, number>>((acc, lead) => {
+      if (!lead.dataServico) return acc;
+      const serviceStatus = getLeadServiceStatus(lead);
+      acc[serviceStatus] += 1;
+      return acc;
+    }, {
+      Marcado: 0,
+      Confirmado: 0,
+      'Em Execucao': 0,
+      Concluido: 0,
+      Reagendar: 0,
+    });
+    const topServiceNeighborhood = leads
+      .filter((lead) => !!lead.dataServico && getLeadServiceStatus(lead) !== 'Concluido')
+      .reduce<Record<string, number>>((acc, lead) => {
+        const key = lead.neighborhood || 'Sem bairro';
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+      }, {});
+
     const revenue = leads
       .filter(l => l.status === 'Fechado')
       .reduce((acc, curr) => acc + curr.value, 0);
 
     const conversionRate = total > 0 ? Math.round((closed / total) * 100) : 0;
+    const answeredLeads = activeLeads.filter((lead) => lead.status !== 'Novo' || !!lead.proximoContato || !!lead.dataServico).length;
+    const responseRate = activeLeads.length > 0 ? Math.round((answeredLeads / activeLeads.length) * 100) : 0;
 
-    return { total, activeProposals, closed, revenue, conversionRate };
+    const priorityRoute =
+      Object.entries(topServiceNeighborhood).sort((a, b) => b[1] - a[1])[0]?.[0] || 'Sem rota';
+
+    return {
+      total,
+      activeLeads: activeLeads.length,
+      activeProposals,
+      closed,
+      revenue,
+      conversionRate,
+      responseRate,
+      servicesToday,
+      futureServices: futureServices.length,
+      overdueFollowUps: overdueFollowUpsList.length,
+      dueFollowUpsToday,
+      noNextAction: noNextActionLeads.length,
+      staleNoAgenda: staleNoAgendaLeads.length,
+      servicePipelineValue,
+      serviceStatusCounts,
+      priorityRoute,
+      weeklyCapacity,
+    };
   }, [leads]);
 
   const targetPercent = Math.min(Math.round((stats.revenue / targetGoal) * 100), 100);
@@ -1835,12 +2722,75 @@ export default function HomePage() {
           {/* Quick Stats Summary inside navbar */}
           <div className="hidden items-center gap-2 sm:flex">
             <span className="text-xs text-white/40">Status da Sessão:</span>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
-              Online
+            <span
+              title={[
+                crmSync.message,
+                crmSync.details,
+                lastCloudCheckAt ? `Ultima conferencia: ${format(new Date(lastCloudCheckAt), 'HH:mm:ss')}` : '',
+              ].filter(Boolean).join(' - ')}
+              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${
+                crmSync.status === 'error'
+                  ? 'border-red-500/25 bg-red-500/10 text-red-300'
+                  : crmSync.status === 'warning'
+                    ? 'border-[#c9a227]/25 bg-[#c9a227]/10 text-[#f5d77a]'
+                    : 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400'
+              }`}
+            >
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${
+                  crmSync.status === 'error'
+                    ? 'bg-red-400'
+                    : crmSync.status === 'warning'
+                      ? 'animate-pulse bg-[#f5d77a]'
+                      : 'bg-emerald-400'
+                }`}
+              />
+              {crmSync.status === 'error' ? 'Erro' : crmSync.status === 'warning' ? (crmSync.message.includes('Salvando') || crmSync.message.includes('Excluindo') ? 'Salvando' : 'Sincronizando') : 'Salvo'}
             </span>
+            <button
+              type="button"
+              onClick={handleVerifyCloudLeads}
+              disabled={isVerifyingCloud}
+              className="rounded-full border border-white/10 px-3 py-1 text-xs font-semibold text-white/70 transition hover:border-[#c9a227]/30 hover:text-[#f5d77a] disabled:cursor-not-allowed disabled:opacity-50"
+              title="Buscar um snapshot novo do Supabase e comparar com o que esta na tela"
+            >
+              {isVerifyingCloud ? 'Conferindo...' : 'Verificar'}
+            </button>
           </div>
         </header>
+
+        <section hidden
+          className={`mb-6 rounded-2xl border px-4 py-3 text-sm ${
+            crmSync.status === 'error'
+              ? 'border-red-500/25 bg-red-500/10 text-red-100'
+              : crmSync.status === 'warning'
+                ? 'border-[#c9a227]/25 bg-[#c9a227]/10 text-[#f5d77a]'
+                : 'border-emerald-500/20 bg-emerald-500/10 text-emerald-100'
+          }`}
+        >
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p className="font-bold">
+                {crmSync.status === 'error' ? 'Erro de Supabase' : crmSync.status === 'warning' ? 'Sincronização em andamento' : 'Supabase conectado'}
+              </p>
+              <p className="mt-0.5 text-xs opacity-75">{crmSync.message}</p>
+              {crmSync.details && (
+                <p className="mt-2 rounded-xl border border-current/10 bg-black/15 px-3 py-2 text-xs opacity-80">
+                  {crmSync.details}
+                </p>
+              )}
+            </div>
+            {crmSync.status === 'error' && (
+              <button
+                type="button"
+                onClick={() => window.location.reload()}
+                className="mt-2 w-fit rounded-xl border border-current/20 px-3 py-1.5 text-xs font-bold transition hover:bg-white/10 sm:mt-0"
+              >
+                Recarregar
+              </button>
+            )}
+          </div>
+        </section>
 
         {/* TAB CONTENTS */}
 
@@ -1849,68 +2799,125 @@ export default function HomePage() {
           <div className="space-y-8">
             
             {/* KPI STAT CARDS */}
-            <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               
-              <div className="rounded-3xl border border-white/5 bg-[#07111d]/50 p-6 backdrop-blur-md shadow-lg shadow-black/20 hover:border-[#c9a227]/20 transition-all duration-300 group">
+              <div className="rounded-2xl border border-white/5 bg-[#07111d]/50 p-3.5 backdrop-blur-md shadow-lg shadow-black/20 transition-all duration-300 hover:border-[#c9a227]/20 sm:p-4 group">
                 <div className="flex justify-between items-start">
-                  <span className="text-xs uppercase tracking-[0.2em] text-white/50">Total de Leads</span>
-                  <div className="p-2 rounded-xl bg-white/[0.02] border border-white/5 group-hover:border-[#c9a227]/30 text-[#c9a227] transition">
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <span className="text-[10px] uppercase tracking-[0.18em] text-white/50">Serviços Futuros</span>
+                  <div className="rounded-lg border border-white/5 bg-white/[0.02] p-1.5 text-[#c9a227] transition group-hover:border-[#c9a227]/30">
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                     </svg>
                   </div>
                 </div>
-                <div className="mt-4 flex items-baseline gap-2">
-                  <span className="text-4xl font-black text-white">{stats.total}</span>
-                  <span className="text-xs text-white/40">leads no funil</span>
+                <div className="mt-2 flex items-baseline gap-1.5">
+                  <span className="text-2xl font-black text-white">{stats.futureServices}</span>
+                  <span className="text-[11px] text-white/40">{stats.servicesToday} hoje</span>
                 </div>
               </div>
 
-              <div className="rounded-3xl border border-white/5 bg-[#07111d]/50 p-6 backdrop-blur-md shadow-lg shadow-black/20 hover:border-[#c9a227]/20 transition-all duration-300 group">
-                <div className="flex justify-between items-start">
-                  <span className="text-xs uppercase tracking-[0.2em] text-white/50">Serviços Agendados</span>
-                  <div className="p-2 rounded-xl bg-white/[0.02] border border-white/5 group-hover:border-[#c9a227]/30 text-[#c9a227] transition">
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              <button
+                type="button"
+                onClick={() => {
+                  setAgendaInitialView('sem_acao');
+                  setActiveTab('agenda');
+                }}
+                className="group rounded-2xl border border-red-500/30 bg-[linear-gradient(135deg,rgba(239,68,68,0.18),rgba(127,29,29,0.10))] p-3.5 text-left shadow-lg shadow-red-950/20 transition-all duration-300 hover:border-red-400/40 sm:p-4"
+              >
+                <div className="flex items-start justify-between">
+                  <span className="text-[10px] uppercase tracking-[0.18em] text-red-100/70">Alerta Comercial</span>
+                  <div className="rounded-lg border border-red-200/10 bg-red-200/10 p-1.5 text-red-100 transition group-hover:border-red-200/20">
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m0 3.75h.008v.008H12v-.008z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M10.29 3.86 1.82 18a2.25 2.25 0 0 0 1.93 3.38h16.5A2.25 2.25 0 0 0 22.18 18L13.71 3.86a2.25 2.25 0 0 0-3.42 0Z" />
                     </svg>
                   </div>
                 </div>
-                <div className="mt-4 flex items-baseline gap-2">
-                  <span className="text-4xl font-black text-white">{stats.activeProposals}</span>
-                  <span className="text-xs text-white/40">datas marcadas</span>
+                <div className="mt-2">
+                  <span className="text-2xl font-black text-white">{stats.staleNoAgenda}</span>
+                  <p className="mt-1 text-[11px] text-red-50/75">leads sem agenda ha 3+ dias</p>
+                  <p className="mt-2 text-[11px] text-red-100/55">Abrir fila sem acao</p>
                 </div>
-              </div>
+              </button>
 
-              <div className="rounded-3xl border border-white/5 bg-[#07111d]/50 p-6 backdrop-blur-md shadow-lg shadow-black/20 hover:border-[#c9a227]/20 transition-all duration-300 group">
+              <div className="rounded-2xl border border-white/5 bg-[#07111d]/50 p-3.5 backdrop-blur-md shadow-lg shadow-black/20 transition-all duration-300 hover:border-[#c9a227]/20 sm:p-4 group">
                 <div className="flex justify-between items-start">
-                  <span className="text-xs uppercase tracking-[0.2em] text-white/50">Conversão Comercial</span>
-                  <div className="p-2 rounded-xl bg-white/[0.02] border border-white/5 group-hover:border-[#c9a227]/30 text-emerald-400 transition">
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <span className="text-[10px] uppercase tracking-[0.18em] text-white/50">Sem Próxima Ação</span>
+                  <div className="rounded-lg border border-white/5 bg-white/[0.02] p-1.5 text-emerald-400 transition group-hover:border-[#c9a227]/30">
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
                     </svg>
                   </div>
                 </div>
-                <div className="mt-4 flex items-baseline gap-2">
-                  <span className="text-4xl font-black text-white">{stats.conversionRate}%</span>
-                  <span className="text-xs text-white/40">taxa de fechamento</span>
+                <div className="mt-2 flex items-baseline gap-1.5">
+                  <span className="text-2xl font-black text-white">{stats.noNextAction}</span>
+                  <span className="text-[11px] text-white/40">{stats.staleNoAgenda} há 3+ dias</span>
                 </div>
               </div>
 
-              <div className="rounded-3xl border border-white/5 bg-[#07111d]/50 p-6 backdrop-blur-md shadow-lg shadow-black/20 hover:border-[#c9a227]/20 transition-all duration-300 group">
+              <div className="rounded-2xl border border-white/5 bg-[#07111d]/50 p-3.5 backdrop-blur-md shadow-lg shadow-black/20 transition-all duration-300 hover:border-[#c9a227]/20 sm:p-4 group">
                 <div className="flex justify-between items-start">
-                  <span className="text-xs uppercase tracking-[0.2em] text-white/50">Faturamento Fechado</span>
-                  <div className="p-2 rounded-xl bg-white/[0.02] border border-white/5 group-hover:border-[#c9a227]/30 text-[#c9a227] transition">
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <span className="text-[10px] uppercase tracking-[0.18em] text-white/50">Previsão por Serviço</span>
+                  <div className="rounded-lg border border-white/5 bg-white/[0.02] p-1.5 text-[#c9a227] transition group-hover:border-[#c9a227]/30">
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M12 16V5" />
                     </svg>
                   </div>
                 </div>
-                <div className="mt-4 flex flex-col">
-                  <span className="text-2xl font-black text-[#c9a227] tracking-tight">R$ {stats.revenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                  <span className="text-[10px] text-white/40 mt-1 uppercase font-bold">Total fechado no mês</span>
+                <div className="mt-2 flex flex-col">
+                  <span className="text-xl font-black tracking-tight text-[#c9a227]">{formatDashboardCurrency(stats.servicePipelineValue)}</span>
+                  <span className="mt-1 text-[11px] text-white/45">{stats.responseRate}% taxa de resposta</span>
+                  <span className="mt-0.5 text-[10px] font-bold uppercase text-white/40">{stats.priorityRoute}</span>
                 </div>
               </div>
 
+            </section>
+
+            {false && (
+              <section className="rounded-3xl border border-red-500/30 bg-[linear-gradient(135deg,rgba(239,68,68,0.18),rgba(127,29,29,0.10))] p-5 shadow-2xl shadow-red-950/20">
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-[0.35em] text-red-200/80">Alerta comercial</p>
+                    <h3 className="mt-2 text-2xl font-black text-white">
+                      {stats.staleNoAgenda} leads sem agenda há 3+ dias
+                    </h3>
+                    <p className="mt-2 max-w-2xl text-sm text-red-50/70">
+                      Esses leads não têm retorno nem data de serviço. Priorize contato ou marque a próxima ação antes de abrir novas oportunidades.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAgendaInitialView('sem_acao');
+                      setActiveTab('agenda');
+                    }}
+                    className="rounded-2xl border border-red-200/20 bg-red-200/10 px-5 py-3 text-sm font-bold text-red-50 transition hover:bg-red-200/15"
+                  >
+                    Abrir fila sem ação
+                  </button>
+                </div>
+              </section>
+            )}
+
+            <section className="rounded-3xl border border-white/5 bg-[#07111d]/50 p-5 shadow-lg shadow-black/20 backdrop-blur-md">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#f5d77a]/75">Capacidade da semana</p>
+                  <h3 className="mt-1 text-lg font-black text-white">Serviços por dia e valor previsto</h3>
+                </div>
+                <p className="text-sm font-semibold text-white/55">{formatDashboardCurrency(stats.servicePipelineValue)} em serviços futuros</p>
+              </div>
+              <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-7">
+                {stats.weeklyCapacity.map((day) => (
+                  <div key={`${day.day}-${day.label}`} className="rounded-2xl border border-white/5 bg-white/[0.025] p-4">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/35">{day.label}</p>
+                    <p className="mt-1 text-sm font-semibold text-white/70">{day.day}</p>
+                    <p className="mt-3 text-2xl font-black text-white">{day.count}</p>
+                    <p className="mt-1 text-[11px] text-white/40">serviços</p>
+                    <p className="mt-2 text-xs font-bold text-[#f5d77a]">{formatDashboardCurrency(day.value)}</p>
+                  </div>
+                ))}
+              </div>
             </section>
 
             {/* EVOLUÇÃO DO MÊS */}
@@ -1918,9 +2925,9 @@ export default function HomePage() {
               <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div>
                   <span className="text-[10px] font-bold uppercase tracking-[0.32em] text-[#f5d77a]/80">Fechamentos acumulados</span>
-                  <h3 className="font-display mt-1 text-xl font-black uppercase tracking-wider text-white">EVOLUCAO DO MES</h3>
+                  <h3 className="font-display mt-1 text-xl font-black uppercase tracking-wider text-white">EVOLUÇÃO DO MÊS</h3>
                   <p className="mt-2 max-w-2xl text-xs leading-5 text-white/45">
-                    Comparativo acumulado contra o mes anterior no mesmo intervalo, com previsao separada para servicos futuros.
+                    Comparativo acumulado contra o mês anterior no mesmo intervalo, com previsão separada para serviços futuros.
                   </p>
                 </div>
 
@@ -1931,7 +2938,7 @@ export default function HomePage() {
                       : 'border-red-500/25 bg-red-500/10 shadow-red-950/20'
                   }`}
                 >
-                  <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/40">Vs. mes anterior</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/40">Vs. mês anterior</p>
                   <p className={`mt-1 text-2xl font-black ${monthTrendIsPositive ? 'text-emerald-300' : 'text-red-300'}`}>
                     {monthTrendIsPositive ? '+' : '-'}
                     {Math.abs(monthDifferencePercent).toFixed(1)}%
@@ -1945,26 +2952,26 @@ export default function HomePage() {
 
               <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 <div className="rounded-2xl border border-white/5 bg-white/[0.035] p-4">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/35">Mes atual</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/35">Mês atual</p>
                   <p className="mt-2 text-xl font-black text-[#f5d77a]">{formatDashboardCurrency(monthlyEvolution.currentTotal)}</p>
-                  <p className="mt-1 text-[11px] text-white/40">{monthlyEvolution.currentCount} fechamentos ate hoje</p>
+                  <p className="mt-1 text-[11px] text-white/40">{monthlyEvolution.currentCount} fechamentos até hoje</p>
                 </div>
                 <div className="rounded-2xl border border-white/5 bg-white/[0.025] p-4">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/35">Mes anterior</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/35">Mês anterior</p>
                   <p className="mt-2 text-xl font-black text-white/75">{formatDashboardCurrency(monthlyEvolution.previousTotal)}</p>
-                  <p className="mt-1 text-[11px] text-white/40">{monthlyEvolution.previousCount} fechamentos no mesmo periodo</p>
+                  <p className="mt-1 text-[11px] text-white/40">{monthlyEvolution.previousCount} fechamentos no mesmo período</p>
                 </div>
                 <div className="rounded-2xl border border-sky-400/15 bg-sky-400/[0.045] p-4">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-sky-200/60">Ganhos futuros</p>
                   <p className="mt-2 text-xl font-black text-sky-200">{formatDashboardCurrency(monthlyEvolution.futureTotal)}</p>
-                  <p className="mt-1 text-[11px] text-white/40">{monthlyEvolution.futureCount} servicos agendados</p>
+                  <p className="mt-1 text-[11px] text-white/40">{monthlyEvolution.futureCount} serviços agendados</p>
                 </div>
                 <div className="rounded-2xl border border-white/5 bg-white/[0.025] p-4">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/35">Diferenca</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/35">Diferença</p>
                   <p className={`mt-2 text-xl font-black ${monthTrendIsPositive ? 'text-emerald-300' : 'text-red-300'}`}>
                     {formatDashboardCurrency(Math.abs(monthDifference))}
                   </p>
-                  <p className="mt-1 text-[11px] text-white/40">{monthTrendIsPositive ? 'acima do periodo anterior' : 'abaixo do periodo anterior'}</p>
+                  <p className="mt-1 text-[11px] text-white/40">{monthTrendIsPositive ? 'acima do período anterior' : 'abaixo do período anterior'}</p>
                 </div>
               </div>
 
@@ -1984,20 +2991,20 @@ export default function HomePage() {
                   onClick={() => toggleMonthlySeries('atual')}
                   aria-pressed={visibleMonthlySeries.atual}
                   className={`inline-flex items-center gap-2 rounded-full transition hover:text-white focus:outline-none focus:ring-2 focus:ring-[#f5d77a]/35 ${visibleMonthlySeries.atual ? 'text-white/55' : 'text-white/25'}`}
-                  title="Mostrar ou ocultar Mes atual acumulado"
+                  title="Mostrar ou ocultar Mês atual acumulado"
                 >
                   <span className="h-2 w-8 rounded-full bg-[#f5d77a] shadow-[0_0_18px_rgba(245,215,122,0.45)]" />
-                  Mes atual acumulado
+                  Mês atual acumulado
                 </button>
                 <button
                   type="button"
                   onClick={() => toggleMonthlySeries('anterior')}
                   aria-pressed={visibleMonthlySeries.anterior}
                   className={`inline-flex items-center gap-2 rounded-full transition hover:text-white focus:outline-none focus:ring-2 focus:ring-white/25 ${visibleMonthlySeries.anterior ? 'text-white/55' : 'text-white/25'}`}
-                  title="Mostrar ou ocultar Mes anterior"
+                  title="Mostrar ou ocultar Mês anterior"
                 >
                   <span className="h-0 w-8 border-t border-dashed border-white/35" />
-                  Mes anterior
+                  Mês anterior
                 </button>
                 <button
                   type="button"
@@ -2013,7 +3020,7 @@ export default function HomePage() {
 
               {monthlyEvolution.currentTotal === 0 && monthlyEvolution.previousTotal === 0 && monthlyEvolution.futureTotal === 0 ? (
                 <p className="mt-6 rounded-2xl border border-white/5 bg-white/[0.02] py-10 text-center text-xs text-white/30">
-                  Nenhum fechamento ou servico futuro registrado nos periodos comparados
+                  Nenhum fechamento ou serviço futuro registrado nos períodos comparados
                 </p>
               ) : (
                 <div className="mt-3 h-[280px] rounded-2xl border border-white/5 bg-[#04080f]/35 px-2 py-4 sm:px-3">
@@ -2192,8 +3199,11 @@ export default function HomePage() {
                   <p className="text-xs text-white/40">Últimos clientes adicionados ao LUME CRM</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => setActiveTab('agenda')}
+          <button
+            onClick={() => {
+              setAgendaInitialView('hoje');
+              setActiveTab('agenda');
+            }}
                     className="text-xs font-bold text-red-300 hover:underline"
                   >
                     Ir para a agenda →
@@ -2422,11 +3432,14 @@ export default function HomePage() {
                             draggable
                             onDragStart={(e) => { e.dataTransfer.setData('text/plain', JSON.stringify({ id: lead.id, fromStage: stage })); e.currentTarget.classList.add('opacity-40'); }}
                             onDragEnd={(e) => e.currentTarget.classList.remove('opacity-40')}
+                            onDoubleClick={() => handleLeadTableRowDoubleClick(lead)}
+                            title="Duplo clique para editar este lead"
                             className="group relative rounded-2xl border border-white/5 bg-[#04080f]/90 p-3 shadow-md transition hover:border-[#c9a227]/30 md:p-2.5 md:cursor-grab md:active:cursor-grabbing"
                           >
                             <div className="flex items-center gap-1.5">
                               <button
-                                onClick={() => {
+                                onClick={(e) => {
+                                  e.stopPropagation();
                                   const next = new Set(collapsedCards);
                                   if (collapsed) {
                                     next.delete(lead.id);
@@ -2435,6 +3448,7 @@ export default function HomePage() {
                                   }
                                   setCollapsedCards(next);
                                 }}
+                                onDoubleClick={(e) => e.stopPropagation()}
                                 className="shrink-0 text-white/30 hover:text-white/60 transition"
                                 title={collapsed ? 'Expandir' : 'Colapsar'}
                               >
@@ -2442,7 +3456,17 @@ export default function HomePage() {
                                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                                 </svg>
                               </button>
-                              <button onClick={() => setLeadDetail(lead)} className="text-left flex-1 min-w-0">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setLeadDetail(lead);
+                                }}
+                                onDoubleClick={(e) => {
+                                  e.stopPropagation();
+                                  void openEditModal(lead);
+                                }}
+                                className="text-left flex-1 min-w-0"
+                              >
                                 <h4 className="font-bold text-white text-xs border-b border-dotted border-white/20 hover:border-[#c9a227]/60 transition truncate">{lead.name}</h4>
                               </button>
                             </div>
@@ -2489,11 +3513,13 @@ export default function HomePage() {
                             <div className="mt-2 flex justify-between items-center gap-1.5 border-t border-white/5 pt-1.5 opacity-100 transition duration-300 md:opacity-0 md:group-hover:opacity-100">
                               <button
                                 disabled={stage === 'Novo'}
-                                onClick={() => {
+                                onClick={(e) => {
+                                  e.stopPropagation();
                                   const stages = LEAD_STAGES;
                                   const idx = stages.indexOf(stage);
                                   if (idx > 0) handleStatusChange(lead.id, stages[idx - 1]);
                                 }}
+                                onDoubleClick={(e) => e.stopPropagation()}
                                 className="p-0.5 rounded bg-white/5 text-white/50 hover:text-[#c9a227] disabled:opacity-20 text-[11px] leading-none"
                                 title="Mover para esquerda"
                               >
@@ -2502,7 +3528,11 @@ export default function HomePage() {
 
                               <div className="flex gap-2">
                                 <button
-                                  onClick={() => openEditModal(lead)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    void openEditModal(lead);
+                                  }}
+                                  onDoubleClick={(e) => e.stopPropagation()}
                                   className="text-white/40 hover:text-white"
                                   title="Editar"
                                 >
@@ -2511,7 +3541,11 @@ export default function HomePage() {
                                   </svg>
                                 </button>
                                 <button
-                                  onClick={() => handleDeleteLead(lead.id)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    void handleDeleteLead(lead.id);
+                                  }}
+                                  onDoubleClick={(e) => e.stopPropagation()}
                                   className="text-white/30 hover:text-red-400"
                                   title="Excluir"
                                 >
@@ -2523,11 +3557,13 @@ export default function HomePage() {
 
                               <button
                                 disabled={stage === 'Perdido'}
-                                onClick={() => {
+                                onClick={(e) => {
+                                  e.stopPropagation();
                                   const stages = LEAD_STAGES;
                                   const idx = stages.indexOf(stage);
                                   if (idx < stages.length - 1) handleStatusChange(lead.id, stages[idx + 1]);
                                 }}
+                                onDoubleClick={(e) => e.stopPropagation()}
                                 className="p-0.5 rounded bg-white/5 text-white/50 hover:text-[#c9a227] disabled:opacity-20 text-[11px] leading-none"
                                 title="Mover para direita"
                               >
@@ -2627,8 +3663,14 @@ export default function HomePage() {
                   </thead>
                   <tbody className="divide-y divide-white/5">
                     {sortedFilteredLeads.map((lead) => (
-                      <tr key={lead.id} className="hover:bg-white/[0.01] group">
-                        <td className="py-3.5 font-semibold text-white cursor-pointer" onClick={() => setLeadDetail(lead)}>
+                      <tr
+                        key={lead.id}
+                        className="group cursor-pointer hover:bg-white/[0.01]"
+                        onClick={() => handleLeadTableRowClick(lead)}
+                        onDoubleClick={() => handleLeadTableRowDoubleClick(lead)}
+                        title="Clique para ver detalhes. Duplo clique para editar."
+                      >
+                        <td className="py-3.5 font-semibold text-white">
                           <div className="flex flex-col">
                             <span className="border-b border-dotted border-white/20 hover:border-[#c9a227]/60 transition">{lead.name}</span>
                             <span className="text-xs font-normal text-white/40">{lead.phone}</span>
@@ -2654,7 +3696,11 @@ export default function HomePage() {
                         <td className="py-3.5 text-right">
                           <div className="flex justify-end gap-3 opacity-60 group-hover:opacity-100 transition duration-300">
                             <button
-                              onClick={() => openEditModal(lead)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                void openEditModal(lead);
+                              }}
+                              onDoubleClick={(e) => e.stopPropagation()}
                               className="text-white/40 hover:text-white"
                               title="Editar"
                             >
@@ -2663,7 +3709,11 @@ export default function HomePage() {
                               </svg>
                             </button>
                             <button
-                              onClick={() => handleDeleteLead(lead.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                void handleDeleteLead(lead.id);
+                              }}
+                              onDoubleClick={(e) => e.stopPropagation()}
                               className="text-white/30 hover:text-red-400"
                               title="Excluir"
                             >
@@ -2698,8 +3748,10 @@ export default function HomePage() {
         {activeTab === 'agenda' && (
           <AgendaFollowUpSection
             leads={leads}
+            initialView={agendaInitialView}
             onAgendarRetorno={handleAgendaSchedule}
             onMarcarFeito={handleAgendaMarkDone}
+            onUpdateServiceStatus={handleServiceStatusChange}
             onAbrirLead={(lead) => setLeadDetail(lead)}
             onIrParaLeads={() => setActiveTab('leads')}
           />
@@ -2900,10 +3952,19 @@ export default function HomePage() {
                 </div>
                 <div>
                   <label className="mb-1 block text-[10px] uppercase tracking-widest text-white/50 font-semibold">Data do Serviço</label>
-                  <input
-                    type="date"
+                  <DateFieldWithPicker
+                    ariaLabel="Abrir calendário para data do serviço"
                     value={formatDateInputValue(leadForm.dataServico)}
-                    onChange={(e) => setLeadForm({ ...leadForm, dataServico: e.target.value || null })}
+                    onChange={(value) => setLeadForm({ ...leadForm, dataServico: value || null })}
+                    className="w-full rounded-2xl border border-white/5 bg-[#04080f] px-4 py-3 text-sm text-white focus:border-[#c9a227]/40 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-[10px] uppercase tracking-widest text-white/50 font-semibold">Próximo Contato</label>
+                  <DateFieldWithPicker
+                    ariaLabel="Abrir calendário para próximo contato"
+                    value={formatDateInputValue(leadForm.proximoContato)}
+                    onChange={(value) => setLeadForm({ ...leadForm, proximoContato: value || null })}
                     className="w-full rounded-2xl border border-white/5 bg-[#04080f] px-4 py-3 text-sm text-white focus:border-[#c9a227]/40 focus:outline-none"
                   />
                 </div>
@@ -2977,6 +4038,14 @@ export default function HomePage() {
                 <span className="font-bold text-sm text-white">{leadDetail.filmType}</span>
               </div>
               <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
+                <span className="block text-[10px] uppercase tracking-wider text-white/50 font-semibold mb-1">Próxima Ação</span>
+                <span className="font-bold text-sm text-[#f5d77a]">
+                  {getLeadFollowUpDate(leadDetail)
+                    ? format(getLeadFollowUpDate(leadDetail)!, 'dd/MM/yyyy')
+                    : 'Sem retorno'}
+                </span>
+              </div>
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
                 <span className="block text-[10px] uppercase tracking-wider text-white/50 font-semibold mb-1">Valor</span>
                 <span className="font-black text-lg text-[#c9a227]">R$ {formatCurrency(leadDetail.value)}</span>
               </div>
@@ -3001,6 +4070,46 @@ export default function HomePage() {
                 <span className="text-sm text-white/80 whitespace-pre-wrap">{leadDetail.notes}</span>
               </div>
             )}
+            <div className="mt-4 grid grid-cols-2 gap-2 rounded-2xl border border-white/5 bg-white/[0.02] p-2">
+              {getWhatsAppHref(leadDetail) && (
+                <a
+                  href={getWhatsAppHref(leadDetail)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2.5 text-center text-xs font-bold text-emerald-300 transition hover:bg-emerald-500/15"
+                >
+                  WhatsApp
+                </a>
+              )}
+              <button
+                type="button"
+                onClick={() => openCommercialAction(leadDetail, 'retorno')}
+                className="rounded-xl border border-[#c9a227]/20 bg-[#c9a227]/10 px-3 py-2.5 text-xs font-bold text-[#f5d77a] transition hover:bg-[#c9a227]/15"
+              >
+                Agendar Retorno
+              </button>
+              <button
+                type="button"
+                onClick={() => openCommercialAction(leadDetail, 'servico')}
+                className="rounded-xl border border-sky-500/20 bg-sky-500/10 px-3 py-2.5 text-xs font-bold text-sky-300 transition hover:bg-sky-500/15"
+              >
+                Agendar Serviço
+              </button>
+              <button
+                type="button"
+                onClick={() => openCommercialAction(leadDetail, 'fechado')}
+                className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2.5 text-xs font-bold text-emerald-300 transition hover:bg-emerald-500/15"
+              >
+                Fechar Venda
+              </button>
+              <button
+                type="button"
+                onClick={() => openCommercialAction(leadDetail, 'perdido')}
+                className="rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2.5 text-xs font-bold text-red-300 transition hover:bg-red-500/15"
+              >
+                Marcar Perdido
+              </button>
+            </div>
             <div className="flex gap-3 mt-4 border-t border-white/5 pt-3">
               <button
                 onClick={() => setLeadDetail(null)}
@@ -3016,6 +4125,96 @@ export default function HomePage() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {commercialAction && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm" onClick={() => setCommercialAction(null)}>
+          <form
+            onSubmit={applyCommercialAction}
+            className="w-full max-w-md rounded-3xl border border-white/10 bg-[#07111d] p-5 text-white shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between gap-4 border-b border-white/5 pb-4">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#f5d77a]">Ação Comercial</p>
+                <h3 className="mt-1 font-display text-lg font-black tracking-tight text-white">{commercialActionTitle}</h3>
+                <p className="mt-1 text-sm text-white/50">{commercialAction.lead.name}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setCommercialAction(null)}
+                className="rounded-full border border-white/5 p-2 text-white/40 transition hover:text-white"
+              >
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="mt-4 space-y-4">
+              {commercialAction.action === 'retorno' && (
+                <div>
+                  <label className="mb-1 block text-[10px] font-semibold uppercase tracking-widest text-white/50">Próximo contato</label>
+                  <DateFieldWithPicker
+                    ariaLabel="Abrir calendário para próximo contato"
+                    required
+                    value={commercialAction.followUpDate}
+                    onChange={(value) => setCommercialAction({ ...commercialAction, followUpDate: value })}
+                    className="w-full rounded-2xl border border-white/5 bg-[#04080f] px-4 py-3 text-sm text-white focus:border-[#c9a227]/40 focus:outline-none"
+                  />
+                </div>
+              )}
+
+              {commercialAction.action === 'servico' && (
+                <div>
+                  <label className="mb-1 block text-[10px] font-semibold uppercase tracking-widest text-white/50">Data do serviço</label>
+                  <DateFieldWithPicker
+                    ariaLabel="Abrir calendário para data do serviço"
+                    required
+                    value={commercialAction.serviceDate}
+                    onChange={(value) => setCommercialAction({ ...commercialAction, serviceDate: value })}
+                    className="w-full rounded-2xl border border-white/5 bg-[#04080f] px-4 py-3 text-sm text-white focus:border-sky-400/40 focus:outline-none"
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className="mb-1 block text-[10px] font-semibold uppercase tracking-widest text-white/50">
+                  {commercialAction.action === 'perdido' ? 'Motivo / observação' : 'Observação comercial'}
+                </label>
+                <textarea
+                  rows={4}
+                  value={commercialAction.note}
+                  onChange={(e) => setCommercialAction({ ...commercialAction, note: e.target.value })}
+                  placeholder={
+                    commercialAction.action === 'fechado'
+                      ? 'Ex.: cliente confirmou pagamento, instalar pela manhã...'
+                      : commercialAction.action === 'perdido'
+                        ? 'Ex.: preço, prazo, concorrente, sem resposta...'
+                        : 'Ex.: combinado, dúvida, pendência ou próximo passo...'
+                  }
+                  className="w-full resize-none rounded-2xl border border-white/5 bg-[#04080f] px-4 py-3 text-sm text-white placeholder:text-white/20 focus:border-[#c9a227]/40 focus:outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="mt-5 flex gap-3 border-t border-white/5 pt-4">
+              <button
+                type="button"
+                onClick={() => setCommercialAction(null)}
+                className="flex-1 rounded-2xl border border-white/5 bg-white/[0.01] py-3 text-sm font-semibold text-white/60 transition hover:bg-white/5"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                className="flex-1 rounded-2xl bg-gradient-to-r from-[#c9a227] to-[#d4ad30] py-3 text-sm font-bold text-[#04080f] shadow-lg shadow-[#c9a227]/10 transition hover:brightness-110"
+              >
+                {commercialActionLabel}
+              </button>
+            </div>
+          </form>
         </div>
       )}
 
