@@ -40,6 +40,7 @@ export async function loadDraftFromCloud(): Promise<DraftData | null> {
 interface HistoryItem {
   id: string;
   cliente: string;
+  phone?: string;
   data: string;
   valor: number;
   qtd: number;
@@ -53,6 +54,7 @@ interface HistoryItem {
 interface CalculatorHistoryRow {
   id: string;
   cliente: string;
+  phone?: string | null;
   data: string;
   valor: number;
   qtd: number;
@@ -70,6 +72,7 @@ export async function saveHistoryItemToCloud(item: HistoryItem): Promise<boolean
     .upsert({
       id: item.id,
       cliente: item.cliente,
+      phone: item.phone || null,
       data: item.data,
       valor: item.valor,
       qtd: item.qtd,
@@ -94,6 +97,7 @@ export async function loadHistoryFromCloud(): Promise<HistoryItem[]> {
   return (data as CalculatorHistoryRow[]).map((row) => ({
     id: row.id,
     cliente: row.cliente,
+    phone: row.phone || undefined,
     data: row.data,
     valor: row.valor,
     qtd: row.qtd,

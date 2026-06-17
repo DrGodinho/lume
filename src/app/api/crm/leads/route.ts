@@ -4,6 +4,22 @@ import { verifyToken } from '@/lib/crm-auth';
 import { roundCurrency, roundMeasure } from '@/lib/numberPrecision';
 
 type LeadStatus = 'Novo' | 'Em Contato' | 'Agendado' | 'Fechado' | 'Perdido';
+type ServiceStatus = 'Marcado' | 'Confirmado' | 'Em Execucao' | 'Concluido' | 'Reagendar';
+type LeadRow = Record<string, string | number | null | undefined>;
+type SupabaseError = {
+  message: string;
+  code?: string;
+  details?: string | null;
+  hint?: string | null;
+};
+
+const OPTIONAL_LEAD_COLUMNS = new Set([
+  'status_changed_at',
+  'proximo_contato',
+  'data_servico',
+  'service_status',
+  'updated_at',
+]);
 
 interface LeadPayload {
   id?: string;
@@ -21,6 +37,7 @@ interface LeadPayload {
   statusChangedAt?: string;
   proximoContato?: string | null;
   dataServico?: string | null;
+  serviceStatus?: ServiceStatus | null;
   updatedAt?: string;
 }
 
@@ -31,6 +48,33 @@ const normalizeLeadStatus = (status: unknown): LeadStatus => {
   }
   return 'Novo';
 };
+
+const normalizeServiceStatus = (status: unknown): ServiceStatus | null => {
+  if (status === 'Marcado' || status === 'Confirmado' || status === 'Em Execucao' || status === 'Concluido' || status === 'Reagendar') {
+    return status;
+  }
+  if (status === 'Em execução') return 'Em Execucao';
+  return null;
+};
+
+const isMissingOptionalLeadColumnError = (message?: string) =>
+  !!message && [...OPTIONAL_LEAD_COLUMNS].some((column) => message.includes(`'${column}' column`));
+
+const withoutOptionalLeadColumns = (row: LeadRow) =>
+  Object.fromEntries(
+    Object.entries(row).filter(([key]) => !OPTIONAL_LEAD_COLUMNS.has(key))
+  );
+
+const crmErrorResponse = (error: SupabaseError, status = 500) =>
+  NextResponse.json(
+    {
+      error: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint,
+    },
+    { status }
+  );
 
 function createSupabaseAdmin() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -46,35 +90,83 @@ function createSupabaseAdmin() {
   });
 }
 
+async function createSupabaseRequestClient(request: NextRequest) {
+  const supabaseAdmin = createSupabaseAdmin();
+  if (supabaseAdmin) return supabaseAdmin;
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const authHeader = request.headers.get('authorization');
+
+  if (!supabaseUrl || !supabaseAnonKey || !authHeader?.startsWith('Bearer ')) {
+    return null;
+  }
+
+  return createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+    global: {
+      headers: {
+        Authorization: authHeader,
+      },
+    },
+  });
+}
+
+const getBearerToken = (request: NextRequest) => {
+  const authHeader = request.headers.get('authorization');
+  if (!authHeader?.startsWith('Bearer ')) return null;
+  return authHeader.slice('Bearer '.length).trim() || null;
+};
+
+async function hasValidSupabaseSession(request: NextRequest) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const token = getBearerToken(request);
+
+  if (!supabaseUrl || !supabaseAnonKey || !token) return false;
+
+  const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  });
+  const { data, error } = await supabaseClient.auth.getUser(token);
+
+  return !error && !!data.user;
+}
+
 async function ensureAuthorized(request: NextRequest) {
   const crmToken = request.cookies.get('crm-token')?.value;
-  if (!crmToken) {
-    return NextResponse.json({ error: 'Nao autenticado' }, { status: 401 });
+
+  if (crmToken) {
+    const payload = await verifyToken(crmToken);
+    if (payload) return null;
   }
 
-  const payload = await verifyToken(crmToken);
-  if (!payload) {
-    return NextResponse.json({ error: 'Sessao expirada ou invalida' }, { status: 401 });
-  }
+  if (await hasValidSupabaseSession(request)) return null;
 
-  return null;
+  return NextResponse.json({ error: 'Nao autenticado' }, { status: 401 });
 }
 
 export async function GET(request: NextRequest) {
   const authError = await ensureAuthorized(request);
   if (authError) return authError;
 
-  const supabaseAdmin = createSupabaseAdmin();
-  if (!supabaseAdmin) {
-    return NextResponse.json({ error: 'Supabase admin nao configurado' }, { status: 500 });
+  const supabaseClient = await createSupabaseRequestClient(request);
+  if (!supabaseClient) {
+    return NextResponse.json({ error: 'Sessao Supabase nao restaurada' }, { status: 401 });
   }
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabaseClient
     .from('leads')
     .select('*')
     .order('created_at', { ascending: false });
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return crmErrorResponse(error);
   return NextResponse.json(
     (data || []).map((lead) => ({
       ...lead,
@@ -88,9 +180,9 @@ export async function POST(request: NextRequest) {
   const authError = await ensureAuthorized(request);
   if (authError) return authError;
 
-  const supabaseAdmin = createSupabaseAdmin();
-  if (!supabaseAdmin) {
-    return NextResponse.json({ error: 'Supabase admin nao configurado' }, { status: 500 });
+  const supabaseClient = await createSupabaseRequestClient(request);
+  if (!supabaseClient) {
+    return NextResponse.json({ error: 'Sessao Supabase nao restaurada' }, { status: 401 });
   }
 
   const body = await request.json();
@@ -107,6 +199,7 @@ export async function POST(request: NextRequest) {
     notes: body.notes || '',
     proximoContato: body.proximoContato || null,
     dataServico: body.dataServico || null,
+    serviceStatus: normalizeServiceStatus(body.serviceStatus) || (body.dataServico ? 'Marcado' : null),
     updatedAt: body.updatedAt || new Date().toISOString(),
   };
 
@@ -131,20 +224,19 @@ export async function POST(request: NextRequest) {
     notes: lead.notes,
     proximo_contato: lead.proximoContato,
     data_servico: lead.dataServico,
+    service_status: lead.serviceStatus,
     updated_at: lead.updatedAt,
     created_at: createdAt,
   };
 
-  const { error } = await supabaseAdmin.from('leads').insert(row);
+  const { error } = await supabaseClient.from('leads').insert(row);
 
-  if (error?.message.includes("'data_servico' column")) {
-    const fallbackRow = Object.fromEntries(
-      Object.entries(row).filter(([key]) => key !== 'data_servico')
-    );
-    const retry = await supabaseAdmin.from('leads').insert(fallbackRow);
-    if (retry.error) return NextResponse.json({ error: retry.error.message }, { status: 500 });
+  if (isMissingOptionalLeadColumnError(error?.message)) {
+    const fallbackRow = withoutOptionalLeadColumns(row);
+    const retry = await supabaseClient.from('leads').insert(fallbackRow);
+    if (retry.error) return crmErrorResponse(retry.error);
   } else if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return crmErrorResponse(error);
   }
 
   return NextResponse.json({ id, ...lead, createdAt }, { status: 201 });
@@ -154,9 +246,9 @@ export async function PUT(request: NextRequest) {
   const authError = await ensureAuthorized(request);
   if (authError) return authError;
 
-  const supabaseAdmin = createSupabaseAdmin();
-  if (!supabaseAdmin) {
-    return NextResponse.json({ error: 'Supabase admin nao configurado' }, { status: 500 });
+  const supabaseClient = await createSupabaseRequestClient(request);
+  if (!supabaseClient) {
+    return NextResponse.json({ error: 'Sessao Supabase nao restaurada' }, { status: 401 });
   }
 
   const body = await request.json();
@@ -176,6 +268,7 @@ export async function PUT(request: NextRequest) {
     statusChangedAt: body.statusChangedAt || body.createdAt || new Date().toISOString().split('T')[0],
     proximoContato: body.proximoContato || null,
     dataServico: body.dataServico || null,
+    serviceStatus: normalizeServiceStatus(body.serviceStatus) || (body.dataServico ? 'Marcado' : null),
     updatedAt: body.updatedAt || new Date().toISOString(),
   };
 
@@ -199,19 +292,18 @@ export async function PUT(request: NextRequest) {
     notes: lead.notes,
     proximo_contato: lead.proximoContato,
     data_servico: lead.dataServico,
+    service_status: lead.serviceStatus,
     updated_at: lead.updatedAt,
   };
 
-  const { error } = await supabaseAdmin.from('leads').upsert(row, { onConflict: 'id' });
+  const { error } = await supabaseClient.from('leads').upsert(row, { onConflict: 'id' });
 
-  if (error?.message.includes("'status_changed_at' column") || error?.message.includes("'data_servico' column")) {
-    const fallbackRow = Object.fromEntries(
-      Object.entries(row).filter(([key]) => key !== 'status_changed_at' && key !== 'data_servico')
-    );
-    const retry = await supabaseAdmin.from('leads').upsert(fallbackRow, { onConflict: 'id' });
-    if (retry.error) return NextResponse.json({ error: retry.error.message }, { status: 500 });
+  if (isMissingOptionalLeadColumnError(error?.message)) {
+    const fallbackRow = withoutOptionalLeadColumns(row);
+    const retry = await supabaseClient.from('leads').upsert(fallbackRow, { onConflict: 'id' });
+    if (retry.error) return crmErrorResponse(retry.error);
   } else if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return crmErrorResponse(error);
   }
 
   return NextResponse.json(lead);
@@ -221,9 +313,9 @@ export async function DELETE(request: NextRequest) {
   const authError = await ensureAuthorized(request);
   if (authError) return authError;
 
-  const supabaseAdmin = createSupabaseAdmin();
-  if (!supabaseAdmin) {
-    return NextResponse.json({ error: 'Supabase admin nao configurado' }, { status: 500 });
+  const supabaseClient = await createSupabaseRequestClient(request);
+  if (!supabaseClient) {
+    return NextResponse.json({ error: 'Sessao Supabase nao restaurada' }, { status: 401 });
   }
 
   const id = request.nextUrl.searchParams.get('id');
@@ -231,8 +323,8 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: 'ID do lead e obrigatorio' }, { status: 400 });
   }
 
-  const { error } = await supabaseAdmin.from('leads').delete().eq('id', id);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  const { error } = await supabaseClient.from('leads').delete().eq('id', id);
+  if (error) return crmErrorResponse(error);
 
   return NextResponse.json({ success: true });
 }

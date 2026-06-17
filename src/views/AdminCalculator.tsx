@@ -16,6 +16,7 @@ import {
     saveConfigToCloud, loadConfigFromCloud,
 } from '../lib/cloudSync';
 import { roundCurrency, roundMeasure } from '../lib/numberPrecision';
+import { supabase } from '../lib/supabase';
 
 // ─── CONFIGURAÇÕES PADRÃO ─────────────────────────────────────────────────────
 
@@ -35,6 +36,19 @@ const FILM_TYPE_LABELS: Record<FilmTypeKey, string> = {
   dupla_camada: 'Dupla Camada',
   nano_ceramica: 'Nano Cerâmica',
   jateado: 'Jateado',
+};
+
+const getCrmLeadHeaders = async () => {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (!supabase) return headers;
+
+  const { data } = await supabase.auth.getSession();
+  const accessToken = data.session?.access_token;
+  if (accessToken) {
+    headers.Authorization = `Bearer ${accessToken}`;
+  }
+
+  return headers;
 };
 
 interface AppConfig {
@@ -644,7 +658,7 @@ export function AdminCalculator() {
     localStorage.setItem('lume_calculator_draft', JSON.stringify(draft));
 }, [draftRestored, cliente, phone, vidros, desconto, descontoInput, rollW, price, margin, modoOtimizacao, userName, selectedFilm]);
 
-  // ─── CLOUD AUTO-SAVE (debounced 2s) ──────────────────────────────────────
+  // ─── CLOUD AUTO-SAVE (debounced 5s) ──────────────────────────────────────
   useEffect(() => {
     if (!draftRestored) return;
     if (cloudTimerRef.current) clearTimeout(cloudTimerRef.current);
@@ -657,7 +671,7 @@ export function AdminCalculator() {
       });
       setCloudStatus(ok ? 'synced' : 'error');
       if (ok) setTimeout(() => setCloudStatus('idle'), 3000);
-    }, 2000);
+    }, 5000);
     return () => { if (cloudTimerRef.current) clearTimeout(cloudTimerRef.current); };
   }, [draftRestored, cliente, phone, vidros, desconto, descontoInput, rollW, price, margin, modoOtimizacao, userName, selectedFilm]);
 
@@ -997,7 +1011,7 @@ export function AdminCalculator() {
       const totalM2 = roundMeasure(vidros.reduce((acc, v) => acc + (v.oh * v.ow), 0) / 10000);
       const res = await fetch('/api/crm/leads', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: await getCrmLeadHeaders(),
         body: JSON.stringify({
           name: cliente || `Cliente ${phone}`,
           phone,
@@ -1016,7 +1030,8 @@ export function AdminCalculator() {
         setTimeout(() => setShowSaveToast(false), 3000);
       } else {
         const err = await res.json();
-        alert('Erro ao criar lead: ' + (err.error || 'desconhecido'));
+        const details = [err.error, err.details, err.hint].filter(Boolean).join(' - ');
+        alert('Erro ao criar lead: ' + (details || 'desconhecido'));
       }
     }, [cliente, phone, vidros, selectedFilm, finalPrice]);
 

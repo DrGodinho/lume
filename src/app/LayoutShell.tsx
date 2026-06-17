@@ -7,6 +7,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Navbar } from '@/sections/Navbar';
 import { Footer } from '@/sections/Footer';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
+import { GoogleConversionTracker } from '@/components/GoogleConversionTracker';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -28,7 +29,7 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
     // Kill old Service Workers from previous Vite setup to clear cache
     if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
       navigator.serviceWorker.getRegistrations().then(registrations => {
-        for (let registration of registrations) {
+        for (const registration of registrations) {
           registration.unregister();
         }
       });
@@ -48,6 +49,7 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-[#04080f] text-white">
+      <GoogleConversionTracker />
       {!isExcluded && <Navbar />}
       <main>{children}</main>
       {!isExcluded && (

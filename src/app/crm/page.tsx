@@ -2899,27 +2899,6 @@ export default function HomePage() {
               </section>
             )}
 
-            <section className="rounded-3xl border border-white/5 bg-[#07111d]/50 p-5 shadow-lg shadow-black/20 backdrop-blur-md">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#f5d77a]/75">Capacidade da semana</p>
-                  <h3 className="mt-1 text-lg font-black text-white">Serviços por dia e valor previsto</h3>
-                </div>
-                <p className="text-sm font-semibold text-white/55">{formatDashboardCurrency(stats.servicePipelineValue)} em serviços futuros</p>
-              </div>
-              <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-7">
-                {stats.weeklyCapacity.map((day) => (
-                  <div key={`${day.day}-${day.label}`} className="rounded-2xl border border-white/5 bg-white/[0.025] p-4">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/35">{day.label}</p>
-                    <p className="mt-1 text-sm font-semibold text-white/70">{day.day}</p>
-                    <p className="mt-3 text-2xl font-black text-white">{day.count}</p>
-                    <p className="mt-1 text-[11px] text-white/40">serviços</p>
-                    <p className="mt-2 text-xs font-bold text-[#f5d77a]">{formatDashboardCurrency(day.value)}</p>
-                  </div>
-                ))}
-              </div>
-            </section>
-
             {/* EVOLUÇÃO DO MÊS */}
             <div className="overflow-hidden rounded-3xl border border-[#c9a227]/15 bg-[radial-gradient(circle_at_top_right,rgba(201,162,39,0.16),transparent_34%),linear-gradient(180deg,rgba(7,17,29,0.92),rgba(4,8,15,0.86))] p-5 shadow-2xl shadow-black/25 backdrop-blur-md sm:p-6">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
@@ -3189,7 +3168,26 @@ export default function HomePage() {
 
             </div>
 
-
+            <section className="rounded-3xl border border-white/5 bg-[#07111d]/50 p-5 shadow-lg shadow-black/20 backdrop-blur-md">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#f5d77a]/75">Capacidade da semana</p>
+                  <h3 className="mt-1 text-lg font-black text-white">Serviços por dia e valor previsto</h3>
+                </div>
+                <p className="text-sm font-semibold text-white/55">{formatDashboardCurrency(stats.servicePipelineValue)} em serviços futuros</p>
+              </div>
+              <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-7">
+                {stats.weeklyCapacity.map((day) => (
+                  <div key={`${day.day}-${day.label}`} className="rounded-2xl border border-white/5 bg-white/[0.025] p-4">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/35">{day.label}</p>
+                    <p className="mt-1 text-sm font-semibold text-white/70">{day.day}</p>
+                    <p className="mt-3 text-2xl font-black text-white">{day.count}</p>
+                    <p className="mt-1 text-[11px] text-white/40">serviços</p>
+                    <p className="mt-2 text-xs font-bold text-[#f5d77a]">{formatDashboardCurrency(day.value)}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
 
             {/* RECENT LEADS & ACTIONS */}
             <div className="rounded-3xl border border-white/5 bg-[#07111d]/50 p-6 backdrop-blur-md shadow-lg">
