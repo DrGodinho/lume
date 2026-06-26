@@ -66,13 +66,6 @@ const jsonLd = {
       name: 'LUME Controle Solar',
     },
   },
-  aggregateRating: {
-    '@type': 'AggregateRating',
-    ratingValue: '5.0',
-    reviewCount: '22',
-    bestRating: '5',
-    worstRating: '1',
-  },
   additionalProperty: [
     { '@type': 'PropertyValue', name: 'Proteção UV', value: 'Até 99%' },
     { '@type': 'PropertyValue', name: 'Rejeição de Calor', value: 'Alta Performance Térmica' },

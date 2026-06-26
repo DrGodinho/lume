@@ -54,21 +54,6 @@ export function NeighborhoodTemplate({ data }: Props) {
             "name": "Rio de Janeiro"
           }
         },
-        "aggregateRating": {
-          "@type": "AggregateRating",
-          "ratingValue": "5.0",
-          "reviewCount": "32",
-          "bestRating": "5"
-        },
-        "review": [
-          {
-            "@type": "Review",
-            "author": { "@type": "Person", "name": "Carlos Mendes" },
-            "datePublished": "2025-01-15",
-            "reviewBody": `Excelente trabalho de instalação de insulfilm em ${data.neighborName}. Atendimento nota 10.`,
-            "reviewRating": { "@type": "Rating", "ratingValue": "5" }
-          }
-        ]
       },
       {
         "@type": "FAQPage",

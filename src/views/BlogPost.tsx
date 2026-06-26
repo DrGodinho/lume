@@ -144,8 +144,8 @@ function BlogBlock({ block }: { block: BlogContentBlock }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5 text-sm text-gray-300">
-              {block.rows.map((row) => (
-                <tr key={row.title} className="transition-colors hover:bg-white/[0.03]">
+              {block.rows.map((row, rowIndex) => (
+                <tr key={`${row.title}-${rowIndex}`} className="transition-colors hover:bg-white/[0.03]">
                   <td className="p-4 font-bold text-white">
                     {row.href ? (
                       <a href={row.href} className="hover:text-[#c9a227]">
@@ -155,8 +155,8 @@ function BlogBlock({ block }: { block: BlogContentBlock }) {
                       row.title
                     )}
                   </td>
-                  {row.values.map((value, index) => (
-                    <td key={`${row.title}-${index}`} className="p-4">
+                  {row.values.map((value, valueIndex) => (
+                    <td key={`${row.title}-${rowIndex}-${valueIndex}`} className="p-4">
                       {value}
                     </td>
                   ))}

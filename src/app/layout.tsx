@@ -10,6 +10,7 @@ const fontVariables: CSSProperties = {
 } as CSSProperties;
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://lumecontrolesolar.com.br'),
   title: {
     default: 'LUME Controle Solar | Películas de Alta Tecnologia',
     template: '%s | LUME Controle Solar',
@@ -138,22 +139,6 @@ const jsonLd = {
       },
     ],
   },
-  review: [
-    {
-      '@type': 'Review',
-      'author': { '@type': 'Person', 'name': 'Carlos Mendes' },
-      'datePublished': '2025-01-15',
-      'reviewBody': 'Trabalho impecável! Instalaram a película Nano Cerâmica no meu apartamento e a redução de calor foi imediata. Excelente atendimento.',
-      'reviewRating': { '@type': 'Rating', 'ratingValue': '5' }
-    },
-    {
-      '@type': 'Review',
-      'author': { '@type': 'Person', 'name': 'Mariana Silva' },
-      'datePublished': '2025-02-01',
-      'reviewBody': 'Pesquisei muito antes de fechar e a LUME me passou mais confiança. Ficou lindo e muito privativo.',
-      'reviewRating': { '@type': 'Rating', 'ratingValue': '5' }
-    }
-  ],
   description:
     'Especialistas em instalação de insulfilm residencial e comercial no Rio de Janeiro. Proteção solar, redução de calor e privacidade com películas de alta tecnologia.',
 };

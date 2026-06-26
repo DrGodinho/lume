@@ -1,0 +1,73 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Preco de insulfilm residencial no Rio de Janeiro</title>
+  <desc id="desc">Arte editorial premium com exemplos de preco para janela, porta de vidro, pelicula carbono, refletiva e nano ceramica.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#03070D"/>
+      <stop offset="0.47" stop-color="#081321"/>
+      <stop offset="1" stop-color="#0F1621"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="197" y1="84" x2="948" y2="570" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F4D166"/>
+      <stop offset="0.45" stop-color="#C9A227"/>
+      <stop offset="1" stop-color="#8D6A12"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="382" y1="96" x2="858" y2="564" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#DDF6FF" stop-opacity="0.78"/>
+      <stop offset="0.52" stop-color="#5E7F96" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.05"/>
+    </linearGradient>
+    <filter id="softGlow" x="-80" y="-80" width="1360" height="790" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="40"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <path d="M0 104H1200M0 232H1200M0 360H1200M0 488H1200M152 0V630M304 0V630M456 0V630M608 0V630M760 0V630M912 0V630M1064 0V630" stroke="#C9A227" stroke-opacity="0.045"/>
+  <circle cx="242" cy="110" r="150" fill="#C9A227" fill-opacity="0.2" filter="url(#softGlow)"/>
+  <circle cx="942" cy="503" r="170" fill="#1A3A5C" fill-opacity="0.6" filter="url(#softGlow)"/>
+
+  <g opacity="0.95">
+    <path d="M430 76H862C886.301 76 906 95.6995 906 120V510C906 534.301 886.301 554 862 554H430C405.699 554 386 534.301 386 510V120C386 95.6995 405.699 76 430 76Z" fill="#07101B" stroke="#C9A227" stroke-opacity="0.36" stroke-width="2"/>
+    <path d="M432 124H860V506H432V124Z" fill="url(#glass)" stroke="white" stroke-opacity="0.12"/>
+    <path d="M646 124V506" stroke="#C9A227" stroke-opacity="0.35" stroke-width="3"/>
+    <path d="M432 315H860" stroke="#C9A227" stroke-opacity="0.22" stroke-width="2"/>
+    <path d="M486 157L774 506" stroke="white" stroke-opacity="0.14" stroke-width="16"/>
+    <path d="M564 124L860 485" stroke="white" stroke-opacity="0.09" stroke-width="10"/>
+  </g>
+
+  <g>
+    <rect x="84" y="118" width="292" height="148" rx="24" fill="#07101B" stroke="#C9A227" stroke-opacity="0.32"/>
+    <text x="112" y="162" fill="#C9A227" font-family="Montserrat, Arial, sans-serif" font-size="18" font-weight="800" letter-spacing="2">JANELA</text>
+    <text x="112" y="202" fill="#FFFFFF" font-family="Montserrat, Arial, sans-serif" font-size="42" font-weight="900">R$ 80</text>
+    <text x="112" y="232" fill="#B8C1CC" font-family="Arial, sans-serif" font-size="19">2 vidros de 100 x 50 cm</text>
+    <text x="112" y="254" fill="#B8C1CC" font-family="Arial, sans-serif" font-size="17">Filme carbono residencial</text>
+  </g>
+
+  <g>
+    <rect x="824" y="106" width="292" height="154" rx="24" fill="#07101B" stroke="#C9A227" stroke-opacity="0.32"/>
+    <text x="852" y="150" fill="#C9A227" font-family="Montserrat, Arial, sans-serif" font-size="18" font-weight="800" letter-spacing="2">NANO CERAMICA</text>
+    <text x="852" y="191" fill="#FFFFFF" font-family="Montserrat, Arial, sans-serif" font-size="42" font-weight="900">R$ 220</text>
+    <text x="852" y="221" fill="#B8C1CC" font-family="Arial, sans-serif" font-size="19">mesma janela do exemplo</text>
+    <text x="852" y="244" fill="#B8C1CC" font-family="Arial, sans-serif" font-size="17">maior rejeicao de calor</text>
+  </g>
+
+  <g>
+    <rect x="84" y="364" width="300" height="156" rx="24" fill="#07101B" stroke="#C9A227" stroke-opacity="0.32"/>
+    <text x="112" y="408" fill="#C9A227" font-family="Montserrat, Arial, sans-serif" font-size="18" font-weight="800" letter-spacing="2">PORTA DE VIDRO</text>
+    <text x="112" y="450" fill="#FFFFFF" font-family="Montserrat, Arial, sans-serif" font-size="42" font-weight="900">R$ 152</text>
+    <text x="112" y="480" fill="#B8C1CC" font-family="Arial, sans-serif" font-size="19">200 x 80 cm</text>
+    <text x="112" y="504" fill="#B8C1CC" font-family="Arial, sans-serif" font-size="17">Pelicula refletiva</text>
+  </g>
+
+  <g>
+    <rect x="805" y="376" width="316" height="142" rx="24" fill="#07101B" stroke="#C9A227" stroke-opacity="0.32"/>
+    <text x="833" y="421" fill="#C9A227" font-family="Montserrat, Arial, sans-serif" font-size="18" font-weight="800" letter-spacing="2">RIO DE JANEIRO</text>
+    <text x="833" y="462" fill="#FFFFFF" font-family="Montserrat, Arial, sans-serif" font-size="31" font-weight="900">Preco por projeto</text>
+    <text x="833" y="494" fill="#B8C1CC" font-family="Arial, sans-serif" font-size="18">quanto maior a quantidade,</text>
+    <text x="833" y="518" fill="#B8C1CC" font-family="Arial, sans-serif" font-size="18">menor pode ficar por janela</text>
+  </g>
+
+  <text x="84" y="586" fill="#FFFFFF" font-family="Montserrat, Arial, sans-serif" font-size="34" font-weight="900">Preco de insulfilm residencial</text>
+  <text x="84" y="612" fill="#C9A227" font-family="Arial, sans-serif" font-size="18">janela, porta de vidro, carbono, refletiva e nano ceramica</text>
+</svg>

@@ -40,18 +40,17 @@ export function Hero() {
 
           {/* Headline */}
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-[1.15] sm:leading-tight mb-4 sm:mb-6 font-montserrat">
-            <span className="word opacity-0 inline-block">Proteção</span>{' '}
-            <span className="word opacity-0 inline-block">Solar</span>{' '}
+            <span className="word opacity-0 inline-block">Insulfilm</span>{' '}
+            <span className="word opacity-0 inline-block">Residencial</span>{' '}
             <span className="word opacity-0 inline-block text-gradient-gold">Premium</span>{' '}
-            <span className="word opacity-0 inline-block">para</span>{' '}
-            <span className="word opacity-0 inline-block">Sua</span>{' '}
-            <span className="word opacity-0 inline-block">Casa</span>
+            <span className="word opacity-0 inline-block">no</span>{' '}
+            <span className="word opacity-0 inline-block">Rio</span>
           </h1>
 
           {/* Subheadline */}
           <p className="animate-hero opacity-0 text-base sm:text-lg md:text-xl text-gray-300 mb-6 sm:mb-8 leading-relaxed max-w-2xl">
-            Especialistas em insulfilm residencial na Zona Oeste do Rio.
-            Garantia de 5 anos em todas as instalações. Trabalhamos apenas com películas de alta qualidade.
+            Controle solar para casas, apartamentos e portas de vidro na Zona Oeste.
+            Reduza calor, proteja móveis e escolha a privacidade certa com garantia de 5 anos.
           </p>
 
           {/* CTA Buttons */}

@@ -85,12 +85,19 @@ interface EaseBias {
   horizontalSnapWeight: number;
   lineCreationWeight: number;
   nearMissPenalty: number;
+  rotationWeight: number;
   shelfStartBonus: number;
   edgeBonus: number;
   maxSnapShift: number;
   maxLineCandidates: number;
   maxRectCandidates: number;
   maxXCandidates: number;
+}
+
+interface EasyV2SearchProfile {
+  beamWidth: number;
+  candidateLimit: number;
+  orderStrategyLimit: number;
 }
 
 const STRIP_HEIGHT = 1_000_000;
@@ -260,21 +267,39 @@ const getEaseBias = (agressividadeCorte: number): EaseBias => {
     localWasteWeight: 0.7 + compactness * 1.4,
     fragmentationWeight: 120 + linePriority * 220,
     xLineWeight: 20 + linePriority * 75,
-    yLineWeight: 8_000 + linePriority * 32_000,
+    yLineWeight: 12_000 + linePriority * 58_000,
     raggedWeight: 100 + linePriority * 220,
     alignmentWeight: 8 + linePriority * 30,
     verticalGapWeight: 85 + compactness * 260,
     horizontalSnapTolerance: 3 + linePriority * 10,
     lineMergeTolerance: 1.5 + linePriority * 2.5,
-    horizontalSnapWeight: 8_000 + linePriority * 42_000,
-    lineCreationWeight: 3_000 + linePriority * 18_000,
-    nearMissPenalty: 8_000 + linePriority * 22_000,
+    horizontalSnapWeight: 10_000 + linePriority * 70_000,
+    lineCreationWeight: 5_000 + linePriority * 42_000,
+    nearMissPenalty: 8_000 + linePriority * 34_000,
+    rotationWeight: 6 + linePriority * 520,
     shelfStartBonus: -3_000 - linePriority * 9_000,
     edgeBonus: -300 - linePriority * 700,
     maxSnapShift: 8 + linePriority * 58,
-    maxLineCandidates: compactness > 0.75 ? 3 : 4,
-    maxRectCandidates: compactness > 0.75 ? 10 : 12,
-    maxXCandidates: 2,
+    maxLineCandidates: compactness > 0.75 ? 3 : compactness > 0.4 ? 4 : 6,
+    maxRectCandidates: compactness > 0.75 ? 10 : compactness > 0.4 ? 12 : 16,
+    maxXCandidates: compactness > 0.75 ? 2 : compactness > 0.4 ? 3 : 4,
+  };
+};
+
+const getEasyV2SearchProfile = (itemCount: number, agressividadeCorte: number): EasyV2SearchProfile => {
+  const compactness = clamp(agressividadeCorte, 0, 100) / 100;
+  const linePriority = 1 - compactness;
+  const baseBeam = itemCount > 120 ? 5 : itemCount > 80 ? 6 : itemCount > 45 ? 8 : 10;
+  const baseCandidateLimit = itemCount > 120 ? 6 : itemCount > 80 ? 7 : itemCount > 45 ? 8 : 10;
+  const searchBudget = itemCount > 120 ? 2 : itemCount > 80 ? 2 : itemCount > 45 ? 3 : 5;
+  const compactTrim = compactness > 0.8 ? 1 : 0;
+
+  return {
+    beamWidth: Math.round(baseBeam + linePriority * searchBudget - compactTrim),
+    candidateLimit: Math.round(baseCandidateLimit + linePriority * (searchBudget + 1) - compactTrim),
+    orderStrategyLimit: itemCount > 80
+      ? (linePriority > 0.55 ? 4 : 3)
+      : linePriority > 0.55 ? 6 : 4,
   };
 };
 
@@ -294,7 +319,7 @@ const stateScore = (state: BeamState, rollW: number, agressividadeCorte: number)
     uniqueRoundedCount(xs) * bias.xLineWeight +
     Math.max(0, state.horizontalLines.length - 1) * bias.yLineWeight +
     raggedBlocks * bias.raggedWeight +
-    state.rotations * 3
+    state.rotations * bias.rotationWeight
   );
 };
 
@@ -396,7 +421,7 @@ const placementScore = (state: BeamState, block: PackedBlock, footprint: FreeRec
     align * bias.alignmentWeight +
     verticalGap * bias.verticalGapWeight +
     horizontalLineScore +
-    (block.rotated ? 8 : 0) +
+    (block.rotated ? bias.rotationWeight * 0.15 : 0) +
     edgeBonus
   );
 };
@@ -481,15 +506,16 @@ const dedupeStates = (states: BeamState[], rollW: number, limit: number, agressi
   return result;
 };
 
-const getOrderStrategies = (items: PackItem[]) => {
+const getOrderStrategies = (items: PackItem[], strategyLimit: number) => {
   const byOrder = [...items];
   const baseStrategies = [
     byOrder,
     [...items].sort((a, b) => (b.ow * b.oh) - (a.ow * a.oh)),
     [...items].sort((a, b) => b.oh - a.oh || b.ow - a.ow),
     [...items].sort((a, b) => b.ow - a.ow || b.oh - a.oh),
+    [...items].sort((a, b) => Math.round(b.oh / 5) - Math.round(a.oh / 5) || b.ow - a.ow),
   ];
-  const strategies = items.length > 80 ? baseStrategies.slice(0, 3) : baseStrategies;
+  const strategies = items.length > 80 ? baseStrategies.slice(0, 4) : baseStrategies;
 
   if (items.length <= 25) {
     strategies.push(
@@ -504,23 +530,22 @@ const getOrderStrategies = (items: PackItem[]) => {
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
-  });
+  }).slice(0, strategyLimit);
 };
 
 const packEasyV2 = (items: PackItem[], rollW: number, margin: number, agressividadeCorte: number) => {
   if (items.length === 0) return { blocks: [], totalY: 0, areaV: 0 };
 
-  const beamWidth = items.length > 120 ? 5 : items.length > 80 ? 6 : items.length > 45 ? 8 : 10;
-  const candidateLimit = items.length > 120 ? 6 : items.length > 80 ? 7 : items.length > 45 ? 8 : 10;
+  const searchProfile = getEasyV2SearchProfile(items.length, agressividadeCorte);
   let bestState: BeamState | null = null;
   const baseBias = getEaseBias(agressividadeCorte);
   const bias: EaseBias = {
     ...baseBias,
-    maxLineCandidates: items.length > 80 ? Math.min(baseBias.maxLineCandidates, 3) : baseBias.maxLineCandidates,
-    maxRectCandidates: items.length > 80 ? Math.min(baseBias.maxRectCandidates, 8) : items.length > 45 ? Math.min(baseBias.maxRectCandidates, 10) : baseBias.maxRectCandidates,
+    maxLineCandidates: items.length > 80 ? Math.min(baseBias.maxLineCandidates, 4) : baseBias.maxLineCandidates,
+    maxRectCandidates: items.length > 80 ? Math.min(baseBias.maxRectCandidates, 10) : items.length > 45 ? Math.min(baseBias.maxRectCandidates, 12) : baseBias.maxRectCandidates,
   };
 
-  for (const orderedItems of getOrderStrategies(items)) {
+  for (const orderedItems of getOrderStrategies(items, searchProfile.orderStrategyLimit)) {
     let beam: BeamState[] = [{
       blocks: [],
       freeRects: [{ x: 0, y: 0, w: rollW, h: STRIP_HEIGHT }],
@@ -535,7 +560,7 @@ const packEasyV2 = (items: PackItem[], rollW: number, margin: number, agressivid
       const nextStates: BeamState[] = [];
 
       beam.forEach((state) => {
-        const candidates = buildCandidates(state, item, rollW, margin, candidateLimit, bias);
+        const candidates = buildCandidates(state, item, rollW, margin, searchProfile.candidateLimit, bias);
         const placementOptions = candidates.length > 0
           ? candidates
           : [buildFallbackCandidate(state, item, rollW, margin, bias)];
@@ -563,7 +588,7 @@ const packEasyV2 = (items: PackItem[], rollW: number, margin: number, agressivid
         });
       });
 
-      beam = dedupeStates(nextStates, rollW, beamWidth, agressividadeCorte);
+      beam = dedupeStates(nextStates, rollW, searchProfile.beamWidth, agressividadeCorte);
     });
 
     const candidateBest = beam.sort((a, b) => stateScore(a, rollW, agressividadeCorte) - stateScore(b, rollW, agressividadeCorte))[0];

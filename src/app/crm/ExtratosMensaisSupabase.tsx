@@ -3,7 +3,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { ComponentType } from 'react';
 import { supabase } from '@/lib/supabase';
+import { getCrmApiErrorMessage, getCrmApiHeaders } from './utils';
 import {
+  endOfMonth,
   format,
   getDate,
   getMonth,
@@ -11,7 +13,6 @@ import {
   setMonth,
   setYear,
   startOfMonth,
-  endOfMonth,
 } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import html2canvas from 'html2canvas';
@@ -21,10 +22,12 @@ import {
   BarChart3,
   CalendarRange,
   Download,
+  Layers3,
+  Link2,
   Loader2,
-  MapPin,
   Package,
   ReceiptText,
+  Sparkles,
   TrendingUp,
   Wallet,
 } from 'lucide-react';
@@ -39,6 +42,14 @@ import {
   YAxis,
 } from 'recharts';
 
+type GlassPane = {
+  oh?: number;
+  ow?: number;
+  h?: number;
+  w?: number;
+  label?: string;
+};
+
 type ExtratoRecord = {
   id: string;
   cliente?: string;
@@ -47,7 +58,7 @@ type ExtratoRecord = {
   created_at?: string;
   selected_film?: string | null;
   modo_otimizacao?: string | null;
-  vidros?: Array<{ oh?: number; ow?: number; h?: number; w?: number; label?: string }>;
+  vidros?: GlassPane[];
   bairro?: string | null;
   neighborhood?: string | null;
   area?: number | null;
@@ -55,6 +66,28 @@ type ExtratoRecord = {
   metros?: number | null;
   sqm?: number | null;
   lead_id?: string | null;
+  lead_status?: string | null;
+  service_date?: string | null;
+  service_status?: ServiceStatus | null;
+  source?: 'calculator' | 'lead';
+};
+
+type ServiceStatus = 'Marcado' | 'Confirmado' | 'Em Execucao' | 'Concluido' | 'Reagendar';
+
+type LeadServiceRecord = {
+  id: string;
+  name?: string | null;
+  value?: number | null;
+  sqm?: number | null;
+  film_type?: string | null;
+  neighborhood?: string | null;
+  status?: string | null;
+  data_servico?: string | null;
+  service_status?: string | null;
+  status_changed_at?: string | null;
+  created_at?: string | null;
+  deleted_at?: string | null;
+  dormant?: boolean | null;
 };
 
 type KpiCard = {
@@ -62,6 +95,16 @@ type KpiCard = {
   value: string;
   subtext: string;
   icon: ComponentType<{ className?: string }>;
+  tone: 'gold' | 'sky' | 'emerald' | 'white';
+};
+
+type FilmRankingItem = {
+  nome: string;
+  valor: number;
+  jobs: number;
+  area: number;
+  ticket: number;
+  share: number;
 };
 
 const FILM_LABELS: Record<string, string> = {
@@ -71,6 +114,35 @@ const FILM_LABELS: Record<string, string> = {
   nano_ceramica: 'Nano Cerâmica',
   jateado: 'Jateado',
 };
+
+const WEEK_LABELS = ['Sem. 1', 'Sem. 2', 'Sem. 3', 'Sem. 4', 'Sem. 5'] as const;
+
+const KPI_TONES: Record<KpiCard['tone'], string> = {
+  gold: 'border-[#c9a227]/20 bg-[#c9a227]/10 text-[#f5d77a]',
+  sky: 'border-sky-400/15 bg-sky-400/10 text-sky-200',
+  emerald: 'border-emerald-400/15 bg-emerald-400/10 text-emerald-200',
+  white: 'border-white/10 bg-white/[0.04] text-white/75',
+};
+
+function asString(value: unknown, fallback = '') {
+  return typeof value === 'string' ? value : fallback;
+}
+
+function asNullableString(value: unknown) {
+  return typeof value === 'string' && value ? value : null;
+}
+
+function asNumber(value: unknown) {
+  const numberValue = Number(value || 0);
+  return Number.isFinite(numberValue) ? numberValue : 0;
+}
+
+function parseDateValue(value?: string | null) {
+  if (!value) return null;
+  const normalized = value.includes('T') ? value : `${value}T12:00:00`;
+  const parsed = new Date(normalized);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
 
 function capitalizeFirst(text: string) {
   if (!text) return text;
@@ -84,6 +156,10 @@ function formatBRL(value: number) {
   }).format(value || 0);
 }
 
+function formatPercent(value: number) {
+  return `${Math.round(value)}%`;
+}
+
 function semanaDoMes(diaDoMes: number) {
   if (diaDoMes <= 7) return 'Sem. 1';
   if (diaDoMes <= 14) return 'Sem. 2';
@@ -92,23 +168,70 @@ function semanaDoMes(diaDoMes: number) {
   return 'Sem. 5';
 }
 
-function normalizeRecord(row: any): ExtratoRecord {
+function normalizeServiceStatus(status: unknown): ServiceStatus | null {
+  if (status === 'Marcado' || status === 'Confirmado' || status === 'Em Execucao' || status === 'Concluido' || status === 'Reagendar') {
+    return status;
+  }
+  if (status === 'Em execução' || status === 'Em execuÃ§Ã£o') return 'Em Execucao';
+  if (status === 'Concluído' || status === 'ConcluÃ­do') return 'Concluido';
+  return null;
+}
+
+function getLeadServiceStatus(lead: LeadServiceRecord): ServiceStatus | null {
+  const explicitStatus = normalizeServiceStatus(lead.service_status);
+  if (explicitStatus) return explicitStatus;
+  if (lead.data_servico) return 'Marcado';
+  if (lead.status === 'Fechado') return 'Concluido';
+  return null;
+}
+
+function getLeadServiceReferenceDate(lead: LeadServiceRecord) {
+  return parseDateValue(lead.data_servico) || parseDateValue(lead.status_changed_at) || parseDateValue(lead.created_at);
+}
+
+function isServiceLeadInPeriod(lead: LeadServiceRecord, inicio: Date, fim: Date) {
+  if (lead.deleted_at || lead.status === 'Perdido') return false;
+
+  const serviceStatus = getLeadServiceStatus(lead);
+  const hasValidServiceStatus = serviceStatus && serviceStatus !== 'Reagendar';
+  if (!hasValidServiceStatus) return false;
+
+  const referenceDate = getLeadServiceReferenceDate(lead);
+  if (!referenceDate) return false;
+
+  return referenceDate >= inicio && referenceDate <= fim;
+}
+
+function getServiceStatusLabel(status?: ServiceStatus | null) {
+  if (status === 'Em Execucao') return 'Em execução';
+  if (status === 'Concluido') return 'Feito';
+  return status || 'Serviço';
+}
+
+function normalizeRecord(row: Record<string, unknown>, lead?: LeadServiceRecord): ExtratoRecord {
+  const serviceStatus = lead ? getLeadServiceStatus(lead) : null;
+  const serviceDate = lead ? getLeadServiceReferenceDate(lead)?.toISOString() || null : null;
+
   return {
-    id: row.id,
-    cliente: row.cliente || row.name || row.nome || '',
-    valor: Number(row.valor || 0),
-    qtd: Number(row.qtd || 0),
-    created_at: row.created_at || row.data || row.createdAt || new Date().toISOString(),
-    selected_film: row.selected_film || row.selectedFilm || null,
-    modo_otimizacao: row.modo_otimizacao || row.modoOtimizacao || null,
-    vidros: Array.isArray(row.vidros) ? row.vidros : [],
-    bairro: row.bairro || row.neighborhood || row.bairro_cliente || null,
-    neighborhood: row.neighborhood || null,
-    area: row.area ?? null,
-    m2: row.m2 ?? null,
-    metros: row.metros ?? null,
-    sqm: row.sqm ?? null,
-    lead_id: row.lead_id || null,
+    id: asString(row.id) || lead?.id || crypto.randomUUID(),
+    cliente: asString(row.cliente) || asString(row.name) || asString(row.nome) || lead?.name || '',
+    valor: asNumber(row.valor) || asNumber(lead?.value),
+    qtd: asNumber(row.qtd),
+    created_at: serviceDate || asString(row.created_at) || asString(row.data) || asString(row.createdAt) || new Date().toISOString(),
+    selected_film: asNullableString(row.selected_film) || asNullableString(row.selectedFilm) || asNullableString(lead?.film_type),
+    modo_otimizacao: asNullableString(row.modo_otimizacao) || asNullableString(row.modoOtimizacao),
+    vidros: Array.isArray(row.vidros) ? row.vidros as GlassPane[] : [],
+    bairro: asNullableString(row.bairro) || asNullableString(row.neighborhood) || asNullableString(row.bairro_cliente) || asNullableString(lead?.neighborhood),
+    neighborhood: asNullableString(row.neighborhood) || asNullableString(lead?.neighborhood),
+    area: row.area === null || row.area === undefined ? null : asNumber(row.area),
+    m2: row.m2 === null || row.m2 === undefined ? lead?.sqm ?? null : asNumber(row.m2),
+    metros: row.metros === null || row.metros === undefined ? null : asNumber(row.metros),
+    sqm: row.sqm === null || row.sqm === undefined ? lead?.sqm ?? null : asNumber(row.sqm),
+    lead_id: asNullableString(row.lead_id) || lead?.id || null,
+    lead_status: lead?.status || null,
+    service_date: serviceDate,
+    service_status: serviceStatus,
+    source: row.id ? 'calculator' : 'lead',
   };
 }
 
@@ -118,13 +241,10 @@ function getFilmLabel(record: ExtratoRecord) {
   }
 
   if (record.modo_otimizacao) {
-    return record.modo_otimizacao === 'densidade'
-      ? 'Nano Cerâmica'
-      : record.modo_otimizacao === 'facilidade'
-        ? 'Refletiva'
-        : record.modo_otimizacao === 'facilidade_v2'
-          ? 'Carbono'
-          : record.modo_otimizacao;
+    if (record.modo_otimizacao === 'densidade') return 'Nano Cerâmica';
+    if (record.modo_otimizacao === 'facilidade') return 'Refletiva';
+    if (record.modo_otimizacao === 'facilidade_v2') return 'Carbono';
+    return record.modo_otimizacao;
   }
 
   return 'Não informado';
@@ -148,26 +268,22 @@ function getAreaTotal(record: ExtratoRecord) {
   }, 0);
 }
 
-function getBairroLabel(record: ExtratoRecord) {
-  return record.bairro || record.neighborhood || '';
-}
-
 function LoadingSkeleton() {
   return (
-    <div className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, i) => (
+    <div className="space-y-5">
+      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, index) => (
           <div
-            key={i}
-            className="h-28 rounded-3xl border border-white/5 bg-white/[0.03] animate-pulse"
+            key={index}
+            className="h-28 rounded-2xl border border-white/5 bg-white/[0.03] animate-pulse"
           />
         ))}
       </div>
-      <div className="grid gap-6 xl:grid-cols-[1.7fr_1fr]">
-        <div className="h-[280px] rounded-3xl border border-white/5 bg-white/[0.03] animate-pulse" />
-        <div className="h-[280px] rounded-3xl border border-white/5 bg-white/[0.03] animate-pulse" />
+      <div className="grid gap-5 xl:grid-cols-[1.45fr_1fr]">
+        <div className="h-[320px] rounded-2xl border border-white/5 bg-white/[0.03] animate-pulse" />
+        <div className="h-[320px] rounded-2xl border border-white/5 bg-white/[0.03] animate-pulse" />
       </div>
-      <div className="h-[420px] rounded-3xl border border-white/5 bg-white/[0.03] animate-pulse" />
+      <div className="h-[420px] rounded-2xl border border-white/5 bg-white/[0.03] animate-pulse" />
     </div>
   );
 }
@@ -183,15 +299,15 @@ export function ExtratosMensaisSupabase() {
 
   const meses = useMemo(
     () =>
-      Array.from({ length: 12 }, (_, i) =>
-        capitalizeFirst(format(setMonth(new Date(), i), 'MMMM', { locale: ptBR }))
+      Array.from({ length: 12 }, (_, index) =>
+        capitalizeFirst(format(setMonth(new Date(), index), 'MMMM', { locale: ptBR }))
       ),
     []
   );
 
   const anos = useMemo(() => {
     const currentYear = getYear(new Date());
-    return Array.from({ length: currentYear - 2025 + 2 }, (_, i) => 2025 + i);
+    return Array.from({ length: currentYear - 2025 + 2 }, (_, index) => 2025 + index);
   }, []);
 
   useEffect(() => {
@@ -213,24 +329,59 @@ export function ExtratosMensaisSupabase() {
       const inicio = startOfMonth(dataReferencia);
       const fim = endOfMonth(dataReferencia);
 
-      const { data, error } = await supabase
-        .from('calculator_history')
-        .select('*')
-        .gte('created_at', inicio.toISOString())
-        .lte('created_at', fim.toISOString())
-        .order('created_at', { ascending: true });
+      const leadsResponse = await fetch('/api/crm/leads', {
+        headers: await getCrmApiHeaders(),
+        credentials: 'same-origin',
+        cache: 'no-store',
+      });
+      const leadsPayload = await leadsResponse.json().catch(() => null);
 
       if (cancelled) return;
 
-      if (error) {
+      if (!leadsResponse.ok || !Array.isArray(leadsPayload)) {
+        const details = getCrmApiErrorMessage(leadsPayload, leadsResponse.statusText);
         setRegistros([]);
-        setErrorMessage('Erro ao carregar extrato.');
-        toast.error('Erro ao carregar extrato');
+        setErrorMessage(`Erro ao carregar serviços do CRM: ${details}`);
+        toast.error('Erro ao carregar serviços do CRM');
         setLoading(false);
         return;
       }
 
-      setRegistros((data || []).map(normalizeRecord));
+      const serviceLeads = (leadsPayload as LeadServiceRecord[])
+        .filter((lead) => isServiceLeadInPeriod(lead, inicio, fim));
+      const serviceLeadIds = serviceLeads.map((lead) => lead.id).filter(Boolean);
+
+      if (serviceLeadIds.length === 0) {
+        setRegistros([]);
+        setLoading(false);
+        return;
+      }
+
+      const { data: historyData, error: historyError } = await supabase
+        .from('calculator_history')
+        .select('*')
+        .in('lead_id', serviceLeadIds)
+        .order('created_at', { ascending: false });
+
+      if (cancelled) return;
+
+      if (historyError) {
+        setRegistros([]);
+        setErrorMessage('Erro ao carregar orçamentos vinculados aos serviços.');
+        toast.error('Erro ao carregar orçamentos vinculados');
+        setLoading(false);
+        return;
+      }
+
+      const historyByLeadId = new Map<string, Record<string, unknown>>();
+      (historyData || []).forEach((row) => {
+        const leadId = asNullableString((row as Record<string, unknown>).lead_id);
+        if (leadId && !historyByLeadId.has(leadId)) {
+          historyByLeadId.set(leadId, row as Record<string, unknown>);
+        }
+      });
+
+      setRegistros(serviceLeads.map((lead) => normalizeRecord(historyByLeadId.get(lead.id) || {}, lead)));
       setLoading(false);
     }
 
@@ -240,6 +391,10 @@ export function ExtratosMensaisSupabase() {
       cancelled = true;
     };
   }, [mesSelecionado, anoSelecionado]);
+
+  const tituloMes = capitalizeFirst(
+    format(setMonth(new Date(), mesSelecionado), 'MMMM', { locale: ptBR })
+  );
 
   const dadosOrdenados = useMemo(
     () =>
@@ -258,79 +413,99 @@ export function ExtratosMensaisSupabase() {
 
   const numJobs = registros.length;
   const ticketMedio = numJobs > 0 ? faturamentoTotal / numJobs : 0;
+
   const m2Total = useMemo(
     () => registros.reduce((sum, row) => sum + getAreaTotal(row), 0),
     [registros]
   );
+
   const maiorOrcamento = useMemo(
     () => (registros.length > 0 ? Math.max(...registros.map((row) => Number(row.valor || 0))) : 0),
     [registros]
   );
 
-  const dadosGrafico = useMemo(() => {
-    const base = {
-      'Sem. 1': 0,
-      'Sem. 2': 0,
-      'Sem. 3': 0,
-      'Sem. 4': 0,
-      'Sem. 5': 0,
-    };
+  const calculatorSourceCount = useMemo(
+    () => registros.filter((record) => record.source === 'calculator').length,
+    [registros]
+  );
+
+  const servicosFeitos = useMemo(
+    () => registros.filter((record) => record.service_status === 'Concluido').length,
+    [registros]
+  );
+
+  const servicosAgendados = Math.max(0, numJobs - servicosFeitos);
+
+  const dadosSemana = useMemo(() => {
+    const base = WEEK_LABELS.reduce<Record<typeof WEEK_LABELS[number], number>>((acc, label) => {
+      acc[label] = 0;
+      return acc;
+    }, {} as Record<typeof WEEK_LABELS[number], number>);
 
     registros.forEach((record) => {
-      const key = semanaDoMes(getDate(new Date(record.created_at || new Date())));
-      base[key as keyof typeof base] += Number(record.valor || 0);
+      const key = semanaDoMes(getDate(new Date(record.created_at || new Date()))) as typeof WEEK_LABELS[number];
+      base[key] += Number(record.valor || 0);
     });
 
-    return Object.entries(base)
-      .filter(([, valor]) => valor > 0)
-      .map(([semana, valor]) => ({ semana, valor }));
+    return WEEK_LABELS.map((semana) => ({ semana, valor: base[semana] }));
   }, [registros]);
 
-  const rankingPeliculas = useMemo(() => {
-    const porPelicula: Record<string, { valor: number; jobs: number }> = {};
+  const rankingPeliculas = useMemo<FilmRankingItem[]>(() => {
+    const porPelicula: Record<string, { valor: number; jobs: number; area: number }> = {};
 
     registros.forEach((record) => {
-      const nome = getFilmLabel(record) || 'Não informado';
-      if (!porPelicula[nome]) porPelicula[nome] = { valor: 0, jobs: 0 };
+      const nome = getFilmLabel(record);
+      if (!porPelicula[nome]) porPelicula[nome] = { valor: 0, jobs: 0, area: 0 };
       porPelicula[nome].valor += Number(record.valor || 0);
       porPelicula[nome].jobs += 1;
+      porPelicula[nome].area += getAreaTotal(record);
     });
 
-    return Object.entries(porPelicula).sort(([, a], [, b]) => b.valor - a.valor);
-  }, [registros]);
-
-  const topBairros = useMemo(() => {
-    const porBairro: Record<string, number> = {};
-
-    registros.forEach((record) => {
-      const bairro = getBairroLabel(record);
-      if (!bairro) return;
-      porBairro[bairro] = (porBairro[bairro] || 0) + Number(record.valor || 0);
-    });
-
-    return Object.entries(porBairro)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 5);
-  }, [registros]);
+    return Object.entries(porPelicula)
+      .map(([nome, dados]) => ({
+        nome,
+        valor: dados.valor,
+        jobs: dados.jobs,
+        area: dados.area,
+        ticket: dados.jobs > 0 ? dados.valor / dados.jobs : 0,
+        share: faturamentoTotal > 0 ? (dados.valor / faturamentoTotal) * 100 : 0,
+      }))
+      .sort((a, b) => b.valor - a.valor);
+  }, [faturamentoTotal, registros]);
 
   const melhorSemana = useMemo(() => {
-    if (dadosGrafico.length === 0) return null;
-    return dadosGrafico.reduce((best, current) =>
-      current.valor > best.valor ? current : best
-    );
-  }, [dadosGrafico]);
+    if (faturamentoTotal <= 0) return null;
+    return dadosSemana.reduce((best, current) => (current.valor > best.valor ? current : best));
+  }, [dadosSemana, faturamentoTotal]);
 
-  const bairroLider = topBairros[0]?.[0] || 'Não disponível';
-  const peliculaLider = rankingPeliculas[0]?.[0] || 'Não disponível';
-  const melhorSemanaValor = melhorSemana?.valor || 0;
+  const melhorDia = useMemo(() => {
+    if (faturamentoTotal <= 0) return null;
+
+    const porDia: Record<string, { valor: number; jobs: number }> = {};
+    registros.forEach((record) => {
+      const key = format(new Date(record.created_at || new Date()), 'yyyy-MM-dd');
+      if (!porDia[key]) porDia[key] = { valor: 0, jobs: 0 };
+      porDia[key].valor += Number(record.valor || 0);
+      porDia[key].jobs += 1;
+    });
+
+    return Object.entries(porDia)
+      .map(([dia, dados]) => ({ dia, ...dados }))
+      .sort((a, b) => b.valor - a.valor)[0] || null;
+  }, [faturamentoTotal, registros]);
+
+  const peliculaLider = rankingPeliculas[0] || null;
 
   const tabelaResumo = useMemo(
     () =>
       dadosOrdenados.map((record) => ({
-        cliente: record.cliente || '—',
+        cliente: record.cliente || 'Sem nome',
         pelicula: getFilmLabel(record),
         valor: formatBRL(Number(record.valor || 0)),
-        data: record.created_at ? format(new Date(record.created_at), 'dd/MM/yyyy') : '—',
+        area: getAreaTotal(record),
+        data: record.created_at ? format(new Date(record.created_at), 'dd/MM/yyyy') : '-',
+        status: getServiceStatusLabel(record.service_status),
+        origem: record.source === 'calculator' ? 'Orçamento' : 'Lead',
       })),
     [dadosOrdenados]
   );
@@ -338,31 +513,35 @@ export function ExtratosMensaisSupabase() {
   const kpis: KpiCard[] = useMemo(() => {
     return [
       {
-        label: 'Faturamento Total',
+        label: 'Faturamento',
         value: formatBRL(faturamentoTotal),
-        subtext: 'total do mês',
+        subtext: 'serviços feitos e agendados',
         icon: Wallet,
+        tone: 'gold',
       },
       {
-        label: 'Nº de Jobs',
+        label: 'Serviços',
         value: String(numJobs),
-        subtext: 'orçamentos emitidos',
+        subtext: `${servicosAgendados} agendado${servicosAgendados !== 1 ? 's' : ''} • ${servicosFeitos} feito${servicosFeitos !== 1 ? 's' : ''}`,
         icon: ReceiptText,
+        tone: 'white',
       },
       {
-        label: 'Ticket Médio',
+        label: 'Ticket médio',
         value: formatBRL(ticketMedio),
-        subtext: 'por orçamento',
+        subtext: 'receita média por serviço',
         icon: TrendingUp,
+        tone: 'emerald',
       },
       {
-        label: m2Total > 0 ? 'M² Instalados' : 'Maior Orçamento',
+        label: m2Total > 0 ? 'Área estimada' : 'Maior serviço',
         value: m2Total > 0 ? `${m2Total.toFixed(1)} m²` : formatBRL(maiorOrcamento),
-        subtext: m2Total > 0 ? 'área total estimada' : 'maior venda do mês',
+        subtext: m2Total > 0 ? 'm² somados no extrato' : 'maior valor individual',
         icon: Package,
+        tone: 'sky',
       },
     ];
-  }, [faturamentoTotal, maiorOrcamento, m2Total, numJobs, ticketMedio]);
+  }, [faturamentoTotal, maiorOrcamento, m2Total, numJobs, servicosAgendados, servicosFeitos, ticketMedio]);
 
   async function exportarPDF() {
     const elemento = document.getElementById('extrato-conteudo');
@@ -397,15 +576,11 @@ export function ExtratosMensaisSupabase() {
     }
   }
 
-  const tituloMes = capitalizeFirst(
-    format(setMonth(new Date(), mesSelecionado), 'MMMM', { locale: ptBR })
-  );
-
   return (
-    <div className="relative min-h-[calc(100vh-2rem)] overflow-hidden space-y-6 bg-[#040811] px-4 py-6 md:px-6 md:py-8">
+    <div className="relative min-h-[calc(100vh-2rem)] overflow-hidden space-y-5 bg-[#040811] px-4 py-6 md:px-6 md:py-8">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute top-12 left-[8%] h-80 w-80 rounded-full bg-[#c9a227]/6 blur-[120px]" />
-        <div className="absolute right-[6%] top-32 h-[420px] w-[420px] rounded-full bg-blue-500/5 blur-[160px]" />
+        <div className="absolute left-[8%] top-12 h-80 w-80 rounded-full bg-[#c9a227]/6 blur-[120px]" />
+        <div className="absolute right-[6%] top-32 h-[420px] w-[420px] rounded-full bg-sky-500/5 blur-[160px]" />
         <div className="absolute bottom-0 left-1/2 h-64 w-[32rem] -translate-x-1/2 rounded-full bg-white/[0.03] blur-[120px]" />
       </div>
 
@@ -420,31 +595,30 @@ export function ExtratosMensaisSupabase() {
         }}
       />
 
-      <div className="relative rounded-3xl border border-white/5 bg-gradient-to-br from-[#07111d]/95 via-[#07111d]/80 to-[#04080f]/95 p-6 shadow-2xl shadow-black/20 backdrop-blur-md md:p-7">
+      <div className="relative rounded-2xl border border-white/5 bg-gradient-to-br from-[#07111d]/95 via-[#07111d]/80 to-[#04080f]/95 p-5 shadow-2xl shadow-black/20 backdrop-blur-md md:p-6">
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#c9a227]/40 to-transparent" />
         <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
           <div className="max-w-3xl">
-            <span className="inline-flex items-center gap-2 rounded-full border border-[#c9a227]/20 bg-[#c9a227]/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.35em] text-[#eab308]">
+            <span className="inline-flex items-center gap-2 rounded-full border border-[#c9a227]/20 bg-[#c9a227]/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.3em] text-[#eab308]">
               <span className="h-1.5 w-1.5 rounded-full bg-[#eab308]" />
-              LUME CRM
+              Fechamento comercial
             </span>
             <h2 className="mt-4 text-3xl font-black tracking-tight text-white md:text-5xl">
               Extratos Mensais
             </h2>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-white/50 md:text-[15px]">
-              Acompanhe o desempenho mensal dos orçamentos com uma única consulta ao
-              Supabase e consolide o faturamento por período, película e bairro.
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-white/55 md:text-[15px]">
+              Receita, mix de películas e lista de serviços feitos ou agendados no mês, sem misturar orçamentos que não viraram execução.
             </p>
           </div>
 
           <div className="flex flex-wrap items-end gap-3">
-            <div className="min-w-[170px]">
+            <div className="min-w-[165px]">
               <label className="mb-1 block text-[10px] uppercase tracking-widest text-white/40 font-semibold">
                 Mês
               </label>
               <select
                 value={mesSelecionado}
-                onChange={(e) => setMesSelecionado(Number(e.target.value))}
+                onChange={(event) => setMesSelecionado(Number(event.target.value))}
                 className="w-full rounded-2xl border border-white/10 bg-[#04080f] px-4 py-3 text-sm text-white outline-none transition focus:border-[#c9a227]/50"
               >
                 {meses.map((mes, index) => (
@@ -455,13 +629,13 @@ export function ExtratosMensaisSupabase() {
               </select>
             </div>
 
-            <div className="min-w-[150px]">
+            <div className="min-w-[135px]">
               <label className="mb-1 block text-[10px] uppercase tracking-widest text-white/40 font-semibold">
                 Ano
               </label>
               <select
                 value={anoSelecionado}
-                onChange={(e) => setAnoSelecionado(Number(e.target.value))}
+                onChange={(event) => setAnoSelecionado(Number(event.target.value))}
                 className="w-full rounded-2xl border border-white/10 bg-[#04080f] px-4 py-3 text-sm text-white outline-none transition focus:border-[#c9a227]/50"
               >
                 {anos.map((ano) => (
@@ -482,100 +656,8 @@ export function ExtratosMensaisSupabase() {
               ) : (
                 <Download className="h-4 w-4" />
               )}
-              Exportar PDF
+              PDF
             </button>
-          </div>
-        </div>
-
-        <div className="mt-6 grid gap-4 xl:grid-cols-[1.5fr_1fr]">
-          <div className="rounded-3xl border border-white/5 bg-white/[0.03] p-5 shadow-lg shadow-black/20">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="text-[10px] uppercase tracking-[0.35em] text-white/35 font-semibold">
-                  Resumo do período
-                </p>
-                <h3 className="mt-1 text-lg font-bold text-white">
-                  {tituloMes} {anoSelecionado}
-                </h3>
-              </div>
-              <span className="rounded-full border border-[#eab308]/20 bg-[#eab308]/10 px-3 py-1 text-[11px] font-semibold text-[#eab308]">
-                Atualizado ao selecionar
-              </span>
-            </div>
-
-            <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-              <div className="rounded-2xl border border-white/5 bg-[#04080f]/60 px-4 py-3">
-                <p className="text-[10px] uppercase tracking-[0.3em] text-white/35 font-semibold">
-                  Receita
-                </p>
-                <p className="mt-2 text-lg font-black text-white">{formatBRL(faturamentoTotal)}</p>
-              </div>
-              <div className="rounded-2xl border border-white/5 bg-[#04080f]/60 px-4 py-3">
-                <p className="text-[10px] uppercase tracking-[0.3em] text-white/35 font-semibold">
-                  Ticket
-                </p>
-                <p className="mt-2 text-lg font-black text-white">{formatBRL(ticketMedio)}</p>
-              </div>
-              <div className="rounded-2xl border border-white/5 bg-[#04080f]/60 px-4 py-3">
-                <p className="text-[10px] uppercase tracking-[0.3em] text-white/35 font-semibold">
-                  Película líder
-                </p>
-                <p className="mt-2 truncate text-lg font-black text-white">{peliculaLider}</p>
-              </div>
-              <div className="rounded-2xl border border-white/5 bg-[#04080f]/60 px-4 py-3">
-                <p className="text-[10px] uppercase tracking-[0.3em] text-white/35 font-semibold">
-                  Bairro líder
-                </p>
-                <p className="mt-2 truncate text-lg font-black text-white">{bairroLider}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-3xl border border-white/5 bg-white/[0.03] p-5 shadow-lg shadow-black/20">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="text-[10px] uppercase tracking-[0.35em] text-white/35 font-semibold">
-                  Destaque rápido
-                </p>
-                <h3 className="mt-1 text-lg font-bold text-white">Pico semanal</h3>
-              </div>
-              <BarChart3 className="h-5 w-5 text-[#eab308]" />
-            </div>
-
-            <div className="mt-5 rounded-2xl border border-white/5 bg-[#04080f]/65 p-4">
-              <div className="flex items-end justify-between gap-3">
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.3em] text-white/35 font-semibold">
-                    Melhor semana
-                  </p>
-                  <p className="mt-2 text-2xl font-black text-white">
-                    {melhorSemana?.semana || '—'}
-                  </p>
-                </div>
-                <p className="text-lg font-bold text-[#eab308]">{formatBRL(melhorSemanaValor)}</p>
-              </div>
-
-              <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/5">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-[#8a6d10] via-[#eab308] to-[#f7d66a]"
-                  style={{
-                    width: faturamentoTotal > 0 ? `${Math.min(100, (melhorSemanaValor / faturamentoTotal) * 100)}%` : '0%',
-                  }}
-                />
-              </div>
-
-              <div className="mt-3 flex flex-wrap gap-2 text-[11px] font-semibold text-white/45">
-                <span className="rounded-full border border-white/5 bg-white/[0.02] px-2.5 py-1">
-                  Consulta única
-                </span>
-                <span className="rounded-full border border-white/5 bg-white/[0.02] px-2.5 py-1">
-                  PDF pronto
-                </span>
-                <span className="rounded-full border border-white/5 bg-white/[0.02] px-2.5 py-1">
-                  Atualização dinâmica
-                </span>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -583,30 +665,31 @@ export function ExtratosMensaisSupabase() {
       {loading ? (
         <LoadingSkeleton />
       ) : errorMessage ? (
-        <div className="rounded-3xl border border-red-500/20 bg-red-500/5 p-6 text-center text-red-300">
+        <div className="relative rounded-2xl border border-red-500/20 bg-red-500/5 p-6 text-center text-red-300">
           <p className="font-semibold">{errorMessage}</p>
         </div>
       ) : (
-        <div id="extrato-conteudo" className="relative space-y-6">
-          <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div id="extrato-conteudo" className="relative space-y-5">
+          <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
             {kpis.map((card) => {
               const Icon = card.icon;
+
               return (
                 <article
                   key={card.label}
-                  className="group rounded-3xl border border-white/5 bg-white/[0.03] p-6 shadow-lg shadow-black/20 transition hover:-translate-y-0.5 hover:border-[#c9a227]/20 hover:bg-white/[0.045]"
+                  className="group rounded-2xl border border-white/5 bg-[#07111d]/78 p-5 shadow-lg shadow-black/20 transition hover:-translate-y-0.5 hover:border-[#c9a227]/20 hover:bg-white/[0.045]"
                 >
                   <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <span className="text-[10px] uppercase tracking-[0.3em] text-white/40 font-semibold">
+                    <div className="min-w-0">
+                      <span className="text-[10px] uppercase tracking-[0.24em] text-white/40 font-semibold">
                         {card.label}
                       </span>
-                      <p className="mt-3 text-3xl font-black tracking-tight text-white">
+                      <p className="mt-2 truncate text-2xl font-black tracking-tight text-white">
                         {card.value}
                       </p>
                       <p className="mt-1 text-xs text-white/40">{card.subtext}</p>
                     </div>
-                    <div className="rounded-2xl border border-white/5 bg-[#c9a227]/10 p-3 text-[#eab308] shadow-inner shadow-black/20 transition group-hover:border-[#c9a227]/30">
+                    <div className={`rounded-2xl border p-3 shadow-inner shadow-black/20 transition ${KPI_TONES[card.tone]}`}>
                       <Icon className="h-5 w-5" />
                     </div>
                   </div>
@@ -615,60 +698,65 @@ export function ExtratosMensaisSupabase() {
             })}
           </section>
 
-          <section className="grid gap-6 xl:grid-cols-[1.7fr_1fr]">
-            <article className="rounded-3xl border border-white/5 bg-[#07111d]/75 p-6 shadow-2xl shadow-black/20 backdrop-blur-md">
-              <div className="mb-5 flex items-center justify-between gap-3">
+          <section className="grid gap-5 xl:grid-cols-[1.45fr_1fr]">
+            <article className="rounded-2xl border border-white/5 bg-[#07111d]/78 p-5 shadow-2xl shadow-black/20 backdrop-blur-md md:p-6">
+              <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                  <span className="text-[10px] uppercase tracking-[0.3em] text-white/40 font-semibold">
-                    FATURAMENTO POR SEMANA
+                  <span className="text-[10px] uppercase tracking-[0.26em] text-white/40 font-semibold">
+                    Faturamento por semana
                   </span>
                   <h3 className="mt-1 text-lg font-bold text-white">
-                    Período: {tituloMes} / {anoSelecionado}
+                    {tituloMes} / {anoSelecionado}
                   </h3>
                 </div>
-                <BarChart3 className="h-5 w-5 text-[#c9a227]" />
+                <span className="inline-flex w-fit items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs font-semibold text-white/55">
+                  <CalendarRange className="h-3.5 w-3.5 text-[#eab308]" />
+                  {numJobs} serviço{numJobs !== 1 ? 's' : ''}
+                </span>
               </div>
 
-              <div className="h-[270px]">
-                {dadosGrafico.length === 0 ? (
-                  <div className="flex h-full items-center justify-center rounded-2xl border border-dashed border-white/10 bg-white/[0.02] text-sm text-white/35">
-                    Nenhum orçamento encontrado neste período.
+              <div className="h-[285px]">
+                {faturamentoTotal <= 0 ? (
+                  <div className="flex h-full items-center justify-center rounded-2xl border border-dashed border-white/10 bg-white/[0.02] text-center text-sm text-white/35">
+                    Nenhum serviço feito ou agendado neste período.
                   </div>
                 ) : (
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={dadosGrafico} barSize={44} barGap={8}>
+                    <BarChart data={dadosSemana} barSize={44} barGap={8}>
                       <CartesianGrid
                         strokeDasharray="3 3"
-                        stroke="rgba(255,255,255,0.04)"
+                        stroke="rgba(255,255,255,0.045)"
                         vertical={false}
                       />
                       <XAxis
                         dataKey="semana"
-                        tick={{ fontSize: 12, fill: 'rgba(255,255,255,0.55)' }}
+                        tick={{ fontSize: 12, fill: 'rgba(255,255,255,0.58)' }}
                         axisLine={false}
                         tickLine={false}
                       />
                       <YAxis
-                        tick={{ fontSize: 12, fill: 'rgba(255,255,255,0.55)' }}
+                        tick={{ fontSize: 12, fill: 'rgba(255,255,255,0.5)' }}
                         tickFormatter={(value) => `R$${(Number(value) / 1000).toFixed(0)}k`}
                         width={56}
                         axisLine={false}
                         tickLine={false}
                       />
                       <Tooltip
-                        cursor={{ fill: 'rgba(255,255,255,0.04)' }}
+                        cursor={{ fill: 'rgba(255,255,255,0.045)' }}
                         formatter={(value: number) => formatBRL(Number(value))}
                         contentStyle={{
                           background: '#04080f',
                           border: '1px solid rgba(255,255,255,0.08)',
                           borderRadius: 14,
+                          color: '#fff',
                         }}
                       />
                       <Bar dataKey="valor" radius={[8, 8, 0, 0]}>
-                        {dadosGrafico.map((_, index) => (
+                        {dadosSemana.map((entry) => (
                           <Cell
-                            key={index}
-                            fill={index === 0 ? '#f7d66a' : index % 2 === 0 ? '#eab308' : '#8a6d10'}
+                            key={entry.semana}
+                            fill={entry.semana === melhorSemana?.semana ? '#f7d66a' : '#8a6d10'}
+                            fillOpacity={entry.valor > 0 ? 1 : 0.28}
                           />
                         ))}
                       </Bar>
@@ -678,119 +766,172 @@ export function ExtratosMensaisSupabase() {
               </div>
             </article>
 
-            <article className="rounded-3xl border border-white/5 bg-[#07111d]/75 p-6 shadow-2xl shadow-black/20 backdrop-blur-md">
+            <article className="rounded-2xl border border-white/5 bg-[#07111d]/78 p-5 shadow-2xl shadow-black/20 backdrop-blur-md md:p-6">
               <div className="mb-5 flex items-center justify-between gap-3">
                 <div>
-                  <span className="text-[10px] uppercase tracking-[0.3em] text-white/40 font-semibold">
-                    TOP BAIRROS
+                  <span className="text-[10px] uppercase tracking-[0.26em] text-white/40 font-semibold">
+                    Leitura do mês
                   </span>
-                  <h3 className="mt-1 text-lg font-bold text-white">Faturamento concentrado</h3>
+                  <h3 className="mt-1 text-lg font-bold text-white">Sinais úteis</h3>
                 </div>
-                <MapPin className="h-5 w-5 text-[#c9a227]" />
+                <Sparkles className="h-5 w-5 text-[#f5d77a]" />
               </div>
 
-              {topBairros.length === 0 ? (
-                <p className="text-sm text-white/45">
-                  Dados de bairro não disponíveis para este período.
+              <div className="space-y-3">
+                <div className="rounded-2xl border border-[#c9a227]/10 bg-[#c9a227]/10 p-4">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#f5d77a]/70">
+                    Película líder
+                  </p>
+                  <div className="mt-2 flex items-end justify-between gap-3">
+                    <p className="min-w-0 truncate text-2xl font-black text-white">
+                      {peliculaLider?.nome || 'Sem dados'}
+                    </p>
+                    <p className="shrink-0 text-sm font-bold text-[#f5d77a]">
+                      {peliculaLider ? formatPercent(peliculaLider.share) : '-'}
+                    </p>
+                  </div>
+                  <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-[#8a6d10] via-[#eab308] to-[#f7d66a]"
+                      style={{ width: peliculaLider ? `${Math.min(100, peliculaLider.share)}%` : '0%' }}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+                  <div className="flex items-center justify-between gap-4 rounded-2xl border border-white/5 bg-white/[0.025] px-4 py-3">
+                    <div className="min-w-0">
+                      <p className="text-xs text-white/40">Melhor semana</p>
+                      <p className="mt-1 font-bold text-white">{melhorSemana?.semana || '-'}</p>
+                    </div>
+                    <p className="shrink-0 text-sm font-bold text-[#f5d77a]">
+                      {formatBRL(melhorSemana?.valor || 0)}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-4 rounded-2xl border border-white/5 bg-white/[0.025] px-4 py-3">
+                    <div className="min-w-0">
+                      <p className="text-xs text-white/40">Melhor dia</p>
+                      <p className="mt-1 font-bold text-white">
+                        {melhorDia ? format(new Date(`${melhorDia.dia}T12:00:00`), 'dd/MM') : '-'}
+                      </p>
+                    </div>
+                    <p className="shrink-0 text-sm font-bold text-[#f5d77a]">
+                      {formatBRL(melhorDia?.valor || 0)}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-4 rounded-2xl border border-white/5 bg-white/[0.025] px-4 py-3">
+                    <div className="min-w-0">
+                      <p className="text-xs text-white/40">Com orçamento vinculado</p>
+                      <p className="mt-1 font-bold text-white">
+                        {calculatorSourceCount}/{numJobs}
+                      </p>
+                    </div>
+                    <Link2 className="h-4 w-4 text-sky-200" />
+                  </div>
+                </div>
+              </div>
+            </article>
+          </section>
+
+          <section className="grid gap-5 xl:grid-cols-[1.35fr_1fr]">
+            <article className="rounded-2xl border border-white/5 bg-[#07111d]/78 p-5 shadow-2xl shadow-black/20 backdrop-blur-md md:p-6">
+              <div className="mb-5 flex items-center justify-between gap-3">
+                <div>
+                  <span className="text-[10px] uppercase tracking-[0.26em] text-white/40 font-semibold">
+                    Ranking de películas
+                  </span>
+                  <h3 className="mt-1 text-lg font-bold text-white">Mix de receita e volume</h3>
+                </div>
+                <Layers3 className="h-5 w-5 text-[#c9a227]" />
+              </div>
+
+              {rankingPeliculas.length === 0 ? (
+                <p className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] px-4 py-8 text-center text-sm text-white/40">
+                  Nenhum dado para agrupar por película.
                 </p>
               ) : (
-                <div className="space-y-2">
-                  {topBairros.map(([bairro, valor], index) => (
+                <div className="space-y-3">
+                  {rankingPeliculas.map((item, index) => (
                     <div
-                      key={bairro}
-                      className="flex items-center gap-3 rounded-2xl border border-white/5 bg-white/[0.02] px-3 py-3 transition hover:border-white/10 hover:bg-white/[0.04]"
+                      key={item.nome}
+                      className="rounded-2xl border border-white/5 bg-white/[0.025] px-4 py-4 transition hover:border-[#c9a227]/20 hover:bg-white/[0.04]"
                     >
-                      <span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/5 bg-white/[0.03] text-xs font-bold text-white/40">
-                        {index + 1}
-                      </span>
-                      <span className="min-w-0 flex-1 truncate text-sm text-white">{bairro}</span>
-                      <span className="text-sm font-semibold text-[#eab308]">{formatBRL(valor)}</span>
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex min-w-0 items-center gap-3">
+                          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-xs font-black text-white/55">
+                            {index + 1}
+                          </span>
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-bold text-white">{item.nome}</p>
+                            <p className="text-xs text-white/40">
+                              {item.jobs} serviço{item.jobs !== 1 ? 's' : ''} • ticket {formatBRL(item.ticket)}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="text-left sm:text-right">
+                          <p className="text-sm font-bold text-[#f5d77a]">{formatBRL(item.valor)}</p>
+                          <p className="text-xs text-white/40">
+                            {formatPercent(item.share)} do mês{item.area > 0 ? ` • ${item.area.toFixed(1)} m²` : ''}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10">
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-[#8a6d10] via-[#d4ad30] to-[#f5d77a]"
+                          style={{ width: `${Math.max(4, Math.min(100, item.share))}%` }}
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>
               )}
             </article>
-          </section>
 
-          <section className="grid gap-6 xl:grid-cols-[1.4fr_1fr]">
-            <article className="rounded-3xl border border-white/5 bg-[#07111d]/75 p-6 shadow-2xl shadow-black/20 backdrop-blur-md">
+            <article className="rounded-2xl border border-white/5 bg-[#07111d]/78 p-5 shadow-2xl shadow-black/20 backdrop-blur-md md:p-6">
               <div className="mb-5 flex items-center justify-between gap-3">
                 <div>
-                  <span className="text-[10px] uppercase tracking-[0.3em] text-white/40 font-semibold">
-                    BREAKDOWN POR PELÍCULA
+                  <span className="text-[10px] uppercase tracking-[0.26em] text-white/40 font-semibold">
+                    Serviços do período
                   </span>
-                  <h3 className="mt-1 text-lg font-bold text-white">Mix de receita</h3>
+                  <h3 className="mt-1 text-lg font-bold text-white">Lista operacional</h3>
                 </div>
                 <BarChart3 className="h-5 w-5 text-[#c9a227]" />
               </div>
 
-              <div className="space-y-2">
-                {rankingPeliculas.length === 0 ? (
-                  <p className="text-sm text-white/45">Nenhum dado para agrupar por película.</p>
-                ) : (
-                  rankingPeliculas.map(([nome, dados]) => (
+              {tabelaResumo.length === 0 ? (
+                <p className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] px-4 py-8 text-center text-sm text-white/40">
+                  Nenhum serviço feito ou agendado em {tituloMes} {anoSelecionado}.
+                </p>
+              ) : (
+                <div className="max-h-[520px] space-y-2 overflow-y-auto pr-1">
+                  {tabelaResumo.map((row, index) => (
                     <div
-                      key={nome}
-                      className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-3 border-b border-white/5 py-3 transition last:border-b-0 hover:bg-white/[0.02]"
+                      key={`${row.cliente}-${row.data}-${index}`}
+                      className="rounded-2xl border border-white/5 bg-white/[0.025] px-4 py-3 transition hover:border-white/10 hover:bg-white/[0.04]"
                     >
-                      <span className="min-w-0 truncate text-sm text-white">{nome}</span>
-                      <span className="text-xs text-white/45">
-                        {dados.jobs} job{dados.jobs !== 1 ? 's' : ''}
-                      </span>
-                      <span className="text-sm font-semibold text-[#eab308]">
-                        {formatBRL(dados.valor)}
-                      </span>
-                      <span className="w-12 text-right text-xs text-white/40">
-                        {faturamentoTotal > 0
-                          ? `${((dados.valor / faturamentoTotal) * 100).toFixed(0)}%`
-                          : '—'}
-                      </span>
-                    </div>
-                  ))
-                )}
-              </div>
-            </article>
-
-            <article className="rounded-3xl border border-white/5 bg-[#07111d]/75 p-6 shadow-2xl shadow-black/20 backdrop-blur-md">
-              <div className="mb-5 flex items-center justify-between gap-3">
-                <div>
-                  <span className="text-[10px] uppercase tracking-[0.3em] text-white/40 font-semibold">
-                    RESUMO DO MÊS
-                  </span>
-                  <h3 className="mt-1 text-lg font-bold text-white">Lista de orçamentos</h3>
-                </div>
-                <CalendarRange className="h-5 w-5 text-[#c9a227]" />
-              </div>
-
-              <div className="space-y-3">
-                {tabelaResumo.length === 0 ? (
-                  <p className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] px-4 py-8 text-center text-sm text-white/40">
-                    Nenhum orçamento registrado em {tituloMes} {anoSelecionado}.
-                  </p>
-                ) : (
-                  <>
-                    <div className="grid grid-cols-[1.4fr_1fr_0.8fr_0.8fr] gap-3 border-b border-white/5 pb-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-white/35">
-                      <span>Cliente</span>
-                      <span>Película</span>
-                      <span>Valor</span>
-                      <span>Data</span>
-                    </div>
-                    <div className="max-h-[360px] space-y-2 overflow-y-auto pr-1">
-                      {tabelaResumo.map((row, index) => (
-                        <div
-                          key={`${row.cliente}-${row.data}-${index}`}
-                          className="grid grid-cols-[1.4fr_1fr_0.8fr_0.8fr] items-center gap-3 rounded-2xl border border-white/5 bg-white/[0.02] px-3 py-3 transition hover:border-white/10 hover:bg-white/[0.04]"
-                        >
-                          <span className="truncate text-sm text-white">{row.cliente}</span>
-                          <span className="truncate text-sm text-white/70">{row.pelicula}</span>
-                          <span className="text-sm font-semibold text-[#eab308]">{row.valor}</span>
-                          <span className="text-sm text-white/55">{row.data}</span>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-bold text-white">{row.cliente}</p>
+                          <p className="mt-1 truncate text-xs text-white/45">
+                            {row.pelicula} • {row.status} • {row.data}
+                            {row.area > 0 ? ` • ${row.area.toFixed(1)} m²` : ''}
+                          </p>
                         </div>
-                      ))}
+                        <div className="shrink-0 text-right">
+                          <p className="text-sm font-bold text-[#f5d77a]">{row.valor}</p>
+                          <p className={`mt-1 text-[10px] font-semibold uppercase tracking-[0.16em] ${row.origem === 'Orçamento' ? 'text-sky-200/80' : 'text-white/40'}`}>
+                            {row.origem}
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                  </>
-                )}
-              </div>
+                  ))}
+                </div>
+              )}
             </article>
           </section>
         </div>

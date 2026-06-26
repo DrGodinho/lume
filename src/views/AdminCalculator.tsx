@@ -190,9 +190,6 @@ const ROOM_SWATCHES = [
 const resolveRoomKey = (label: string) => {
   const normalized = normalizeRoomKey(label);
   if (!normalized) return '';
-  for (const rule of ROOM_ALIAS_RULES) {
-    if (rule.test.test(normalized)) return rule.key;
-  }
   return normalized.replace(/\s+/g, '_');
 };
 
@@ -200,7 +197,7 @@ const stableRoomColor = (label: string) => {
   const key = resolveRoomKey(label);
   if (!key) return '#94a3b8';
   if (ROOM_PALETTE[key]) return ROOM_PALETTE[key];
-  let hash = 0;
+  let hash = ROOM_ALIAS_RULES.length;
   for (let i = 0; i < key.length; i++) {
     hash = ((hash << 5) - hash) + key.charCodeAt(i);
     hash |= 0;

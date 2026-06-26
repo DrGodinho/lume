@@ -60,29 +60,14 @@ export function RealengoPage() {
                 </div>
             </section>
 
-            {/* Auto-Scroll Info Strip / Estatísticas */}
-            <section className="bg-[#c9a227] py-6 overflow-hidden relative z-20">
-                <div className="container-lume">
-                    <div className="flex flex-wrap lg:flex-nowrap justify-center lg:justify-between items-center gap-6 lg:gap-4 text-black font-extrabold uppercase tracking-widest text-xs lg:text-sm text-center">
-                        <span className="flex items-center gap-2"><Thermometer size={18} /> Até 80% de rejeição de calor</span>
-                        <span className="hidden lg:inline opacity-30">•</span>
-                        <span className="flex items-center gap-2"><Sun size={18} /> 99% bloqueio de raios UV</span>
-                        <span className="hidden lg:inline opacity-30">•</span>
-                        <span className="flex items-center gap-2"><Shield size={18} /> Proteção Solar Arquitetônica</span>
-                        <span className="hidden lg:inline opacity-30">•</span>
-                        <span className="flex items-center gap-2"><CheckCircle size={18} /> Garantia de 5 anos Lume</span>
-                    </div>
-                </div>
-            </section>
-
-            {/* Faixa de Garantias (Intro Strip) */}
+            {/* Faixa de Garantias e Benefícios (Merged Strip) */}
             <section className="py-8 bg-[#04080f] border-b border-white/5 relative z-10">
                 <div className="container-lume page-entrance">
-                    <div className="flex flex-wrap justify-center gap-8 text-sm text-gray-400 font-medium">
-                        <div className="flex items-center gap-2"><CheckCircle size={16} className="text-[#c9a227]" /> Orçamento gratuito e sem compromisso</div>
-                        <div className="flex items-center gap-2"><CheckCircle size={16} className="text-[#c9a227]" /> Atendimento local em Realengo</div>
-                        <div className="flex items-center gap-2"><CheckCircle size={16} className="text-[#c9a227]" /> Películas de procedência certificada</div>
-                        <div className="flex items-center gap-2"><CheckCircle size={16} className="text-[#c9a227]" /> Rapidez total: Instalado em 24h</div>
+                    <div className="flex flex-wrap justify-center gap-6 lg:gap-8 text-sm text-gray-400 font-medium">
+                        <div className="flex items-center gap-2"><Thermometer size={16} className="text-[#c9a227]" /> Até 80% de Rejeição de Calor</div>
+                        <div className="flex items-center gap-2"><Sun size={16} className="text-[#c9a227]" /> 99% Bloqueio Anti-UV</div>
+                        <div className="flex items-center gap-2"><CheckCircle size={16} className="text-[#c9a227]" /> Orçamento Gratuito no Local</div>
+                        <div className="flex items-center gap-2"><Shield size={16} className="text-[#c9a227]" /> Garantia de 5 Anos Lume</div>
                     </div>
                 </div>
             </section>

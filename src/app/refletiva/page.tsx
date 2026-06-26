@@ -68,18 +68,9 @@ const jsonLd = {
   aggregateRating: {
     '@type': 'AggregateRating',
     ratingValue: '5.0',
-    reviewCount: '31',
+    reviewCount: '22',
     bestRating: '5'
-  },
-  review: [
-    {
-      '@type': 'Review',
-      'author': { '@type': 'Person', 'name': 'Mariana Silva' },
-      'datePublished': '2025-02-01',
-      'reviewBody': 'Fizeram a varanda com a película refletiva. Ficou lindo e muito privativo.',
-      'reviewRating': { '@type': 'Rating', 'ratingValue': '5' }
-    }
-  ]
+  }
 },
 {
   '@type': 'FAQPage',

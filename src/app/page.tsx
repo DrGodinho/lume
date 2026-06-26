@@ -11,7 +11,7 @@ import { GoogleReviews } from '../components/GoogleReviews';
 export const metadata: Metadata = {
   title: 'LUME Controle Solar | Insulfilm Residencial e Comercial no Rio de Janeiro',
   description:
-    'Especialista em insulfilm de alta performance no RJ. Redução de calor (até 97%), privacidade 24h e proteção UV. Atendimento em Bangu, Barra, Recreio e Zona Oeste.',
+    'Insulfilm residencial e comercial no RJ com redução de calor, proteção UV e privacidade 24h com jateado. Bangu, Barra, Recreio e Zona Oeste.',
   keywords: [
     'insulfilm residencial rj',
     'insulfilm comercial rj',
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'LUME Controle Solar | Insulfilm de Elite no RJ',
-    description: 'Películas residenciais de alta performance com instalação express em 24h no Rio de Janeiro.',
+    description: 'Insulfilm residencial de alta performance no Rio, com instalação profissional, garantia de 5 anos e opção de privacidade 24h com jateado.',
     url: 'https://lumecontrolesolar.com.br/',
     siteName: 'LUME Controle Solar',
     images: [
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'LUME Controle Solar | Insulfilm de Elite no RJ',
-    description: 'Películas residenciais de alta performance com redução de calor de até 97% e proteção UV.',
+    description: 'Insulfilm residencial no RJ para reduzir calor, proteger móveis e ter privacidade 24h com película jateada.',
     images: ['https://lumecontrolesolar.com.br/og-image.jpg'],
   },
 };

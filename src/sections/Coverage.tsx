@@ -8,6 +8,7 @@ const locations = [
   { name: 'Jacarepaguá', active: true },
   { name: 'Barra da Tijuca', active: true },
   { name: 'Recreio', active: true },
+  { name: 'Sulacap', active: true },
 ];
 
 const urlMap: Record<string, string> = {
@@ -16,7 +17,8 @@ const urlMap: Record<string, string> = {
   'Campo Grande': '/insulfilm-em-campo-grande',
   'Jacarepaguá': '/insulfilm-em-jacarepagua',
   'Barra da Tijuca': '/insulfilm-na-barra-da-tijuca',
-  'Recreio': '/insulfilm-no-recreio'
+  'Recreio': '/insulfilm-no-recreio',
+  'Sulacap': '/insulfilm-em-sulacap'
 };
 
 export function Coverage() {

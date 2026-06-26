@@ -49,6 +49,7 @@ interface HistoryItem {
   desconto: number;
   modoOtimizacao: string;
   selectedFilm?: string;
+  leadId?: string | null;
 }
 
 interface CalculatorHistoryRow {
@@ -63,6 +64,7 @@ interface CalculatorHistoryRow {
   desconto: number;
   modo_otimizacao: string;
   selected_film?: string | null;
+  lead_id?: string | null;
 }
 
 export async function saveHistoryItemToCloud(item: HistoryItem): Promise<boolean> {
@@ -81,6 +83,7 @@ export async function saveHistoryItemToCloud(item: HistoryItem): Promise<boolean
       desconto: item.desconto,
       modo_otimizacao: item.modoOtimizacao,
       selected_film: item.selectedFilm || null,
+      lead_id: item.leadId || null,
     });
   if (error) console.error('[Cloud] History save failed:', error.message);
   return !error;
@@ -106,6 +109,7 @@ export async function loadHistoryFromCloud(): Promise<HistoryItem[]> {
     desconto: row.desconto,
     modoOtimizacao: row.modo_otimizacao,
     selectedFilm: row.selected_film || undefined,
+    leadId: row.lead_id || null,
   }));
 }
 

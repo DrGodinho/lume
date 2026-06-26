@@ -79,6 +79,29 @@ const roomsData = [
   }
 ];
 
+const quickAnswers = [
+  {
+    question: 'Quanto custa insulfilm residencial no Rio de Janeiro?',
+    answer:
+      'Na LUME, as linhas principais começam em R$ 80/m² no Carbono, R$ 95/m² na Refletiva, R$ 120/m² na Dupla Camada e R$ 220/m² na Nano Cerâmica. O valor final depende da metragem, altura, tipo de vidro e objetivo do ambiente.',
+  },
+  {
+    question: 'Qual insulfilm reduz mais calor sem escurecer?',
+    answer:
+      'A Nano Cerâmica é a escolha premium para manter luz natural e bloquear calor. Ela funciona muito bem em salas, varandas gourmet, escritórios e janelas grandes com sol forte.',
+  },
+  {
+    question: 'Qual película oferece privacidade 24h?',
+    answer:
+      'A película Jateada oferece privacidade permanente sem bloquear a luz. Películas refletivas e carbono aumentam a privacidade durante o dia, mas podem perder esse efeito à noite com luz interna acesa.',
+  },
+  {
+    question: 'Quais bairros a LUME atende?',
+    answer:
+      'Atendemos Bangu, Realengo, Campo Grande, Jacarepaguá, Barra da Tijuca, Recreio, Sulacap e outras regiões da Zona Oeste do Rio de Janeiro.',
+  },
+];
+
 export function SelectionGuide() {
   return (
     <section id="escolha-ideal" className="relative section-padding bg-[#070f1a] overflow-hidden">
@@ -175,6 +198,40 @@ export function SelectionGuide() {
           <p className="text-[10px] sm:text-xs text-gray-500 italic text-center sm:text-left px-4">
             * A privacidade das películas (exceto Jateado) é baseada na luminosidade. Oferecem privacidade total durante o dia (quem está fora não vê dentro). À noite, com luzes internas acesas, o efeito se inverte. Apenas a película <strong>Jateada</strong> oferece privacidade 24h.
           </p>
+        </ScrollReveal>
+
+        <ScrollReveal animation="slide-up" className="mb-16">
+          <div className="text-center mb-8">
+            <div className="animate-item flex items-center justify-center gap-4 mb-4">
+              <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
+              <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
+                Respostas Rápidas
+              </span>
+              <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
+            </div>
+            <h2 className="animate-item text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 font-montserrat">
+              Insulfilm no RJ: <span className="text-gradient-gold">preço, privacidade e calor</span>
+            </h2>
+            <p className="animate-item text-gray-400 text-sm sm:text-base max-w-2xl mx-auto">
+              Respostas diretas para quem está comparando opções de insulfilm residencial antes de pedir um orçamento.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+            {quickAnswers.map((item) => (
+              <article
+                key={item.question}
+                className="animate-item glass-card rounded-2xl border border-[#1a3a5c]/30 bg-gradient-to-b from-[#1a3a5c]/30 to-[#04080f]/70 p-5 sm:p-6"
+              >
+                <h3 className="text-white font-bold text-base sm:text-lg mb-3 font-montserrat">
+                  {item.question}
+                </h3>
+                <p className="text-gray-400 text-sm leading-relaxed">
+                  {item.answer}
+                </p>
+              </article>
+            ))}
+          </div>
         </ScrollReveal>
 
         {/* Room Cards Grid */}

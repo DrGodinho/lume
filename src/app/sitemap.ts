@@ -18,6 +18,7 @@ const staticRoutes = [
   { path: '/insulfilm-em-jacarepagua/', priority: 0.7, changeFrequency: 'weekly' as const },
   { path: '/insulfilm-na-barra-da-tijuca/', priority: 0.7, changeFrequency: 'weekly' as const },
   { path: '/insulfilm-no-recreio/', priority: 0.7, changeFrequency: 'weekly' as const },
+  { path: '/insulfilm-em-sulacap/', priority: 0.7, changeFrequency: 'weekly' as const },
   { path: '/insulfilm-na-cozinha/', priority: 0.8, changeFrequency: 'monthly' as const },
   { path: '/insulfilm-no-banheiro/', priority: 0.8, changeFrequency: 'monthly' as const },
   { path: '/insulfilm-no-quarto/', priority: 0.8, changeFrequency: 'monthly' as const },
