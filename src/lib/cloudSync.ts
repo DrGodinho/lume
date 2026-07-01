@@ -1,4 +1,7 @@
 import { supabase } from './supabase';
+import { createScopedLogger } from './logger';
+
+const logger = createScopedLogger('cloud-sync');
 
 type CloudGlass = object;
 type CloudConfig = object;
@@ -22,7 +25,7 @@ export async function saveDraftToCloud(draft: DraftData): Promise<boolean> {
   const { error } = await supabase
     .from('calculator_draft')
     .upsert({ id: 'default', ...draft, updated_at: new Date().toISOString() });
-  if (error) console.error('[Cloud] Draft save failed:', error.message);
+  if (error) logger.error('Draft save failed', undefined, { message: error.message });
   return !error;
 }
 
@@ -85,7 +88,7 @@ export async function saveHistoryItemToCloud(item: HistoryItem): Promise<boolean
       selected_film: item.selectedFilm || null,
       lead_id: item.leadId || null,
     });
-  if (error) console.error('[Cloud] History save failed:', error.message);
+  if (error) logger.error('History save failed', undefined, { message: error.message });
   return !error;
 }
 
@@ -119,7 +122,7 @@ export async function deleteHistoryItemFromCloud(id: string): Promise<boolean> {
     .from('calculator_history')
     .delete()
     .eq('id', id);
-  if (error) console.error('[Cloud] History delete failed:', error.message);
+  if (error) logger.error('History delete failed', undefined, { message: error.message });
   return !error;
 }
 
@@ -176,12 +179,12 @@ export async function saveConfigToCloud(config: ConfigData): Promise<boolean> {
       .find((column) => error.message?.includes(column));
 
     if (!missingColumn || !(missingColumn in row)) {
-      console.error('[Cloud] Config save failed:', error.message);
+      logger.error('Config save failed', undefined, { message: error.message });
       return false;
     }
 
     delete row[missingColumn];
-    console.warn(`[Cloud] Column ${missingColumn} missing - run: ${CONFIG_OPTIONAL_COLUMNS[missingColumn]}`);
+    logger.warn(`Column ${missingColumn} missing - run: ${CONFIG_OPTIONAL_COLUMNS[missingColumn]}`);
   }
 }
 

@@ -19,7 +19,9 @@ import {
   subMonths,
 } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { CalendarPlus } from 'lucide-react';
 import { WhatsAppTemplateMenu, type WhatsAppTemplateType } from './WhatsAppTemplateMenu';
+import { buildGoogleCalendarUrl } from '../utils/googleCalendar';
 import type { AgendaView, Lead, LeadCardKind, ServiceStatus, ServiceStatusMeta } from '../types';
 
 interface AgendaSectionProps {
@@ -278,6 +280,18 @@ function LeadCardAgenda({
             </a>
           )}
           <WhatsAppTemplateMenu getHref={(template) => getWhatsAppHref(lead, template)} />
+          {serviceDate && (
+            <a
+              href={buildGoogleCalendarUrl(lead, serviceDate)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-2xl border border-sky-500/20 bg-sky-500/10 px-4 py-2 text-xs font-semibold text-sky-300 transition hover:bg-sky-500/15"
+              title="Adicionar este serviço ao Google Calendar"
+            >
+              <CalendarPlus className="h-3.5 w-3.5" />
+              Google Calendar
+            </a>
+          )}
           <button
             onClick={() => onAbrirLead(lead)}
             className="rounded-2xl border border-white/10 px-4 py-2 text-xs font-semibold text-white/70 transition hover:border-white/20 hover:text-white"

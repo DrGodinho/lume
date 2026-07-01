@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { NanoCeramicaPage } from '../../views/NanoCeramica';
+import { businessAddressSchema, businessInfo } from '@/lib/businessInfo';
 
 export const metadata: Metadata = {
   title: 'Película Nano Cerâmica | Rejeição de 97% do Calor IR - LUME',
@@ -55,14 +56,8 @@ const jsonLd = {
           '@type': 'LocalBusiness',
           name: 'LUME Controle Solar',
           image: 'https://lumecontrolesolar.com.br/logo-lume.png',
-          telephone: '+5521965140612',
-          address: {
-            '@type': 'PostalAddress',
-            streetAddress: 'Estrada do Realengo, 973',
-            addressLocality: 'Bangu',
-            addressRegion: 'RJ',
-            addressCountry: 'BR'
-          }
+          telephone: businessInfo.phoneE164,
+          address: businessAddressSchema
         }
       },
       aggregateRating: {

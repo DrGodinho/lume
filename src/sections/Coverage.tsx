@@ -1,5 +1,6 @@
 import { MapPin, Navigation } from 'lucide-react';
 import { ScrollReveal } from '../components/ScrollReveal';
+import { businessInfo } from '@/lib/businessInfo';
 
 const locations = [
   { name: 'Bangu', active: true },
@@ -70,7 +71,7 @@ export function Coverage() {
               <div className="text-left">
                 <p className="text-white text-sm sm:text-base font-medium">Nossa Sede</p>
                 <p className="text-gray-400 text-xs sm:text-sm">
-                  Estrada do Realengo, 973 - <a href="/insulfilm-em-bangu/" className="text-[#c9a227] hover:underline">Bangu</a>, Rio de Janeiro
+                  {businessInfo.address.display}
                 </p>
               </div>
             </div>

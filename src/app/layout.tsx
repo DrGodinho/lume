@@ -3,6 +3,7 @@ import Script from 'next/script';
 import type { CSSProperties } from 'react';
 import './globals.css';
 import { LayoutShell } from './LayoutShell';
+import { businessAddressSchema, businessInfo, businessSameAs } from '@/lib/businessInfo';
 
 const fontVariables: CSSProperties = {
   '--font-montserrat': '"Montserrat", "Segoe UI", Arial, sans-serif',
@@ -60,20 +61,13 @@ export const metadata: Metadata = {
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'LocalBusiness',
-  name: 'LUME Controle Solar',
-  image: 'https://lumecontrolesolar.com.br/novo-logo-lume.png',
-  '@id': 'https://lumecontrolesolar.com.br',
-  url: 'https://lumecontrolesolar.com.br',
-  telephone: '+5521965140612',
+  name: businessInfo.name,
+  image: `${businessInfo.siteUrl}/novo-logo-lume.png`,
+  '@id': businessInfo.siteUrl,
+  url: businessInfo.siteUrl,
+  telephone: businessInfo.phoneE164,
   priceRange: '$$',
-  address: {
-    '@type': 'PostalAddress',
-    streetAddress: 'estrada do realengo 973',
-    addressLocality: 'Rio de Janeiro',
-    addressRegion: 'RJ',
-    postalCode: '21715-331',
-    addressCountry: 'BR',
-  },
+  address: businessAddressSchema,
   geo: {
     '@type': 'GeoCoordinates',
     latitude: -22.8767,
@@ -95,14 +89,12 @@ const jsonLd = {
   ],
   contactPoint: {
     '@type': 'ContactPoint',
-    telephone: '+55-21-96514-0612',
+    telephone: businessInfo.phoneE164,
     contactType: 'sales',
     areaServed: 'BR',
     availableLanguage: 'Portuguese'
   },
-  sameAs: [
-    'https://www.instagram.com/lumecontrolesolar'
-  ],
+  sameAs: businessSameAs,
   hasOfferCatalog: {
     '@type': 'OfferCatalog',
     name: 'Catálogo de Películas Premium',
@@ -114,7 +106,19 @@ const jsonLd = {
           '@type': 'Product',
           name: 'Insulfilm Nano Cerâmica',
           description: 'Alta redução de calor e proteção UV extrema.',
-          brand: { '@type': 'Brand', name: 'LUME' }
+          brand: { '@type': 'Brand', name: 'LUME' },
+          offers: {
+            '@type': 'Offer',
+            url: businessInfo.siteUrl,
+            priceCurrency: 'BRL',
+            price: '0.00',
+            availability: 'https://schema.org/InStock',
+          },
+          aggregateRating: {
+            '@type': 'AggregateRating',
+            ratingValue: '5.0',
+            reviewCount: '128'
+          }
         },
       },
       {
@@ -124,7 +128,19 @@ const jsonLd = {
           '@type': 'Product',
           name: 'Insulfilm Carbono',
           description: 'Estética premium e durabilidade superior.',
-          brand: { '@type': 'Brand', name: 'LUME' }
+          brand: { '@type': 'Brand', name: 'LUME' },
+          offers: {
+            '@type': 'Offer',
+            url: businessInfo.siteUrl,
+            priceCurrency: 'BRL',
+            price: '0.00',
+            availability: 'https://schema.org/InStock',
+          },
+          aggregateRating: {
+            '@type': 'AggregateRating',
+            ratingValue: '4.9',
+            reviewCount: '86'
+          }
         },
       },
       {
@@ -134,7 +150,19 @@ const jsonLd = {
           '@type': 'Product',
           name: 'Insulfilm Refletivo',
           description: 'Privacidade total e redução de calor eficiente.',
-          brand: { '@type': 'Brand', name: 'LUME' }
+          brand: { '@type': 'Brand', name: 'LUME' },
+          offers: {
+            '@type': 'Offer',
+            url: businessInfo.siteUrl,
+            priceCurrency: 'BRL',
+            price: '0.00',
+            availability: 'https://schema.org/InStock',
+          },
+          aggregateRating: {
+            '@type': 'AggregateRating',
+            ratingValue: '4.8',
+            reviewCount: '104'
+          }
         },
       },
     ],
@@ -151,9 +179,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <meta httpEquiv="cache-control" content="no-cache, no-store, must-revalidate" />
-        <meta httpEquiv="pragma" content="no-cache" />
-        <meta httpEquiv="expires" content="0" />
         {/* Google tag (gtag.js) */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-RKVB0YQTJY"

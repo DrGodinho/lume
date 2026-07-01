@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { ToastProvider } from './hooks/useToast';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -12,5 +13,5 @@ export const metadata: Metadata = {
 };
 
 export default function CrmLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return <ToastProvider>{children}</ToastProvider>;
 }

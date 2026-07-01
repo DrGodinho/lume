@@ -13,7 +13,7 @@ const getLeadRevenueDate = (lead: Lead) => {
   return serviceDate || closingDate;
 };
 
-export const useMetrics = (leads: Lead[], targetGoal: number) => {
+export const useMetrics = (leads: Lead[], targetGoal: number | null) => {
   const monthlyEvolution = useMemo<MonthlyEvolutionData>(() => {
     const now = new Date();
     const todayStart = parseAgendaDate(format(now, 'yyyy-MM-dd')) || now;
@@ -238,7 +238,10 @@ export const useMetrics = (leads: Lead[], targetGoal: number) => {
         ? 100
         : 0;
   const monthTrendIsPositive = monthDifference >= 0;
-  const targetPercent = Math.min(Math.round((stats.revenue / targetGoal) * 100), 100);
+  const targetPercent =
+    targetGoal && targetGoal > 0
+      ? Math.min(Math.round((stats.revenue / targetGoal) * 100), 100)
+      : null;
 
   return {
     stats,

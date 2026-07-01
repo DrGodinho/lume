@@ -2,6 +2,7 @@
 
 import { MapPin, Phone, Mail, Clock, Facebook, Instagram, MessageCircle } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
+import { businessInfo } from '@/lib/businessInfo';
 
 const quickLinks = [
   { name: 'Início', href: '/' },
@@ -22,9 +23,9 @@ const products = [
 ];
 
 const contactInfo = [
-  { icon: MapPin, text: 'Estrada do Realengo, 973 - Bangu, Rio de Janeiro' },
-  { icon: Phone, text: '(21) 96514-0612' },
-  { icon: Mail, text: 'drgodinho@gmail.com' },
+  { icon: MapPin, text: businessInfo.address.display },
+  { icon: Phone, text: businessInfo.phoneDisplay },
+  { icon: Mail, text: businessInfo.email },
   { icon: Clock, text: 'Seg - Sáb: 8h às 20h' },
 ];
 
@@ -82,7 +83,7 @@ export function Footer() {
             {/* Social Links */}
             <div className="flex gap-2 sm:gap-3">
               <a
-                href="https://www.facebook.com/lumecontrolesolar"
+                href={businessInfo.socialProfiles.facebook}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-[#1a3a5c]/50 flex items-center justify-center text-gray-400 hover:bg-[#c9a227] hover:text-[#04080f] transition-all duration-300 hover:-translate-y-1"
@@ -91,7 +92,7 @@ export function Footer() {
                 <Facebook className="w-4 h-4 sm:w-5 sm:h-5" />
               </a>
               <a
-                href="https://www.instagram.com/lumecontrolesolar"
+                href={businessInfo.socialProfiles.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-[#1a3a5c]/50 flex items-center justify-center text-gray-400 hover:bg-[#c9a227] hover:text-[#04080f] transition-all duration-300 hover:-translate-y-1"
@@ -100,7 +101,7 @@ export function Footer() {
                 <Instagram className="w-4 h-4 sm:w-5 sm:h-5" />
               </a>
               <a
-                href="https://wa.me/5521965140612"
+                href={businessInfo.whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-[#1a3a5c]/50 flex items-center justify-center text-gray-400 hover:bg-[#25d366] hover:text-white transition-all duration-300 hover:-translate-y-1"

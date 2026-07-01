@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { RealengoPage } from '../../views/RealengoPage';
+import { businessAddressSchema, businessInfo } from '@/lib/businessInfo';
 
 export const metadata: Metadata = {
   title: 'Insulfilm em Realengo RJ | Instalação Profissional - LUME',
@@ -38,16 +39,9 @@ const jsonLd = {
       'name': 'LUME Controle Solar - Realengo',
       'image': 'https://lumecontrolesolar.com.br/realengo_hero_bg.webp',
       'url': 'https://lumecontrolesolar.com.br/insulfilm-em-realengo/',
-      'telephone': '+5521965140612',
+      'telephone': businessInfo.phoneE164,
       'priceRange': '$$',
-      'address': {
-        '@type': 'PostalAddress',
-        'streetAddress': 'Estrada do Realengo, 973',
-        'addressLocality': 'Bangu',
-        'addressRegion': 'RJ',
-        'postalCode': '21820-000',
-        'addressCountry': 'BR'
-      },
+      'address': businessAddressSchema,
       'areaServed': {
         '@type': 'Neighborhood',
         'name': 'Realengo'

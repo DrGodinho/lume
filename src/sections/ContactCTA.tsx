@@ -2,6 +2,7 @@ import { MessageCircle, Phone, Check } from 'lucide-react';
 import { RadiatingLines } from '../components/RadiatingLines';
 import { ScrollReveal } from '../components/ScrollReveal';
 import { GtagLink } from '../components/GtagLink';
+import { businessInfo } from '@/lib/businessInfo';
 
 const trustIndicators = [
   'Resposta em até 2h',
@@ -45,16 +46,16 @@ export function ContactCTA() {
                 <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-[#c9a227]" />
               </div>
               <a
-                href="tel:+5521965140612"
+                href={`tel:${businessInfo.phoneE164}`}
                 className="text-xl sm:text-2xl md:text-3xl font-bold text-white hover:text-[#c9a227] transition-colors font-montserrat"
               >
-                (21) 96514-0612
+                {businessInfo.phoneDisplay}
               </a>
             </div>
 
             <div className="animate-item flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start mb-8 sm:mb-10">
               <GtagLink
-                href="https://wa.me/5521965140612"
+                href={businessInfo.whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 eventName="conversion_event_contact"
@@ -64,7 +65,7 @@ export function ContactCTA() {
                 Falar no WhatsApp
               </GtagLink>
               <a
-                href="tel:+5521965140612"
+                href={`tel:${businessInfo.phoneE164}`}
                 className="btn-secondary flex items-center justify-center gap-2 text-sm sm:text-base w-full sm:w-auto"
               >
                 <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -89,12 +90,12 @@ export function ContactCTA() {
           {/* Right Column: Google Maps Location */}
           <div className="animate-item rounded-2xl overflow-hidden glass-panel h-[350px] lg:h-[450px] w-full border border-[#1a3a5c]/50 relative shadow-2xl">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3674.3820248238127!2d-43.4358872!3d-22.880795499999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9be31fbeddc125%3A0xc3bdefb9d8857fd2!2sEstr.%20do%20Realengo%2C%20973%20-%20Padre%20Miguel%2C%20Rio%20de%20Janeiro%20-%20RJ%2C%2021715-001!5e0!3m2!1sen!2sbr!4v1709401758580!5m2!1sen!2sbr"
+              src={`https://www.google.com/maps?q=${encodeURIComponent(businessInfo.address.mapsQuery)}&output=embed`}
               className="absolute inset-0 w-full h-full border-0"
               allowFullScreen={true}
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              title="Google Maps Lume Controle Solar, Estrada do Realengo 973"
+              title={`Google Maps ${businessInfo.name}, ${businessInfo.address.display}`}
             />
           </div>
 

@@ -1,6 +1,9 @@
-export type CrmTab = 'dashboard' | 'leads' | 'trash' | 'historico' | 'extratos' | 'agenda';
+export type CrmTab = 'dashboard' | 'leads' | 'trash' | 'historico' | 'extratos' | 'agenda' | 'settings';
 
-export type LeadStatus = 'Novo' | 'Em Contato' | 'Agendado' | 'Fechado' | 'Perdido';
+import type { LeadStatus } from './constants/stages';
+
+export { LEAD_STAGES, isLeadStatus } from './constants/stages';
+export type { LeadStatus } from './constants/stages';
 
 export type ServiceStatus = 'Marcado' | 'Confirmado' | 'Em Execucao' | 'Concluido' | 'Reagendar';
 
@@ -10,11 +13,32 @@ export type LeadCardKind = 'followup' | 'service' | 'idle' | 'dormant';
 
 export type MonthlyEvolutionSeries = 'atualDia' | 'atual' | 'anterior' | 'previsto';
 
+export type LeadSyncStatus = 'pending' | 'ok' | 'error';
+
 export type LeadSortKey = '' | 'name' | 'neighborhood' | 'filmType' | 'sqm' | 'value' | 'status' | 'dataServico' | 'serviceStatus';
 
 export type CommercialActionType = 'retorno' | 'servico' | 'fechado' | 'perdido';
 
-export interface Lead {
+export type PlaybookActionType = 'follow_up';
+
+export interface FollowUpPlaybookRule {
+  id: string;
+  triggerStatus: LeadStatus;
+  scheduleOffsetDays: number;
+  actionType: PlaybookActionType;
+  enabled: boolean;
+}
+
+export interface SellerPlaybook {
+  sellerId: string;
+  rules: FollowUpPlaybookRule[];
+}
+
+/**
+ * Campos imutáveis do lead — definidos na criação e que identificam o lead comercialmente.
+ * Mudanças nessa camada significam que é um lead diferente (use um novo id).
+ */
+export interface LeadCore {
   id: string;
   name: string;
   phone: string;
@@ -24,19 +48,57 @@ export interface Lead {
   filmType: string;
   sqm: number;
   value: number;
-  status: LeadStatus;
   createdAt: string;
+}
+
+/**
+ * Estado mutável do lead — status, datas, flags e observações livres.
+ * Atualizado continuamente ao longo do ciclo de vida comercial.
+ *
+ * Observação: `notes` mora aqui temporariamente até a issue #17 movê-lo para
+ * a tabela relacional `LeadNote[]` (1:N com lead).
+ */
+export interface LeadStatusInfo {
+  status: LeadStatus;
   statusChangedAt: string;
   notes: string;
-  proximoContato?: string | null;
   dataServico?: string | null;
   serviceStatus?: ServiceStatus | null;
+  proximoContato?: string | null;
   dormant: boolean;
+  pinned?: boolean;
   updatedAt?: string;
   deletedAt?: string | null;
 }
 
-export type LeadFormValues = Omit<Lead, 'id' | 'createdAt'>;
+/**
+ * Placeholder para a issue #17 — quando virar relacional, `LeadStatusInfo.notes`
+ * deixa de existir e os componentes passam a ler `LeadNote[]` via hook dedicado.
+ */
+export interface LeadNote {
+  id: number;
+  leadId: string;
+  body: string;
+  createdAt: string;
+  createdBy: string | null;
+}
+
+/**
+ * Tipo composto para uso geral (retrocompatibilidade).
+ * Para updates parciais prefira `LeadCoreUpdate` ou `LeadStatusInfoUpdate`.
+ */
+export type Lead = LeadCore & LeadStatusInfo;
+
+/** Subset parcial de LeadCore — usado em updates que tocam só identidade. */
+export type LeadCoreUpdate = Partial<LeadCore>;
+
+/** Subset parcial de LeadStatusInfo — usado em updates parciais (pin, dormant, agenda etc). */
+export type LeadStatusInfoUpdate = Partial<LeadStatusInfo>;
+
+/** Union genérico quando o caller pode atualizar qualquer subset. */
+export type LeadUpdate = LeadCoreUpdate & LeadStatusInfoUpdate;
+
+export type LeadFormValues = Omit<Lead, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>;
 
 export interface ServiceStatusMeta {
   label: string;

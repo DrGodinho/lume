@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { InsulfilmPortasVidro } from '../../views/InsulfilmPortasVidro';
+import { businessAddressSchema, businessInfo } from '@/lib/businessInfo';
 
 const pageUrl = 'https://lumecontrolesolar.com.br/insulfilm-para-portas-de-vidro/';
 const title = 'Insulfilm para Portas de Vidro no Rio de Janeiro | LUME Controle Solar';
@@ -61,14 +62,8 @@ const serviceJsonLd = {
     '@type': 'LocalBusiness',
     name: 'LUME Controle Solar',
     url: 'https://lumecontrolesolar.com.br',
-    telephone: '+5521965140612',
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: 'Estrada do Realengo, 973',
-      addressLocality: 'Rio de Janeiro',
-      addressRegion: 'RJ',
-      addressCountry: 'BR',
-    },
+    telephone: businessInfo.phoneE164,
+    address: businessAddressSchema,
   },
   areaServed: [
     { '@type': 'Place', name: 'Bangu' },

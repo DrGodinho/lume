@@ -1,9 +1,17 @@
 'use client';
 
+import { DndContext, DragOverlay, KeyboardSensor, PointerSensor, useDroppable, useSensor, useSensors, type DragEndEvent, type DragStartEvent } from '@dnd-kit/core';
+import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { format } from 'date-fns';
+import { X } from 'lucide-react';
+import { useCallback, useMemo, useState } from 'react';
 import { LEAD_STAGES } from '../constants';
+import type { LeadStatus } from '../constants/stages';
+import { resolveKanbanDrop, type KanbanDragData } from '../utils/kanbanDnd';
 import { LeadCard } from './LeadCard';
-import type { Lead, LeadSortKey } from '../types';
+import { MultiSelectDropdown } from './MultiSelectDropdown';
+import { SortableLeadCard } from './SortableLeadCard';
+import type { Lead, LeadSortKey, LeadSyncStatus } from '../types';
 
 interface KanbanBoardProps {
   leads: Lead[];
@@ -11,11 +19,13 @@ interface KanbanBoardProps {
   sortedFilteredLeads: Lead[];
   searchQuery: string;
   setSearchQuery: (value: string) => void;
-  filterNeighborhood: string;
-  setFilterNeighborhood: (value: string) => void;
-  filterStatus: string;
-  setFilterStatus: (value: string) => void;
-  neighborhoods: string[];
+  filterNeighborhood: string[];
+  setFilterNeighborhood: (value: string[]) => void;
+  filterStatus: LeadStatus[];
+  setFilterStatus: (value: LeadStatus[]) => void;
+  hasActiveFilters: boolean;
+  onClearFilters: () => void;
+  neighborhoods: readonly string[];
   viewMode: 'kanban' | 'table';
   setViewMode: (mode: 'kanban' | 'table') => void;
   collapsedCards: Set<string>;
@@ -26,7 +36,9 @@ interface KanbanBoardProps {
   onOpenDetail: (lead: Lead) => void;
   onOpenEdit: (lead: Lead) => void;
   onDelete: (leadId: string) => void;
+  onTogglePin: (leadId: string) => void;
   onStatusChange: (leadId: string, status: Lead['status']) => void;
+  onReorderLead: (activeLeadId: string, overLeadId: string) => void;
   onTableRowClick: (lead: Lead) => void;
   onTableRowDoubleClick: (lead: Lead) => void;
   sortKey: LeadSortKey;
@@ -36,7 +48,10 @@ interface KanbanBoardProps {
   formatCurrency: (value: number) => string;
   getLeadServiceDate: (lead: Lead) => Date | null;
   getLeadStatusClasses: (status: Lead['status']) => string;
+  leadSyncState: Record<string, LeadSyncStatus>;
 }
+
+const STATUS_OPTIONS = LEAD_STAGES as unknown as readonly LeadStatus[];
 
 export function KanbanBoard({
   leads,
@@ -48,6 +63,8 @@ export function KanbanBoard({
   setFilterNeighborhood,
   filterStatus,
   setFilterStatus,
+  hasActiveFilters,
+  onClearFilters,
   neighborhoods,
   viewMode,
   setViewMode,
@@ -59,7 +76,9 @@ export function KanbanBoard({
   onOpenDetail,
   onOpenEdit,
   onDelete,
+  onTogglePin,
   onStatusChange,
+  onReorderLead,
   onTableRowClick,
   onTableRowDoubleClick,
   sortKey,
@@ -69,35 +88,8 @@ export function KanbanBoard({
   formatCurrency,
   getLeadServiceDate,
   getLeadStatusClasses,
+  leadSyncState,
 }: KanbanBoardProps) {
-  const stageStyles: Record<string, { border: string; headerBg: string; badge: string }> = {
-    Novo: {
-      border: 'border-blue-500/20 hover:border-blue-500/40',
-      headerBg: 'bg-blue-500/10 text-blue-400',
-      badge: 'bg-blue-500/20 text-blue-300',
-    },
-    'Em Contato': {
-      border: 'border-amber-500/20 hover:border-amber-500/40',
-      headerBg: 'bg-amber-500/10 text-amber-400',
-      badge: 'bg-amber-500/20 text-amber-300',
-    },
-    Agendado: {
-      border: 'border-purple-500/20 hover:border-purple-500/40',
-      headerBg: 'bg-purple-500/10 text-purple-400',
-      badge: 'bg-purple-500/20 text-purple-300',
-    },
-    Fechado: {
-      border: 'border-emerald-500/20 hover:border-emerald-500/40',
-      headerBg: 'bg-emerald-500/10 text-emerald-400',
-      badge: 'bg-emerald-500/20 text-emerald-300',
-    },
-    Perdido: {
-      border: 'border-red-500/20 hover:border-red-500/40',
-      headerBg: 'bg-red-500/10 text-red-400',
-      badge: 'bg-red-500/20 text-red-300',
-    },
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 rounded-2xl border border-white/5 bg-[#07111d]/50 p-4 shadow-lg backdrop-blur-md sm:rounded-3xl sm:p-6 lg:flex-row lg:items-center">
@@ -115,29 +107,37 @@ export function KanbanBoard({
         </div>
 
         <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:gap-3 lg:w-auto">
-          <select
-            value={filterNeighborhood}
-            onChange={(event) => setFilterNeighborhood(event.target.value)}
-            className="min-w-0 rounded-2xl border border-white/5 bg-[#04080f] px-3 py-3 text-sm text-white/70 focus:border-[#c9a227]/40 focus:outline-none sm:px-4"
-          >
-            <option value="">Todos os Bairros</option>
-            {neighborhoods.map((neighborhood) => (
-              <option key={neighborhood} value={neighborhood}>{neighborhood}</option>
-            ))}
-          </select>
+          <MultiSelectDropdown
+            className="col-span-1"
+            label="Bairro"
+            emptyLabel="Todos os Bairros"
+            options={neighborhoods}
+            selected={filterNeighborhood}
+            onChange={setFilterNeighborhood}
+            testId="filter-neighborhood"
+          />
 
-          <select
-            value={filterStatus}
-            onChange={(event) => setFilterStatus(event.target.value)}
-            className="min-w-0 rounded-2xl border border-white/5 bg-[#04080f] px-3 py-3 text-sm text-white/70 focus:border-[#c9a227]/40 focus:outline-none sm:px-4"
-          >
-            <option value="">Todos os Status</option>
-            <option value="Novo">Novo</option>
-            <option value="Em Contato">Em Contato</option>
-            <option value="Agendado">Agendado</option>
-            <option value="Fechado">Fechado</option>
-            <option value="Perdido">Perdido</option>
-          </select>
+          <MultiSelectDropdown
+            className="col-span-1"
+            label="Status"
+            emptyLabel="Todos os Status"
+            options={STATUS_OPTIONS}
+            selected={filterStatus}
+            onChange={(value) => setFilterStatus(value as LeadStatus[])}
+            testId="filter-status"
+          />
+
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={onClearFilters}
+              className="col-span-2 inline-flex items-center justify-center gap-1.5 rounded-2xl border border-white/5 bg-white/[0.02] px-3 py-3 text-xs font-semibold text-white/70 transition hover:border-red-400/30 hover:text-red-200 sm:col-span-1 sm:px-4"
+              title="Limpar todos os filtros e busca"
+            >
+              <X className="h-3.5 w-3.5" />
+              Limpar filtros
+            </button>
+          )}
 
           <div className="col-span-2 flex rounded-2xl border border-white/5 bg-[#04080f] p-1 sm:col-span-1">
             <button
@@ -183,81 +183,60 @@ export function KanbanBoard({
             </div>
           )}
         </div>
+
+        {(filterNeighborhood.length > 0 || filterStatus.length > 0) && (
+          <div className="mt-3 flex flex-wrap items-center gap-1.5">
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-white/40">Filtros ativos:</span>
+            {filterNeighborhood.map((neighborhood) => (
+              <button
+                key={`chip-bairro-${neighborhood}`}
+                type="button"
+                onClick={() => setFilterNeighborhood(filterNeighborhood.filter((item) => item !== neighborhood))}
+                className="inline-flex items-center gap-1 rounded-full border border-[#c9a227]/30 bg-[#c9a227]/10 px-2.5 py-1 text-[11px] font-semibold text-[#f5d77a] transition hover:border-[#c9a227]/50"
+                title={`Remover filtro de bairro: ${neighborhood}`}
+              >
+                <span className="text-[9px] uppercase tracking-wider text-[#c9a227]/70">Bairro</span>
+                {neighborhood}
+                <X className="h-3 w-3" />
+              </button>
+            ))}
+            {filterStatus.map((status) => (
+              <button
+                key={`chip-status-${status}`}
+                type="button"
+                onClick={() => setFilterStatus(filterStatus.filter((item) => item !== status))}
+                className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider transition hover:brightness-110 ${getLeadStatusClasses(status)}`}
+                title={`Remover filtro de status: ${status}`}
+              >
+                {status}
+                <X className="h-3 w-3" />
+              </button>
+            ))}
+            {filteredLeads.length === 0 && (
+              <span className="ml-2 text-[11px] text-amber-300">
+                Nenhum lead corresponde aos filtros.
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {viewMode === 'kanban' && (
-        <div className="grid gap-3 pb-4 md:grid-cols-5 md:gap-4">
-          {LEAD_STAGES.map((stage) => {
-            const stageLeads = filteredLeads.filter((lead) => lead.status === stage);
-            const style = stageStyles[stage] || {
-              border: 'border-white/5',
-              headerBg: 'bg-white/5 text-white/50',
-              badge: 'bg-white/5 text-white/80',
-            };
-
-            return (
-              <div
-                key={stage}
-                onDragOver={(event) => event.preventDefault()}
-                onDrop={(event) => {
-                  event.preventDefault();
-                  try {
-                    const data = JSON.parse(event.dataTransfer.getData('text/plain'));
-                    if (data.fromStage !== stage) onStatusChange(data.id, stage);
-                  } catch {
-                    return;
-                  }
-                }}
-                className={`flex min-h-0 flex-col rounded-2xl border ${style.border} bg-[#07111d]/30 p-3 transition duration-300 md:min-h-[500px] md:rounded-3xl md:p-4`}
-              >
-                <div className={`mb-4 flex items-center justify-between rounded-xl border-b border-white/5 px-2 py-1 pb-2 ${style.headerBg}`}>
-                  <span className="text-xs font-black uppercase tracking-wider">{stage}</span>
-                  <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${style.badge}`}>{stageLeads.length}</span>
-                </div>
-
-                <div className="flex-1 space-y-3 overflow-y-auto">
-                  {stageLeads.map((lead) => {
-                    const stageIndex = LEAD_STAGES.indexOf(stage);
-
-                    return (
-                      <LeadCard
-                        key={lead.id}
-                        lead={lead}
-                        collapsed={collapsedCards.has(lead.id)}
-                        daysInStatus={daysInStatus}
-                        formatCurrency={formatCurrency}
-                        getLeadServiceDate={getLeadServiceDate}
-                        onToggleCollapse={onToggleCollapse}
-                        onOpenDetail={onOpenDetail}
-                        onOpenEdit={onOpenEdit}
-                        onDelete={onDelete}
-                        onMoveLeft={() => {
-                          if (stageIndex > 0) onStatusChange(lead.id, LEAD_STAGES[stageIndex - 1]);
-                        }}
-                        onMoveRight={() => {
-                          if (stageIndex < LEAD_STAGES.length - 1) onStatusChange(lead.id, LEAD_STAGES[stageIndex + 1]);
-                        }}
-                        onDragStart={(event) => {
-                          event.dataTransfer.setData('text/plain', JSON.stringify({ id: lead.id, fromStage: stage }));
-                          event.currentTarget.classList.add('opacity-40');
-                        }}
-                        onDragEnd={(event) => event.currentTarget.classList.remove('opacity-40')}
-                        disableMoveLeft={stage === 'Novo'}
-                        disableMoveRight={stage === 'Perdido'}
-                      />
-                    );
-                  })}
-
-                  {stageLeads.length === 0 && (
-                    <div className="rounded-2xl border-2 border-dashed border-white/5 p-6 text-center text-xs text-white/20 select-none">
-                      Coluna Vazia
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        <KanbanDnD
+          leads={sortedFilteredLeads}
+          leadSyncState={leadSyncState}
+          collapsedCards={collapsedCards}
+          onStatusChange={onStatusChange}
+          onToggleCollapse={onToggleCollapse}
+          onOpenDetail={onOpenDetail}
+          onOpenEdit={onOpenEdit}
+          onDelete={onDelete}
+          onTogglePin={onTogglePin}
+          onReorderLead={onReorderLead}
+          daysInStatus={daysInStatus}
+          formatCurrency={formatCurrency}
+          getLeadServiceDate={getLeadServiceDate}
+        />
       )}
 
       {viewMode === 'table' && (
@@ -431,6 +410,283 @@ export function KanbanBoard({
           </table>
         </div>
       )}
+    </div>
+  );
+}
+
+const KANBAN_DND_FALLBACK_STYLE = {
+  border: 'border-white/5',
+  headerBg: 'bg-white/5 text-white/50',
+  badge: 'bg-white/5 text-white/80',
+};
+
+interface KanbanDnDProps {
+  leads: Lead[];
+  leadSyncState: Record<string, LeadSyncStatus>;
+  collapsedCards: Set<string>;
+  onStatusChange: (leadId: string, status: Lead['status']) => void;
+  onReorderLead: (activeLeadId: string, overLeadId: string) => void;
+  onToggleCollapse: (leadId: string) => void;
+  onOpenDetail: (lead: Lead) => void;
+  onOpenEdit: (lead: Lead) => void;
+  onDelete: (leadId: string) => void;
+  onTogglePin: (leadId: string) => void;
+  daysInStatus: (lead: Lead) => number;
+  formatCurrency: (value: number) => string;
+  getLeadServiceDate: (lead: Lead) => Date | null;
+}
+
+function KanbanDnD({
+  leads,
+  leadSyncState,
+  collapsedCards,
+  onStatusChange,
+  onToggleCollapse,
+  onOpenDetail,
+  onOpenEdit,
+  onDelete,
+  onTogglePin,
+  onReorderLead,
+  daysInStatus,
+  formatCurrency,
+  getLeadServiceDate,
+}: KanbanDnDProps) {
+  const stageStyles: Record<string, { border: string; headerBg: string; badge: string }> = {
+    Novo: {
+      border: 'border-blue-500/20 hover:border-blue-500/40',
+      headerBg: 'bg-blue-500/10 text-blue-400',
+      badge: 'bg-blue-500/20 text-blue-300',
+    },
+    'Em Contato': {
+      border: 'border-amber-500/20 hover:border-amber-500/40',
+      headerBg: 'bg-amber-500/10 text-amber-400',
+      badge: 'bg-amber-500/20 text-amber-300',
+    },
+    Agendado: {
+      border: 'border-purple-500/20 hover:border-purple-500/40',
+      headerBg: 'bg-purple-500/10 text-purple-400',
+      badge: 'bg-purple-500/20 text-purple-300',
+    },
+    Fechado: {
+      border: 'border-emerald-500/20 hover:border-emerald-500/40',
+      headerBg: 'bg-emerald-500/10 text-emerald-400',
+      badge: 'bg-emerald-500/20 text-emerald-300',
+    },
+    Perdido: {
+      border: 'border-red-500/20 hover:border-red-500/40',
+      headerBg: 'bg-red-500/10 text-red-400',
+      badge: 'bg-red-500/20 text-red-300',
+    },
+  };
+
+  const [activeLeadId, setActiveLeadId] = useState<string | null>(null);
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  const activeLead = useMemo(
+    () => (activeLeadId ? leads.find((lead) => lead.id === activeLeadId) ?? null : null),
+    [activeLeadId, leads],
+  );
+
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    setActiveLeadId(String(event.active.id));
+  }, []);
+
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      setActiveLeadId(null);
+      const resolved = resolveKanbanDrop(
+        { id: event.active.id, data: { current: event.active.data.current as KanbanDragData | undefined } },
+        event.over ? { id: event.over.id, data: { current: event.over.data.current as KanbanDragData | undefined } } : null,
+      );
+      if (!resolved) return;
+      if (resolved.isSameStatus) {
+        if (resolved.overLeadId) onReorderLead(resolved.leadId, resolved.overLeadId);
+        return;
+      }
+      onStatusChange(resolved.leadId, resolved.toStatus);
+    },
+    [onReorderLead, onStatusChange],
+  );
+
+  const handleDragCancel = useCallback(() => {
+    setActiveLeadId(null);
+  }, []);
+
+  const announcements = useMemo(
+    () => ({
+      onDragStart({ active }: { active: { id: string | number } }) {
+        const lead = leads.find((entry) => entry.id === active.id);
+        return lead ? `Lead ${lead.name} selecionado. Use as setas para mudar de coluna.` : 'Lead selecionado.';
+      },
+      onDragOver({ active, over }: { active: { id: string | number }; over: { data: { current?: { stage?: LeadStatus } } } | null }) {
+        if (!over) return undefined;
+        const target = over.data.current?.stage;
+        if (!target) return undefined;
+        const lead = leads.find((entry) => entry.id === active.id);
+        return lead ? `Lead ${lead.name} sobre a coluna ${target}.` : undefined;
+      },
+      onDragEnd({ active, over }: { active: { id: string | number }; over: { data: { current?: { stage?: LeadStatus } } } | null }) {
+        setActiveLeadId(null);
+        if (!over) return 'Movimento cancelado.';
+        const target = over.data.current?.stage;
+        const lead = leads.find((entry) => entry.id === active.id);
+        if (!lead || !target) return undefined;
+        return `Lead ${lead.name} movido para ${target}.`;
+      },
+      onDragCancel() {
+        return 'Movimento cancelado.';
+      },
+    }),
+    [leads],
+  );
+
+  return (
+    <DndContext
+      sensors={sensors}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+      onDragCancel={handleDragCancel}
+      accessibility={{ announcements, screenReaderInstructions: { draggable: 'Para mover um lead, pressione espaco ou enter. Use as setas para reposicionar. Pressione escape para cancelar.' } }}
+    >
+      <div className="grid gap-3 pb-4 md:grid-cols-5 md:gap-4">
+        {LEAD_STAGES.map((stage) => {
+          const stageLeads = leads.filter((lead) => lead.status === stage);
+          const style = stageStyles[stage] || KANBAN_DND_FALLBACK_STYLE;
+          return (
+            <KanbanColumn
+              key={stage}
+              stage={stage}
+              stageLeads={stageLeads}
+              style={style}
+              collapsedCards={collapsedCards}
+              leadSyncState={leadSyncState}
+              onStatusChange={onStatusChange}
+              onToggleCollapse={onToggleCollapse}
+              onOpenDetail={onOpenDetail}
+              onOpenEdit={onOpenEdit}
+              onDelete={onDelete}
+              onTogglePin={onTogglePin}
+              daysInStatus={daysInStatus}
+              formatCurrency={formatCurrency}
+              getLeadServiceDate={getLeadServiceDate}
+            />
+          );
+        })}
+      </div>
+
+      <DragOverlay dropAnimation={{ duration: 180, easing: 'cubic-bezier(0.18, 0.67, 0.43, 1)' }}>
+        {activeLead ? (
+          <LeadCard
+            lead={activeLead}
+            collapsed={collapsedCards.has(activeLead.id)}
+            daysInStatus={daysInStatus}
+            formatCurrency={formatCurrency}
+            getLeadServiceDate={getLeadServiceDate}
+            syncStatus={leadSyncState[activeLead.id] || 'ok'}
+            onToggleCollapse={onToggleCollapse}
+            onOpenDetail={onOpenDetail}
+            onOpenEdit={onOpenEdit}
+            onDelete={onDelete}
+            onTogglePin={onTogglePin}
+            onMoveLeft={() => undefined}
+            onMoveRight={() => undefined}
+            isDragOverlay
+            disableMoveLeft={false}
+            disableMoveRight={false}
+          />
+        ) : null}
+      </DragOverlay>
+    </DndContext>
+  );
+}
+
+interface KanbanColumnProps {
+  stage: LeadStatus;
+  stageLeads: Lead[];
+  style: { border: string; headerBg: string; badge: string };
+  collapsedCards: Set<string>;
+  leadSyncState: Record<string, LeadSyncStatus>;
+  onStatusChange: (leadId: string, status: Lead['status']) => void;
+  onToggleCollapse: (leadId: string) => void;
+  onOpenDetail: (lead: Lead) => void;
+  onOpenEdit: (lead: Lead) => void;
+  onDelete: (leadId: string) => void;
+  onTogglePin: (leadId: string) => void;
+  daysInStatus: (lead: Lead) => number;
+  formatCurrency: (value: number) => string;
+  getLeadServiceDate: (lead: Lead) => Date | null;
+}
+
+function KanbanColumn({
+  stage,
+  stageLeads,
+  style,
+  collapsedCards,
+  leadSyncState,
+  onStatusChange,
+  onToggleCollapse,
+  onOpenDetail,
+  onOpenEdit,
+  onDelete,
+  onTogglePin,
+  daysInStatus,
+  formatCurrency,
+  getLeadServiceDate,
+}: KanbanColumnProps) {
+  const { setNodeRef, isOver } = useDroppable({ id: `column-${stage}`, data: { type: 'column', stage } });
+  const stageIndex = LEAD_STAGES.indexOf(stage);
+
+  return (
+    <div
+      ref={setNodeRef}
+      data-stage={stage}
+      className={`flex min-h-0 flex-col rounded-2xl border ${style.border} bg-[#07111d]/30 p-3 transition duration-300 md:min-h-[500px] md:rounded-3xl md:p-4 ${
+        isOver ? 'ring-2 ring-[#c9a227]/60 ring-offset-2 ring-offset-[#04080f] bg-[#c9a227]/[0.04]' : ''
+      }`}
+    >
+      <div className={`mb-4 flex items-center justify-between rounded-xl border-b border-white/5 px-2 py-1 pb-2 ${style.headerBg}`}>
+        <span className="text-xs font-black uppercase tracking-wider">{stage}</span>
+        <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${style.badge}`}>{stageLeads.length}</span>
+      </div>
+
+      <SortableContext items={stageLeads.map((lead) => lead.id)} strategy={verticalListSortingStrategy}>
+        <div className="flex-1 space-y-3 overflow-y-auto">
+          {stageLeads.map((lead) => (
+            <SortableLeadCard
+              key={lead.id}
+              lead={lead}
+              stage={stage}
+              collapsed={collapsedCards.has(lead.id)}
+              daysInStatus={daysInStatus}
+              formatCurrency={formatCurrency}
+              getLeadServiceDate={getLeadServiceDate}
+              syncStatus={leadSyncState[lead.id] || 'ok'}
+              onToggleCollapse={onToggleCollapse}
+              onOpenDetail={onOpenDetail}
+              onOpenEdit={onOpenEdit}
+              onDelete={onDelete}
+              onTogglePin={onTogglePin}
+              onMoveLeft={() => {
+                if (stageIndex > 0) onStatusChange(lead.id, LEAD_STAGES[stageIndex - 1]);
+              }}
+              onMoveRight={() => {
+                if (stageIndex < LEAD_STAGES.length - 1) onStatusChange(lead.id, LEAD_STAGES[stageIndex + 1]);
+              }}
+              disableMoveLeft={stage === 'Novo'}
+              disableMoveRight={stage === 'Perdido'}
+            />
+          ))}
+
+          {stageLeads.length === 0 && (
+            <div className="rounded-2xl border-2 border-dashed border-white/5 p-6 text-center text-xs text-white/20 select-none">
+              {isOver ? 'Solte aqui' : 'Coluna Vazia'}
+            </div>
+          )}
+        </div>
+      </SortableContext>
     </div>
   );
 }

@@ -38,6 +38,7 @@ export const mapLeadRow = (row: LeadRow): Lead => ({
   dataServico: asNullableString(row.data_servico),
   serviceStatus: normalizeServiceStatus(row.service_status),
   dormant: typeof row.dormant === 'boolean' ? row.dormant : false,
+  pinned: typeof row.pinned === 'boolean' ? row.pinned : false,
   updatedAt: asString(row.updated_at, asString(row.status_changed_at, asString(row.created_at, new Date().toISOString()))),
   deletedAt: asNullableString(row.deleted_at),
 });
@@ -49,6 +50,7 @@ export const normalizeLeadAmounts = (lead: Lead): Lead => ({
   status: normalizeLeadStatus(lead.status),
   serviceStatus: normalizeServiceStatus(lead.serviceStatus) || (lead.dataServico ? 'Marcado' : null),
   dormant: Boolean(lead.dormant),
+  pinned: Boolean(lead.pinned),
 });
 
 export const getInitialCollapsedCards = () => {
@@ -111,6 +113,7 @@ const getLeadComparisonSnapshot = (lead: Lead) => {
     proximoContato: normalized.proximoContato ?? null,
     serviceStatus: normalized.serviceStatus ?? null,
     dormant: normalized.dormant,
+    pinned: normalized.pinned,
     notes: normalized.notes,
     updatedAt: normalized.updatedAt ?? null,
     createdAt: normalized.createdAt,

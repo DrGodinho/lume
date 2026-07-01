@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { InsulfilmEscritorio } from '../../views/InsulfilmEscritorio';
+import { businessAddressSchema, businessInfo } from '@/lib/businessInfo';
 
 export const metadata: Metadata = {
   title: 'Insulfilm para Escritório | Conforto e Produtividade - LUME',
@@ -44,14 +45,8 @@ const jsonLd = {
     '@type': 'LocalBusiness',
     name: 'LUME Controle Solar',
     url: 'https://lumecontrolesolar.com.br',
-    telephone: '+5521965140612',
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: 'Estrada do Realengo, 973',
-      addressLocality: 'Rio de Janeiro',
-      addressRegion: 'RJ',
-      addressCountry: 'BR',
-    },
+    telephone: businessInfo.phoneE164,
+    address: businessAddressSchema,
   },
   areaServed: {
     '@type': 'City',

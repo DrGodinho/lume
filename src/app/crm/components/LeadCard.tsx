@@ -1,8 +1,9 @@
 'use client';
 
 import { format } from 'date-fns';
-import type { DragEvent } from 'react';
-import type { Lead } from '../types';
+import { AlertTriangle, CheckCircle2, RefreshCw, Star } from 'lucide-react';
+import type { CSSProperties } from 'react';
+import type { Lead, LeadSyncStatus } from '../types';
 
 interface LeadCardProps {
   lead: Lead;
@@ -10,14 +11,20 @@ interface LeadCardProps {
   daysInStatus: (lead: Lead) => number;
   formatCurrency: (value: number) => string;
   getLeadServiceDate: (lead: Lead) => Date | null;
+  syncStatus?: LeadSyncStatus;
   onToggleCollapse: (leadId: string) => void;
   onOpenDetail: (lead: Lead) => void;
   onOpenEdit: (lead: Lead) => void;
   onDelete: (leadId: string) => void;
+  onTogglePin: (leadId: string) => void;
   onMoveLeft: () => void;
   onMoveRight: () => void;
-  onDragStart: (event: DragEvent<HTMLDivElement>) => void;
-  onDragEnd: (event: DragEvent<HTMLDivElement>) => void;
+  sortableRef?: (node: HTMLElement | null) => void;
+  sortableStyle?: CSSProperties;
+  sortableAttributes?: Record<string, unknown>;
+  sortableListeners?: Record<string, unknown>;
+  isDragging?: boolean;
+  isDragOverlay?: boolean;
   disableMoveLeft: boolean;
   disableMoveRight: boolean;
 }
@@ -28,27 +35,63 @@ export function LeadCard({
   daysInStatus,
   formatCurrency,
   getLeadServiceDate,
+  syncStatus = 'ok',
   onToggleCollapse,
   onOpenDetail,
   onOpenEdit,
   onDelete,
+  onTogglePin,
   onMoveLeft,
   onMoveRight,
-  onDragStart,
-  onDragEnd,
+  sortableRef,
+  sortableStyle,
+  sortableAttributes,
+  sortableListeners,
+  isDragging = false,
+  isDragOverlay = false,
   disableMoveLeft,
   disableMoveRight,
 }: LeadCardProps) {
   const serviceDate = getLeadServiceDate(lead);
+  const syncMeta = {
+    ok: {
+      label: 'Salvo no Supabase',
+      className: 'border-emerald-400/20 bg-emerald-500/10 text-emerald-300',
+      icon: CheckCircle2,
+    },
+    pending: {
+      label: 'Sincronizando com Supabase',
+      className: 'border-[#c9a227]/25 bg-[#c9a227]/10 text-[#f5d77a]',
+      icon: RefreshCw,
+    },
+    error: {
+      label: 'Falha ao salvar no Supabase',
+      className: 'border-red-400/25 bg-red-500/10 text-red-300',
+      icon: AlertTriangle,
+    },
+  }[syncStatus];
+  const SyncStatusIcon = syncMeta.icon;
+  const isPinned = Boolean(lead.pinned);
+  const isSortable = Boolean(sortableRef);
+  const isInteractive = isSortable || isDragOverlay;
 
   return (
     <div
-      draggable
-      onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
+      ref={isSortable ? sortableRef : undefined}
+      style={isSortable ? sortableStyle : undefined}
+      {...(isSortable ? sortableAttributes : {})}
+      {...(isSortable ? sortableListeners : {})}
       onDoubleClick={() => onOpenEdit(lead)}
-      title="Duplo clique para editar este lead"
-      className="group relative rounded-2xl border border-white/5 bg-[#04080f]/90 p-3 shadow-md transition hover:border-[#c9a227]/30 md:p-2.5 md:cursor-grab md:active:cursor-grabbing"
+      title={isSortable ? 'Arraste para mudar de status, duplo clique para editar' : 'Duplo clique para editar este lead'}
+      className={`group relative rounded-2xl border bg-[#04080f]/90 p-3 shadow-md transition md:p-2.5 ${
+        isInteractive ? 'cursor-grab touch-none active:cursor-grabbing' : 'cursor-pointer'
+      } ${
+        isDragging ? 'opacity-40' : ''
+      } ${
+        isPinned
+          ? 'border-[#c9a227]/40 shadow-[inset_0_0_0_1px_rgba(201,162,39,0.12)] hover:border-[#c9a227]/60'
+          : 'border-white/5 hover:border-[#c9a227]/30'
+      }`}
     >
       <div className="flex items-center gap-1.5">
         <button
@@ -79,6 +122,31 @@ export function LeadCard({
         >
           <h4 className="truncate border-b border-dotted border-white/20 text-xs font-bold text-white transition hover:border-[#c9a227]/60">{lead.name}</h4>
         </button>
+        <button
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation();
+            onTogglePin(lead.id);
+          }}
+          onDoubleClick={(event) => event.stopPropagation()}
+          className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition ${
+            isPinned
+              ? 'border-[#c9a227]/50 bg-[#c9a227]/15 text-[#f5d77a] hover:bg-[#c9a227]/25'
+              : 'border-white/10 bg-transparent text-white/30 hover:border-white/20 hover:text-white/60'
+          }`}
+          title={isPinned ? 'Desafixar lead' : 'Fixar lead no topo'}
+          aria-label={isPinned ? 'Desafixar lead' : 'Fixar lead no topo'}
+          aria-pressed={isPinned}
+        >
+          <Star className={`h-3 w-3 ${isPinned ? 'fill-current' : ''}`} strokeWidth={isPinned ? 0 : 2} />
+        </button>
+        <span
+          className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${syncMeta.className}`}
+          title={syncMeta.label}
+          aria-label={syncMeta.label}
+        >
+          <SyncStatusIcon className={`h-3 w-3 ${syncStatus === 'pending' ? 'animate-spin' : ''}`} />
+        </span>
       </div>
 
       {collapsed ? (

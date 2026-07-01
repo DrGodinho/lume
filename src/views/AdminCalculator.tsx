@@ -8,6 +8,9 @@ import {
 } from 'lucide-react';
 import gsap from 'gsap';
 import { InvoicePNG } from '../components/InvoicePNG';
+import { createScopedLogger } from '../lib/logger';
+
+const logger = createScopedLogger('AdminCalculator');
 import { ConfigPanel } from '../components/ConfigPanel';
 import { HistoryPanel } from '../components/HistoryPanel';
 import {
@@ -761,7 +764,7 @@ export function AdminCalculator() {
       if (isFilmTypeKey(draft.selectedFilm)) setSelectedFilm(draft.selectedFilm);
                     }
                 } catch (e) {
-                    console.error('Erro ao carregar rascunho local', e);
+                    logger.error('Erro ao carregar rascunho local', e);
                 }
             }
           } finally {
@@ -1151,7 +1154,7 @@ const carregarDoHistorico = (orc: OrcamentoSalvo) => {
                 link.click();
             }
         } catch (err) {
-            console.error(err);
+            logger.error('Falha no calculo', err);
         } finally {
             setIsCalculating(false);
         }
@@ -1204,7 +1207,7 @@ const carregarDoHistorico = (orc: OrcamentoSalvo) => {
                 setTimeout(() => URL.revokeObjectURL(url), 100);
             }
         } catch (err) {
-            console.error(err);
+            logger.error('Falha no calculo', err);
         } finally {
             setIsCalculating(false);
         }

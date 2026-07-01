@@ -7,6 +7,7 @@ import { NavigationBreadcrumbs } from './NavigationBreadcrumbs';
 import { NeighborhoodData } from '../data/neighborhoods';
 import { NeighborhoodAnimations } from './NeighborhoodAnimations';
 import Image from 'next/image';
+import { businessAddressSchema, businessInfo } from '@/lib/businessInfo';
 
 interface Props {
   data: NeighborhoodData;
@@ -37,15 +38,9 @@ export function NeighborhoodTemplate({ data }: Props) {
         "name": `LUME Controle Solar - ${data.neighborName}`,
         "description": data.metaDescription,
         "image": "https://lumecontrolesolar.com.br/novo-logo-lume.png",
-        "telephone": "+5521965140612",
+        "telephone": businessInfo.phoneE164,
         "url": `https://lumecontrolesolar.com.br/${data.slug}`,
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": "Estrada do Realengo, 973",
-          "addressLocality": data.neighborName,
-          "addressRegion": "RJ",
-          "addressCountry": "BR"
-        },
+        "address": businessAddressSchema,
         "areaServed": {
           "@type": "Neighborhood",
           "name": data.neighborName,

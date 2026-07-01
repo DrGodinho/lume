@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { BarraPage } from '../../views/BarraPage';
+import { businessAddressSchema, businessInfo } from '@/lib/businessInfo';
 
 export const metadata: Metadata = {
   title: 'Insulfilm na Barra da Tijuca RJ | Residencial e Comercial - LUME',
@@ -38,16 +39,9 @@ const jsonLd = {
       'name': 'LUME Controle Solar - Barra da Tijuca',
       'image': 'https://lumecontrolesolar.com.br/barra_hero_bg.webp',
       'url': 'https://lumecontrolesolar.com.br/insulfilm-na-barra-da-tijuca/',
-      'telephone': '+5521965140612',
+      'telephone': businessInfo.phoneE164,
       'priceRange': '$$',
-      'address': {
-        '@type': 'PostalAddress',
-        'streetAddress': 'Estrada do Realengo, 973',
-        'addressLocality': 'Bangu',
-        'addressRegion': 'RJ',
-        'postalCode': '21820-000',
-        'addressCountry': 'BR'
-      },
+      'address': businessAddressSchema,
       'areaServed': {
         '@type': 'Neighborhood',
         'name': 'Barra da Tijuca'

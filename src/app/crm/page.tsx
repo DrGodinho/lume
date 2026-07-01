@@ -11,6 +11,7 @@ import {
   Plus,
   ReceiptText,
   RefreshCw,
+  Settings,
   Trash2,
   UsersRound,
   XCircle,
@@ -18,20 +19,23 @@ import {
 import type { LucideIcon } from 'lucide-react';
 import { AgendaSection } from './components/AgendaSection';
 import { CommercialActionModal, LeadDetailModal, LeadFormModal } from './components/LeadModal';
+import { TabErrorBoundary } from './components/ErrorBoundary';
 import { HistoricoSupabase } from './components/HistoricoSupabase';
 import { KanbanBoard } from './components/KanbanBoard';
 import { MetricsPanel } from './components/MetricsPanel';
+import { PlaybookSettings } from './components/PlaybookSettings';
+import { ToastProvider, ToastViewport } from './components/ToastProvider';
 import { TrashLeadsView } from './components/TrashLeadsView';
 import { ExtratosMensaisSupabase } from './ExtratosMensaisSupabase';
 import { CRM_ACTIVE_TAB_STORAGE_KEY, RJ_NEIGHBORHOODS } from './constants';
 import { useAgenda, formatCurrencyBRL, formatDateInputValue, getLeadActivityDate, getLeadFollowUpDate, getLeadPhoneHref, getLeadServiceDate, getLeadServiceStatus, getLeadStatusClasses, getWhatsAppHref, isClosedLead, SERVICE_STATUS_META } from './hooks/useAgenda';
 import { useLeads } from './hooks/useLeads';
+import { useLogout } from './hooks/useLogout';
 import { useMetrics } from './hooks/useMetrics';
 import { formatLeadCurrency } from './utils';
-import { supabase } from '@/lib/supabase';
 import type { CrmTab } from './types';
 
-const VALID_CRM_TABS = new Set<CrmTab>(['dashboard', 'leads', 'trash', 'historico', 'extratos', 'agenda']);
+const VALID_CRM_TABS = new Set<CrmTab>(['dashboard', 'leads', 'trash', 'historico', 'extratos', 'agenda', 'settings']);
 
 type NavTone = 'gold' | 'red' | 'slate';
 
@@ -57,6 +61,7 @@ const CRM_NAV_SECTIONS: Array<{ label: string; items: CrmNavItem[] }> = [
     items: [
       { id: 'historico', label: 'Histórico Supabase', description: 'Orçamentos salvos', icon: Database, tone: 'slate' },
       { id: 'extratos', label: 'Extratos Mensais', description: 'Fechamentos por mês', icon: ReceiptText, tone: 'slate' },
+      { id: 'settings', label: 'Configuracoes', description: 'Playbooks e automacoes', icon: Settings, tone: 'slate' },
       { id: 'trash', label: 'Lixeira', description: 'Leads removidos', icon: Trash2, tone: 'red' },
     ],
   },
@@ -91,6 +96,8 @@ export default function HomePage() {
     setFilterNeighborhood,
     filterStatus,
     setFilterStatus,
+    hasActiveFilters,
+    clearFilters,
     viewMode,
     setViewMode,
     collapsedCards,
@@ -103,6 +110,8 @@ export default function HomePage() {
     isModalOpen,
     selectedLead,
     leadDetail,
+    isLeadFormDirty,
+    setInitialLeadForm,
     commercialAction,
     setCommercialAction,
     trashedLeads,
@@ -110,15 +119,26 @@ export default function HomePage() {
     leadStatusHistory,
     loadingLeadStatusHistory,
     availableFilmTypeOptions,
-    notification,
     crmSync,
+    leadSyncState,
     linkedOrcamento,
+    linkedDetailOrcamento,
     targetGoal,
     editingTarget,
     setEditingTarget,
     targetInput,
     setTargetInput,
     saveTargetGoal,
+    activeSellerId,
+    activePlaybook,
+    sellerIds,
+    playbookLoading,
+    playbookSaving,
+    playbookError,
+    setActiveSellerId,
+    updatePlaybookRule,
+    resetActivePlaybook,
+    reloadPlaybooks,
     isVerifyingCloud,
     lastCloudCheckAt,
     leadForm,
@@ -132,6 +152,7 @@ export default function HomePage() {
     setCollapsedStateForAllLeads,
     toggleCollapsedCard,
     handleLeadSubmit,
+    handleLeadSave,
     openCreateModal,
     openEditModal,
     closeLeadModal,
@@ -141,10 +162,12 @@ export default function HomePage() {
     handleDeleteLead,
     handleRestoreLead,
     handleStatusChange,
+    handleKanbanReorder,
     handleAgendaSchedule,
     handleServiceStatusChange,
     handleAgendaMarkDone,
     handleDormantStateChange,
+    handleTogglePin,
     toggleSort,
     daysInStatus,
     commercialActionTitle,
@@ -195,17 +218,7 @@ export default function HomePage() {
     },
   }[syncTone];
 
-  const handleLogout = async () => {
-    try {
-      if (supabase) {
-        await supabase.auth.signOut();
-      }
-      await fetch('/api/auth/logout', { method: 'POST' });
-      window.location.href = '/login';
-    } catch {
-      setLeadDetail(null);
-    }
-  };
+  const { isLoggingOut, logout: handleLogout } = useLogout('/login');
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -249,15 +262,9 @@ export default function HomePage() {
   }, [activeTab, activeTabRestored]);
 
   return (
-    <div className="crm-technical-density flex min-h-screen flex-col overflow-x-hidden bg-[#03060b] font-sans lg:flex-row">
-      {notification && (
-        <div className="fixed right-6 top-6 z-50 animate-bounce rounded-2xl border border-[#c9a227]/40 bg-[#07111d] px-6 py-4 text-sm font-semibold text-white shadow-2xl backdrop-blur-md">
-          <div className="flex items-center gap-3">
-            <span className="h-2.5 w-2.5 animate-ping rounded-full bg-[#c9a227]" />
-            {notification}
-          </div>
-        </div>
-      )}
+    <ToastProvider>
+      <div className="crm-technical-density flex min-h-screen flex-col overflow-x-hidden bg-[#03060b] font-sans lg:flex-row">
+        <ToastViewport />
 
       <aside className="sticky top-0 z-40 flex w-full flex-col border-b border-white/10 bg-[#050b13] p-3 lg:relative lg:z-10 lg:w-64 lg:border-b-0 lg:border-r lg:p-4">
         <div className="flex items-center justify-between gap-3 lg:justify-start">
@@ -281,7 +288,7 @@ export default function HomePage() {
             <button onClick={() => openCreateModal()} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#c9a227] text-[#04080f] shadow-lg shadow-[#c9a227]/10 transition active:scale-95" title="Novo Lead">
               <Plus className="h-4.5 w-4.5" strokeWidth={3} />
             </button>
-            <button onClick={() => void handleLogout()} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-white/5 bg-white/[0.03] text-white/45 transition hover:text-red-300 active:scale-95" title="Sair do CRM">
+            <button onClick={() => void handleLogout()} disabled={isLoggingOut} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-white/5 bg-white/[0.03] text-white/45 transition hover:text-red-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60" title="Sair do CRM">
               <LogOut className="h-4.5 w-4.5" />
             </button>
           </div>
@@ -290,12 +297,17 @@ export default function HomePage() {
         <div className="mt-5 hidden rounded-xl border border-white/10 bg-[#03060b] p-3 lg:block">
           <div className="flex justify-between text-xs font-semibold">
             <span className="text-white/60">Faturamento Mensal</span>
-            <span className="text-[#c9a227]">{targetPercent}%</span>
+            <span className="text-[#c9a227]">{targetPercent ?? '--'}{targetPercent !== null ? '%' : ''}</span>
           </div>
           <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-white/5 p-0.5">
-            <div className="h-full rounded-full bg-gradient-to-r from-[#c9a227] to-[#d4ad30] shadow-inner transition-all duration-1000" style={{ width: `${targetPercent}%` }} />
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-[#c9a227] to-[#d4ad30] shadow-inner transition-all duration-1000"
+              style={{ width: `${targetPercent ?? 0}%` }}
+            />
           </div>
-          <p className="mt-2 text-right text-[10px] text-white/40">Meta: R$ {targetGoal.toLocaleString('pt-BR')}</p>
+          <p className="mt-2 text-right text-[10px] text-white/40">
+            {targetGoal !== null ? `Meta: R$ ${targetGoal.toLocaleString('pt-BR')}` : 'Sem meta definida'}
+          </p>
         </div>
 
         <nav className="mt-3 flex flex-1 gap-2 overflow-x-auto pb-1 lg:mt-6 lg:flex-none lg:flex-col lg:gap-4 lg:overflow-visible lg:pb-0">
@@ -399,10 +411,11 @@ export default function HomePage() {
           </button>
           <button
             onClick={() => void handleLogout()}
-            className="flex w-full items-center gap-3 rounded-xl border-l-4 border-transparent px-3 py-2.5 text-sm font-semibold tracking-wide text-white/65 transition-all hover:bg-red-500/10 hover:text-red-300 active:scale-95"
+            disabled={isLoggingOut}
+            className="flex w-full items-center gap-3 rounded-xl border-l-4 border-transparent px-3 py-2.5 text-sm font-semibold tracking-wide text-white/65 transition-all hover:bg-red-500/10 hover:text-red-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <LogOut className="h-4.5 w-4.5" />
-            Sair do CRM
+            {isLoggingOut ? 'Saindo...' : 'Sair do CRM'}
           </button>
         </div>
       </aside>
@@ -418,6 +431,7 @@ export default function HomePage() {
               {activeTab === 'historico' && 'Histórico Supabase'}
               {activeTab === 'extratos' && 'Extratos Mensais'}
               {activeTab === 'agenda' && 'Agenda & Follow-up'}
+              {activeTab === 'settings' && 'Configuracoes do CRM'}
             </h2>
           </div>
 
@@ -486,112 +500,148 @@ export default function HomePage() {
         </header>
 
         {activeTab === 'dashboard' && (
-          <MetricsPanel
-            leads={leads}
-            stats={stats}
-            monthlyEvolution={monthlyEvolution}
-            monthDifference={monthDifference}
-            monthDifferencePercent={monthDifferencePercent}
-            monthTrendIsPositive={monthTrendIsPositive}
-            visibleMonthlySeries={visibleMonthlySeries}
-            onToggleMonthlySeries={toggleMonthlySeries}
-            formatDashboardCurrency={formatDashboardCurrency}
-            formatCurrency={formatLeadCurrency}
-            getLeadStatusClasses={getLeadStatusClasses}
-            onOpenLead={setLeadDetail}
-            onOpenCreateModal={() => openCreateModal()}
-            onOpenAgendaNoAction={() => {
-              setAgendaInitialView('sem_acao');
-              setActiveTab('agenda');
-            }}
-            onOpenAgendaToday={() => {
-              setAgendaInitialView('hoje');
-              setActiveTab('agenda');
-            }}
-            onOpenLeads={() => setActiveTab('leads')}
-            targetGoal={targetGoal}
-            targetPercent={targetPercent}
-            editingTarget={editingTarget}
-            targetInput={targetInput}
-            setTargetInput={setTargetInput}
-            setEditingTarget={setEditingTarget}
-            saveTargetGoal={saveTargetGoal}
-          />
+          <TabErrorBoundary fallbackTitle="Painel Geral">
+            <MetricsPanel
+              leads={leads}
+              stats={stats}
+              monthlyEvolution={monthlyEvolution}
+              monthDifference={monthDifference}
+              monthDifferencePercent={monthDifferencePercent}
+              monthTrendIsPositive={monthTrendIsPositive}
+              visibleMonthlySeries={visibleMonthlySeries}
+              onToggleMonthlySeries={toggleMonthlySeries}
+              formatDashboardCurrency={formatDashboardCurrency}
+              formatCurrency={formatLeadCurrency}
+              getLeadStatusClasses={getLeadStatusClasses}
+              onOpenLead={setLeadDetail}
+              onOpenCreateModal={() => openCreateModal()}
+              onOpenAgendaNoAction={() => {
+                setAgendaInitialView('sem_acao');
+                setActiveTab('agenda');
+              }}
+              onOpenAgendaToday={() => {
+                setAgendaInitialView('hoje');
+                setActiveTab('agenda');
+              }}
+              onOpenLeads={() => setActiveTab('leads')}
+              targetGoal={targetGoal}
+              targetPercent={targetPercent}
+              editingTarget={editingTarget}
+              targetInput={targetInput}
+              setTargetInput={setTargetInput}
+              setEditingTarget={setEditingTarget}
+              saveTargetGoal={saveTargetGoal}
+            />
+          </TabErrorBoundary>
         )}
 
         {activeTab === 'leads' && (
-          <KanbanBoard
-            leads={leads}
-            filteredLeads={filteredLeads}
-            sortedFilteredLeads={sortedFilteredLeads}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            filterNeighborhood={filterNeighborhood}
-            setFilterNeighborhood={setFilterNeighborhood}
-            filterStatus={filterStatus}
-            setFilterStatus={setFilterStatus}
-            neighborhoods={RJ_NEIGHBORHOODS}
-            viewMode={viewMode}
-            setViewMode={setViewMode}
-            collapsedCards={collapsedCards}
-            onCollapseAll={() => setCollapsedStateForAllLeads(true)}
-            onExpandAll={() => setCollapsedStateForAllLeads(false)}
-            onToggleCollapse={toggleCollapsedCard}
-            onOpenCreateModal={() => openCreateModal()}
-            onOpenDetail={setLeadDetail}
-            onOpenEdit={(lead) => void openEditModal(lead)}
-            onDelete={(leadId) => void handleDeleteLead(leadId)}
-            onStatusChange={(leadId, status) => void handleStatusChange(leadId, status)}
-            onTableRowClick={handleLeadTableRowClick}
-            onTableRowDoubleClick={handleLeadTableRowDoubleClick}
-            sortKey={sortKey}
-            sortDir={sortDir}
-            onToggleSort={toggleSort}
-            daysInStatus={daysInStatus}
-            formatCurrency={formatLeadCurrency}
-            getLeadServiceDate={getLeadServiceDate}
-            getLeadStatusClasses={getLeadStatusClasses}
-          />
+          <TabErrorBoundary fallbackTitle="Controle de Leads">
+            <KanbanBoard
+              leads={leads}
+              filteredLeads={filteredLeads}
+              sortedFilteredLeads={sortedFilteredLeads}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              filterNeighborhood={filterNeighborhood}
+              setFilterNeighborhood={setFilterNeighborhood}
+              filterStatus={filterStatus}
+              setFilterStatus={setFilterStatus}
+              hasActiveFilters={hasActiveFilters}
+              onClearFilters={clearFilters}
+              neighborhoods={RJ_NEIGHBORHOODS}
+              viewMode={viewMode}
+              setViewMode={setViewMode}
+              collapsedCards={collapsedCards}
+              onCollapseAll={() => setCollapsedStateForAllLeads(true)}
+              onExpandAll={() => setCollapsedStateForAllLeads(false)}
+              onToggleCollapse={toggleCollapsedCard}
+              onOpenCreateModal={() => openCreateModal()}
+              onOpenDetail={setLeadDetail}
+              onOpenEdit={(lead) => void openEditModal(lead)}
+              onDelete={(leadId) => void handleDeleteLead(leadId)}
+              onStatusChange={(leadId, status) => void handleStatusChange(leadId, status)}
+              onReorderLead={handleKanbanReorder}
+              onTogglePin={(leadId) => void handleTogglePin(leadId)}
+              onTableRowClick={handleLeadTableRowClick}
+              onTableRowDoubleClick={handleLeadTableRowDoubleClick}
+              sortKey={sortKey}
+              sortDir={sortDir}
+              onToggleSort={toggleSort}
+              daysInStatus={daysInStatus}
+              formatCurrency={formatLeadCurrency}
+              getLeadServiceDate={getLeadServiceDate}
+              getLeadStatusClasses={getLeadStatusClasses}
+              leadSyncState={leadSyncState}
+            />
+          </TabErrorBoundary>
         )}
 
         {activeTab === 'trash' && (
-          <TrashLeadsView
-            leads={trashedLeads}
-            loading={loadingTrashLeads}
-            onRefresh={loadTrashLeads}
-            onRestore={(lead) => handleRestoreLead(lead)}
-          />
+          <TabErrorBoundary fallbackTitle="Lixeira de Leads">
+            <TrashLeadsView
+              leads={trashedLeads}
+              loading={loadingTrashLeads}
+              onRefresh={loadTrashLeads}
+              onRestore={(lead) => handleRestoreLead(lead)}
+            />
+          </TabErrorBoundary>
         )}
 
         {activeTab === 'historico' && (
-          <HistoricoSupabase
-            setActiveTab={setActiveTab}
-            openCreateModal={openCreateModal}
-          />
+          <TabErrorBoundary fallbackTitle="Histórico Supabase">
+            <HistoricoSupabase
+              setActiveTab={setActiveTab}
+              openCreateModal={openCreateModal}
+            />
+          </TabErrorBoundary>
         )}
 
-        {activeTab === 'extratos' && <ExtratosMensaisSupabase />}
+        {activeTab === 'extratos' && (
+          <TabErrorBoundary fallbackTitle="Extratos Mensais">
+            <ExtratosMensaisSupabase />
+          </TabErrorBoundary>
+        )}
+
+        {activeTab === 'settings' && (
+          <TabErrorBoundary fallbackTitle="Configuracoes do CRM">
+            <PlaybookSettings
+              activeSellerId={activeSellerId}
+              activePlaybook={activePlaybook}
+              sellerIds={sellerIds}
+              loading={playbookLoading}
+              saving={playbookSaving}
+              error={playbookError}
+              onChangeSeller={setActiveSellerId}
+              onUpdateRule={updatePlaybookRule}
+              onResetPlaybook={resetActivePlaybook}
+              onReload={reloadPlaybooks}
+            />
+          </TabErrorBoundary>
+        )}
 
         {activeTab === 'agenda' && (
-          <AgendaSection
-            leads={leads}
-            initialView={agendaInitialView}
-            onAgendarRetorno={handleAgendaSchedule}
-            onMarcarFeito={handleAgendaMarkDone}
-            onSetDormant={handleDormantStateChange}
-            onUpdateServiceStatus={handleServiceStatusChange}
-            onAbrirLead={setLeadDetail}
-            isClosedLead={isClosedLead}
-            getLeadFollowUpDate={getLeadFollowUpDate}
-            getLeadServiceDate={getLeadServiceDate}
-            getLeadActivityDate={getLeadActivityDate}
-            getLeadServiceStatus={getLeadServiceStatus}
-            getLeadStatusClasses={getLeadStatusClasses}
-            getLeadPhoneHref={getLeadPhoneHref}
-            getWhatsAppHref={getWhatsAppHref}
-            formatCurrencyBRL={formatCurrencyBRL}
-            serviceStatusMeta={SERVICE_STATUS_META}
-          />
+          <TabErrorBoundary fallbackTitle="Agenda & Follow-up">
+            <AgendaSection
+              leads={leads}
+              initialView={agendaInitialView}
+              onAgendarRetorno={handleAgendaSchedule}
+              onMarcarFeito={handleAgendaMarkDone}
+              onSetDormant={handleDormantStateChange}
+              onUpdateServiceStatus={handleServiceStatusChange}
+              onAbrirLead={setLeadDetail}
+              isClosedLead={isClosedLead}
+              getLeadFollowUpDate={getLeadFollowUpDate}
+              getLeadServiceDate={getLeadServiceDate}
+              getLeadActivityDate={getLeadActivityDate}
+              getLeadServiceStatus={getLeadServiceStatus}
+              getLeadStatusClasses={getLeadStatusClasses}
+              getLeadPhoneHref={getLeadPhoneHref}
+              getWhatsAppHref={getWhatsAppHref}
+              formatCurrencyBRL={formatCurrencyBRL}
+              serviceStatusMeta={SERVICE_STATUS_META}
+            />
+          </TabErrorBoundary>
         )}
       </main>
 
@@ -603,8 +653,16 @@ export default function HomePage() {
         neighborhoods={RJ_NEIGHBORHOODS}
         leadForm={leadForm}
         setLeadForm={setLeadForm}
+        isDirty={isLeadFormDirty}
         onClose={closeLeadModal}
         onSubmit={handleLeadSubmit}
+        onSave={async () => {
+          const saved = await handleLeadSave();
+          if (saved) {
+            setInitialLeadForm(leadForm);
+          }
+          return saved;
+        }}
         onOpenHistory={() => setActiveTab('historico')}
         formatDateInputValue={formatDateInputValue}
       />
@@ -613,6 +671,7 @@ export default function HomePage() {
         leadDetail={leadDetail}
         leadStatusHistory={leadStatusHistory}
         loadingLeadStatusHistory={loadingLeadStatusHistory}
+        linkedOrcamento={linkedDetailOrcamento}
         getLeadPhoneHref={getLeadPhoneHref}
         getLeadStatusClasses={getLeadStatusClasses}
         getLeadServiceDate={getLeadServiceDate}
@@ -622,6 +681,34 @@ export default function HomePage() {
         onClose={closeLeadDetailModal}
         onOpenEdit={(lead) => {
           void openEditModal(lead);
+          closeLeadDetailModal();
+        }}
+        onDuplicate={(lead) => {
+          openCreateModal({
+            prefill: {
+              name: `${lead.name} (cópia)`,
+              phone: lead.phone,
+              email: lead.email,
+              address: lead.address,
+              neighborhood: lead.neighborhood,
+              filmType: lead.filmType,
+              sqm: lead.sqm,
+              value: lead.value,
+              status: 'Novo',
+              statusChangedAt: new Date().toISOString().split('T')[0],
+              dataServico: null,
+              serviceStatus: null,
+              proximoContato: null,
+              dormant: false,
+              pinned: false,
+              notes: '',
+            },
+            sourceCalculatorHistoryId: null,
+          });
+          closeLeadDetailModal();
+        }}
+        onOpenHistory={() => {
+          setActiveTab('historico');
           closeLeadDetailModal();
         }}
         onOpenCommercialAction={openCommercialAction}
@@ -635,6 +722,7 @@ export default function HomePage() {
         onSubmit={applyCommercialAction}
         setCommercialAction={setCommercialAction}
       />
-    </div>
+      </div>
+    </ToastProvider>
   );
 }

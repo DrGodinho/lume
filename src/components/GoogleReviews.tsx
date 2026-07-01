@@ -1,4 +1,5 @@
 import { Star, Quote } from 'lucide-react';
+import { businessInfo } from '@/lib/businessInfo';
 
 const reviews = [
   {
@@ -86,7 +87,7 @@ export function GoogleReviews() {
         {/* Call to action for more reviews */}
         <div className="text-center mt-12">
           <a
-            href="https://www.google.com/maps/search/?api=1&query=Estrada+do+Realengo+973,+Rio+de+Janeiro,+RJ"
+            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(businessInfo.address.mapsQuery)}`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 text-[#c9a227] hover:text-white transition-colors text-sm font-medium border border-[#c9a227]/30 hover:border-[#c9a227] rounded-full px-6 py-2 bg-[#c9a227]/5"

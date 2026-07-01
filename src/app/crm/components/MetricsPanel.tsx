@@ -1,6 +1,7 @@
 'use client';
 
 import { MonthlyChart } from './MonthlyChart';
+import { LEAD_STAGE_DOT_COLORS, LEAD_STAGE_LABELS, LEAD_STAGES } from '../constants';
 import type { DashboardStats, Lead, MonthlyEvolutionData, MonthlyEvolutionSeries } from '../types';
 
 interface MetricsPanelProps {
@@ -20,8 +21,8 @@ interface MetricsPanelProps {
   onOpenAgendaNoAction: () => void;
   onOpenAgendaToday: () => void;
   onOpenLeads: () => void;
-  targetGoal: number;
-  targetPercent: number;
+  targetGoal: number | null;
+  targetPercent: number | null;
   editingTarget: boolean;
   targetInput: string;
   setTargetInput: (value: string) => void;
@@ -142,23 +143,17 @@ export function MetricsPanel({
           <h3 className="mb-6 font-display text-base font-bold uppercase tracking-wider text-white">Distribuição Comercial do Funil</h3>
 
           <div className="space-y-4">
-            {[
-              { label: 'Novos Leads', stage: 'Novo', color: 'bg-blue-500' },
-              { label: 'Em Atendimento', stage: 'Em Contato', color: 'bg-amber-500' },
-              { label: 'Agendados', stage: 'Agendado', color: 'bg-sky-500' },
-              { label: 'Contratos Fechados', stage: 'Fechado', color: 'bg-emerald-500' },
-              { label: 'Perdidos / Descartados', stage: 'Perdido', color: 'bg-red-500' },
-            ].map((item) => {
-              const count = leads.filter((lead) => lead.status === item.stage).length;
+            {LEAD_STAGES.map((stage) => {
+              const count = leads.filter((lead) => lead.status === stage).length;
               const percent = leads.length > 0 ? Math.round((count / leads.length) * 100) : 0;
               return (
-                <div key={item.stage} className="flex flex-col gap-1">
+                <div key={stage} className="flex flex-col gap-1">
                   <div className="flex justify-between text-xs font-semibold">
-                    <span className="text-white/60">{item.label}</span>
+                    <span className="text-white/60">{LEAD_STAGE_LABELS[stage]}</span>
                     <span className="text-white">{count} ({percent}%)</span>
                   </div>
                   <div className="h-3 w-full overflow-hidden rounded-full bg-white/5 p-0.5">
-                    <div className={`h-full rounded-full ${item.color}`} style={{ width: `${percent}%` }} />
+                    <div className={`h-full rounded-full ${LEAD_STAGE_DOT_COLORS[stage]}`} style={{ width: `${percent}%` }} />
                   </div>
                 </div>
               );
@@ -172,74 +167,95 @@ export function MetricsPanel({
             <p className="text-xs text-white/50">Progresso do consultor LUME</p>
           </div>
 
-          <div className="my-6 flex flex-col items-center">
-            <div className="relative flex h-32 w-32 items-center justify-center">
-              <svg className="absolute left-0 top-0 h-full w-full -rotate-90">
-                <circle cx="64" cy="64" r="54" className="stroke-white/5" strokeWidth="8" fill="transparent" />
-                <circle
-                  cx="64"
-                  cy="64"
-                  r="54"
-                  className="stroke-[#c9a227]"
-                  strokeWidth="8"
-                  fill="transparent"
-                  strokeDasharray={2 * Math.PI * 54}
-                  strokeDashoffset={2 * Math.PI * 54 * (1 - targetPercent / 100)}
-                />
-              </svg>
-              <div className="text-center">
-                <span className="text-3xl font-black text-white">{targetPercent}%</span>
-                <p className="text-[10px] font-semibold uppercase text-white/40">Metas</p>
+          {targetGoal === null ? (
+            <div className="my-6 flex flex-col items-center gap-4 text-center">
+              <div className="flex h-32 w-32 items-center justify-center rounded-full border-2 border-dashed border-white/15">
+                <span className="text-[10px] font-black uppercase tracking-[0.18em] text-white/40">Sem meta</span>
               </div>
+              <p className="max-w-[200px] text-xs font-semibold text-white/55">
+                Defina uma meta mensal para acompanhar seu progresso no dashboard.
+              </p>
+              <button
+                type="button"
+                onClick={() => setEditingTarget(true)}
+                className="rounded-2xl border border-[#c9a227]/30 bg-[#c9a227]/10 px-4 py-2 text-xs font-black uppercase tracking-wider text-[#f5d77a] transition hover:bg-[#c9a227]/20"
+              >
+                Definir meta
+              </button>
             </div>
-          </div>
+          ) : (
+            <>
+              <div className="my-6 flex flex-col items-center">
+                <div className="relative flex h-32 w-32 items-center justify-center">
+                  <svg className="absolute left-0 top-0 h-full w-full -rotate-90">
+                    <circle cx="64" cy="64" r="54" className="stroke-white/5" strokeWidth="8" fill="transparent" />
+                    <circle
+                      cx="64"
+                      cy="64"
+                      r="54"
+                      className="stroke-[#c9a227]"
+                      strokeWidth="8"
+                      fill="transparent"
+                      strokeDasharray={2 * Math.PI * 54}
+                      strokeDashoffset={2 * Math.PI * 54 * (1 - (targetPercent ?? 0) / 100)}
+                    />
+                  </svg>
+                  <div className="text-center">
+                    <span className="text-3xl font-black text-white">{targetPercent ?? 0}%</span>
+                    <p className="text-[10px] font-semibold uppercase text-white/40">Metas</p>
+                  </div>
+                </div>
+              </div>
 
-          <div className="space-y-2 border-t border-white/5 pt-4 text-xs font-semibold">
-            <div className="flex justify-between">
-              <span className="text-white/40">Faturamento Atual:</span>
-              <span className="text-white">R$ {stats.revenue.toLocaleString('pt-BR')}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-white/40">Meta Estabelecida:</span>
-              <span className="flex items-center gap-1.5 text-[#c9a227]">
-                {editingTarget ? (
-                  <input
-                    type="number"
-                    value={targetInput}
-                    onChange={(event) => setTargetInput(event.target.value)}
-                    onBlur={() => {
-                      const value = parseInt(targetInput, 10);
-                      if (value > 0) {
-                        void saveTargetGoal(value);
-                      } else {
-                        setEditingTarget(false);
-                      }
-                    }}
-                    onKeyDown={(event) => {
-                      if (event.key === 'Enter') {
-                        const value = parseInt(targetInput, 10);
-                        if (value > 0) {
-                          void saveTargetGoal(value);
-                        }
-                      }
-                      if (event.key === 'Escape') setEditingTarget(false);
-                    }}
-                    className="w-24 rounded-lg border border-[#c9a227]/40 bg-[#04080f] px-2 py-0.5 text-right text-xs text-white focus:outline-none"
-                    autoFocus
-                  />
-                ) : (
-                  <>
-                    R$ {targetGoal.toLocaleString('pt-BR')}
-                    <button type="button" onClick={() => setEditingTarget(true)} className="text-white/30 transition hover:text-white/60" title="Editar meta">
-                      <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                      </svg>
-                    </button>
-                  </>
-                )}
-              </span>
-            </div>
-          </div>
+              <div className="space-y-2 border-t border-white/5 pt-4 text-xs font-semibold">
+                <div className="flex justify-between">
+                  <span className="text-white/40">Faturamento Atual:</span>
+                  <span className="text-white">R$ {stats.revenue.toLocaleString('pt-BR')}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-white/40">Meta Estabelecida:</span>
+                  <span className="flex items-center gap-1.5 text-[#c9a227]">
+                    {editingTarget ? (
+                      <input
+                        type="number"
+                        value={targetInput}
+                        placeholder="Ex: 10000"
+                        onChange={(event) => setTargetInput(event.target.value)}
+                        onBlur={() => {
+                          const value = parseInt(targetInput, 10);
+                          if (value > 0) {
+                            void saveTargetGoal(value);
+                          } else {
+                            setEditingTarget(false);
+                          }
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Enter') {
+                            const value = parseInt(targetInput, 10);
+                            if (value > 0) {
+                              void saveTargetGoal(value);
+                            }
+                          }
+                          if (event.key === 'Escape') setEditingTarget(false);
+                        }}
+                        className="w-24 rounded-lg border border-[#c9a227]/40 bg-[#04080f] px-2 py-0.5 text-right text-xs text-white focus:outline-none"
+                        autoFocus
+                      />
+                    ) : (
+                      <>
+                        R$ {targetGoal.toLocaleString('pt-BR')}
+                        <button type="button" onClick={() => setEditingTarget(true)} className="text-white/30 transition hover:text-white/60" title="Editar meta">
+                          <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                          </svg>
+                        </button>
+                      </>
+                    )}
+                  </span>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
 

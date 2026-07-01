@@ -2,6 +2,8 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { verifyToken } from '@/lib/crm-auth';
 import { roundCurrency, roundMeasure } from '@/lib/numberPrecision';
+import { createDefaultPlaybookRules, getPlaybookFollowUpDate, normalizeSellerId, sanitizePlaybookRules } from '@/app/crm/utils/playbooks';
+import type { FollowUpPlaybookRule } from '@/app/crm/types';
 
 type LeadStatus = 'Novo' | 'Em Contato' | 'Agendado' | 'Fechado' | 'Perdido';
 type ServiceStatus = 'Marcado' | 'Confirmado' | 'Em Execucao' | 'Concluido' | 'Reagendar';
@@ -21,6 +23,7 @@ const OPTIONAL_LEAD_COLUMNS = new Set([
   'updated_at',
   'deleted_at',
   'dormant',
+  'pinned',
 ]);
 
 interface LeadPayload {
@@ -41,6 +44,7 @@ interface LeadPayload {
   dataServico?: string | null;
   serviceStatus?: ServiceStatus | null;
   dormant?: boolean;
+  pinned?: boolean;
   updatedAt?: string;
   deletedAt?: string | null;
 }
@@ -210,6 +214,47 @@ async function insertLeadStatusHistory(
   return error;
 }
 
+const isMissingPlaybookTableError = (error?: SupabaseError | null) =>
+  error?.code === '42P01' || !!error?.message?.includes('crm_playbooks');
+
+async function loadSellerPlaybookRules(
+  supabaseClient: Awaited<ReturnType<typeof createSupabaseRequestClient>>,
+  sellerId: string | null,
+) {
+  if (!supabaseClient) return createDefaultPlaybookRules();
+
+  const normalizedSellerId = normalizeSellerId(sellerId || 'equipe-lume');
+  const { data, error } = await supabaseClient
+    .from('crm_playbooks')
+    .select('rules')
+    .eq('seller_id', normalizedSellerId)
+    .maybeSingle();
+
+  if (isMissingPlaybookTableError(error)) return createDefaultPlaybookRules();
+  if (error) return createDefaultPlaybookRules();
+  if (!Array.isArray(data?.rules)) return createDefaultPlaybookRules();
+
+  return sanitizePlaybookRules(data.rules as FollowUpPlaybookRule[]);
+}
+
+const applyServerPlaybookToLead = async (
+  supabaseClient: Awaited<ReturnType<typeof createSupabaseRequestClient>>,
+  lead: LeadPayload,
+  sellerId: string | null,
+  options: { overwriteExisting?: boolean } = {},
+) => {
+  const rules = await loadSellerPlaybookRules(supabaseClient, sellerId);
+  return {
+    ...lead,
+    proximoContato: getPlaybookFollowUpDate(
+      lead.status,
+      lead.proximoContato,
+      rules,
+      { overwriteExisting: options.overwriteExisting },
+    ),
+  };
+};
+
 export async function GET(request: NextRequest) {
   const authError = await ensureAuthorized(request);
   if (authError) return authError;
@@ -260,7 +305,7 @@ export async function POST(request: NextRequest) {
 
   const body = await request.json();
   const changedBy = await resolveActor(request);
-  const lead: LeadPayload = {
+  let lead: LeadPayload = {
     id: body.id || `lead_${Date.now()}`,
     name: body.name || '',
     phone: body.phone || '',
@@ -278,6 +323,7 @@ export async function POST(request: NextRequest) {
     dataServico: body.dataServico || null,
     serviceStatus: normalizeServiceStatus(body.serviceStatus) || (body.dataServico ? 'Marcado' : null),
     dormant: body.dormant === true,
+    pinned: body.pinned === true,
     updatedAt: body.updatedAt || new Date().toISOString(),
     deletedAt: body.deletedAt || null,
   };
@@ -285,6 +331,8 @@ export async function POST(request: NextRequest) {
   if (!lead.name) {
     return NextResponse.json({ error: 'Nome e obrigatorio' }, { status: 400 });
   }
+
+  lead = await applyServerPlaybookToLead(supabaseClient, lead, changedBy);
 
   const row = {
     id: lead.id,
@@ -303,6 +351,7 @@ export async function POST(request: NextRequest) {
     data_servico: lead.dataServico,
     service_status: lead.serviceStatus,
     dormant: lead.dormant,
+    pinned: lead.pinned,
     updated_at: lead.updatedAt,
     created_at: lead.createdAt,
     deleted_at: lead.deletedAt,
@@ -344,7 +393,7 @@ export async function PUT(request: NextRequest) {
 
   const body = await request.json();
   const changedBy = await resolveActor(request);
-  const lead: LeadPayload = {
+  let lead: LeadPayload = {
     id: body.id || `lead_${Date.now()}`,
     name: body.name || '',
     phone: body.phone || '',
@@ -362,6 +411,7 @@ export async function PUT(request: NextRequest) {
     dataServico: body.dataServico || null,
     serviceStatus: normalizeServiceStatus(body.serviceStatus) || (body.dataServico ? 'Marcado' : null),
     dormant: body.dormant === true,
+    pinned: body.pinned === true,
     updatedAt: body.updatedAt || new Date().toISOString(),
     deletedAt: body.deletedAt || null,
   };
@@ -382,6 +432,10 @@ export async function PUT(request: NextRequest) {
 
   const previousStatus = normalizeLeadStatus(existingLead?.status);
 
+  if (!existingLead || previousStatus !== lead.status) {
+    lead = await applyServerPlaybookToLead(supabaseClient, lead, changedBy);
+  }
+
   const row = {
     id: lead.id,
     name: lead.name,
@@ -400,6 +454,7 @@ export async function PUT(request: NextRequest) {
     data_servico: lead.dataServico,
     service_status: lead.serviceStatus,
     dormant: lead.dormant,
+    pinned: lead.pinned,
     updated_at: lead.updatedAt,
     deleted_at: lead.deletedAt,
   };
@@ -468,6 +523,31 @@ export async function DELETE(request: NextRequest) {
   });
 }
 
+const LEAD_STATUS_INFO_PATCH_FIELDS = new Set([
+  'status',
+  'status_changed_at',
+  'notes',
+  'proximo_contato',
+  'data_servico',
+  'service_status',
+  'dormant',
+  'pinned',
+  'updated_at',
+]);
+
+const buildStatusInfoUpdate = (body: Record<string, unknown>) => {
+  const update: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(body)) {
+    if (LEAD_STATUS_INFO_PATCH_FIELDS.has(key)) update[key] = value;
+  }
+  if ('statusChangedAt' in body) update.status_changed_at = body.statusChangedAt;
+  if ('proximoContato' in body) update.proximo_contato = body.proximoContato;
+  if ('dataServico' in body) update.data_servico = body.dataServico;
+  if ('serviceStatus' in body) update.service_status = body.serviceStatus;
+  if ('updatedAt' in body) update.updated_at = body.updatedAt;
+  return update;
+};
+
 export async function PATCH(request: NextRequest) {
   const authError = await ensureAuthorized(request);
   if (authError) return authError;
@@ -481,26 +561,52 @@ export async function PATCH(request: NextRequest) {
   const id = typeof body?.id === 'string' ? body.id : '';
   const action = typeof body?.action === 'string' ? body.action : '';
 
-  if (!id || !['restore', 'dormant', 'activate'].includes(action)) {
-    return NextResponse.json({ error: 'Acao invalida para leads' }, { status: 400 });
+  if (!id) {
+    return NextResponse.json({ error: 'ID do lead e obrigatorio' }, { status: 400 });
   }
 
-  if (action === 'dormant' || action === 'activate') {
-    const updatedAt = new Date().toISOString();
+  if (action && ['restore', 'dormant', 'activate'].includes(action)) {
+    if (action === 'dormant' || action === 'activate') {
+      const updatedAt = new Date().toISOString();
+      const { data, error } = await supabaseClient
+        .from('leads')
+        .update({ dormant: action === 'dormant', updated_at: updatedAt })
+        .eq('id', id)
+        .is('deleted_at', null)
+        .select('*')
+        .single();
+
+      if (isMissingOptionalLeadColumnError(error?.message)) {
+        return NextResponse.json(
+          { error: 'A coluna de lead dormente ainda nao existe no Supabase.', hint: 'Rode o SQL helper de dormencia para habilitar esta funcao.' },
+          { status: 409 },
+        );
+      }
+
+      if (error) return crmErrorResponse(error);
+
+      return NextResponse.json({
+        success: true,
+        lead: data
+          ? {
+              ...data,
+              sqm: roundMeasure(data.sqm),
+              value: roundCurrency(data.value),
+            }
+          : null,
+      });
+    }
+
+    const thirtyDaysAgoIso = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    const restoredAt = new Date().toISOString();
+
     const { data, error } = await supabaseClient
       .from('leads')
-      .update({ dormant: action === 'dormant', updated_at: updatedAt })
+      .update({ deleted_at: null, updated_at: restoredAt })
       .eq('id', id)
-      .is('deleted_at', null)
+      .gte('deleted_at', thirtyDaysAgoIso)
       .select('*')
       .single();
-
-    if (isMissingOptionalLeadColumnError(error?.message)) {
-      return NextResponse.json(
-        { error: 'A coluna de lead dormente ainda nao existe no Supabase.', hint: 'Rode o SQL helper de dormencia para habilitar esta funcao.' },
-        { status: 409 },
-      );
-    }
 
     if (error) return crmErrorResponse(error);
 
@@ -516,27 +622,76 @@ export async function PATCH(request: NextRequest) {
     });
   }
 
-  const thirtyDaysAgoIso = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-  const restoredAt = new Date().toISOString();
+  const statusInfoPatch = buildStatusInfoUpdate(body);
+  if (Object.keys(statusInfoPatch).length === 0) {
+    return NextResponse.json({ error: 'PATCH precisa de uma acao ou ao menos um campo de status.' }, { status: 400 });
+  }
+
+  const { data: existingLead, error: existingLeadError } = await supabaseClient
+    .from('leads')
+    .select('status,proximo_contato')
+    .eq('id', id)
+    .maybeSingle();
+
+  if (existingLeadError) {
+    return crmErrorResponse(existingLeadError);
+  }
+
+  const previousStatus = normalizeLeadStatus(existingLead?.status);
+  const nextStatus = 'status' in statusInfoPatch
+    ? normalizeLeadStatus(statusInfoPatch.status)
+    : previousStatus;
+
+  if ('status' in statusInfoPatch) {
+    statusInfoPatch.status = nextStatus;
+  }
+
+  if (existingLead && nextStatus !== previousStatus && !('proximo_contato' in statusInfoPatch)) {
+    const changedBy = await resolveActor(request);
+    const rules = await loadSellerPlaybookRules(supabaseClient, changedBy);
+    statusInfoPatch.proximo_contato = getPlaybookFollowUpDate(
+      nextStatus,
+      existingLead.proximo_contato as string | null | undefined,
+      rules,
+      { overwriteExisting: true },
+    );
+  }
+
+  statusInfoPatch.updated_at = statusInfoPatch.updated_at || new Date().toISOString();
 
   const { data, error } = await supabaseClient
     .from('leads')
-    .update({ deleted_at: null, updated_at: restoredAt })
+    .update(statusInfoPatch)
     .eq('id', id)
-    .gte('deleted_at', thirtyDaysAgoIso)
     .select('*')
     .single();
+
+  if (isMissingOptionalLeadColumnError(error?.message)) {
+    const { pinned: _ignoredPinned, ...withoutPinned } = statusInfoPatch;
+    void _ignoredPinned;
+    const retry = await supabaseClient
+      .from('leads')
+      .update(withoutPinned)
+      .eq('id', id)
+      .select('*')
+      .single();
+    if (retry.error) return crmErrorResponse(retry.error);
+    return NextResponse.json({
+      success: true,
+      partial: true,
+      lead: retry.data
+        ? { ...retry.data, sqm: roundMeasure(retry.data.sqm), value: roundCurrency(retry.data.value) }
+        : null,
+    });
+  }
 
   if (error) return crmErrorResponse(error);
 
   return NextResponse.json({
     success: true,
+    partial: true,
     lead: data
-      ? {
-          ...data,
-          sqm: roundMeasure(data.sqm),
-          value: roundCurrency(data.value),
-        }
+      ? { ...data, sqm: roundMeasure(data.sqm), value: roundCurrency(data.value) }
       : null,
   });
 }
