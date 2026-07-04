@@ -1,9 +1,10 @@
 'use client';
 
 import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from 'react';
+import { format } from 'date-fns';
 import { supabase } from '@/lib/supabase';
 import { loadConfigFromCloud } from '@/lib/cloudSync';
-import { DEFAULT_CRM_FILM_OPTIONS } from '../constants';
+import { DEFAULT_CRM_FILM_OPTIONS, DEFAULT_CRM_TARGET_GOAL } from '../constants';
 import { getCrmApiErrorMessage, getCrmApiHeaders, getFilmTypeLabel, mapLeadRow, normalizeLeadAmounts } from '../utils';
 import type { CrmTab, Lead } from '../types';
 
@@ -50,6 +51,8 @@ const fetchTrashLeadsSnapshot = async (): Promise<TrashSnapshotResult> => {
   return { ok: true, leads: payload.map(mapLeadRow) };
 };
 
+const getMonthlyTargetConfigId = () => `crm_goal_${format(new Date(), 'yyyy-MM')}`;
+
 export const useLeadList = (
   activeTab: CrmTab,
   toast: ToastApi,
@@ -59,9 +62,9 @@ export const useLeadList = (
   const [loadingTrashLeads, setLoadingTrashLeads] = useState(false);
   const [filmTypeOptions, setFilmTypeOptions] = useState<string[]>(DEFAULT_CRM_FILM_OPTIONS);
   const [defaultLeadFilmType, setDefaultLeadFilmType] = useState(DEFAULT_CRM_FILM_OPTIONS[0] || 'Outro');
-  const [targetGoal, setTargetGoal] = useState<number | null>(null);
+  const [targetGoal, setTargetGoal] = useState<number | null>(DEFAULT_CRM_TARGET_GOAL);
   const [editingTarget, setEditingTarget] = useState(false);
-  const [targetInput, setTargetInput] = useState('');
+  const [targetInput, setTargetInput] = useState(String(DEFAULT_CRM_TARGET_GOAL));
 
   useEffect(() => {
     const loadCalculatorConfig = async () => {
@@ -85,10 +88,11 @@ export const useLeadList = (
     void loadCalculatorConfig();
 
     if (supabase) {
-      supabase.from('configuracoes').select('*').eq('id', 'default').single().then(({ data }) => {
+      supabase.from('configuracoes').select('meta_valor').eq('id', getMonthlyTargetConfigId()).maybeSingle().then(({ data }) => {
         if (data?.meta_valor) {
-          setTargetGoal(data.meta_valor);
-          setTargetInput(String(data.meta_valor));
+          const monthlyGoal = Number(data.meta_valor);
+          setTargetGoal(monthlyGoal);
+          setTargetInput(String(monthlyGoal));
         }
       });
     }
@@ -96,9 +100,10 @@ export const useLeadList = (
 
   const saveTargetGoal = useCallback(async (value: number) => {
     setTargetGoal(value);
+    setTargetInput(String(value));
     setEditingTarget(false);
     if (!supabase) return;
-    await supabase.from('configuracoes').upsert({ id: 'default', meta_valor: value }, { onConflict: 'id' });
+    await supabase.from('configuracoes').upsert({ id: getMonthlyTargetConfigId(), meta_valor: value }, { onConflict: 'id' });
   }, []);
 
   const loadTrashLeads = useCallback(async () => {

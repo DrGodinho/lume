@@ -1,7 +1,7 @@
 'use client';
 
 import { MonthlyChart } from './MonthlyChart';
-import { LEAD_STAGE_DOT_COLORS, LEAD_STAGE_LABELS, LEAD_STAGES } from '../constants';
+import { DEFAULT_CRM_TARGET_GOAL, LEAD_STAGE_DOT_COLORS, LEAD_STAGE_LABELS, LEAD_STAGES } from '../constants';
 import type { DashboardStats, Lead, MonthlyEvolutionData, MonthlyEvolutionSeries } from '../types';
 
 interface MetricsPanelProps {
@@ -55,6 +55,11 @@ export function MetricsPanel({
   setEditingTarget,
   saveTargetGoal,
 }: MetricsPanelProps) {
+  const beginTargetEdit = () => {
+    setTargetInput(String(targetGoal ?? DEFAULT_CRM_TARGET_GOAL));
+    setEditingTarget(true);
+  };
+
   return (
     <div className="space-y-8">
       <section className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
@@ -164,7 +169,7 @@ export function MetricsPanel({
         <div className="flex flex-col justify-between rounded-3xl border border-white/5 bg-[#07111d]/50 p-6 shadow-lg backdrop-blur-md">
           <div>
             <h3 className="mb-1 font-display text-base font-bold uppercase tracking-wider text-white">Meta de Vendas</h3>
-            <p className="text-xs text-white/50">Progresso do consultor LUME</p>
+            <p className="text-xs text-white/50">Progresso mensal do consultor LUME</p>
           </div>
 
           {targetGoal === null ? (
@@ -177,7 +182,7 @@ export function MetricsPanel({
               </p>
               <button
                 type="button"
-                onClick={() => setEditingTarget(true)}
+                onClick={beginTargetEdit}
                 className="rounded-2xl border border-[#c9a227]/30 bg-[#c9a227]/10 px-4 py-2 text-xs font-black uppercase tracking-wider text-[#f5d77a] transition hover:bg-[#c9a227]/20"
               >
                 Definir meta
@@ -209,8 +214,8 @@ export function MetricsPanel({
 
               <div className="space-y-2 border-t border-white/5 pt-4 text-xs font-semibold">
                 <div className="flex justify-between">
-                  <span className="text-white/40">Faturamento Atual:</span>
-                  <span className="text-white">R$ {stats.revenue.toLocaleString('pt-BR')}</span>
+                  <span className="text-white/40">Faturamento do mês:</span>
+                  <span className="text-white">{formatDashboardCurrency(monthlyEvolution.currentTotal)}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-white/40">Meta Estabelecida:</span>
@@ -244,7 +249,7 @@ export function MetricsPanel({
                     ) : (
                       <>
                         R$ {targetGoal.toLocaleString('pt-BR')}
-                        <button type="button" onClick={() => setEditingTarget(true)} className="text-white/30 transition hover:text-white/60" title="Editar meta">
+                        <button type="button" onClick={beginTargetEdit} className="text-white/30 transition hover:text-white/60" title="Editar meta">
                           <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                           </svg>

@@ -97,72 +97,72 @@ const jsonLd = {
   sameAs: businessSameAs,
   hasOfferCatalog: {
     '@type': 'OfferCatalog',
-    name: 'Catálogo de Películas Premium',
+    name: 'Catalogo de servicos de insulfilm premium',
     itemListElement: [
       {
         '@type': 'ListItem',
         position: 1,
         item: {
-          '@type': 'Product',
-          name: 'Insulfilm Nano Cerâmica',
-          description: 'Alta redução de calor e proteção UV extrema.',
-          brand: { '@type': 'Brand', name: 'LUME' },
-          offers: {
-            '@type': 'Offer',
-            url: businessInfo.siteUrl,
-            priceCurrency: 'BRL',
-            price: '0.00',
-            availability: 'https://schema.org/InStock',
+          '@type': 'Offer',
+          url: `${businessInfo.siteUrl}/nano-ceramica`,
+          priceCurrency: 'BRL',
+          availability: 'https://schema.org/InStock',
+          itemOffered: {
+            '@type': 'Service',
+            name: 'Instalacao de insulfilm nano ceramica',
+            description: 'Servico profissional de instalacao de insulfilm nano ceramica para alta reducao de calor e protecao UV.',
+            provider: {
+              '@type': 'LocalBusiness',
+              name: businessInfo.name,
+              telephone: businessInfo.phoneE164,
+              address: businessAddressSchema,
+            },
+            areaServed: { '@type': 'City', name: 'Rio de Janeiro' },
           },
-          aggregateRating: {
-            '@type': 'AggregateRating',
-            ratingValue: '5.0',
-            reviewCount: '128'
-          }
         },
       },
       {
         '@type': 'ListItem',
         position: 2,
         item: {
-          '@type': 'Product',
-          name: 'Insulfilm Carbono',
-          description: 'Estética premium e durabilidade superior.',
-          brand: { '@type': 'Brand', name: 'LUME' },
-          offers: {
-            '@type': 'Offer',
-            url: businessInfo.siteUrl,
-            priceCurrency: 'BRL',
-            price: '0.00',
-            availability: 'https://schema.org/InStock',
+          '@type': 'Offer',
+          url: `${businessInfo.siteUrl}/carbono`,
+          priceCurrency: 'BRL',
+          availability: 'https://schema.org/InStock',
+          itemOffered: {
+            '@type': 'Service',
+            name: 'Instalacao de insulfilm carbono',
+            description: 'Servico profissional de instalacao de insulfilm carbono para privacidade, estetica premium e durabilidade.',
+            provider: {
+              '@type': 'LocalBusiness',
+              name: businessInfo.name,
+              telephone: businessInfo.phoneE164,
+              address: businessAddressSchema,
+            },
+            areaServed: { '@type': 'City', name: 'Rio de Janeiro' },
           },
-          aggregateRating: {
-            '@type': 'AggregateRating',
-            ratingValue: '4.9',
-            reviewCount: '86'
-          }
         },
       },
       {
         '@type': 'ListItem',
         position: 3,
         item: {
-          '@type': 'Product',
-          name: 'Insulfilm Refletivo',
-          description: 'Privacidade total e redução de calor eficiente.',
-          brand: { '@type': 'Brand', name: 'LUME' },
-          offers: {
-            '@type': 'Offer',
-            url: businessInfo.siteUrl,
-            priceCurrency: 'BRL',
-            price: '0.00',
-            availability: 'https://schema.org/InStock',
+          '@type': 'Offer',
+          url: `${businessInfo.siteUrl}/refletiva`,
+          priceCurrency: 'BRL',
+          availability: 'https://schema.org/InStock',
+          itemOffered: {
+            '@type': 'Service',
+            name: 'Instalacao de insulfilm refletivo',
+            description: 'Servico profissional de instalacao de insulfilm refletivo para privacidade e reducao eficiente de calor.',
+            provider: {
+              '@type': 'LocalBusiness',
+              name: businessInfo.name,
+              telephone: businessInfo.phoneE164,
+              address: businessAddressSchema,
+            },
+            areaServed: { '@type': 'City', name: 'Rio de Janeiro' },
           },
-          aggregateRating: {
-            '@type': 'AggregateRating',
-            ratingValue: '4.8',
-            reviewCount: '104'
-          }
         },
       },
     ],

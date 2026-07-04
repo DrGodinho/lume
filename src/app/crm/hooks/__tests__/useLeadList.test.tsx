@@ -38,6 +38,8 @@ describe('useLeadList', () => {
     const { result } = renderHook(() => useLeadList('dashboard', toast));
 
     expect(result.current.leads).toEqual([]);
+    expect(result.current.targetGoal).toBe(10000);
+    expect(result.current.targetInput).toBe('10000');
 
     act(() => {
       result.current.upsertLeadInState(lead);
@@ -76,6 +78,6 @@ describe('useLeadList', () => {
       expect(result.current.defaultLeadFilmType).toBe('Refletiva');
     });
 
-    expect(result.current.filmTypeOptions).toEqual(expect.arrayContaining(['Carbono', 'Refletiva']));
+    expect(result.current.filmTypeOptions).toEqual(expect.arrayContaining(['Carbono G20', 'Refletiva']));
   });
 });

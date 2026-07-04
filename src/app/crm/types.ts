@@ -11,7 +11,7 @@ export type AgendaView = 'hoje' | 'semana' | 'mes' | 'servicos' | 'sem_acao' | '
 
 export type LeadCardKind = 'followup' | 'service' | 'idle' | 'dormant';
 
-export type MonthlyEvolutionSeries = 'atualDia' | 'atual' | 'anterior' | 'previsto';
+export type MonthlyEvolutionSeries = 'atualDia' | 'atual' | 'anterior' | 'anteriorAcumulado' | 'previsto';
 
 export type LeadSyncStatus = 'pending' | 'ok' | 'error';
 

@@ -1,14 +1,15 @@
 import React from 'react';
 import { Cloud, CloudOff, Loader2, Settings, X } from 'lucide-react';
 
-type FilmTypeKey = 'carbono' | 'refletiva' | 'dupla_camada' | 'nano_ceramica' | 'jateado';
+type FilmTypeKey = 'carbono_g5' | 'carbono_g20' | 'refletiva' | 'dupla_camada' | 'nano_ceramica' | 'jateado';
 type OptimizationMode = 'densidade' | 'facilidade' | 'facilidade_v2';
 type LossMode = 'dinamico' | 'fixo';
 type ColorMode = 'ambiente' | 'tamanho';
 type CloudStatus = 'idle' | 'syncing' | 'synced' | 'error';
 
 const FILM_TYPE_LABELS: Record<FilmTypeKey, string> = {
-  carbono: 'Carbono',
+  carbono_g5: 'Carbono G5',
+  carbono_g20: 'Carbono G20',
   refletiva: 'Refletiva',
   dupla_camada: 'Dupla Camada',
   nano_ceramica: 'Nano Cerâmica',
@@ -188,7 +189,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
               >
                 {FILM_TYPE_KEYS.map((key) => (
                   <option key={key} value={key}>
-                    {FILM_TYPE_LABELS[key]} - R${config.filmTypes[key]}/m²
+                    {FILM_TYPE_LABELS[key]}
                   </option>
                 ))}
               </select>

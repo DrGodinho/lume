@@ -23,7 +23,7 @@ import { supabase } from '../lib/supabase';
 
 // ─── CONFIGURAÇÕES PADRÃO ─────────────────────────────────────────────────────
 
-type FilmTypeKey = 'carbono' | 'refletiva' | 'dupla_camada' | 'nano_ceramica' | 'jateado';
+type FilmTypeKey = 'carbono_g5' | 'carbono_g20' | 'refletiva' | 'dupla_camada' | 'nano_ceramica' | 'jateado';
 type OptimizationMode = 'densidade' | 'facilidade' | 'facilidade_v2';
 type LossMode = 'dinamico' | 'fixo';
 type ColorMode = 'ambiente' | 'tamanho';
@@ -31,10 +31,11 @@ type ColorMode = 'ambiente' | 'tamanho';
 const OPTIMIZATION_MODES: OptimizationMode[] = ['densidade', 'facilidade', 'facilidade_v2'];
 const LOSS_MODES: LossMode[] = ['dinamico', 'fixo'];
 const COLOR_MODES: ColorMode[] = ['ambiente', 'tamanho'];
-const FILM_TYPE_KEYS: FilmTypeKey[] = ['carbono', 'refletiva', 'dupla_camada', 'nano_ceramica', 'jateado'];
+const FILM_TYPE_KEYS: FilmTypeKey[] = ['carbono_g5', 'carbono_g20', 'refletiva', 'dupla_camada', 'nano_ceramica', 'jateado'];
 
 const FILM_TYPE_LABELS: Record<FilmTypeKey, string> = {
-  carbono: 'Carbono',
+  carbono_g5: 'Carbono G5',
+  carbono_g20: 'Carbono G20',
   refletiva: 'Refletiva',
   dupla_camada: 'Dupla Camada',
   nano_ceramica: 'Nano Cerâmica',
@@ -69,7 +70,8 @@ interface AppConfig {
 }
 
 const DEFAULT_FILM_TYPES: Record<FilmTypeKey, number> = {
-  carbono: 80,
+  carbono_g5: 80,
+  carbono_g20: 80,
   refletiva: 95,
   dupla_camada: 120,
   nano_ceramica: 220,
@@ -87,7 +89,7 @@ const DEFAULT_CONFIG: AppConfig = {
   modoCorConfig: 'tamanho',
   agressividadeCorte: 35,
   filmTypes: { ...DEFAULT_FILM_TYPES },
-  selectedFilm: 'carbono',
+  selectedFilm: 'carbono_g20',
 };
 
 const DEFAULT_ROOM_COLORS: Record<string, string> = {
@@ -132,6 +134,30 @@ const isColorMode = (value: unknown): value is ColorMode =>
 
 const isFilmTypeKey = (value: unknown): value is FilmTypeKey =>
   FILM_TYPE_KEYS.includes(value as FilmTypeKey);
+
+const normalizeFilmTypeKey = (value: unknown): FilmTypeKey => {
+  if (value === 'carbono') return 'carbono_g20';
+  return isFilmTypeKey(value) ? value : DEFAULT_CONFIG.selectedFilm;
+};
+
+const normalizeFilmTypes = (value: unknown): Record<FilmTypeKey, number> => {
+  const next = { ...DEFAULT_FILM_TYPES };
+  if (!value || typeof value !== 'object') return next;
+
+  const source = value as Record<string, unknown>;
+  const legacyCarbono = Number(source.carbono);
+  if (Number.isFinite(legacyCarbono)) {
+    next.carbono_g5 = legacyCarbono;
+    next.carbono_g20 = legacyCarbono;
+  }
+
+  FILM_TYPE_KEYS.forEach((key) => {
+    const price = Number(source[key]);
+    if (Number.isFinite(price)) next[key] = price;
+  });
+
+  return next;
+};
 
 const getSizeColor = (h?: number, w?: number) => {
   if (typeof h !== 'number' || typeof w !== 'number') return '#94a3b8';
@@ -211,7 +237,15 @@ const stableRoomColor = (label: string) => {
 function loadConfig(): AppConfig {
     try {
         const saved = localStorage.getItem('lume_config');
-        if (saved) return { ...DEFAULT_CONFIG, ...JSON.parse(saved) };
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          return {
+            ...DEFAULT_CONFIG,
+            ...parsed,
+            filmTypes: normalizeFilmTypes(parsed.filmTypes),
+            selectedFilm: normalizeFilmTypeKey(parsed.selectedFilm),
+          };
+        }
     } catch {
         return DEFAULT_CONFIG;
     }
@@ -430,8 +464,8 @@ export function AdminCalculator() {
   const [modoPerdas, setModoPerdas] = useState<LossMode>(cfg.modoPerdas);
   const [perdasFixas, setPerdasFixas] = useState(cfg.perdasFixas);
   const [agressividadeCorte, setAgressividadeCorte] = useState(cfg.agressividadeCorte);
-  const [filmTypes, setFilmTypes] = useState<Record<FilmTypeKey, number>>(cfg.filmTypes || { ...DEFAULT_FILM_TYPES });
-  const [selectedFilm, setSelectedFilm] = useState<FilmTypeKey>(cfg.selectedFilm || 'carbono');
+  const [filmTypes, setFilmTypes] = useState<Record<FilmTypeKey, number>>(normalizeFilmTypes(cfg.filmTypes));
+  const [selectedFilm, setSelectedFilm] = useState<FilmTypeKey>(normalizeFilmTypeKey(cfg.selectedFilm));
   const [configRestored, setConfigRestored] = useState(false);
   const [draftRestored, setDraftRestored] = useState(false);
 
@@ -702,8 +736,8 @@ export function AdminCalculator() {
         if (source.perdasFixas !== undefined) setPerdasFixas(source.perdasFixas);
         if (isColorMode(source.modoCorConfig)) setUsarCoresPorAmbiente(source.modoCorConfig === 'ambiente');
         if (source.agressividadeCorte !== undefined) setAgressividadeCorte(source.agressividadeCorte);
-        if (source.filmTypes) setFilmTypes({ ...DEFAULT_FILM_TYPES, ...source.filmTypes });
-        if (isFilmTypeKey(source.selectedFilm)) setSelectedFilm(source.selectedFilm);
+        if (source.filmTypes) setFilmTypes(normalizeFilmTypes(source.filmTypes));
+        setSelectedFilm(normalizeFilmTypeKey(source.selectedFilm));
 
         if (cloud) {
           saveConfig({
@@ -712,8 +746,8 @@ export function AdminCalculator() {
             modoOtimizacao: isOptimizationMode(source.modoOtimizacao) ? source.modoOtimizacao : DEFAULT_CONFIG.modoOtimizacao,
             modoPerdas: isLossMode(source.modoPerdas) ? source.modoPerdas : DEFAULT_CONFIG.modoPerdas,
             modoCorConfig: isColorMode(source.modoCorConfig) ? source.modoCorConfig : DEFAULT_CONFIG.modoCorConfig,
-            selectedFilm: isFilmTypeKey(source.selectedFilm) ? source.selectedFilm : DEFAULT_CONFIG.selectedFilm,
-            filmTypes: source.filmTypes ? { ...DEFAULT_FILM_TYPES, ...source.filmTypes } : { ...DEFAULT_FILM_TYPES },
+            selectedFilm: normalizeFilmTypeKey(source.selectedFilm),
+            filmTypes: normalizeFilmTypes(source.filmTypes),
           });
         }
       } finally {
@@ -740,7 +774,7 @@ export function AdminCalculator() {
                 if (cloud.margin !== undefined) setMargin(cloud.margin);
     if (isOptimizationMode(cloud.modo_otimizacao)) setModoOtimizacao(cloud.modo_otimizacao);
       if (cloud.user_name) setUserName(cloud.user_name);
-      if (isFilmTypeKey(cloud.selected_film)) setSelectedFilm(cloud.selected_film);
+      setSelectedFilm(normalizeFilmTypeKey(cloud.selected_film));
                 setCloudStatus('synced');
                 setTimeout(() => setCloudStatus('idle'), 3000);
                 return;
@@ -761,7 +795,7 @@ export function AdminCalculator() {
                         if (draft.margin !== undefined) setMargin(draft.margin);
       if (isOptimizationMode(draft.modoOtimizacao)) setModoOtimizacao(draft.modoOtimizacao);
       if (draft.userName) setUserName(draft.userName);
-      if (isFilmTypeKey(draft.selectedFilm)) setSelectedFilm(draft.selectedFilm);
+      setSelectedFilm(normalizeFilmTypeKey(draft.selectedFilm));
                     }
                 } catch (e) {
                     logger.error('Erro ao carregar rascunho local', e);
@@ -1046,7 +1080,7 @@ const carregarDoHistorico = (orc: OrcamentoSalvo) => {
             setDescontoInput((orc.desconto * 100).toString());
         }
   if (orc.modoOtimizacao) setModoOtimizacao(orc.modoOtimizacao);
-    if (isFilmTypeKey(orc.selectedFilm)) setSelectedFilm(orc.selectedFilm);
+    setSelectedFilm(normalizeFilmTypeKey(orc.selectedFilm));
     dispatch({ type: 'SET', payload: orc.vidros });
         setHistoricoAberto(false);
     };
@@ -1098,7 +1132,7 @@ const carregarDoHistorico = (orc: OrcamentoSalvo) => {
                 setPhone(d.config?.phone || '');
                 setRollW(parseFloat(String(d.config?.rolo ?? '')) || 152);
                 setPrice(parseFloat(String(d.config?.preco ?? '')) || 80);
-                if (isFilmTypeKey(d.config?.selectedFilm)) setSelectedFilm(d.config.selectedFilm);
+                setSelectedFilm(normalizeFilmTypeKey(d.config?.selectedFilm));
                 dispatch({ type: 'SET', payload: (d.vidros || []).map((v) => ({ ...v, oh: v.oh ?? v.h ?? 0, ow: v.ow ?? v.w ?? 0 })) as GlassItem[] });
                 setDesconto(0);
             } catch {
@@ -1480,7 +1514,7 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
           <label className="block text-[10px] text-gray-400 mb-1 text-center font-bold uppercase">Película</label>
           <select value={selectedFilm} onChange={(e) => setSelectedFilm(e.target.value as FilmTypeKey)} className="w-full bg-[#040811] border border-white/10 rounded-lg p-3 text-sm text-center font-bold appearance-none cursor-pointer">
             {(Object.keys(FILM_TYPE_LABELS) as FilmTypeKey[]).map((key) => (
-              <option key={key} value={key}>{FILM_TYPE_LABELS[key]} — R${filmTypes[key]}/m²</option>
+              <option key={key} value={key}>{FILM_TYPE_LABELS[key]}</option>
             ))}
           </select>
         </div>

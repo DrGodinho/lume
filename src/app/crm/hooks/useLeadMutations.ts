@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, type Dispatch, type FormEvent, type SetStateAction } from 'react';
-import { getCrmApiErrorMessage, getCrmApiHeaders, mapLeadRow, normalizeLeadAmounts } from '../utils';
+import { getCrmApiErrorMessage, getCrmApiHeaders, hasLeadNextAction, mapLeadRow, normalizeLeadAmounts, requiresLeadNextAction } from '../utils';
 import { applyFollowUpPlaybook } from '../utils/playbooks';
 import type { CrmSyncState, FollowUpPlaybookRule, Lead, LeadFormValues, LeadStatusInfoUpdate, LeadSyncStatus, ServiceStatus } from '../types';
 
@@ -130,9 +130,7 @@ export const useLeadMutations = ({
       resultLead = newLead;
     }
 
-    const needsNextAction = resultLead.status === 'Agendado' || resultLead.status === 'Em Contato';
-    const hasNextAction = Boolean(resultLead.proximoContato);
-    if (needsNextAction && !hasNextAction) {
+    if (requiresLeadNextAction(resultLead.status) && !hasLeadNextAction(resultLead)) {
       toast.warning('Lead salvo sem proxima acao. Nao aparecera na agenda (so na aba "Sem Acao" apos 3 dias sem movimento).');
       return true;
     }

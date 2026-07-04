@@ -1,0 +1,1 @@
+export const DEFAULT_CRM_TARGET_GOAL = 10000;

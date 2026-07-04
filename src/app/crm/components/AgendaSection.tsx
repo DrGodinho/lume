@@ -359,8 +359,6 @@ export function AgendaSection({
   const inicioGradeMes = startOfWeek(startOfMonth(mesVisivel), { weekStartsOn: 1 });
   const fimGradeMes = endOfWeek(endOfMonth(mesVisivel), { weekStartsOn: 1 });
   const diasMes = eachDayOfInterval({ start: inicioGradeMes, end: fimGradeMes });
-  const agendaViews: Array<{ id: AgendaView; label: string; count: number }> = [];
-
   const leadsAtivos = useMemo(() => leads.filter((lead) => !isClosedLead(lead.status)), [isClosedLead, leads]);
   const leadsComRetorno = useMemo(() => leadsAtivos.filter((lead) => !!lead.proximoContato), [leadsAtivos]);
   const leadsComServico = useMemo(() => leadsAtivos.filter((lead) => !!lead.dataServico), [leadsAtivos]);
@@ -572,15 +570,6 @@ export function AgendaSection({
   const selectedDayLabel = diaSelecionado ? format(diaSelecionado, "EEEE, d 'de' MMMM", { locale: ptBR }) : '';
   const sectionsEmpty = contactarHoje.length === 0 && proximos7Dias.length === 0 && parados.length === 0 && servicosAgendados.length === 0;
 
-  agendaViews.push(
-    { id: 'hoje', label: diaSelecionado ? 'Dia selecionado' : 'Hoje', count: contactarHoje.length + servicosHoje.length },
-    { id: 'semana', label: 'Proximos 7 dias', count: proximos7Dias.length },
-    { id: 'mes', label: 'Mes', count: activeMonthLeadCount },
-    { id: 'servicos', label: 'Servicos', count: servicosAgendados.length },
-    { id: 'sem_acao', label: 'Sem acao', count: parados.length },
-    { id: 'dormentes', label: 'Dormentes', count: dormentes.length },
-  );
-
   const activeAgendaEmpty =
     (agendaView === 'hoje' && contactarHoje.length === 0 && servicosHoje.length === 0) ||
     (agendaView === 'semana' && proximos7Dias.length === 0) ||
@@ -595,6 +584,11 @@ export function AgendaSection({
       return;
     }
     setDiaSelecionado(day);
+  };
+
+  const openAgendaView = (view: AgendaView) => {
+    setDiaSelecionado(null);
+    setAgendaView(view);
   };
 
   const goToPreviousMonth = () => {
@@ -620,6 +614,71 @@ export function AgendaSection({
       forecastValue: monthValueByDay(day),
     };
   });
+
+  const summaryCards: Array<{
+    view: AgendaView;
+    label: string;
+    count: number;
+    description: string;
+    activeClass: string;
+    idleClass: string;
+    labelClass: string;
+  }> = [
+    {
+      view: 'hoje',
+      label: 'Contatar hoje',
+      count: contactarHoje.length,
+      description: 'Atrasados e contatos do dia.',
+      activeClass: 'border-red-400/45 bg-red-500/[0.12]',
+      idleClass: 'border-red-500/20 bg-red-500/[0.055] hover:border-red-400/35 hover:bg-red-500/[0.08]',
+      labelClass: 'text-red-300/80',
+    },
+    {
+      view: 'semana',
+      label: 'Proximos 7 dias',
+      count: proximos7Dias.length,
+      description: 'Retornos agendados para a semana.',
+      activeClass: 'border-[#c9a227]/50 bg-[#c9a227]/15',
+      idleClass: 'border-[#c9a227]/20 bg-[#c9a227]/5 hover:border-[#c9a227]/35 hover:bg-[#c9a227]/10',
+      labelClass: 'text-[#f5d77a]',
+    },
+    {
+      view: 'servicos',
+      label: 'Servicos',
+      count: servicosAgendados.length,
+      description: 'Datas de servico marcadas.',
+      activeClass: 'border-sky-400/45 bg-sky-500/[0.11]',
+      idleClass: 'border-sky-500/15 bg-sky-500/[0.045] hover:border-sky-400/30 hover:bg-sky-500/[0.07]',
+      labelClass: 'text-sky-300/85',
+    },
+    {
+      view: 'mes',
+      label: 'Mes',
+      count: activeMonthLeadCount,
+      description: 'Retornos e servicos do mes.',
+      activeClass: 'border-emerald-400/45 bg-emerald-500/[0.11]',
+      idleClass: 'border-emerald-500/15 bg-emerald-500/[0.045] hover:border-emerald-400/30 hover:bg-emerald-500/[0.07]',
+      labelClass: 'text-emerald-300/85',
+    },
+    {
+      view: 'sem_acao',
+      label: 'Parados',
+      count: parados.length,
+      description: 'Sem agenda e sem contato recente.',
+      activeClass: 'border-white/25 bg-white/[0.07]',
+      idleClass: 'border-white/10 bg-white/[0.025] hover:border-white/20 hover:bg-white/[0.045]',
+      labelClass: 'text-white/38',
+    },
+    {
+      view: 'dormentes',
+      label: 'Dormentes',
+      count: dormentes.length,
+      description: 'Leads pausados fora da rotina.',
+      activeClass: 'border-slate-400/35 bg-slate-500/[0.10]',
+      idleClass: 'border-slate-500/15 bg-slate-500/[0.04] hover:border-slate-400/25 hover:bg-slate-500/[0.065]',
+      labelClass: 'text-slate-300/80',
+    },
+  ];
 
   const renderLeadCard = (lead: Lead, kind: LeadCardKind) => (
     <LeadCardAgenda
@@ -706,47 +765,30 @@ export function AgendaSection({
         </div>
       </section>
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-[1.75rem] border border-red-500/20 bg-[linear-gradient(180deg,rgba(239,68,68,0.12),rgba(239,68,68,0.04))] p-5 shadow-lg shadow-black/10">
-          <p className="text-[10px] uppercase tracking-[0.35em] text-red-300/70">Contatar hoje</p>
-          <p className="mt-3 text-4xl font-black text-white">{contactarHoje.length}</p>
-          <p className="mt-2 text-sm text-white/50">Atrasados e contatos do dia.</p>
-        </div>
-        <div className="rounded-[1.75rem] border border-[#c9a227]/20 bg-[linear-gradient(180deg,rgba(201,162,39,0.16),rgba(201,162,39,0.05))] p-5 shadow-lg shadow-black/10">
-          <p className="text-[10px] uppercase tracking-[0.35em] text-[#f5d77a]">Proximos 7 dias</p>
-          <p className="mt-3 text-4xl font-black text-white">{proximos7Dias.length}</p>
-          <p className="mt-2 text-sm text-white/50">Retornos agendados para a semana.</p>
-        </div>
-        <div className="rounded-[1.75rem] border border-white/10 bg-white/[0.03] p-5 shadow-lg shadow-black/10">
-          <p className="text-[10px] uppercase tracking-[0.35em] text-sky-300/80">Servicos</p>
-          <p className="mt-3 text-4xl font-black text-white">{servicosAgendados.length}</p>
-          <p className="mt-2 text-sm text-white/50">Datas de servico marcadas.</p>
-        </div>
-        <div className="rounded-[1.75rem] border border-white/10 bg-white/[0.03] p-5 shadow-lg shadow-black/10">
-          <p className="text-[10px] uppercase tracking-[0.35em] text-white/35">Parados</p>
-          <p className="mt-3 text-4xl font-black text-white">{parados.length}</p>
-          <p className="mt-2 text-sm text-white/50">Sem agenda e sem contato recente.</p>
-        </div>
-      </section>
+      <section className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+        {summaryCards.map((card) => {
+          const selected = agendaView === card.view;
 
-      <section className="flex flex-wrap gap-2 rounded-[1.5rem] border border-white/5 bg-[#07111d]/70 p-2">
-        {agendaViews.map((view) => (
-          <button
-            key={view.id}
-            type="button"
-            onClick={() => setAgendaView(view.id)}
-            className={`flex items-center gap-2 rounded-2xl px-4 py-2.5 text-xs font-bold uppercase tracking-[0.18em] transition ${
-              agendaView === view.id
-                ? 'bg-[#c9a227] text-[#04080f]'
-                : 'border border-white/5 bg-white/[0.02] text-white/50 hover:border-[#c9a227]/25 hover:text-white'
-            }`}
-          >
-            <span>{view.label}</span>
-            <span className={`rounded-full px-2 py-0.5 text-[10px] ${agendaView === view.id ? 'bg-[#04080f]/15' : 'bg-white/[0.06]'}`}>
-              {view.count}
-            </span>
-          </button>
-        ))}
+          return (
+            <button
+              key={card.view}
+              type="button"
+              onClick={() => openAgendaView(card.view)}
+              aria-pressed={selected}
+              className={`group flex min-h-[86px] w-full items-center justify-between gap-3 rounded-2xl border px-3 py-2.5 text-left shadow-md shadow-black/10 transition duration-200 hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f5d77a]/60 ${
+                selected ? card.activeClass : card.idleClass
+              }`}
+            >
+              <div className="min-w-0">
+                <p className={`truncate text-[9px] font-black uppercase tracking-[0.22em] ${card.labelClass}`}>{card.label}</p>
+                <p className="mt-1.5 line-clamp-2 text-[11px] font-semibold leading-snug text-white/45 group-hover:text-white/55">
+                  {card.description}
+                </p>
+              </div>
+              <span className="shrink-0 text-2xl font-black leading-none text-white sm:text-3xl">{card.count}</span>
+            </button>
+          );
+        })}
       </section>
 
       {agendaView !== 'mes' && (
@@ -830,16 +872,6 @@ export function AgendaSection({
             })}
           </div>
 
-          <div className="mt-3 rounded-2xl border border-white/5 bg-white/[0.03] px-4 py-3 text-sm text-white/60">
-            {diaSelecionado ? (
-              <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
-                <p>Exibindo o dia <span className="font-semibold text-white">{selectedDayLabel}</span>.</p>
-                <p className="text-white/40">Hoje seguem visiveis tambem os atrasados.</p>
-              </div>
-            ) : (
-              <p>Clique em um dia para filtrar os blocos de contato da semana.</p>
-            )}
-          </div>
           </div>
         </section>
       )}

@@ -4,5 +4,6 @@ export const MONTHLY_EVOLUTION_SERIES: Record<MonthlyEvolutionSeries, boolean> =
   atualDia: true,
   atual: true,
   anterior: true,
+  anteriorAcumulado: true,
   previsto: true,
 };

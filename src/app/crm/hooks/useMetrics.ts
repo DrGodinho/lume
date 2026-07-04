@@ -78,13 +78,13 @@ export const useMetrics = (leads: Lead[], targetGoal: number | null) => {
         const isCurrentPeriod = day <= currentEnd;
         const isForecastPeriod = day >= todayStart;
         const currentDay = isCurrentPeriod ? currentByDay[currentKey] || { value: 0, count: 0 } : { value: 0, count: 0 };
-        const previousDayData =
-          isCurrentPeriod && previousDay <= previousEnd ? previousByDay[previousKey] || { value: 0, count: 0 } : { value: 0, count: 0 };
+        const hasPreviousDay = previousDay <= previousEnd;
+        const previousDayData = hasPreviousDay ? previousByDay[previousKey] || { value: 0, count: 0 } : { value: 0, count: 0 };
         const futureDay = futureByDay[currentKey] || { value: 0, count: 0 };
         const currentAcc = acc.currentAcc + currentDay.value;
-        const previousAcc = acc.previousAcc + previousDayData.value;
+        const previousAcc = hasPreviousDay ? acc.previousAcc + previousDayData.value : acc.previousAcc;
         const currentCount = acc.currentCount + currentDay.count;
-        const previousCount = acc.previousCount + previousDayData.count;
+        const previousCount = hasPreviousDay ? acc.previousCount + previousDayData.count : acc.previousCount;
         const bestDay =
           isCurrentPeriod && currentDay.value > acc.bestDay.value
             ? { label: format(day, 'dd/MM'), value: currentDay.value }
@@ -100,12 +100,12 @@ export const useMetrics = (leads: Lead[], targetGoal: number | null) => {
             ...acc.chartData,
             {
               dia: format(day, 'dd/MM'),
-              diaAnterior: previousDay <= previousEnd ? format(previousDay, 'dd/MM') : '--',
+              diaAnterior: hasPreviousDay ? format(previousDay, 'dd/MM') : '--',
               atual: isCurrentPeriod ? currentAcc : null,
-              anterior: isCurrentPeriod ? previousAcc : null,
+              anterior: hasPreviousDay ? previousAcc : null,
               previsto: futureTotal > 0 && isForecastPeriod ? futureDay.value : null,
               atualDia: isCurrentPeriod ? currentDay.value : null,
-              anteriorDia: isCurrentPeriod ? previousDayData.value : null,
+              anteriorDia: hasPreviousDay ? previousDayData.value : null,
               previstoDia: isForecastPeriod ? futureDay.value : 0,
             },
           ],
@@ -121,12 +121,20 @@ export const useMetrics = (leads: Lead[], targetGoal: number | null) => {
       },
     );
 
+    const previousFullTotals = Object.values(previousByDay).reduce(
+      (acc, day) => ({
+        value: acc.value + day.value,
+        count: acc.count + day.count,
+      }),
+      { value: 0, count: 0 },
+    );
+
     return {
       chartData: monthlyTotals.chartData,
       currentTotal: monthlyTotals.currentAcc,
-      previousTotal: monthlyTotals.previousAcc,
+      previousTotal: previousFullTotals.value,
       currentCount: monthlyTotals.currentCount,
-      previousCount: monthlyTotals.previousCount,
+      previousCount: previousFullTotals.count,
       bestDay: monthlyTotals.bestDay,
       futureTotal,
       futureCount,
@@ -240,7 +248,7 @@ export const useMetrics = (leads: Lead[], targetGoal: number | null) => {
   const monthTrendIsPositive = monthDifference >= 0;
   const targetPercent =
     targetGoal && targetGoal > 0
-      ? Math.min(Math.round((stats.revenue / targetGoal) * 100), 100)
+      ? Math.min(Math.round((monthlyEvolution.currentTotal / targetGoal) * 100), 100)
       : null;
 
   return {

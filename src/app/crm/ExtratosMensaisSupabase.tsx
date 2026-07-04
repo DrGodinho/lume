@@ -108,7 +108,9 @@ type FilmRankingItem = {
 };
 
 const FILM_LABELS: Record<string, string> = {
-  carbono: 'Carbono',
+  carbono: 'Carbono G20',
+  carbono_g5: 'Carbono G5',
+  carbono_g20: 'Carbono G20',
   refletiva: 'Refletiva',
   dupla_camada: 'Dupla Camada',
   nano_ceramica: 'Nano Cerâmica',
@@ -243,7 +245,7 @@ function getFilmLabel(record: ExtratoRecord) {
   if (record.modo_otimizacao) {
     if (record.modo_otimizacao === 'densidade') return 'Nano Cerâmica';
     if (record.modo_otimizacao === 'facilidade') return 'Refletiva';
-    if (record.modo_otimizacao === 'facilidade_v2') return 'Carbono';
+    if (record.modo_otimizacao === 'facilidade_v2') return 'Carbono G20';
     return record.modo_otimizacao;
   }
 

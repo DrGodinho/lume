@@ -19,3 +19,5 @@ export { CRM_FILM_TYPE_LABELS, DEFAULT_CRM_FILM_OPTIONS } from './filmTypes';
 
 export { RJ_NEIGHBORHOODS } from './neighborhoods';
 export type { RjNeighborhood } from './neighborhoods';
+
+export { DEFAULT_CRM_TARGET_GOAL } from './targets';

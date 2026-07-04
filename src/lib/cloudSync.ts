@@ -140,13 +140,46 @@ interface ConfigData {
   selectedFilm: string;
 }
 
+const DEFAULT_FILM_TYPES: Record<string, number> = {
+  carbono_g5: 80,
+  carbono_g20: 80,
+  refletiva: 95,
+  dupla_camada: 120,
+  nano_ceramica: 220,
+  jateado: 90,
+};
+
+const normalizeSelectedFilm = (value: unknown) => {
+  if (value === 'carbono') return 'carbono_g20';
+  return typeof value === 'string' && value ? value : 'carbono_g20';
+};
+
+const normalizeFilmTypes = (value: unknown): Record<string, number> => {
+  const next = { ...DEFAULT_FILM_TYPES };
+  if (!value || typeof value !== 'object') return next;
+
+  const source = value as Record<string, unknown>;
+  const legacyCarbono = Number(source.carbono);
+  if (Number.isFinite(legacyCarbono)) {
+    next.carbono_g5 = legacyCarbono;
+    next.carbono_g20 = legacyCarbono;
+  }
+
+  Object.keys(DEFAULT_FILM_TYPES).forEach((key) => {
+    const price = Number(source[key]);
+    if (Number.isFinite(price)) next[key] = price;
+  });
+
+  return next;
+};
+
 const CONFIG_OPTIONAL_COLUMNS = {
   modo_perdas: "ALTER TABLE calculator_config ADD COLUMN modo_perdas text DEFAULT 'dinamico';",
   perdas_fixas: "ALTER TABLE calculator_config ADD COLUMN perdas_fixas numeric DEFAULT 20;",
   modo_cor_config: "ALTER TABLE calculator_config ADD COLUMN modo_cor_config text DEFAULT 'tamanho';",
   agressividade_corte: "ALTER TABLE calculator_config ADD COLUMN agressividade_corte numeric DEFAULT 35;",
-  film_types: "ALTER TABLE calculator_config ADD COLUMN film_types jsonb DEFAULT '{\"carbono\":80,\"refletiva\":95,\"dupla_camada\":120,\"nano_ceramica\":220,\"jateado\":90}';",
-  selected_film: "ALTER TABLE calculator_config ADD COLUMN selected_film text DEFAULT 'carbono';",
+  film_types: "ALTER TABLE calculator_config ADD COLUMN film_types jsonb DEFAULT '{\"carbono_g5\":80,\"carbono_g20\":80,\"refletiva\":95,\"dupla_camada\":120,\"nano_ceramica\":220,\"jateado\":90}';",
+  selected_film: "ALTER TABLE calculator_config ADD COLUMN selected_film text DEFAULT 'carbono_g20';",
 } as const;
 
 export async function saveConfigToCloud(config: ConfigData): Promise<boolean> {
@@ -163,8 +196,8 @@ export async function saveConfigToCloud(config: ConfigData): Promise<boolean> {
     perdas_fixas: config.perdasFixas,
     modo_cor_config: config.modoCorConfig,
     agressividade_corte: config.agressividadeCorte,
-    film_types: config.filmTypes,
-    selected_film: config.selectedFilm,
+    film_types: normalizeFilmTypes(config.filmTypes),
+    selected_film: normalizeSelectedFilm(config.selectedFilm),
     updated_at: new Date().toISOString(),
   };
 
@@ -206,7 +239,7 @@ export async function loadConfigFromCloud(): Promise<ConfigData | null> {
     perdasFixas: data.perdas_fixas ?? 20,
     modoCorConfig: data.modo_cor_config ?? 'tamanho',
     agressividadeCorte: data.agressividade_corte ?? 35,
-    filmTypes: data.film_types ?? { carbono: 80, refletiva: 95, dupla_camada: 120, nano_ceramica: 220, jateado: 90 },
-    selectedFilm: data.selected_film ?? 'carbono',
+    filmTypes: normalizeFilmTypes(data.film_types),
+    selectedFilm: normalizeSelectedFilm(data.selected_film),
   };
 }

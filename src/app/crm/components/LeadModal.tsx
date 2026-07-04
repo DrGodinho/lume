@@ -8,6 +8,7 @@ import { DateFieldWithPicker } from './DateFieldWithPicker';
 import { DiscardChangesDialog } from './DiscardChangesDialog';
 import { WhatsAppTemplateMenu } from './WhatsAppTemplateMenu';
 import { useDirtyFormGuard } from '../hooks/useDirtyFormGuard';
+import { hasLeadNextAction, requiresLeadNextAction } from '../utils';
 import type { CalculatorHistoryRow, CommercialActionDraft, Lead, LeadFormValues, LeadStatusHistoryEntry } from '../types';
 
 interface LeadFormModalProps {
@@ -70,12 +71,9 @@ export function LeadFormModal({
     onClose();
   }, [onClose]);
 
-  const requiresNextAction = (status: Lead['status']) => status === 'Agendado' || status === 'Em Contato';
-  const hasNextAction = (form: LeadFormValues) => Boolean(form.proximoContato);
-
   const handleSubmitAttempt = useCallback((event: React.FormEvent) => {
     event.preventDefault();
-    if (requiresNextAction(leadForm.status) && !hasNextAction(leadForm)) {
+    if (requiresLeadNextAction(leadForm.status) && !hasLeadNextAction(leadForm)) {
       setShowSaveWithoutDateConfirm(true);
       return;
     }
@@ -293,7 +291,7 @@ export function LeadFormModal({
                 onChange={(value) => setLeadForm({ ...leadForm, proximoContato: value || null })}
                 className="w-full rounded-2xl border border-white/5 bg-[#04080f] px-4 py-3 text-sm text-white focus:border-[#c9a227]/40 focus:outline-none"
               />
-              {requiresNextAction(leadForm.status) && !hasNextAction(leadForm) && (
+              {requiresLeadNextAction(leadForm.status) && !hasLeadNextAction(leadForm) && (
                 <div
                   className="mt-2 flex items-start gap-2 rounded-2xl border border-amber-400/30 bg-amber-500/10 p-3 text-xs text-amber-200"
                   role="status"
@@ -302,7 +300,7 @@ export function LeadFormModal({
                   <div>
                     <p className="font-semibold">Lead sem próxima ação definida</p>
                     <p className="mt-0.5 text-amber-200/80">
-                      Leads com status "Agendado" ou "Em Contato" costumam ter uma data de retorno. Defina uma data para que o lead apareça na agenda ou salve mesmo assim.
+                      Leads com status "Agendado" ou "Em Contato" costumam ter uma data de retorno ou serviço. Defina uma data para que o lead apareça na agenda ou salve mesmo assim.
                     </p>
                   </div>
                 </div>

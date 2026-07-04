@@ -150,6 +150,23 @@ describe('useLeadMutations', () => {
       expect(params.toast.success).toHaveBeenCalledWith('Lead criado com sucesso!');
     });
 
+    it('does not warn and links the budget when Agendado lead has a service date', async () => {
+      const params = createParams({
+        leadForm: { ...leadForm, status: 'Agendado', proximoContato: null, dataServico: '2026-07-20' },
+        pendingCalculatorHistoryId: 'history_1',
+        playbookRules: disabledPlaybookRules,
+      });
+      const { result } = renderHook(() => useLeadMutations(params));
+
+      await act(async () => {
+        await result.current.handleLeadSave();
+      });
+
+      expect(params.toast.warning).not.toHaveBeenCalled();
+      expect(params.linkCalculatorHistoryToLead).toHaveBeenCalledWith('history_1', expect.stringMatching(/^lead_/));
+      expect(params.toast.success).toHaveBeenCalledWith('Lead criado com sucesso!');
+    });
+
     it('does not warn when status is Novo (no date required)', async () => {
       const params = createParams({
         leadForm: { ...leadForm, status: 'Novo', proximoContato: null },

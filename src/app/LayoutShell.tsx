@@ -13,7 +13,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 export function LayoutShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isExcluded = pathname.startsWith('/admin') || pathname.startsWith('/crm');
+  const isExcluded = pathname.startsWith('/admin') || pathname.startsWith('/crm') || pathname.startsWith('/dashboard-esportes');
 
   // Scroll to top on route change, but only if no hash is present
   useEffect(() => {

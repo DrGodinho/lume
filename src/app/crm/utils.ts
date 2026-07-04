@@ -53,6 +53,10 @@ export const normalizeLeadAmounts = (lead: Lead): Lead => ({
   pinned: Boolean(lead.pinned),
 });
 
+export const requiresLeadNextAction = (status: Lead['status']) => status === 'Agendado' || status === 'Em Contato';
+
+export const hasLeadNextAction = (lead: Pick<Lead, 'proximoContato' | 'dataServico'>) => Boolean(lead.proximoContato || lead.dataServico);
+
 export const getInitialCollapsedCards = () => {
   if (typeof window === 'undefined') return new Set<string>();
   const savedCollapsed = localStorage.getItem(CRM_COLLAPSED_CARDS_STORAGE_KEY);
@@ -150,7 +154,7 @@ export const getHistoryFilmLabel = (history: CalculatorHistoryRow) => {
   const legacyFilmMap: Record<string, string> = {
     densidade: 'Nano Ceramica',
     facilidade: 'Refletiva',
-    facilidade_v2: 'Carbono',
+    facilidade_v2: 'Carbono G20',
   };
 
   if (history.selected_film) return CRM_FILM_TYPE_LABELS[history.selected_film] || history.selected_film;

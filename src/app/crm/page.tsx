@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import {
   BarChart3,
@@ -27,7 +27,7 @@ import { PlaybookSettings } from './components/PlaybookSettings';
 import { ToastProvider, ToastViewport } from './components/ToastProvider';
 import { TrashLeadsView } from './components/TrashLeadsView';
 import { ExtratosMensaisSupabase } from './ExtratosMensaisSupabase';
-import { CRM_ACTIVE_TAB_STORAGE_KEY, RJ_NEIGHBORHOODS } from './constants';
+import { CRM_ACTIVE_TAB_STORAGE_KEY, DEFAULT_CRM_TARGET_GOAL, RJ_NEIGHBORHOODS } from './constants';
 import { useAgenda, formatCurrencyBRL, formatDateInputValue, getLeadActivityDate, getLeadFollowUpDate, getLeadPhoneHref, getLeadServiceDate, getLeadServiceStatus, getLeadStatusClasses, getWhatsAppHref, isClosedLead, SERVICE_STATUS_META } from './hooks/useAgenda';
 import { useLeads } from './hooks/useLeads';
 import { useLogout } from './hooks/useLogout';
@@ -88,6 +88,7 @@ const NAV_TONE_CLASSES: Record<NavTone, { active: string; icon: string; badge: s
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState<CrmTab>('dashboard');
   const [activeTabRestored, setActiveTabRestored] = useState(false);
+  const [sidebarEditingTarget, setSidebarEditingTarget] = useState(false);
   const {
     leads,
     searchQuery,
@@ -220,6 +221,27 @@ export default function HomePage() {
 
   const { isLoggingOut, logout: handleLogout } = useLogout('/login');
 
+  const beginSidebarTargetEdit = useCallback(() => {
+    setTargetInput(String(targetGoal ?? DEFAULT_CRM_TARGET_GOAL));
+    setSidebarEditingTarget(true);
+  }, [setTargetInput, targetGoal]);
+
+  const closeSidebarTargetEdit = useCallback(() => {
+    setTargetInput(String(targetGoal ?? DEFAULT_CRM_TARGET_GOAL));
+    setSidebarEditingTarget(false);
+  }, [setTargetInput, targetGoal]);
+
+  const commitTargetGoal = useCallback(() => {
+    const value = parseInt(targetInput, 10);
+    if (value > 0) {
+      void saveTargetGoal(value);
+      setSidebarEditingTarget(false);
+      return;
+    }
+
+    closeSidebarTargetEdit();
+  }, [closeSidebarTargetEdit, saveTargetGoal, targetInput]);
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -294,20 +316,52 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="mt-5 hidden rounded-xl border border-white/10 bg-[#03060b] p-3 lg:block">
-          <div className="flex justify-between text-xs font-semibold">
-            <span className="text-white/60">Faturamento Mensal</span>
-            <span className="text-[#c9a227]">{targetPercent ?? '--'}{targetPercent !== null ? '%' : ''}</span>
-          </div>
-          <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-white/5 p-0.5">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-[#c9a227] to-[#d4ad30] shadow-inner transition-all duration-1000"
-              style={{ width: `${targetPercent ?? 0}%` }}
-            />
-          </div>
-          <p className="mt-2 text-right text-[10px] text-white/40">
-            {targetGoal !== null ? `Meta: R$ ${targetGoal.toLocaleString('pt-BR')}` : 'Sem meta definida'}
-          </p>
+        <div className="mt-5 hidden lg:block">
+          {sidebarEditingTarget ? (
+            <div className="rounded-xl border border-[#c9a227]/30 bg-[#03060b] p-3 shadow-[inset_0_0_0_1px_rgba(201,162,39,0.06)]">
+              <div className="flex justify-between text-xs font-semibold">
+                <span className="text-white/60">Faturamento Mensal</span>
+                <span className="text-[#c9a227]">{targetPercent ?? '--'}{targetPercent !== null ? '%' : ''}</span>
+              </div>
+              <input
+                type="number"
+                value={targetInput}
+                min={1}
+                onChange={(event) => setTargetInput(event.target.value)}
+                onBlur={commitTargetGoal}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') {
+                    event.currentTarget.blur();
+                  }
+                }}
+                className="mt-3 w-full rounded-lg border border-[#c9a227]/35 bg-[#04080f] px-2.5 py-2 text-right text-sm font-bold text-white outline-none transition focus:border-[#f5d77a]/70"
+                aria-label="Meta mensal do CRM"
+                autoFocus
+              />
+              <p className="mt-2 text-right text-[10px] text-white/40">Enter salva a meta</p>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={beginSidebarTargetEdit}
+              className="w-full rounded-xl border border-white/10 bg-[#03060b] p-3 text-left transition hover:border-[#c9a227]/35 hover:bg-[#07111d]"
+              title="Alterar meta mensal"
+            >
+              <div className="flex justify-between text-xs font-semibold">
+                <span className="text-white/60">Faturamento Mensal</span>
+                <span className="text-[#c9a227]">{targetPercent ?? '--'}{targetPercent !== null ? '%' : ''}</span>
+              </div>
+              <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-white/5 p-0.5">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-[#c9a227] to-[#d4ad30] shadow-inner transition-all duration-1000"
+                  style={{ width: `${targetPercent ?? 0}%` }}
+                />
+              </div>
+              <p className="mt-2 text-right text-[10px] text-white/40">
+                {targetGoal !== null ? `Meta: R$ ${targetGoal.toLocaleString('pt-BR')}` : 'Sem meta definida'}
+              </p>
+            </button>
+          )}
         </div>
 
         <nav className="mt-3 flex flex-1 gap-2 overflow-x-auto pb-1 lg:mt-6 lg:flex-none lg:flex-col lg:gap-4 lg:overflow-visible lg:pb-0">
