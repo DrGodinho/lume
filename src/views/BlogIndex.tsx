@@ -16,6 +16,9 @@ function formatDate(date: string) {
 export function BlogIndex({ posts }: BlogIndexProps) {
   const featuredPost = posts.find((post) => post.featured) || posts[0];
   const otherPosts = featuredPost ? posts.filter((post) => post.id !== featuredPost.id) : posts;
+  const recentPosts = [...otherPosts].sort(
+    (left, right) => new Date(right.publishedAt).getTime() - new Date(left.publishedAt).getTime()
+  );
 
   return (
     <div className="min-h-screen bg-[#04080f] text-white">
@@ -94,7 +97,7 @@ export function BlogIndex({ posts }: BlogIndexProps) {
                 Aprenda a escolher a película ideal para seu projeto. Nossos artigos trazem análises técnicas sobre redução de calor, proteção UV, durabilidade e privacidade para vidros.
               </p>
               <div className="mt-8 space-y-4">
-                {otherPosts.slice(0, 3).map((post) => (
+                {recentPosts.slice(0, 3).map((post) => (
                   <a
                     key={post.id}
                     href={`/blog/${post.slug}/`}
@@ -128,7 +131,7 @@ export function BlogIndex({ posts }: BlogIndexProps) {
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {otherPosts.map((post) => (
+              {recentPosts.map((post) => (
                 <article
                   key={post.id}
                   className="group overflow-hidden rounded-[1.7rem] border border-white/10 bg-white/[0.03] transition-all duration-300 hover:-translate-y-1 hover:border-[#c9a227]/40"

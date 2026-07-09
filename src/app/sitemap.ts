@@ -13,7 +13,7 @@ const staticRoutes = [
   { path: '/', priority: 1, changeFrequency: 'monthly', lastModified: '2026-06-25' },
   { path: '/simulador/', priority: 0.8, changeFrequency: 'monthly', lastModified: '2026-04-27' },
   { path: '/guia-insulfilm/', priority: 0.8, changeFrequency: 'monthly', lastModified: '2026-05-03' },
-  { path: '/blog/', priority: 0.9, changeFrequency: 'weekly', lastModified: '2026-06-11' },
+  { path: '/blog/', priority: 0.9, changeFrequency: 'weekly', lastModified: '2026-07-08' },
   { path: '/nano-ceramica/', priority: 0.9, changeFrequency: 'monthly', lastModified: '2026-06-25' },
   { path: '/carbono/', priority: 0.9, changeFrequency: 'monthly', lastModified: '2026-06-25' },
   { path: '/refletiva/', priority: 0.9, changeFrequency: 'monthly', lastModified: '2026-06-25' },
