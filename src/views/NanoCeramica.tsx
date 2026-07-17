@@ -192,7 +192,7 @@ export function NanoCeramicaPage() {
                             <div className="absolute top-0 right-0 w-32 h-32 bg-[#c9a227] blur-[100px] opacity-20" />
 
                             <h3 className="text-2xl font-bold font-montserrat text-white mb-2 border-b border-white/10 pb-4">Tabela de Performance</h3>
-                            <div className="mb-8 text-[#c9a227] font-bold text-xl uppercase tracking-wider">A partir de R$ 220/m² instalado</div>
+                            <div className="mb-8 text-[#c9a227] font-bold text-xl uppercase tracking-wider">A partir de R$ 240/m² instalado</div>
 
                             <div className="space-y-6">
                                 <div className="perf-row opacity-0">

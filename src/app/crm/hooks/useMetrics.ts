@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { addDays, differenceInDays, eachDayOfInterval, endOfMonth, format, isPast, isSameDay, isToday, startOfMonth, startOfWeek, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { formatCurrencyBRL, getLeadActivityDate, getLeadFollowUpDate, getLeadServiceDate, getLeadServiceStatus, isClosedLead, parseAgendaDate } from './useAgenda';
+import type { MonthlySnapshot } from './useMonthlySnapshots';
 import type { DashboardStats, Lead, MonthlyEvolutionData } from '../types';
 
 const getLeadRevenueDate = (lead: Lead) => {
@@ -13,7 +14,11 @@ const getLeadRevenueDate = (lead: Lead) => {
   return serviceDate || closingDate;
 };
 
-export const useMetrics = (leads: Lead[], targetGoal: number | null) => {
+export const useMetrics = (
+  leads: Lead[],
+  targetGoal: number | null,
+  historicalSnapshots: Record<string, MonthlySnapshot> = {},
+) => {
   const monthlyEvolution = useMemo<MonthlyEvolutionData>(() => {
     const now = new Date();
     const todayStart = parseAgendaDate(format(now, 'yyyy-MM-dd')) || now;
@@ -121,25 +126,27 @@ export const useMetrics = (leads: Lead[], targetGoal: number | null) => {
       },
     );
 
-    const previousFullTotals = Object.values(previousByDay).reduce(
-      (acc, day) => ({
-        value: acc.value + day.value,
-        count: acc.count + day.count,
-      }),
-      { value: 0, count: 0 },
-    );
+    const previousMonthKey = format(previousReference, 'yyyy-MM');
+    const previousSnapshot = historicalSnapshots[previousMonthKey];
+
+    // Use snapshot totals for the previous month if in-memory leads don't cover all data
+    // (leads may have been deleted/trashed). Snapshot is always >= in-memory.
+    const previousMemoryTotal = Object.values(previousByDay).reduce((s, d) => s + d.value, 0);
+    const previousMemoryCount = Object.values(previousByDay).reduce((s, d) => s + d.count, 0);
+    const snapshotPreviousTotal = previousSnapshot ? previousSnapshot.revenue : previousMemoryTotal;
+    const snapshotPreviousCount = previousSnapshot ? previousSnapshot.lead_count : previousMemoryCount;
 
     return {
       chartData: monthlyTotals.chartData,
       currentTotal: monthlyTotals.currentAcc,
-      previousTotal: previousFullTotals.value,
+      previousTotal: Math.max(snapshotPreviousTotal, monthlyTotals.previousAcc),
       currentCount: monthlyTotals.currentCount,
-      previousCount: previousFullTotals.count,
+      previousCount: Math.max(snapshotPreviousCount, monthlyTotals.previousCount),
       bestDay: monthlyTotals.bestDay,
       futureTotal,
       futureCount,
     };
-  }, [leads]);
+  }, [leads, historicalSnapshots]);
 
   const stats = useMemo<DashboardStats>(() => {
     const today = new Date();

@@ -325,7 +325,7 @@ export function GuiaInsulfilm() {
                                     <td className="p-4 md:p-6 text-[#c9a227] font-medium">99,9%</td>
                                     <td className="p-4 md:p-6 font-bold text-white">95% a 99%</td>
                                     <td className="p-4 md:p-6">70% a 80%</td>
-                                    <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 220</td>
+                                    <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 240</td>
                                 </tr>
                                 <tr className="hover:bg-white/[0.02] transition-colors">
                                     <td className="p-4 md:p-6 font-bold text-white">
@@ -335,7 +335,7 @@ export function GuiaInsulfilm() {
                                     <td className="p-4 md:p-6 text-[#c9a227] font-medium">99%</td>
                                     <td className="p-4 md:p-6 font-bold text-white">60% a 70%</td>
                                     <td className="p-4 md:p-6">65% a 75%</td>
-                                    <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 120</td>
+                                    <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 140</td>
                                 </tr>
                                 <tr className="hover:bg-white/[0.02] transition-colors">
                                     <td className="p-4 md:p-6 font-bold text-white">
@@ -345,7 +345,7 @@ export function GuiaInsulfilm() {
                                     <td className="p-4 md:p-6 text-[#c9a227] font-medium">99%</td>
                                     <td className="p-4 md:p-6 font-bold text-white">50% a 60%</td>
                                     <td className="p-4 md:p-6">55% a 65%</td>
-                                    <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 120</td>
+                                    <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 140</td>
                                 </tr>
                                 <tr className="hover:bg-white/[0.02] transition-colors">
                                     <td className="p-4 md:p-6 font-bold text-white">
@@ -355,7 +355,7 @@ export function GuiaInsulfilm() {
                                     <td className="p-4 md:p-6 text-[#c9a227] font-medium">99%</td>
                                     <td className="p-4 md:p-6 font-bold text-white">45% a 55%</td>
                                     <td className="p-4 md:p-6">50% a 60%</td>
-                                    <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 80</td>
+                                    <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 90</td>
                                 </tr>
                                 <tr className="hover:bg-white/[0.02] transition-colors">
                                     <td className="p-4 md:p-6 font-bold text-white">
@@ -365,7 +365,7 @@ export function GuiaInsulfilm() {
                                     <td className="p-4 md:p-6 text-[#c9a227] font-medium">99%</td>
                                     <td className="p-4 md:p-6 font-bold text-white">40% a 50%</td>
                                     <td className="p-4 md:p-6">45% a 55%</td>
-                                    <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 80</td>
+                                    <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 90</td>
                                 </tr>
                                 <tr className="hover:bg-white/[0.02] transition-colors">
                                     <td className="p-4 md:p-6 font-bold text-white">
@@ -375,7 +375,7 @@ export function GuiaInsulfilm() {
                                     <td className="p-4 md:p-6 text-[#c9a227] font-medium">99%</td>
                                     <td className="p-4 md:p-6 font-bold text-white">70% a 85%</td>
                                     <td className="p-4 md:p-6">65% a 78%</td>
-                                    <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 95</td>
+                                    <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 110</td>
                                 </tr>
                                 <tr className="hover:bg-white/[0.02] transition-colors">
                                     <td className="p-4 md:p-6 font-bold text-white">
@@ -385,7 +385,7 @@ export function GuiaInsulfilm() {
                                     <td className="p-4 md:p-6 text-[#c9a227] font-medium">99%</td>
                                     <td className="p-4 md:p-6 font-medium text-gray-500">{'< 10%'}</td>
                                     <td className="p-4 md:p-6">15% a 25%</td>
-                                    <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 90</td>
+                                    <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 99</td>
                                 </tr>
                             </tbody>
                         </table>

@@ -141,12 +141,12 @@ interface ConfigData {
 }
 
 const DEFAULT_FILM_TYPES: Record<string, number> = {
-  carbono_g5: 80,
-  carbono_g20: 80,
-  refletiva: 95,
-  dupla_camada: 120,
-  nano_ceramica: 220,
-  jateado: 90,
+  carbono_g5: 90,
+  carbono_g20: 90,
+  refletiva: 110,
+  dupla_camada: 140,
+  nano_ceramica: 240,
+  jateado: 99,
 };
 
 const normalizeSelectedFilm = (value: unknown) => {
@@ -178,7 +178,7 @@ const CONFIG_OPTIONAL_COLUMNS = {
   perdas_fixas: "ALTER TABLE calculator_config ADD COLUMN perdas_fixas numeric DEFAULT 20;",
   modo_cor_config: "ALTER TABLE calculator_config ADD COLUMN modo_cor_config text DEFAULT 'tamanho';",
   agressividade_corte: "ALTER TABLE calculator_config ADD COLUMN agressividade_corte numeric DEFAULT 35;",
-  film_types: "ALTER TABLE calculator_config ADD COLUMN film_types jsonb DEFAULT '{\"carbono_g5\":80,\"carbono_g20\":80,\"refletiva\":95,\"dupla_camada\":120,\"nano_ceramica\":220,\"jateado\":90}';",
+  film_types: "ALTER TABLE calculator_config ADD COLUMN film_types jsonb DEFAULT '{\"carbono_g5\":90,\"carbono_g20\":90,\"refletiva\":110,\"dupla_camada\":140,\"nano_ceramica\":240,\"jateado\":99}';",
   selected_film: "ALTER TABLE calculator_config ADD COLUMN selected_film text DEFAULT 'carbono_g20';",
 } as const;
 

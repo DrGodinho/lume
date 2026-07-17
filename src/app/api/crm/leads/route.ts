@@ -214,6 +214,37 @@ async function insertLeadStatusHistory(
   return error;
 }
 
+async function upsertMonthlySnapshot(
+  supabaseClient: Awaited<ReturnType<typeof createSupabaseRequestClient>>,
+  lead: { status: LeadStatus; value: number; statusChangedAt?: string; createdAt?: string },
+) {
+  if (!supabaseClient || lead.status !== 'Fechado') return;
+
+  const dateStr = lead.statusChangedAt || lead.createdAt || new Date().toISOString().split('T')[0];
+  const month = dateStr.slice(0, 7); // 'yyyy-MM'
+
+  // Recalculate the full month total from all Fechado leads (active + trashed)
+  const { data, error } = await supabaseClient
+    .from('leads')
+    .select('value')
+    .eq('status', 'Fechado')
+    .gte('status_changed_at', `${month}-01`)
+    .lt('status_changed_at', month === new Date().toISOString().slice(0, 7)
+      ? new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).toISOString().split('T')[0]
+      : `${month.slice(0, 4)}-${String(Number(month.slice(5, 7)) + 1).padStart(2, '0')}-01`);
+
+  if (error) return; // Silently fail — snapshot is best-effort
+
+  const revenue = (data || []).reduce((sum, row) => sum + (Number(row.value) || 0), 0);
+  const lead_count = (data || []).length;
+
+  await Promise.resolve(
+    supabaseClient
+      .from('crm_monthly_snapshots')
+      .upsert({ month, revenue, lead_count, updated_at: new Date().toISOString() }, { onConflict: 'month' })
+  ).catch(() => {}); // best-effort
+}
+
 const isMissingPlaybookTableError = (error?: SupabaseError | null) =>
   error?.code === '42P01' || !!error?.message?.includes('crm_playbooks');
 
@@ -277,6 +308,22 @@ export async function GET(request: NextRequest) {
       .gte('deleted_at', thirtyDaysAgoIso)
       .order('deleted_at', { ascending: false });
   } else {
+    const fourteenDaysAgoIso = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
+    const nowIso = new Date().toISOString();
+    
+    // Auto-trash old 'Fechado' leads before fetching active list
+    await Promise.resolve(
+      supabaseClient
+        .from('leads')
+        .update({ 
+          deleted_at: nowIso,
+          updated_at: nowIso
+        })
+        .is('deleted_at', null)
+        .eq('status', 'Fechado')
+        .lt('status_changed_at', fourteenDaysAgoIso)
+    ).catch(() => {}); // Ignore errors if columns are missing
+
     query = query
       .is('deleted_at', null)
       .order('created_at', { ascending: false });
@@ -378,6 +425,8 @@ export async function POST(request: NextRequest) {
   if (historyError) {
     return crmErrorResponse(historyError);
   }
+
+  await upsertMonthlySnapshot(supabaseClient, lead);
 
   return NextResponse.json(lead, { status: 201 });
 }
@@ -482,6 +531,9 @@ export async function PUT(request: NextRequest) {
       return crmErrorResponse(historyError);
     }
   }
+
+  // Always sync snapshot (handles value edits on Fechado leads too)
+  await upsertMonthlySnapshot(supabaseClient, lead);
 
   return NextResponse.json(lead);
 }
@@ -676,6 +728,16 @@ export async function PATCH(request: NextRequest) {
       .select('*')
       .single();
     if (retry.error) return crmErrorResponse(retry.error);
+
+    if (nextStatus === 'Fechado' && retry.data) {
+      await upsertMonthlySnapshot(supabaseClient, {
+        status: 'Fechado',
+        value: roundCurrency(retry.data.value),
+        statusChangedAt: typeof retry.data.status_changed_at === 'string' ? retry.data.status_changed_at : undefined,
+        createdAt: typeof retry.data.created_at === 'string' ? retry.data.created_at : undefined,
+      });
+    }
+
     return NextResponse.json({
       success: true,
       partial: true,
@@ -686,6 +748,15 @@ export async function PATCH(request: NextRequest) {
   }
 
   if (error) return crmErrorResponse(error);
+
+  if (nextStatus === 'Fechado' && data) {
+    await upsertMonthlySnapshot(supabaseClient, {
+      status: 'Fechado',
+      value: roundCurrency(data.value),
+      statusChangedAt: typeof data.status_changed_at === 'string' ? data.status_changed_at : undefined,
+      createdAt: typeof data.created_at === 'string' ? data.created_at : undefined,
+    });
+  }
 
   return NextResponse.json({
     success: true,

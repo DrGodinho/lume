@@ -136,7 +136,7 @@ export function CarbonoPage() {
                         <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
                     </div>
                     <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-4 text-[#c9a227]">Escolha seu Grau de Privacidade</h2>
-                    <p className="text-gray-400 max-w-2xl mx-auto text-lg">A exata transparência ideal para a necessidade da sua residência ou empresa (Apenas R$ 80/m² instalado).</p>
+                    <p className="text-gray-400 max-w-2xl mx-auto text-lg">A exata transparência ideal para a necessidade da sua residência ou empresa (Apenas R$ 90/m² instalado).</p>
                 </div>
 
                 <div className="container-lume grid lg:grid-cols-2 gap-8 md:gap-12 max-w-5xl mx-auto">

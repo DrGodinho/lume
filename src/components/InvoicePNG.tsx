@@ -9,6 +9,7 @@ interface InvoicePNGProps {
     finalPrice: number;
     subtotalBruto: number;
     desconto: number;
+    perdas?: number;
     formatBRL: (v: number) => string;
 }
 
@@ -21,6 +22,7 @@ export const InvoicePNG = forwardRef<HTMLDivElement, InvoicePNGProps>(({
     finalPrice,
     subtotalBruto,
     desconto,
+    perdas = 0,
     formatBRL
 }, ref) => {
     return (
@@ -121,21 +123,29 @@ export const InvoicePNG = forwardRef<HTMLDivElement, InvoicePNGProps>(({
                     width: '100%',
                     boxSizing: 'border-box',
                 }}>
-                    {desconto > 0 && (
+                    {(desconto > 0 || perdas > 0) && (
                         <div style={{ marginBottom: '10px' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                                 <span style={{ fontSize: '12px', fontWeight: '600', color: '#e5e7eb' }}>Subtotal</span>
                                 <span style={{ fontSize: '12px', fontWeight: '700', color: '#e5e7eb' }}>{formatBRL(subtotalBruto)}</span>
                             </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <span style={{ fontSize: '12px', fontWeight: '700', color: '#f87171' }}>Desconto</span>
-                                <span style={{ fontSize: '12px', fontWeight: '700', color: '#f87171' }}>– {formatBRL(desconto)}</span>
-                            </div>
+                            {perdas > 0 && (
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                    <span style={{ fontSize: '10px', fontWeight: '500', color: '#6b7280' }}>Aproveitamento/Perdas</span>
+                                    <span style={{ fontSize: '10px', fontWeight: '500', color: '#6b7280' }}>+ {formatBRL(perdas)}</span>
+                                </div>
+                            )}
+                            {desconto > 0 && (
+                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                    <span style={{ fontSize: '12px', fontWeight: '700', color: '#f87171' }}>Desconto</span>
+                                    <span style={{ fontSize: '12px', fontWeight: '700', color: '#f87171' }}>– {formatBRL(desconto)}</span>
+                                </div>
+                            )}
                             <div style={{ height: '1px', background: 'rgba(255,255,255,0.06)', margin: '10px 0 0' }} />
                         </div>
                     )}
 
-                    <div style={{ fontSize: '8px', fontWeight: '800', color: '#c9a227', textTransform: 'uppercase', letterSpacing: '3px', marginBottom: '5px', marginTop: desconto > 0 ? '8px' : '0' }}>
+                    <div style={{ fontSize: '8px', fontWeight: '800', color: '#c9a227', textTransform: 'uppercase', letterSpacing: '3px', marginBottom: '5px', marginTop: (desconto > 0 || perdas > 0) ? '8px' : '0' }}>
                         Total à Vista
                     </div>
 

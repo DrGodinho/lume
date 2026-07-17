@@ -32,6 +32,7 @@ import { useAgenda, formatCurrencyBRL, formatDateInputValue, getLeadActivityDate
 import { useLeads } from './hooks/useLeads';
 import { useLogout } from './hooks/useLogout';
 import { useMetrics } from './hooks/useMetrics';
+import { useMonthlySnapshots } from './hooks/useMonthlySnapshots';
 import { formatLeadCurrency } from './utils';
 import type { CrmTab } from './types';
 
@@ -176,6 +177,7 @@ export default function HomePage() {
     setLeadDetail,
   } = useLeads(activeTab);
   const { agendaUrgentCount } = useAgenda(leads);
+  const { snapshots: monthlySnapshots } = useMonthlySnapshots();
   const {
     stats,
     monthlyEvolution,
@@ -184,7 +186,7 @@ export default function HomePage() {
     monthTrendIsPositive,
     targetPercent,
     formatDashboardCurrency,
-  } = useMetrics(leads, targetGoal);
+  } = useMetrics(leads, targetGoal, monthlySnapshots);
   const syncTone = crmSync.status === 'error' ? 'error' : crmSync.status === 'warning' ? 'warning' : 'ok';
   const syncStatusLabel = syncTone === 'error'
     ? 'Erro'

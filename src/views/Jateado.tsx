@@ -156,7 +156,7 @@ export function JateadoPage() {
                     <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-4 text-white">O Raio-X do Jateado</h2>
                     <p className="text-gray-400 max-w-2xl mx-auto text-lg mb-8">Performance testada para decorar sem estrangular a claridade do local.</p>
                     <span className="inline-flex px-6 py-2 bg-gradient-to-r from-gray-200 to-gray-400 text-black font-black uppercase text-xl rounded-lg shadow-[0_0_20px_rgba(255,255,255,0.2)] tracking-wider">
-                        R$ 90/m² Instalado
+                        R$ 99/m² Instalado
                     </span>
                 </div>
 

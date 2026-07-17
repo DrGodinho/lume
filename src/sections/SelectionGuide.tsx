@@ -83,7 +83,7 @@ const quickAnswers = [
   {
     question: 'Quanto custa insulfilm residencial no Rio de Janeiro?',
     answer:
-      'Na LUME, as linhas principais começam em R$ 80/m² no Carbono, R$ 95/m² na Refletiva, R$ 120/m² na Dupla Camada e R$ 220/m² na Nano Cerâmica. O valor final depende da metragem, altura, tipo de vidro e objetivo do ambiente.',
+      'Na LUME, as linhas principais começam em R$ 90/m² no Carbono, R$ 110/m² na Refletiva, R$ 140/m² na Dupla Camada e R$ 240/m² na Nano Cerâmica. O valor final depende da metragem, altura, tipo de vidro e objetivo do ambiente.',
   },
   {
     question: 'Qual insulfilm reduz mais calor sem escurecer?',

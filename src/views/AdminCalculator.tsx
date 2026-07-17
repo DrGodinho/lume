@@ -1858,6 +1858,7 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
                 finalPrice={finalPrice}
                 subtotalBruto={subtotalBruto}
                 desconto={desconto}
+                perdas={compensacaoPerda}
                 formatBRL={formatBRL}
             />
 

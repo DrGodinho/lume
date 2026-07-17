@@ -154,7 +154,7 @@ export function DuplaCamadaPage() {
                     </div>
                     <div className="inline-flex flex-col items-center">
                         <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-2 text-white">Escolha sua Dupla Camada</h2>
-                        <span className="text-[#c9a227] font-semibold tracking-wide bg-[#c9a227]/10 px-4 py-1 rounded-full text-sm">Apenas R$ 120/m² Instalado</span>
+                        <span className="text-[#c9a227] font-semibold tracking-wide bg-[#c9a227]/10 px-4 py-1 rounded-full text-sm">Apenas R$ 140/m² Instalado</span>
                     </div>
                 </div>
 

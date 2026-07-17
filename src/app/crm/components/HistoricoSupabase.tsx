@@ -354,8 +354,9 @@ export function HistoricoSupabase({ setActiveTab, openCreateModal }: HistoricoSu
               </button>
               <button
                 onClick={() => {
-                  convertToLead(selectedOrcamento);
+                  const orc = selectedOrcamento;
                   setSelectedOrcamento(null);
+                  convertToLead(orc);
                 }}
                 disabled={!!selectedOrcamento.lead_id}
                 className="flex-1 rounded-xl bg-gradient-to-r from-[#c9a227] to-[#d4ad30] py-2.5 text-sm font-bold text-[#04080f] shadow-lg shadow-[#c9a227]/10 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
