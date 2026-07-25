@@ -1,4 +1,4 @@
-export type CrmTab = 'dashboard' | 'leads' | 'trash' | 'historico' | 'extratos' | 'agenda' | 'settings';
+export type CrmTab = 'dashboard' | 'leads' | 'trash' | 'historico' | 'extratos' | 'agenda' | 'settings' | 'archive';
 
 import type { LeadStatus } from './constants/stages';
 
@@ -7,7 +7,7 @@ export type { LeadStatus } from './constants/stages';
 
 export type ServiceStatus = 'Marcado' | 'Confirmado' | 'Em Execucao' | 'Concluido' | 'Reagendar';
 
-export type AgendaView = 'hoje' | 'semana' | 'mes' | 'servicos' | 'sem_acao' | 'dormentes';
+export type AgendaView = 'hoje' | 'semana' | 'mes' | 'servicos' | 'sem_acao' | 'dormentes' | 'ciclo_5anos';
 
 export type LeadCardKind = 'followup' | 'service' | 'idle' | 'dormant';
 
@@ -67,6 +67,7 @@ export interface LeadStatusInfo {
   proximoContato?: string | null;
   dormant: boolean;
   pinned?: boolean;
+  archived?: boolean;
   updatedAt?: string;
   deletedAt?: string | null;
 }

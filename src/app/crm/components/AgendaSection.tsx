@@ -32,6 +32,7 @@ interface AgendaSectionProps {
   onSetDormant: (leadId: string, dormant: boolean) => Promise<void>;
   onUpdateServiceStatus: (leadId: string, serviceStatus: ServiceStatus) => Promise<void>;
   onAbrirLead: (lead: Lead) => void;
+  onRestoreFromArchive?: (lead: Lead) => Promise<void>;
   isClosedLead: (status: Lead['status']) => boolean;
   getLeadFollowUpDate: (lead: Lead) => Date | null;
   getLeadServiceDate: (lead: Lead) => Date | null;
@@ -52,6 +53,7 @@ interface LeadCardAgendaProps {
   onSetDormant: (leadId: string, dormant: boolean) => Promise<void>;
   onUpdateServiceStatus: (leadId: string, serviceStatus: ServiceStatus) => Promise<void>;
   onAbrirLead: (lead: Lead) => void;
+  onRestoreFromArchive?: (lead: Lead) => Promise<void>;
   getLeadFollowUpDate: (lead: Lead) => Date | null;
   getLeadServiceDate: (lead: Lead) => Date | null;
   getLeadActivityDate: (lead: Lead) => Date | null;
@@ -70,6 +72,7 @@ function LeadCardAgenda({
   onSetDormant,
   onUpdateServiceStatus,
   onAbrirLead,
+  onRestoreFromArchive,
   getLeadFollowUpDate,
   getLeadServiceDate,
   getLeadActivityDate,
@@ -94,16 +97,30 @@ function LeadCardAgenda({
   const isDormantCard = kind === 'dormant';
   const serviceStatus = getLeadServiceStatus(lead);
   const serviceMeta = serviceStatusMeta[serviceStatus];
-  const cardLabel = isServiceCard ? 'Serviço' : isDormantCard ? 'Dormente' : isIdleCard ? 'Sem próxima ação' : 'Follow-up';
+
+  const isFiveYearsCompleted = serviceDate ? differenceInDays(new Date(), serviceDate) >= 1826 : false;
+
+  const cardLabel = isFiveYearsCompleted && lead.archived
+    ? 'Ciclo 5 Anos'
+    : isServiceCard
+      ? 'Serviço'
+      : isDormantCard
+        ? 'Dormente'
+        : isIdleCard
+          ? 'Sem próxima ação'
+          : 'Follow-up';
+
   const cardClasses = atrasado
     ? 'border-red-500/20 bg-red-500/[0.06] hover:border-red-500/35'
-    : isServiceCard
-      ? 'border-sky-500/15 bg-sky-500/[0.05] hover:border-sky-500/30'
-      : isDormantCard
-        ? 'border-slate-500/20 bg-slate-500/[0.05] hover:border-slate-500/30'
-      : isIdleCard
-        ? 'border-white/10 bg-white/[0.025] hover:border-[#c9a227]/20'
-        : 'border-white/5 bg-[#04080f]/90 hover:border-[#c9a227]/20';
+    : isFiveYearsCompleted && lead.archived
+      ? 'border-[#c9a227]/40 bg-[#c9a227]/[0.08] hover:border-[#c9a227]/60 shadow-[inset_0_0_12px_rgba(201,162,39,0.06)]'
+      : isServiceCard
+        ? 'border-sky-500/15 bg-sky-500/[0.05] hover:border-sky-500/30'
+        : isDormantCard
+          ? 'border-slate-500/20 bg-slate-500/[0.05] hover:border-slate-500/30'
+        : isIdleCard
+          ? 'border-white/10 bg-white/[0.025] hover:border-[#c9a227]/20'
+          : 'border-white/5 bg-[#04080f]/90 hover:border-[#c9a227]/20';
 
   const salvarAgendamento = async () => {
     if (!novaData) return;
@@ -123,13 +140,15 @@ function LeadCardAgenda({
         <button onClick={() => onAbrirLead(lead)} className="min-w-0 text-left">
           <span
             className={`mb-2 inline-flex rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] ${
-              isServiceCard
-                ? 'border-sky-500/20 bg-sky-500/10 text-sky-300'
-                : isDormantCard
-                  ? 'border-slate-500/20 bg-slate-500/10 text-slate-300'
-                : isIdleCard
-                  ? 'border-white/10 bg-white/[0.03] text-white/45'
-                  : 'border-[#c9a227]/20 bg-[#c9a227]/10 text-[#f5d77a]'
+              isFiveYearsCompleted && lead.archived
+                ? 'border-[#c9a227]/40 bg-[#c9a227]/20 text-[#f5d77a]'
+                : isServiceCard
+                  ? 'border-sky-500/20 bg-sky-500/10 text-sky-300'
+                  : isDormantCard
+                    ? 'border-slate-500/20 bg-slate-500/10 text-slate-300'
+                  : isIdleCard
+                    ? 'border-white/10 bg-white/[0.03] text-white/45'
+                    : 'border-[#c9a227]/20 bg-[#c9a227]/10 text-[#f5d77a]'
             }`}
           >
             {cardLabel}
@@ -253,7 +272,15 @@ function LeadCardAgenda({
           >
             {hasFollowUp ? 'Reagendar retorno' : 'Agendar retorno'}
           </button>
-          {!isServiceCard && (
+          {lead.archived && onRestoreFromArchive && (
+            <button
+              onClick={() => onRestoreFromArchive(lead)}
+              className="rounded-2xl border border-[#c9a227]/30 bg-[#c9a227]/10 px-4 py-2 text-xs font-bold text-[#f5d77a] transition hover:bg-[#c9a227]/25"
+            >
+              Reativar
+            </button>
+          )}
+          {!isServiceCard && !lead.archived && (
             <button
               onClick={() => onSetDormant(lead.id, !lead.dormant)}
               className="rounded-2xl border border-slate-500/20 px-4 py-2 text-xs font-semibold text-slate-300 transition hover:bg-slate-500/10"
@@ -334,6 +361,7 @@ export function AgendaSection({
   onSetDormant,
   onUpdateServiceStatus,
   onAbrirLead,
+  onRestoreFromArchive,
   isClosedLead,
   getLeadFollowUpDate,
   getLeadServiceDate,
@@ -362,6 +390,15 @@ export function AgendaSection({
   const leadsAtivos = useMemo(() => leads.filter((lead) => !isClosedLead(lead.status)), [isClosedLead, leads]);
   const leadsComRetorno = useMemo(() => leadsAtivos.filter((lead) => !!lead.proximoContato), [leadsAtivos]);
   const leadsComServico = useMemo(() => leadsAtivos.filter((lead) => !!lead.dataServico), [leadsAtivos]);
+
+  const leadsCincoAnos = useMemo(() => {
+    return leads.filter((lead) => {
+      if (!lead.archived && lead.status !== 'Fechado') return false;
+      const serviceDate = getLeadServiceDate(lead);
+      if (!serviceDate) return false;
+      return differenceInDays(new Date(), serviceDate) >= 1826;
+    });
+  }, [getLeadServiceDate, leads]);
 
   const contactarHoje = useMemo(() => {
     return leadsAtivos.filter((lead) => {
@@ -568,7 +605,7 @@ export function AgendaSection({
   });
 
   const selectedDayLabel = diaSelecionado ? format(diaSelecionado, "EEEE, d 'de' MMMM", { locale: ptBR }) : '';
-  const sectionsEmpty = contactarHoje.length === 0 && proximos7Dias.length === 0 && parados.length === 0 && servicosAgendados.length === 0;
+  const sectionsEmpty = contactarHoje.length === 0 && proximos7Dias.length === 0 && parados.length === 0 && servicosAgendados.length === 0 && leadsCincoAnos.length === 0;
 
   const activeAgendaEmpty =
     (agendaView === 'hoje' && contactarHoje.length === 0 && servicosHoje.length === 0) ||
@@ -576,7 +613,8 @@ export function AgendaSection({
     (agendaView === 'mes' && monthlyFollowUps.length === 0 && monthlyServices.length === 0) ||
     (agendaView === 'servicos' && servicosAgendados.length === 0) ||
     (agendaView === 'sem_acao' && parados.length === 0) ||
-    (agendaView === 'dormentes' && dormentes.length === 0);
+    (agendaView === 'dormentes' && dormentes.length === 0) ||
+    (agendaView === 'ciclo_5anos' && leadsCincoAnos.length === 0);
 
   const highlightDay = (day: Date) => {
     if (diaSelecionado && isSameDay(day, diaSelecionado)) {
@@ -678,6 +716,15 @@ export function AgendaSection({
       idleClass: 'border-slate-500/15 bg-slate-500/[0.04] hover:border-slate-400/25 hover:bg-slate-500/[0.065]',
       labelClass: 'text-slate-300/80',
     },
+    {
+      view: 'ciclo_5anos',
+      label: 'Ciclo de 5 Anos',
+      count: leadsCincoAnos.length,
+      description: 'Instalacoes com 5 anos concluidos.',
+      activeClass: 'border-[#c9a227]/50 bg-[#c9a227]/15',
+      idleClass: 'border-[#c9a227]/20 bg-[#c9a227]/5 hover:border-[#c9a227]/35 hover:bg-[#c9a227]/10',
+      labelClass: 'text-[#f5d77a]',
+    },
   ];
 
   const renderLeadCard = (lead: Lead, kind: LeadCardKind) => (
@@ -690,6 +737,7 @@ export function AgendaSection({
       onSetDormant={onSetDormant}
       onUpdateServiceStatus={onUpdateServiceStatus}
       onAbrirLead={onAbrirLead}
+      onRestoreFromArchive={onRestoreFromArchive}
       getLeadFollowUpDate={getLeadFollowUpDate}
       getLeadServiceDate={getLeadServiceDate}
       getLeadActivityDate={getLeadActivityDate}
@@ -760,12 +808,17 @@ export function AgendaSection({
               </span>
               <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-white/60">{emDiaCount} em dia</span>
               <span className="rounded-full border border-sky-500/20 bg-sky-500/10 px-3 py-1 text-sky-300">{servicosAgendados.length} servicos</span>
+              {leadsCincoAnos.length > 0 && (
+                <span className="rounded-full border border-[#c9a227]/30 bg-[#c9a227]/15 px-3 py-1 text-[#f5d77a] shadow-[0_0_0_1px_rgba(201,162,39,0.15)] animate-pulse">
+                  {leadsCincoAnos.length} ciclo de 5 anos
+                </span>
+              )}
             </div>
           </div>
         </div>
       </section>
 
-      <section className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      <section className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7">
         {summaryCards.map((card) => {
           const selected = agendaView === card.view;
 
@@ -1043,6 +1096,7 @@ export function AgendaSection({
       {agendaView === 'semana' && proximos7Dias.length > 0 && renderAgendaSection('Proximos 7 dias', proximos7Dias.length, 'gold', proximos7Dias, 'followup', 'Nenhum retorno para os proximos 7 dias.')}
       {agendaView === 'mes' && monthlyFollowUps.length > 0 && renderAgendaSection(diaSelecionado ? 'Retornos do dia' : 'Retornos do mes', monthlyFollowUps.length, 'gold', monthlyFollowUps, 'followup', diaSelecionado ? 'Nenhum retorno neste dia.' : 'Nenhum retorno neste mes.')}
       {agendaView === 'mes' && monthlyServices.length > 0 && renderAgendaSection(diaSelecionado ? 'Servicos do dia' : 'Servicos do mes', monthlyServices.length, 'sky', monthlyServices, 'service', diaSelecionado ? 'Nenhum servico neste dia.' : 'Nenhum servico neste mes.')}
+      {agendaView === 'ciclo_5anos' && leadsCincoAnos.length > 0 && renderAgendaSection('Ciclo de 5 Anos', leadsCincoAnos.length, 'gold', leadsCincoAnos, 'followup', 'Nenhum lead no ciclo de 5 anos.')}
       {agendaView === 'sem_acao' && parados.length > 0 && renderAgendaSection('Sem atividade ha 3+ dias', parados.length, 'muted', parados, 'idle', 'Nenhum lead parado.')}
       {agendaView === 'dormentes' && dormentes.length > 0 && renderAgendaSection('Leads dormentes', dormentes.length, 'muted', dormentes, 'dormant', 'Nenhum lead dormente.')}
 

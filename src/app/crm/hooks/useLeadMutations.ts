@@ -15,6 +15,7 @@ interface UseLeadMutationsParams {
   leads: Lead[];
   setLeads: Dispatch<SetStateAction<Lead[]>>;
   setTrashedLeads: Dispatch<SetStateAction<Lead[]>>;
+  setArchivedLeads?: Dispatch<SetStateAction<Lead[]>>;
   leadForm: LeadFormValues;
   selectedLead: Lead | null;
   pendingCalculatorHistoryId: string | null;
@@ -36,6 +37,8 @@ export interface UseLeadMutationsReturn {
   handleLeadSave: () => Promise<boolean>;
   handleDeleteLead: (id: string) => Promise<void>;
   handleRestoreLead: (lead: Lead) => Promise<void>;
+  handleArchiveLead: (id: string) => Promise<void>;
+  handleRestoreFromArchive: (lead: Lead) => Promise<void>;
   handleAgendaSchedule: (leadId: string, date: string) => Promise<void>;
   handleServiceStatusChange: (leadId: string, serviceStatus: ServiceStatus) => Promise<void>;
   handleAgendaMarkDone: (leadId: string) => Promise<void>;
@@ -47,6 +50,7 @@ export const useLeadMutations = ({
   leads,
   setLeads,
   setTrashedLeads,
+  setArchivedLeads,
   leadForm,
   selectedLead,
   pendingCalculatorHistoryId,
@@ -287,6 +291,46 @@ export const useLeadMutations = ({
     }
   }, [leads, patchLeadStatusInfo, toast]);
 
+  const handleArchiveLead = useCallback(async (leadId: string) => {
+    setCrmSync({ status: 'warning', message: 'Arquivando lead...' });
+    const { synced, lead } = await patchLeadStatusInfo(leadId, { archived: true });
+    if (synced && lead) {
+      setLeads((current) => current.filter((item) => item.id !== leadId));
+      if (setArchivedLeads) {
+        setArchivedLeads((current) => [lead, ...current.filter((item) => item.id !== leadId)]);
+      }
+      toast.success('Lead arquivado com sucesso!');
+    } else {
+      toast.error('Nao foi possivel arquivar o lead.');
+    }
+  }, [patchLeadStatusInfo, setLeads, setArchivedLeads, toast, setCrmSync]);
+
+  const handleRestoreFromArchive = useCallback(async (lead: Lead) => {
+    setCrmSync({ status: 'warning', message: 'Restaurando lead do arquivo...' });
+    const response = await fetch('/api/crm/leads', {
+      method: 'PATCH',
+      headers: await getCrmApiHeaders(),
+      credentials: 'same-origin',
+      body: JSON.stringify({ id: lead.id, archived: false }),
+    });
+    const payload = await response.json().catch(() => null);
+
+    if (!response.ok || !payload?.lead) {
+      setCrmSync({ status: 'error', message: 'Nao foi possivel restaurar o lead.', details: getCrmApiErrorMessage(payload, response.statusText) });
+      toast.error('Nao foi possivel restaurar o lead.');
+      return;
+    }
+
+    const restoredLead = normalizeLeadAmounts(mapLeadRow(payload.lead));
+    if (setArchivedLeads) {
+      setArchivedLeads((currentLeads) => currentLeads.filter((currentLead) => currentLead.id !== restoredLead.id));
+    }
+    upsertLeadInState(restoredLead);
+    markLeadSyncState(restoredLead.id, 'ok');
+    setCrmSync({ status: 'ok', message: 'Lead restaurado com sucesso.' });
+    toast.success('Lead restaurado com sucesso!');
+  }, [markLeadSyncState, setCrmSync, setArchivedLeads, toast, upsertLeadInState]);
+
   return {
     updateSingleLead,
     patchLeadStatusInfo,
@@ -294,6 +338,8 @@ export const useLeadMutations = ({
     handleLeadSave,
     handleDeleteLead,
     handleRestoreLead,
+    handleArchiveLead,
+    handleRestoreFromArchive,
     handleAgendaSchedule,
     handleServiceStatusChange,
     handleAgendaMarkDone,

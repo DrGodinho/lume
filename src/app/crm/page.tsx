@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import {
+  Archive,
   BarChart3,
   CalendarClock,
   CheckCircle2,
@@ -26,6 +27,7 @@ import { MetricsPanel } from './components/MetricsPanel';
 import { PlaybookSettings } from './components/PlaybookSettings';
 import { ToastProvider, ToastViewport } from './components/ToastProvider';
 import { TrashLeadsView } from './components/TrashLeadsView';
+import { ArchiveLeadsView } from './components/ArchiveLeadsView';
 import { ExtratosMensaisSupabase } from './ExtratosMensaisSupabase';
 import { CRM_ACTIVE_TAB_STORAGE_KEY, DEFAULT_CRM_TARGET_GOAL, RJ_NEIGHBORHOODS } from './constants';
 import { useAgenda, formatCurrencyBRL, formatDateInputValue, getLeadActivityDate, getLeadFollowUpDate, getLeadPhoneHref, getLeadServiceDate, getLeadServiceStatus, getLeadStatusClasses, getWhatsAppHref, isClosedLead, SERVICE_STATUS_META } from './hooks/useAgenda';
@@ -36,7 +38,7 @@ import { useMonthlySnapshots } from './hooks/useMonthlySnapshots';
 import { formatLeadCurrency } from './utils';
 import type { CrmTab } from './types';
 
-const VALID_CRM_TABS = new Set<CrmTab>(['dashboard', 'leads', 'trash', 'historico', 'extratos', 'agenda', 'settings']);
+const VALID_CRM_TABS = new Set<CrmTab>(['dashboard', 'leads', 'trash', 'archive', 'historico', 'extratos', 'agenda', 'settings']);
 
 type NavTone = 'gold' | 'red' | 'slate';
 
@@ -63,6 +65,7 @@ const CRM_NAV_SECTIONS: Array<{ label: string; items: CrmNavItem[] }> = [
       { id: 'historico', label: 'Histórico Supabase', description: 'Orçamentos salvos', icon: Database, tone: 'slate' },
       { id: 'extratos', label: 'Extratos Mensais', description: 'Fechamentos por mês', icon: ReceiptText, tone: 'slate' },
       { id: 'settings', label: 'Configuracoes', description: 'Playbooks e automacoes', icon: Settings, tone: 'slate' },
+      { id: 'archive', label: 'Arquivo', description: 'Leads fechados antigos', icon: Archive, tone: 'gold' },
       { id: 'trash', label: 'Lixeira', description: 'Leads removidos', icon: Trash2, tone: 'red' },
     ],
   },
@@ -118,6 +121,8 @@ export default function HomePage() {
     setCommercialAction,
     trashedLeads,
     loadingTrashLeads,
+    archivedLeads,
+    loadingArchivedLeads,
     leadStatusHistory,
     loadingLeadStatusHistory,
     availableFilmTypeOptions,
@@ -149,6 +154,7 @@ export default function HomePage() {
     sortedFilteredLeads,
     handleVerifyCloudLeads,
     loadTrashLeads,
+    loadArchivedLeads,
     openCommercialAction,
     applyCommercialAction,
     setCollapsedStateForAllLeads,
@@ -163,6 +169,8 @@ export default function HomePage() {
     handleLeadTableRowDoubleClick,
     handleDeleteLead,
     handleRestoreLead,
+    handleArchiveLead,
+    handleRestoreFromArchive,
     handleStatusChange,
     handleKanbanReorder,
     handleAgendaSchedule,
@@ -484,6 +492,7 @@ export default function HomePage() {
               {activeTab === 'dashboard' && 'Painel Geral'}
               {activeTab === 'leads' && 'Gestão de Leads'}
               {activeTab === 'trash' && 'Lixeira de Leads'}
+              {activeTab === 'archive' && 'Arquivo de Leads'}
               {activeTab === 'historico' && 'Histórico Supabase'}
               {activeTab === 'extratos' && 'Extratos Mensais'}
               {activeTab === 'agenda' && 'Agenda & Follow-up'}
@@ -644,6 +653,17 @@ export default function HomePage() {
           </TabErrorBoundary>
         )}
 
+        {activeTab === 'archive' && (
+          <TabErrorBoundary fallbackTitle="Arquivo de Leads">
+            <ArchiveLeadsView
+              leads={archivedLeads}
+              loading={loadingArchivedLeads}
+              onRefresh={loadArchivedLeads}
+              onRestore={(lead) => handleRestoreFromArchive(lead)}
+            />
+          </TabErrorBoundary>
+        )}
+
         {activeTab === 'historico' && (
           <TabErrorBoundary fallbackTitle="Histórico Supabase">
             <HistoricoSupabase
@@ -686,6 +706,7 @@ export default function HomePage() {
               onSetDormant={handleDormantStateChange}
               onUpdateServiceStatus={handleServiceStatusChange}
               onAbrirLead={setLeadDetail}
+              onRestoreFromArchive={handleRestoreFromArchive}
               isClosedLead={isClosedLead}
               getLeadFollowUpDate={getLeadFollowUpDate}
               getLeadServiceDate={getLeadServiceDate}

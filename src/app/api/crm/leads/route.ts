@@ -24,6 +24,7 @@ const OPTIONAL_LEAD_COLUMNS = new Set([
   'deleted_at',
   'dormant',
   'pinned',
+  'archived',
 ]);
 
 interface LeadPayload {
@@ -45,6 +46,7 @@ interface LeadPayload {
   serviceStatus?: ServiceStatus | null;
   dormant?: boolean;
   pinned?: boolean;
+  archived?: boolean;
   updatedAt?: string;
   deletedAt?: string | null;
 }
@@ -296,6 +298,7 @@ export async function GET(request: NextRequest) {
   }
 
   const trashOnly = request.nextUrl.searchParams.get('trash') === '1';
+  const archiveOnly = request.nextUrl.searchParams.get('archive') === '1';
   const thirtyDaysAgoIso = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
   let query = supabaseClient
@@ -307,25 +310,36 @@ export async function GET(request: NextRequest) {
       .not('deleted_at', 'is', null)
       .gte('deleted_at', thirtyDaysAgoIso)
       .order('deleted_at', { ascending: false });
+  } else if (archiveOnly) {
+    query = query
+      .is('deleted_at', null)
+      .eq('archived', true)
+      .order('status_changed_at', { ascending: false });
   } else {
     const fourteenDaysAgoIso = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
     const nowIso = new Date().toISOString();
     
-    // Auto-trash old 'Fechado' leads before fetching active list
+    // Auto-archive old 'Fechado' leads before fetching active list
     await Promise.resolve(
       supabaseClient
         .from('leads')
         .update({ 
-          deleted_at: nowIso,
+          archived: true,
           updated_at: nowIso
         })
         .is('deleted_at', null)
+        .eq('archived', false)
         .eq('status', 'Fechado')
         .lt('status_changed_at', fourteenDaysAgoIso)
     ).catch(() => {}); // Ignore errors if columns are missing
 
+    const fiveYearsAgoDate = new Date();
+    fiveYearsAgoDate.setFullYear(fiveYearsAgoDate.getFullYear() - 5);
+    const fiveYearsAgoIso = fiveYearsAgoDate.toISOString().split('T')[0];
+
     query = query
       .is('deleted_at', null)
+      .or(`archived.eq.false,and(archived.eq.true,data_servico.lte.${fiveYearsAgoIso})`)
       .order('created_at', { ascending: false });
   }
 
@@ -371,6 +385,7 @@ export async function POST(request: NextRequest) {
     serviceStatus: normalizeServiceStatus(body.serviceStatus) || (body.dataServico ? 'Marcado' : null),
     dormant: body.dormant === true,
     pinned: body.pinned === true,
+    archived: body.archived === true,
     updatedAt: body.updatedAt || new Date().toISOString(),
     deletedAt: body.deletedAt || null,
   };
@@ -399,6 +414,7 @@ export async function POST(request: NextRequest) {
     service_status: lead.serviceStatus,
     dormant: lead.dormant,
     pinned: lead.pinned,
+    archived: lead.archived,
     updated_at: lead.updatedAt,
     created_at: lead.createdAt,
     deleted_at: lead.deletedAt,
@@ -461,6 +477,7 @@ export async function PUT(request: NextRequest) {
     serviceStatus: normalizeServiceStatus(body.serviceStatus) || (body.dataServico ? 'Marcado' : null),
     dormant: body.dormant === true,
     pinned: body.pinned === true,
+    archived: body.archived === true,
     updatedAt: body.updatedAt || new Date().toISOString(),
     deletedAt: body.deletedAt || null,
   };
@@ -504,6 +521,7 @@ export async function PUT(request: NextRequest) {
     service_status: lead.serviceStatus,
     dormant: lead.dormant,
     pinned: lead.pinned,
+    archived: lead.archived,
     updated_at: lead.updatedAt,
     deleted_at: lead.deletedAt,
   };
@@ -584,6 +602,7 @@ const LEAD_STATUS_INFO_PATCH_FIELDS = new Set([
   'service_status',
   'dormant',
   'pinned',
+  'archived',
   'updated_at',
 ]);
 
@@ -597,6 +616,7 @@ const buildStatusInfoUpdate = (body: Record<string, unknown>) => {
   if ('dataServico' in body) update.data_servico = body.dataServico;
   if ('serviceStatus' in body) update.service_status = body.serviceStatus;
   if ('updatedAt' in body) update.updated_at = body.updatedAt;
+  if ('archived' in body) update.archived = body.archived;
   return update;
 };
 

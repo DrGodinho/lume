@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { format, isPast, isToday, parseISO } from 'date-fns';
+import { format, isPast, isToday, parseISO, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import type { Lead, LeadStatus, ServiceStatus, ServiceStatusMeta } from '../types';
 
@@ -123,7 +123,11 @@ export const getWhatsAppHref = (lead: Lead, template: 'generic' | 'retorno' | 's
 export const useAgenda = (leads: Lead[]) => {
   const agendaUrgentCount = useMemo(() => {
     return leads.filter((lead) => {
-      if (isClosedLead(lead.status)) return false;
+      const serviceDate = getLeadServiceDate(lead);
+      const isFiveYearsCompleted = serviceDate ? differenceInDays(new Date(), serviceDate) >= 1826 : false;
+      if (lead.archived && isFiveYearsCompleted) return true;
+
+      if (isClosedLead(lead.status) && !lead.archived) return false;
       const followUpDate = getLeadFollowUpDate(lead);
       return !!followUpDate && (isToday(followUpDate) || isPast(followUpDate));
     }).length;

@@ -24,6 +24,9 @@ export interface UseLeadListReturn {
   trashedLeads: Lead[];
   setTrashedLeads: Dispatch<SetStateAction<Lead[]>>;
   loadingTrashLeads: boolean;
+  archivedLeads: Lead[];
+  setArchivedLeads: Dispatch<SetStateAction<Lead[]>>;
+  loadingArchivedLeads: boolean;
   filmTypeOptions: string[];
   defaultLeadFilmType: string;
   targetGoal: number | null;
@@ -33,11 +36,27 @@ export interface UseLeadListReturn {
   setTargetInput: Dispatch<SetStateAction<string>>;
   saveTargetGoal: (value: number) => Promise<void>;
   loadTrashLeads: () => Promise<void>;
+  loadArchivedLeads: () => Promise<void>;
   upsertLeadInState: (lead: Lead) => Lead;
 }
 
 const fetchTrashLeadsSnapshot = async (): Promise<TrashSnapshotResult> => {
   const response = await fetch('/api/crm/leads?trash=1', {
+    headers: await getCrmApiHeaders(),
+    credentials: 'same-origin',
+    cache: 'no-store',
+  });
+  const payload = await response.json().catch(() => null);
+
+  if (!response.ok || !Array.isArray(payload)) {
+    return { ok: false, details: getCrmApiErrorMessage(payload, response.statusText) };
+  }
+
+  return { ok: true, leads: payload.map(mapLeadRow) };
+};
+
+const fetchArchiveLeadsSnapshot = async (): Promise<TrashSnapshotResult> => {
+  const response = await fetch('/api/crm/leads?archive=1', {
     headers: await getCrmApiHeaders(),
     credentials: 'same-origin',
     cache: 'no-store',
@@ -60,6 +79,8 @@ export const useLeadList = (
   const [leads, setLeads] = useState<Lead[]>([]);
   const [trashedLeads, setTrashedLeads] = useState<Lead[]>([]);
   const [loadingTrashLeads, setLoadingTrashLeads] = useState(false);
+  const [archivedLeads, setArchivedLeads] = useState<Lead[]>([]);
+  const [loadingArchivedLeads, setLoadingArchivedLeads] = useState(false);
   const [filmTypeOptions, setFilmTypeOptions] = useState<string[]>(DEFAULT_CRM_FILM_OPTIONS);
   const [defaultLeadFilmType, setDefaultLeadFilmType] = useState(DEFAULT_CRM_FILM_OPTIONS[0] || 'Outro');
   const [targetGoal, setTargetGoal] = useState<number | null>(DEFAULT_CRM_TARGET_GOAL);
@@ -122,10 +143,29 @@ export const useLeadList = (
     }
   }, [toast]);
 
+  const loadArchivedLeads = useCallback(async () => {
+    setLoadingArchivedLeads(true);
+
+    try {
+      const result = await fetchArchiveLeadsSnapshot();
+      if (!result.ok || !result.leads) {
+        toast.error('Nao foi possivel carregar o arquivo.');
+        return;
+      }
+
+      setArchivedLeads(result.leads.map(normalizeLeadAmounts));
+    } finally {
+      setLoadingArchivedLeads(false);
+    }
+  }, [toast]);
+
   useEffect(() => {
-    if (activeTab !== 'trash') return;
-    void loadTrashLeads();
-  }, [activeTab, loadTrashLeads]);
+    if (activeTab === 'trash') {
+      void loadTrashLeads();
+    } else if (activeTab === 'archive') {
+      void loadArchivedLeads();
+    }
+  }, [activeTab, loadTrashLeads, loadArchivedLeads]);
 
   const upsertLeadInState = useCallback((lead: Lead) => {
     const normalized = normalizeLeadAmounts(lead);
@@ -144,6 +184,9 @@ export const useLeadList = (
     trashedLeads,
     setTrashedLeads,
     loadingTrashLeads,
+    archivedLeads,
+    setArchivedLeads,
+    loadingArchivedLeads,
     filmTypeOptions,
     defaultLeadFilmType,
     targetGoal,
@@ -153,6 +196,7 @@ export const useLeadList = (
     setTargetInput,
     saveTargetGoal,
     loadTrashLeads,
+    loadArchivedLeads,
     upsertLeadInState,
   };
 };
