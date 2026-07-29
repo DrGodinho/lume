@@ -3,7 +3,7 @@ import { ScrollReveal } from '../components/ScrollReveal';
 
 const differentiators = [
   'Trabalhamos apenas com películas de alta qualidade',
-  'Garantia de 5 anos em todas as películas',
+  'Garantia de 2 anos em todas as películas',
   'Atendimento personalizado na sua casa',
   'Mais de 500 residências atendidas',
 ];

@@ -319,7 +319,7 @@ export function InsulfilmPortasVidro() {
               </a>
             </div>
             <div className="animate-hero mt-8 grid gap-3 sm:mt-10 sm:grid-cols-2 lg:grid-cols-4">
-              {['Garantia de 5 anos', 'Zona Oeste do Rio', 'Instalação limpa', 'Orçamento gratuito'].map((item) => (
+              {['Garantia de 2 anos', 'Zona Oeste do Rio', 'Instalação limpa', 'Orçamento gratuito'].map((item) => (
                 <div key={item} className="flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-3 text-xs text-gray-200 backdrop-blur sm:justify-start sm:px-4 sm:text-sm">
                   <CheckCircle size={16} className="shrink-0 text-[#c9a227]" />
                   {item}
@@ -517,7 +517,7 @@ export function InsulfilmPortasVidro() {
             {[
               '8 anos de experiência',
               'Mais de 500 residências atendidas',
-              'Garantia de 5 anos',
+              'Garantia de 2 anos',
               'Atendimento na Zona Oeste',
               'Orçamento gratuito',
               'Instalação limpa e cuidadosa',

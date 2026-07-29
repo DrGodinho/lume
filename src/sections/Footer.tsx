@@ -78,7 +78,7 @@ export function Footer() {
             </p>
             <p className="text-gray-400 text-xs sm:text-sm leading-relaxed mb-4 sm:mb-6">
               Especialistas em insulfilm residencial na Zona Oeste do Rio.
-              8 anos de experiência, garantia de 5 anos.
+              8 anos de experiência, garantia de 2 anos.
             </p>
             {/* Social Links */}
             <div className="flex gap-2 sm:gap-3">

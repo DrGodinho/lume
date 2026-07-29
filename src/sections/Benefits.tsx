@@ -32,7 +32,7 @@ const benefits = [
     icon: Lock,
     title: 'Segurança',
     description: 'Películas antivandalismo que dificultam a invasão e seguram vidros quebrados.',
-    stat: '5 anos',
+    stat: '2 anos',
     statLabel: 'Garantia',
   },
 ];

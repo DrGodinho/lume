@@ -66,7 +66,7 @@ export function SulacapPage() {
                         <div className="flex items-center gap-2"><Thermometer size={16} className="text-[#c9a227]" /> Até 80% de Rejeição de Calor</div>
                         <div className="flex items-center gap-2"><Sun size={16} className="text-[#c9a227]" /> 99% Bloqueio Anti-UV</div>
                         <div className="flex items-center gap-2"><CheckCircle size={16} className="text-[#c9a227]" /> Orçamento Gratuito no Local</div>
-                        <div className="flex items-center gap-2"><Shield size={16} className="text-[#c9a227]" /> Garantia de 5 Anos Lume</div>
+                        <div className="flex items-center gap-2"><Shield size={16} className="text-[#c9a227]" /> Garantia de 2 Anos Lume</div>
                     </div>
                 </div>
             </section>
@@ -234,7 +234,7 @@ export function SulacapPage() {
                             },
                             {
                                 icon: Lock, title: "Garantia Documentada", stat: "100%", label: "Segurança",
-                                desc: "Você recebe a nossa Garantia Oficial de 5 anos por escrito. A confiança de que seu insulfilm não vai formar bolhas no ano seguinte."
+                                desc: "Você recebe a nossa Garantia Oficial de 2 anos por escrito. A confiança de que seu insulfilm não vai formar bolhas no ano seguinte."
                             }
                         ].map((benefit, idx) => (
                             <div key={idx} className="benefit-card group relative p-10 rounded-2xl bg-gradient-to-b from-[#1a3a5c]/40 to-[#04080f]/60 border border-[#1a3a5c]/30 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 text-center lg:text-left flex flex-col">
@@ -361,7 +361,7 @@ export function SulacapPage() {
                                 a: "O tempo varia de acordo com a quantidade de vidros. Para a maioria dos apartamentos residenciais, o serviço é concluído em algumas horas (geralmente entre 2 a 4 horas), de forma limpa e muito ágil."
                             },
                             {
-                                q: "5. A garantia de 5 anos cobre o quê?",
+                                q: "5. A garantia de 2 anos cobre o quê?",
                                 a: "A garantia Lume cobre defeitos de instalação, descolamento natural, surgimento de bolhas inesperadas e perda agressiva de coloração (desbotamento acentuado), assegurando que seu investimento dure por anos."
                             }
                         ].map((faq, idx) => (
@@ -421,7 +421,7 @@ export function SulacapPage() {
                         <div className="mt-12 flex flex-wrap justify-center gap-8 text-[11px] text-gray-500 font-bold uppercase tracking-[0.2em]">
                             <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> Instalação Premium</span>
                             <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> Orçamento Local Grátis</span>
-                            <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> 5 Anos de Garantia</span>
+                            <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> 2 Anos de Garantia</span>
                         </div>
                     </div>
                 </div>

@@ -27,7 +27,7 @@ const jsonLd = {
   '@type': 'Product',
   name: 'Película de Carbono Premium LUME',
   image: 'https://lumecontrolesolar.com.br/carbono-hero.webp',
-  description: 'Película de carbono profissional com visual grafite sofisticado, rejeição térmica de até 80% e bloqueio de 99% dos raios UV. Garantia de 5 anos.',
+  description: 'Película de carbono profissional com visual grafite sofisticado, rejeição térmica de até 80% e bloqueio de 99% dos raios UV. Garantia de 2 anos.',
   brand: {
     '@type': 'Brand',
     name: 'LUME Controle Solar',

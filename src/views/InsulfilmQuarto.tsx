@@ -243,9 +243,9 @@ export function InsulfilmQuarto() {
               <div className="w-16 h-16 bg-[#c9a227]/10 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Clock className="text-[#c9a227]" size={32} />
               </div>
-              <h3 className="text-xl font-bold mb-4">Garantia de 5 Anos</h3>
+              <h3 className="text-xl font-bold mb-4">Garantia de 2 Anos</h3>
               <p className="text-gray-400 text-sm">
-               Oferecemos garantia oficial de 5 anos na película e na instalação, garantindo que seu investimento dure por muitos anos.
+               Oferecemos garantia oficial de 2 anos na película e na instalação, garantindo que seu investimento dure por muitos anos.
               </p>
             </div>
           </div>

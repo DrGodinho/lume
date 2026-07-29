@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://lumecontrolesolar.com.br/insulfilm-em-jacarepagua/' },
   openGraph: {
     title: 'Insulfilm em Jacarepaguá RJ | LUME Controle Solar',
-    description: 'Películas de controle solar em Jacarepaguá. Redução de até 80% do calor e proteção UV 99%. Orçamento rápido e garantia de 5 anos.',
+    description: 'Películas de controle solar em Jacarepaguá. Redução de até 80% do calor e proteção UV 99%. Orçamento rápido e garantia de 2 anos.',
     url: 'https://lumecontrolesolar.com.br/insulfilm-em-jacarepagua/',
     type: 'website',
     siteName: 'LUME Controle Solar',
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Insulfilm em Jacarepaguá RJ | LUME Controle Solar',
-    description: 'Redução de até 80% do calor em Jacarepaguá. Proteção UV 99% e garantia de 5 anos.',
+    description: 'Redução de até 80% do calor em Jacarepaguá. Proteção UV 99% e garantia de 2 anos.',
     images: ['https://lumecontrolesolar.com.br/jacarepagua_hero_bg.webp'],
   },
 };

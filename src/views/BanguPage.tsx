@@ -67,7 +67,7 @@ export function BanguPage() {
                         <div className="flex items-center gap-2"><Thermometer size={16} className="text-[#c9a227]" /> Até 80% de Rejeição de Calor</div>
                         <div className="flex items-center gap-2"><Sun size={16} className="text-[#c9a227]" /> 99% Bloqueio Anti-UV</div>
                         <div className="flex items-center gap-2"><CheckCircle size={16} className="text-[#c9a227]" /> Orçamento Gratuito no Local</div>
-                        <div className="flex items-center gap-2"><Shield size={16} className="text-[#c9a227]" /> Garantia de 5 Anos Lume</div>
+                        <div className="flex items-center gap-2"><Shield size={16} className="text-[#c9a227]" /> Garantia de 2 Anos Lume</div>
                     </div>
                 </div>
             </section>
@@ -235,7 +235,7 @@ export function BanguPage() {
                             },
                             {
                                 icon: Lock, title: "Qualidade de Elite", stat: "100%", label: "Filme Original",
-                                desc: "Trabalhamos com películas de procedência que não criam bolhas nem ficam roxas, com garantia oficial de 5 anos pela Lume."
+                                desc: "Trabalhamos com películas de procedência que não criam bolhas nem ficam roxas, com garantia oficial de 2 anos pela Lume."
                             }
                         ].map((benefit, idx) => (
                             <div key={idx} className="benefit-card group relative p-10 rounded-2xl bg-gradient-to-b from-[#1a3a5c]/40 to-[#04080f]/60 border border-[#1a3a5c]/30 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 text-center lg:text-left flex flex-col">
@@ -299,7 +299,7 @@ export function BanguPage() {
                                 <ul className="space-y-4 mb-4">
                                     <li className="flex gap-3 text-base text-gray-300 font-bold"><CheckCircle size={20} className="text-[#c9a227] shrink-0" /> Visita técnica gratuita no seu imóvel</li>
                                     <li className="flex gap-3 text-base text-gray-300 font-bold"><CheckCircle size={20} className="text-[#c9a227] shrink-0" /> Instalação com acabamento Elite</li>
-                                    <li className="flex gap-3 text-base text-gray-300 font-bold"><CheckCircle size={20} className="text-[#c9a227] shrink-0" /> Garantia Lume de 5 anos (Acabamento Elite)</li>
+                                    <li className="flex gap-3 text-base text-gray-300 font-bold"><CheckCircle size={20} className="text-[#c9a227] shrink-0" /> Garantia Lume de 2 anos (Acabamento Elite)</li>
                                 </ul>
                             </div>
 
@@ -367,7 +367,7 @@ export function BanguPage() {
                             },
                             {
                                 q: "5. Qual o tempo de garantia do serviço?",
-                                a: "Oferecemos garantia contratual de 5 anos em todos os nossos serviços de aplicação. Isso cobre bolhas, delaminação e defeitos de instalação, garantindo sua total tranquilidade."
+                                a: "Oferecemos garantia contratual de 2 anos em todos os nossos serviços de aplicação. Isso cobre bolhas, delaminação e defeitos de instalação, garantindo sua total tranquilidade."
                             },
                             {
                                 q: "6. Posso instalar insulfilm em vidro temperado?",
@@ -436,7 +436,7 @@ export function BanguPage() {
                         </div>
 
                         <div className="mt-12 flex flex-wrap justify-center gap-8 text-[11px] text-gray-500 font-bold uppercase tracking-[0.2em]">
-                            <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> 5 Anos de Garantia</span>
+                            <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> 2 Anos de Garantia</span>
                             <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> Conforto Térmico Real</span>
                             <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> Instalação Express</span>
                         </div>

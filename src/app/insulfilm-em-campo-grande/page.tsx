@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://lumecontrolesolar.com.br/insulfilm-em-campo-grande/' },
   openGraph: {
     title: 'Insulfilm em Campo Grande RJ | LUME Controle Solar',
-    description: 'Especialistas em insulfilm em Campo Grande. Proteção contra o calor carioca com garantia de 5 anos. Orçamento grátis no local.',
+    description: 'Especialistas em insulfilm em Campo Grande. Proteção contra o calor carioca com garantia de 2 anos. Orçamento grátis no local.',
     url: 'https://lumecontrolesolar.com.br/insulfilm-em-campo-grande/',
     type: 'website',
     siteName: 'LUME Controle Solar',
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Insulfilm em Campo Grande RJ | LUME Controle Solar',
-    description: 'Proteção contra calor e privacidade total em Campo Grande. Garantia de 5 anos. Orçamento grátis.',
+    description: 'Proteção contra calor e privacidade total em Campo Grande. Garantia de 2 anos. Orçamento grátis.',
     images: ['https://lumecontrolesolar.com.br/campogrande_hero_bg.webp'],
   },
 };

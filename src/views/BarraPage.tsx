@@ -74,7 +74,7 @@ export function BarraPage() {
                         <div className="flex items-center gap-2"><Thermometer size={16} className="text-[#c9a227]" /> Até 80% de Rejeição de Calor</div>
                         <div className="flex items-center gap-2"><Sun size={16} className="text-[#c9a227]" /> 99% Bloqueio Anti-UV</div>
                         <div className="flex items-center gap-2"><CheckCircle size={16} className="text-[#c9a227]" /> Orçamento Gratuito no Local</div>
-                        <div className="flex items-center gap-2"><Shield size={16} className="text-[#c9a227]" /> Garantia de 5 Anos Lume</div>
+                        <div className="flex items-center gap-2"><Shield size={16} className="text-[#c9a227]" /> Garantia de 2 Anos Lume</div>
                     </div>
                 </div>
             </section>
@@ -247,7 +247,7 @@ export function BarraPage() {
                                 desc: "Reduza significativamente o custo mensal com ar-condicionado em apartamentos amplos e lojas."
                             },
                             {
-                                icon: Lock, title: "Garantia Lume", stat: "5 Anos", label: "De Tranquilidade",
+                                icon: Lock, title: "Garantia Lume", stat: "2 Anos", label: "De Tranquilidade",
                                 desc: "Materiais de procedência mundial que não criam bolhas nem perdem a cor sob o sol do Rio de Janeiro."
                             }
                         ].map((benefit, idx) => (
@@ -361,7 +361,7 @@ export function BarraPage() {
                             },
                             {
                                 q: "5. O serviço na Barra tem garantia oficial?",
-                                a: "Sim. Oferecemos garantia oficial de 5 anos cobrindo qualquer defeito de instalação ou material. Sua tranquilidade e satisfação na Barra são prioridade para a LUME."
+                                a: "Sim. Oferecemos garantia oficial de 2 anos cobrindo qualquer defeito de instalação ou material. Sua tranquilidade e satisfação na Barra são prioridade para a LUME."
                             },
                             {
                                 q: "6. Posso instalar insulfilm em coberturas ou varandas envidraçadas?",

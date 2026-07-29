@@ -74,7 +74,7 @@ export function JacarepaguaPage() {
                         <div className="flex items-center gap-2"><Thermometer size={16} className="text-[#c9a227]" /> Até 80% de Rejeição de Calor</div>
                         <div className="flex items-center gap-2"><Sun size={16} className="text-[#c9a227]" /> 99% Bloqueio Anti-UV</div>
                         <div className="flex items-center gap-2"><CheckCircle size={16} className="text-[#c9a227]" /> Orçamento Gratuito no Local</div>
-                        <div className="flex items-center gap-2"><Shield size={16} className="text-[#c9a227]" /> Garantia de 5 Anos Lume</div>
+                        <div className="flex items-center gap-2"><Shield size={16} className="text-[#c9a227]" /> Garantia de 2 Anos Lume</div>
                     </div>
                 </div>
             </section>
@@ -241,7 +241,7 @@ export function JacarepaguaPage() {
                             },
                             {
                                 icon: Lock, title: "Qualidade de Elite", stat: "100%", label: "Filme Original",
-                                desc: "Trabalhamos com películas de procedência certificada, com garantia oficial de 5 anos pela LUME Controle Solar."
+                                desc: "Trabalhamos com películas de procedência certificada, com garantia oficial de 2 anos pela LUME Controle Solar."
                             }
                         ].map((benefit, idx) => (
                             <div key={idx} className="benefit-card group relative p-10 rounded-2xl bg-gradient-to-b from-[#1a3a5c]/40 to-[#04080f]/60 border border-[#1a3a5c]/30 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 text-center lg:text-left flex flex-col">
@@ -356,7 +356,7 @@ export function JacarepaguaPage() {
                             },
                             {
                                 q: "5. Qual a garantia oferecida em Jacarepaguá?",
-                                a: "Você recebe nossa garantia oficial de 5 anos cobrindo qualquer defeito de material ou falha na aplicação. Sua satisfação é nossa prioridade absoluta."
+                                a: "Você recebe nossa garantia oficial de 2 anos cobrindo qualquer defeito de material ou falha na aplicação. Sua satisfação é nossa prioridade absoluta."
                             },
                             {
                                 q: "6. Posso instalar em janelas com molduras de madeira ou alumínio?",
@@ -422,7 +422,7 @@ export function JacarepaguaPage() {
                         </div>
 
                         <div className="mt-12 flex flex-wrap justify-center gap-8 text-[11px] text-gray-500 font-bold uppercase tracking-[0.2em]">
-                            <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> 5 Anos de Garantia</span>
+                            <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> 2 Anos de Garantia</span>
                             <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> Conforto Térmico Real</span>
                             <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> Instalação Padrão Elite</span>
                         </div>

@@ -150,7 +150,7 @@ export function NeighborhoodTemplate({ data }: Props) {
                 <Zap size={18} /> Instalação Express 24h
               </span>
               <span className="flex items-center gap-3 text-[#04080f] font-black uppercase text-sm tracking-tighter">
-                <Shield size={18} /> 5 Anos de Garantia
+                <Shield size={18} /> 2 Anos de Garantia
               </span>
               <span className="flex items-center gap-3 text-[#04080f] font-black uppercase text-sm tracking-tighter">
                 <Star size={18} /> Qualidade Premium LUME

@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://lumecontrolesolar.com.br/insulfilm-na-barra-da-tijuca/' },
   openGraph: {
     title: 'Insulfilm na Barra da Tijuca RJ | LUME Controle Solar',
-    description: 'Películas de alta performance na Barra da Tijuca. Nano cerâmica, carbono e espelhadas. Instalação profissional com garantia de 5 anos.',
+    description: 'Películas de alta performance na Barra da Tijuca. Nano cerâmica, carbono e espelhadas. Instalação profissional com garantia de 2 anos.',
     url: 'https://lumecontrolesolar.com.br/insulfilm-na-barra-da-tijuca/',
     type: 'website',
     siteName: 'LUME Controle Solar',

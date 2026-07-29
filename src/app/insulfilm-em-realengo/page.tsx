@@ -4,7 +4,7 @@ import { businessAddressSchema, businessInfo } from '@/lib/businessInfo';
 
 export const metadata: Metadata = {
   title: 'Insulfilm em Realengo RJ | Instalação Profissional - LUME',
-  description: 'Procurando insulfilm em Realengo? A LUME oferece as melhores películas de controle solar com garantia de 5 anos. Reduza o calor e economize energia hoje!',
+  description: 'Procurando insulfilm em Realengo? A LUME oferece as melhores películas de controle solar com garantia de 2 anos. Reduza o calor e economize energia hoje!',
   keywords: [
     'insulfilm em realengo',
     'insulfilm realengo rj',
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://lumecontrolesolar.com.br/insulfilm-em-realengo/' },
   openGraph: {
     title: 'Insulfilm em Realengo RJ | LUME Controle Solar',
-    description: 'As melhores películas de controle solar em Realengo. Instalação profissional, garantia de 5 anos e orçamento grátis no local.',
+    description: 'As melhores películas de controle solar em Realengo. Instalação profissional, garantia de 2 anos e orçamento grátis no local.',
     url: 'https://lumecontrolesolar.com.br/insulfilm-em-realengo/',
     type: 'website',
     siteName: 'LUME Controle Solar',
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Insulfilm em Realengo RJ | LUME Controle Solar',
-    description: 'Películas de controle solar em Realengo. Instalação profissional e garantia de 5 anos. Orçamento grátis.',
+    description: 'Películas de controle solar em Realengo. Instalação profissional e garantia de 2 anos. Orçamento grátis.',
     images: ['https://lumecontrolesolar.com.br/realengo_hero_bg.webp'],
   },
 };

@@ -441,7 +441,7 @@ export function GuiaInsulfilm() {
                             Você já viu aqueles carros com o vidro cheio de bolhas e com uma cor roxa estranha? Isso é o resultado de películas tintadas de baixa qualidade. Elas duram poucos meses sob o sol do Rio.
                         </p>
                         <p>
-                            Um insulfilm residencial premium aplicado por um profissional experiente deve ter longevidade de performance superior e estabilidade de cor por muitos anos. Na LUME, oferecemos <strong>garantia oficial certificada de 5 anos</strong> em nossos serviços, assegurando:
+                            Um insulfilm residencial premium aplicado por um profissional experiente deve ter longevidade de performance superior e estabilidade de cor por muitos anos. Na LUME, oferecemos <strong>garantia oficial certificada de 2 anos</strong> em nossos serviços, assegurando:
                         </p>
                         <ul className="list-disc pl-6 space-y-2 text-white/80">
                             <li><strong>Tempo de Cura:</strong> Não limpe os vidros nos primeiros 5 dias após a instalação.</li>

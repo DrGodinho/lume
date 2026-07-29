@@ -67,7 +67,7 @@ export function RealengoPage() {
                         <div className="flex items-center gap-2"><Thermometer size={16} className="text-[#c9a227]" /> Até 80% de Rejeição de Calor</div>
                         <div className="flex items-center gap-2"><Sun size={16} className="text-[#c9a227]" /> 99% Bloqueio Anti-UV</div>
                         <div className="flex items-center gap-2"><CheckCircle size={16} className="text-[#c9a227]" /> Orçamento Gratuito no Local</div>
-                        <div className="flex items-center gap-2"><Shield size={16} className="text-[#c9a227]" /> Garantia de 5 Anos Lume</div>
+                        <div className="flex items-center gap-2"><Shield size={16} className="text-[#c9a227]" /> Garantia de 2 Anos Lume</div>
                     </div>
                 </div>
             </section>
@@ -299,7 +299,7 @@ export function RealengoPage() {
                                 <ul className="space-y-4 mb-4">
                                     <li className="flex gap-3 text-base text-gray-300 font-bold"><CheckCircle size={20} className="text-[#c9a227] shrink-0" /> Orçamento Gratuito via Fotos ou Visita</li>
                                     <li className="flex gap-3 text-base text-gray-300 font-bold"><CheckCircle size={20} className="text-[#c9a227] shrink-0" /> Instalação Profissional em 24 Horas</li>
-                                    <li className="flex gap-3 text-base text-gray-300 font-bold"><CheckCircle size={20} className="text-[#c9a227] shrink-0" /> Garantia Lume de 5 anos (Acabamento Elite)</li>
+                                    <li className="flex gap-3 text-base text-gray-300 font-bold"><CheckCircle size={20} className="text-[#c9a227] shrink-0" /> Garantia Lume de 2 anos (Acabamento Elite)</li>
                                 </ul>
                             </div>
 
@@ -363,7 +363,7 @@ export function RealengoPage() {
                             },
                             {
                                 q: "4. Quanto tempo dura o insulfilm e qual a garantia?",
-                                a: "Trabalhamos exclusivamente com películas originais que mantêm suas propriedades térmicas e estabilidade de cor por longos períodos, superando as versões comuns. Elas são resistentes a riscos e possuem garantia oficial de 5 anos."
+                                a: "Trabalhamos exclusivamente com películas originais que mantêm suas propriedades térmicas e estabilidade de cor por longos períodos, superando as versões comuns. Elas são resistentes a riscos e possuem garantia oficial de 2 anos."
                             },
                             {
                                 q: "5. Atendem condomínios e comércios em Realengo?",
@@ -424,7 +424,7 @@ export function RealengoPage() {
                         </div>
 
                         <div className="mt-12 flex flex-wrap justify-center gap-8 text-[11px] text-gray-500 font-bold uppercase tracking-[0.2em]">
-                            <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> Garantia de 5 Anos</span>
+                            <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> Garantia de 2 Anos</span>
                             <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> Estabilidade de Cor</span>
                             <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> Atendimento Rápido</span>
                         </div>

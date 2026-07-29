@@ -84,7 +84,7 @@ const serviceJsonLd = {
     },
   },
   additionalProperty: [
-    { '@type': 'PropertyValue', name: 'Garantia', value: '5 anos' },
+    { '@type': 'PropertyValue', name: 'Garantia', value: '2 anos' },
     { '@type': 'PropertyValue', name: 'Proteção UV', value: 'Até 99%' },
     { '@type': 'PropertyValue', name: 'Aplicação', value: 'Residencial e comercial' },
   ],

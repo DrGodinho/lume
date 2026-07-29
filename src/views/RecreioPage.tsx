@@ -74,7 +74,7 @@ export function RecreioPage() {
                         <div className="flex items-center gap-2"><Thermometer size={16} className="text-[#c9a227]" /> Até 80% de Rejeição de Calor</div>
                         <div className="flex items-center gap-2"><Sun size={16} className="text-[#c9a227]" /> 99% Bloqueio Anti-UV</div>
                         <div className="flex items-center gap-2"><CheckCircle size={16} className="text-[#c9a227]" /> Orçamento Gratuito no Local</div>
-                        <div className="flex items-center gap-2"><Shield size={16} className="text-[#c9a227]" /> Garantia de 5 Anos Lume</div>
+                        <div className="flex items-center gap-2"><Shield size={16} className="text-[#c9a227]" /> Garantia de 2 Anos Lume</div>
                     </div>
                 </div>
             </section>
@@ -354,7 +354,7 @@ export function RecreioPage() {
                             },
                             {
                                 q: "5. O serviço tem garantia oficial no Recreio?",
-                                a: "Sim. Oferecemos 5 anos de garantia oficial da LUME Controle Solar cobrindo instalação e material. Sua satisfação total é o nosso compromisso no bairro."
+                                a: "Sim. Oferecemos 2 anos de garantia oficial da LUME Controle Solar cobrindo instalação e material. Sua satisfação total é o nosso compromisso no bairro."
                             },
                             {
                                 q: "6. Posso instalar em varandas gourmet de vidro?",

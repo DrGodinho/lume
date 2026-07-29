@@ -50,7 +50,7 @@ export function Hero() {
           {/* Subheadline */}
           <p className="animate-hero opacity-0 text-base sm:text-lg md:text-xl text-gray-300 mb-6 sm:mb-8 leading-relaxed max-w-2xl">
             Controle solar para casas, apartamentos e portas de vidro na Zona Oeste.
-            Reduza calor, proteja móveis e escolha a privacidade certa com garantia de 5 anos.
+            Reduza calor, proteja móveis e escolha a privacidade certa com garantia de 2 anos.
           </p>
 
           {/* CTA Buttons */}

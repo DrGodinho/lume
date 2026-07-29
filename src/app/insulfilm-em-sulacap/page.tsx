@@ -4,7 +4,7 @@ import { businessAddressSchema, businessInfo } from '@/lib/businessInfo';
 
 export const metadata: Metadata = {
   title: 'Insulfilm em Sulacap RJ | Residencial e Comercial - LUME',
-  description: 'Aplicação profissional de insulfilm no Jardim Sulacap e região. Redução de calor, privacidade e proteção UV com garantia de 5 anos. Orçamento grátis no local.',
+  description: 'Aplicação profissional de insulfilm no Jardim Sulacap e região. Redução de calor, privacidade e proteção UV com garantia de 2 anos. Orçamento grátis no local.',
   keywords: [
     'insulfilm em sulacap',
     'insulfilm jardim sulacap rj',
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://lumecontrolesolar.com.br/insulfilm-em-sulacap/' },
   openGraph: {
     title: 'Insulfilm em Sulacap RJ | Residencial e Comercial - LUME',
-    description: 'Aplicação profissional de insulfilm em Sulacap, Rio de Janeiro. Redução de calor, privacidade e proteção UV com garantia de 5 anos.',
+    description: 'Aplicação profissional de insulfilm em Sulacap, Rio de Janeiro. Redução de calor, privacidade e proteção UV com garantia de 2 anos.',
     url: 'https://lumecontrolesolar.com.br/insulfilm-em-sulacap/',
     type: 'website',
     siteName: 'LUME Controle Solar',
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Insulfilm em Sulacap RJ | LUME Controle Solar',
-    description: 'Redução de calor, privacidade e proteção UV em Sulacap. Garantia de 5 anos. Orçamento grátis.',
+    description: 'Redução de calor, privacidade e proteção UV em Sulacap. Garantia de 2 anos. Orçamento grátis.',
     images: ['https://lumecontrolesolar.com.br/hero-bg-v2.png'],
   },
 };

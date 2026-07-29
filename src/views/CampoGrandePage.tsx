@@ -67,7 +67,7 @@ export function CampoGrandePage() {
                         <div className="flex items-center gap-2"><Thermometer size={16} className="text-[#c9a227]" /> Até 80% de Rejeição de Calor</div>
                         <div className="flex items-center gap-2"><Sun size={16} className="text-[#c9a227]" /> 99% Bloqueio Anti-UV</div>
                         <div className="flex items-center gap-2"><CheckCircle size={16} className="text-[#c9a227]" /> Orçamento Gratuito no Local</div>
-                        <div className="flex items-center gap-2"><Shield size={16} className="text-[#c9a227]" /> Garantia de 5 Anos Lume</div>
+                        <div className="flex items-center gap-2"><Shield size={16} className="text-[#c9a227]" /> Garantia de 2 Anos Lume</div>
                     </div>
                 </div>
             </section>
@@ -101,7 +101,7 @@ export function CampoGrandePage() {
                         <div className="absolute top-0 left-0 w-32 h-32 bg-[#c9a227] blur-[100px] opacity-10" />
                         <h3 className="text-2xl font-bold font-montserrat text-center mb-8">Especialista em Condomínios e Comércios</h3>
                         <p className="text-gray-400 leading-relaxed text-center max-w-3xl mx-auto font-light text-lg">
-                            Seja para garantir a privacidade total de um apartamento ou reduzir o calor em fachadas comerciais de lojas e clínicas, a LUME oferece a consultoria ideal. Visitamos seu local em Campo Grande com amostras físicas para que você escolha a tonalidade perfeita para seu projeto, sempre com garantia oficial certificada de 5 anos (Acabamento Arquitetônico).
+                            Seja para garantir a privacidade total de um apartamento ou reduzir o calor em fachadas comerciais de lojas e clínicas, a LUME oferece a consultoria ideal. Visitamos seu local em Campo Grande com amostras físicas para que você escolha a tonalidade perfeita para seu projeto, sempre com garantia oficial certificada de 2 anos (Acabamento Arquitetônico).
                         </p>
                     </div>
                 </div>
@@ -299,7 +299,7 @@ export function CampoGrandePage() {
                                 <ul className="space-y-4 mb-4">
                                     <li className="flex gap-3 text-base text-gray-300 font-bold"><CheckCircle size={20} className="text-[#c9a227] shrink-0" /> Orçamento Sem Compromisso via Zap</li>
                                     <li className="flex gap-3 text-base text-gray-300 font-bold"><CheckCircle size={20} className="text-[#c9a227] shrink-0" /> Instalação Express em até 24 Horas</li>
-                                    <li className="flex gap-3 text-base text-gray-300 font-bold"><CheckCircle size={20} className="text-[#c9a227] shrink-0" /> Garantia Lume de 5 anos (Redução Real de Calor)</li>
+                                    <li className="flex gap-3 text-base text-gray-300 font-bold"><CheckCircle size={20} className="text-[#c9a227] shrink-0" /> Garantia Lume de 2 anos (Redução Real de Calor)</li>
                                 </ul>
                             </div>
 
@@ -363,7 +363,7 @@ export function CampoGrandePage() {
                             },
                             {
                                 q: "4. Qual a garantia do serviço da LUME?",
-                                a: "Oferecemos garantia contratual de 5 anos. Nossas películas profissionais mantêm suas propriedades térmicas e estabilidade de cor por muito mais tempo que versões comuns, sem desbotar ou criar bolhas."
+                                a: "Oferecemos garantia contratual de 2 anos. Nossas películas profissionais mantêm suas propriedades térmicas e estabilidade de cor por muito mais tempo que versões comuns, sem desbotar ou criar bolhas."
                             },
                             {
                                 q: "5. Atendem condomínios residenciais e empresas?",
@@ -424,7 +424,7 @@ export function CampoGrandePage() {
                         </div>
 
                         <div className="mt-12 flex flex-wrap justify-center gap-8 text-[11px] text-gray-500 font-bold uppercase tracking-[0.2em]">
-                            <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> 5 Anos de Garantia</span>
+                            <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> 2 Anos de Garantia</span>
                             <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> Foco em Performance</span>
                             <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#c9a227]" /> Orçamento Grátis</span>
                         </div>
