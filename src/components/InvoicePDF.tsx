@@ -166,7 +166,7 @@ interface InvoicePDFProps {
     descontoInput: string;
 }
 
-export const InvoicePDF = ({ cliente, userName, resumo, totalAreaM2, areaV, eficiencia, finalPrice, descontoInput }: InvoicePDFProps) => {
+export const InvoicePDF = ({ cliente, userName, resumo, totalAreaM2, areaV, finalPrice, descontoInput }: InvoicePDFProps) => {
   
   // Group items by label
   const groupedResumo = resumo.reduce((acc, item) => {

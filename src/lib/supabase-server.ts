@@ -17,7 +17,9 @@ export function createSupabaseServerClient(cookieStore: CookieStore) {
           cookiesToSet.forEach(({ name, value, options }) =>
             cookieStore.set(name, value, options)
           );
-        } catch {}
+        } catch {
+          // Ignora: cookies não podem ser setados durante renderização estática
+        }
       },
     },
   });

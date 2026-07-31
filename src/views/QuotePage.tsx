@@ -150,8 +150,9 @@ export function QuotePage() {
         const seuNumero = "5521965140612";
         const url = `https://wa.me/${seuNumero}?text=${msg}`;
         
-        if (typeof (window as any).gtagSendEvent === 'function') {
-            (window as any).gtagSendEvent(url);
+        const w = window as unknown as { gtagSendEvent?: (url: string) => void };
+        if (typeof w.gtagSendEvent === 'function') {
+            w.gtagSendEvent(url);
         } else {
             window.open(url, '_blank');
         }

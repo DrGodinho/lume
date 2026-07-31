@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import gsap from 'gsap';
 import { ContactCTA } from '../sections/ContactCTA';
-import { ArrowRight, Thermometer, Shield, CheckCircle, Star, Monitor, Clock, Eye, Zap } from 'lucide-react';
+import { ArrowRight, Shield, Monitor, Clock, Eye, Zap } from 'lucide-react';
 import { WhatsAppButton } from '../components/WhatsAppButton';
 import { GoogleReviews } from '../components/GoogleReviews';
 import { Particles } from '../components/Particles';

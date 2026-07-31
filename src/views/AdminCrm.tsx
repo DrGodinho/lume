@@ -44,16 +44,33 @@ interface OrcamentoCrm {
   anotacoes: string | null;
 }
 
-function normalizeOrcamento(data: any): OrcamentoCrm {
+interface OrcamentoRow {
+  id?: string;
+  cliente?: string | null;
+  valor?: number | null;
+  qtd?: number | null;
+  modo_otimizacao?: string | null;
+  modoOtimizacao?: string | null;
+  desconto?: number | null;
+  created_at?: string | null;
+  data?: string | null;
+  status?: string | null;
+  data_ultimo_contato?: string | null;
+  data_proximo_contato?: string | null;
+  motivo_declinio?: string | null;
+  anotacoes?: string | null;
+}
+
+function normalizeOrcamento(data: OrcamentoRow): OrcamentoCrm {
   return {
-    id: data.id,
+    id: data.id || '',
     cliente: data.cliente || '',
     valor: data.valor || 0,
     qtd: data.qtd || 0,
     modo_otimizacao: data.modo_otimizacao || data.modoOtimizacao || '',
     desconto: data.desconto || 0,
     created_at: data.created_at || data.data || new Date().toISOString(),
-    status: data.status || 'Novo',
+    status: (data.status as CrmStatus | undefined) || 'Novo',
     data_ultimo_contato: data.data_ultimo_contato || data.created_at || data.data || new Date().toISOString(),
     data_proximo_contato: data.data_proximo_contato || null,
     motivo_declinio: data.motivo_declinio || null,
@@ -80,7 +97,6 @@ function AnimatedCounter({ value, prefix = '' }: { value: number; prefix?: strin
   const [display, setDisplay] = useState(0);
 
   useEffect(() => {
-    const start = display;
     const end = value;
     const duration = 600;
     const startTime = performance.now();
@@ -89,8 +105,7 @@ function AnimatedCounter({ value, prefix = '' }: { value: number; prefix?: strin
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
-      const current = Math.round(start + (end - start) * eased);
-      setDisplay(current);
+      setDisplay((prev) => Math.round(prev + (end - prev) * eased));
       if (progress < 1) requestAnimationFrame(animate);
     }
 
@@ -470,24 +485,27 @@ export default function AdminCrm() {
       return;
     }
 
-    setOrcamentos((data as any[])?.map(normalizeOrcamento) || []);
+    setOrcamentos((data as OrcamentoRow[] | null)?.map(normalizeOrcamento) || []);
     setLoading(false);
   }, []);
 
   useEffect(() => {
+    const supabase = supabaseRef.current;
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch inicial de dados externos (Supabase)
     fetchOrcamentos();
 
-    const channel = supabaseRef.current
+    const channel = supabase
       .channel('crm-realtime')
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'calculator_history' },
         (payload) => {
           if (payload.eventType === 'INSERT') {
-            const newRecord = normalizeOrcamento(payload.new);
+            const newRecord = normalizeOrcamento(payload.new as OrcamentoRow);
             setOrcamentos((prev) => [newRecord, ...prev]);
           } else if (payload.eventType === 'UPDATE') {
-            const updated = normalizeOrcamento(payload.new);
+            const updated = normalizeOrcamento(payload.new as OrcamentoRow);
             setOrcamentos((prev) =>
               prev.map((o) => (o.id === updated.id ? updated : o))
             );
@@ -500,7 +518,7 @@ export default function AdminCrm() {
       .subscribe();
 
     return () => {
-      supabaseRef.current.removeChannel(channel);
+      supabase.removeChannel(channel);
     };
   }, [fetchOrcamentos]);
 

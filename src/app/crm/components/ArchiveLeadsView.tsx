@@ -1,7 +1,6 @@
 'use client';
 
 import { format, parseISO } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import { Archive, RefreshCw } from 'lucide-react';
 import type { Lead } from '../types';
 

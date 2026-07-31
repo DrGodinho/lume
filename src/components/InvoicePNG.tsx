@@ -16,7 +16,6 @@ interface InvoicePNGProps {
 export const InvoicePNG = forwardRef<HTMLDivElement, InvoicePNGProps>(({
     cliente,
     userName,
-    vidrosCount,
     groupedResumo,
     totalAreaM2,
     finalPrice,

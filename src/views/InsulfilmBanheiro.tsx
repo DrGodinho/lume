@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react';
 import gsap from 'gsap';
-import Image from 'next/image';
 import { ContactCTA } from '../sections/ContactCTA';
 import { ArrowRight, Shield, CheckCircle, Star, Eye, Droplets, Clock } from 'lucide-react';
 import { WhatsAppButton } from '../components/WhatsAppButton';

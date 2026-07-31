@@ -14,7 +14,7 @@ export function CarbonoPage() {
     useEffect(() => {
         gsap.registerPlugin(ScrollTrigger);
         
-        let ctx = gsap.context(() => {
+        const ctx = gsap.context(() => {
             // Entrance Animation
             gsap.fromTo('.page-entrance',
                 { opacity: 0, y: 20 },
@@ -22,7 +22,7 @@ export function CarbonoPage() {
             );
 
             // Performance Table Animation
-            const perfRows = gsap.utils.toArray('.perf-row');
+            const perfRows = gsap.utils.toArray('.perf-row') as Element[];
             if (perfRows.length > 0) {
                 gsap.fromTo(perfRows,
                     { opacity: 0, x: -20 },
@@ -35,10 +35,10 @@ export function CarbonoPage() {
                     }
                 );
 
-                perfRows.forEach((row: any) => {
+                perfRows.forEach((row) => {
                     const bar = row.querySelector('.perf-bar-fill');
                     if (bar) {
-                        const targetWidth = bar.getAttribute('data-width');
+                        const targetWidth = bar.getAttribute('data-width') ?? undefined;
                         gsap.fromTo(bar,
                             { width: '0%' },
                             {
