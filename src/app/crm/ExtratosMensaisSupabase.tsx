@@ -113,7 +113,8 @@ const FILM_LABELS: Record<string, string> = {
   carbono_g20: 'Carbono G20',
   refletiva: 'Refletiva',
   dupla_camada: 'Dupla Camada',
-  nano_ceramica: 'Nano Cerâmica',
+  nano_ceramica: 'Nano Cerâmica 75',
+  nano_ceramica_g20: 'Nano Cerâmica G20',
   jateado: 'Jateado',
 };
 

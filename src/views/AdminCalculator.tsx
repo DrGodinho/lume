@@ -23,7 +23,7 @@ import { supabase } from '../lib/supabase';
 
 // ─── CONFIGURAÇÕES PADRÃO ─────────────────────────────────────────────────────
 
-type FilmTypeKey = 'carbono_g5' | 'carbono_g20' | 'refletiva' | 'dupla_camada' | 'nano_ceramica' | 'jateado';
+type FilmTypeKey = 'carbono_g5' | 'carbono_g20' | 'refletiva' | 'dupla_camada' | 'nano_ceramica' | 'nano_ceramica_g20' | 'jateado';
 type OptimizationMode = 'densidade' | 'facilidade' | 'facilidade_v2';
 type LossMode = 'dinamico' | 'fixo';
 type ColorMode = 'ambiente' | 'tamanho';
@@ -31,14 +31,15 @@ type ColorMode = 'ambiente' | 'tamanho';
 const OPTIMIZATION_MODES: OptimizationMode[] = ['densidade', 'facilidade', 'facilidade_v2'];
 const LOSS_MODES: LossMode[] = ['dinamico', 'fixo'];
 const COLOR_MODES: ColorMode[] = ['ambiente', 'tamanho'];
-const FILM_TYPE_KEYS: FilmTypeKey[] = ['carbono_g5', 'carbono_g20', 'refletiva', 'dupla_camada', 'nano_ceramica', 'jateado'];
+const FILM_TYPE_KEYS: FilmTypeKey[] = ['carbono_g5', 'carbono_g20', 'refletiva', 'dupla_camada', 'nano_ceramica', 'nano_ceramica_g20', 'jateado'];
 
 const FILM_TYPE_LABELS: Record<FilmTypeKey, string> = {
   carbono_g5: 'Carbono G5',
   carbono_g20: 'Carbono G20',
   refletiva: 'Refletiva',
   dupla_camada: 'Dupla Camada',
-  nano_ceramica: 'Nano Cerâmica',
+  nano_ceramica: 'Nano Cerâmica 75',
+  nano_ceramica_g20: 'Nano Cerâmica G20',
   jateado: 'Jateado',
 };
 
@@ -75,6 +76,7 @@ const DEFAULT_FILM_TYPES: Record<FilmTypeKey, number> = {
   refletiva: 95,
   dupla_camada: 120,
   nano_ceramica: 220,
+  nano_ceramica_g20: 180,
   jateado: 90,
 };
 

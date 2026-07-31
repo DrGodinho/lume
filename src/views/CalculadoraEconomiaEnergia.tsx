@@ -5,7 +5,6 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowRight,
   Award,
-  BadgeCheck,
   BarChart3,
   Building,
   Calculator,
@@ -53,7 +52,7 @@ const FILMES = {
   nano: {
     nome: 'Nano Cerâmica',
     reducao: 0.3,
-    precoM2: 220,
+    precoM2: 240,
     resumo: 'Maior bloqueio de infravermelho com mais transparência.',
   },
 } satisfies Record<Filme, { nome: string; reducao: number; precoM2: number; resumo: string }>;
@@ -134,14 +133,12 @@ export function CalculadoraEconomiaEnergiaPage() {
     const [currentValue, setCurrentValue] = useState(targetValue);
     const frameRef = useRef<number | null>(null);
     const startTimeRef = useRef<number | null>(null);
-    const startValueRef = useRef(targetValue);
 
     useEffect(() => {
       if (frameRef.current !== null) {
         cancelAnimationFrame(frameRef.current);
       }
 
-      startValueRef.current = currentValue;
       startTimeRef.current = null;
 
       const duration = 250; // transição ultra-rápida e fluida
@@ -152,16 +149,16 @@ export function CalculadoraEconomiaEnergiaPage() {
         }
         const elapsed = timestamp - startTimeRef.current;
         const progress = Math.min(elapsed / duration, 1);
-        
+
         const ease = 1 - Math.pow(1 - progress, 3); // ease out cubic
-        const nextValue = startValueRef.current + (targetValue - startValueRef.current) * ease;
-        
-        setCurrentValue(nextValue);
+
+        setCurrentValue((prev) => {
+          const nextValue = prev + (targetValue - prev) * ease;
+          return progress < 1 ? nextValue : targetValue;
+        });
 
         if (progress < 1) {
           frameRef.current = requestAnimationFrame(animate);
-        } else {
-          setCurrentValue(targetValue);
         }
       };
 

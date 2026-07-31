@@ -19,7 +19,7 @@ interface ProductInfo {
 }
 
 const PRODUCTS: Record<string, ProductInfo> = {
-    nano: { id: 'nano', name: 'NANO CERÂMICA (A Escolha de Luxo)', description: 'A joia da coroa. Bloqueio de calor extremo com transparência cristalina.', price: '220', heat: '95%', light: 'Alta (~75%)', privacy: 'Baixa', color: '#c9a227', tip: 'No Rio, a vista é nosso maior patrimônio. A Nano Cerâmica é a única que protege seus móveis e sua pele sem que você precise \'fechar\' a casa. É o investimento favorito para varandas gourmet e salas com grandes vãos de vidro, mantendo a temperatura agradável sem gastar uma fortuna em ar-condicionado.' },
+    nano: { id: 'nano', name: 'NANO CERÂMICA (A Escolha de Luxo)', description: 'A joia da coroa. Bloqueio de calor extremo com transparência cristalina.', price: '240', heat: '95%', light: 'Alta (~75%)', privacy: 'Baixa', color: '#c9a227', tip: 'No Rio, a vista é nosso maior patrimônio. A Nano Cerâmica é a única que protege seus móveis e sua pele sem que você precise \'fechar\' a casa. É o investimento favorito para varandas gourmet e salas com grandes vãos de vidro, mantendo a temperatura agradável sem gastar uma fortuna em ar-condicionado.' },
     dupla: { id: 'dupla', name: 'DUPLA CAMADA (Conforto Noturno)', description: 'Visão relaxante e alta redução de calor com baixíssima refletividade interna.', price: '120', heat: '80%', light: 'Média', privacy: 'Média/Alta', color: '#34d399', tip: 'Muitos clientes reclamam que, ao colocar película, o vidro vira um espelho para dentro da sala à noite. A Dupla Camada resolve isso com tecnologia anti-reflexo. Recomendo muito para quartos e salas de TV, onde o conforto visual noturno e a privacidade são prioridade absoluta.' },
     refletiva: { id: 'refletiva', name: 'REFLETIVA PREMIUM (Privacidade e Performance)', description: 'Máxima privacidade diurna (efeito espelhado) e alta rejeição solar.', price: '95', heat: '87%', light: 'Média/Baixa', privacy: 'Alta (Dia)', color: '#fbbf24', tip: 'É a campeã em redução térmica por um preço justo. Ideal para casas de rua ou apartamentos onde o condomínio permite o efeito espelhado. Durante o dia, você vê tudo lá fora, mas ninguém vê você. É o \'efeito bunker\' contra o sol forte do Rio.' },
     carbono: { id: 'carbono', name: 'CARBONO ELITE (Estética e Durabilidade)', description: 'Estética grafite profunda que não desbota. Ótimo custo-benefício.', price: '80', heat: '70%', light: 'Baixa', privacy: 'Alta', color: '#60a5fa', tip: 'Se você busca aquele visual \'grafite\' sofisticado e quer fugir das películas baratas que ficam roxas com o tempo, a Carbono é o caminho. Ela dá um ar moderno à fachada e é excelente para reduzir o brilho excessivo em escritórios ou quartos muito claros.' },
@@ -60,7 +60,7 @@ export function SimulatorPage() {
     };
 
     const calculateResult = () => {
-        let scores = { nano: 0, dupla: 0, refletiva: 0, carbono: 0, jateado: 0 };
+        const scores = { nano: 0, dupla: 0, refletiva: 0, carbono: 0, jateado: 0 };
         let restricao_condominio = false;
 
         // Step 1: Location
@@ -178,8 +178,9 @@ export function SimulatorPage() {
         const msg = `Olá! O Assistente LUME me recomendou o insulfilm *${bestMatch.name}*. Gostaria de mais informações e um orçamento!`;
         const url = `https://wa.me/5521965140612?text=${msg}`;
         
-        if (typeof (window as any).gtagSendEvent === 'function') {
-            (window as any).gtagSendEvent(url);
+        const w = window as unknown as { gtagSendEvent?: (url: string) => void };
+        if (typeof w.gtagSendEvent === 'function') {
+            w.gtagSendEvent(url);
         } else {
             window.open(url, '_blank');
         }
