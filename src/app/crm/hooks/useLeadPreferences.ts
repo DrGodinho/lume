@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CRM_UI_PREFERENCES_STORAGE_KEY, MONTHLY_EVOLUTION_SERIES } from '../constants';
 import { isLeadStatus, type LeadStatus } from '../constants/stages';
 import { getInitialCollapsedCards } from '../utils';
+import { DEFAULT_METRICS_PERIOD, isMetricsPeriod, type MetricsPeriod } from '../utils/metricsPeriod';
 import type { AgendaView, Lead, LeadSortKey, MonthlyEvolutionSeries } from '../types';
 
 interface CrmUiPreferences {
@@ -14,6 +15,9 @@ interface CrmUiPreferences {
   agendaInitialView: AgendaView;
   sortKey: LeadSortKey;
   sortDir: 'asc' | 'desc';
+  metricsPeriod: MetricsPeriod;
+  customStart: string | null;
+  customEnd: string | null;
 }
 
 export interface UseLeadPreferencesReturn {
@@ -39,6 +43,12 @@ export interface UseLeadPreferencesReturn {
   toggleCollapsedCard: (leadId: string) => void;
   toggleSort: (key: LeadSortKey) => void;
   toggleMonthlySeries: (series: MonthlyEvolutionSeries) => void;
+  metricsPeriod: MetricsPeriod;
+  setMetricsPeriod: (value: MetricsPeriod) => void;
+  customStart: string | null;
+  setCustomStart: (value: string | null) => void;
+  customEnd: string | null;
+  setCustomEnd: (value: string | null) => void;
 }
 
 const DEFAULT_CRM_UI_PREFERENCES: CrmUiPreferences = {
@@ -49,6 +59,9 @@ const DEFAULT_CRM_UI_PREFERENCES: CrmUiPreferences = {
   agendaInitialView: 'hoje',
   sortKey: '',
   sortDir: 'asc',
+  metricsPeriod: DEFAULT_METRICS_PERIOD,
+  customStart: null,
+  customEnd: null,
 };
 
 const VALID_VIEW_MODES = new Set<CrmUiPreferences['viewMode']>(['kanban', 'table']);
@@ -102,6 +115,11 @@ const parseCrmUiPreferencesFromSearchParams = (searchParams: URLSearchParams): P
   sortDir: VALID_SORT_DIRECTIONS.has(searchParams.get('dir') as CrmUiPreferences['sortDir'])
     ? searchParams.get('dir') as CrmUiPreferences['sortDir']
     : undefined,
+  metricsPeriod: isMetricsPeriod(searchParams.get('period'))
+    ? searchParams.get('period') as MetricsPeriod
+    : undefined,
+  customStart: searchParams.get('periodStart') ?? undefined,
+  customEnd: searchParams.get('periodEnd') ?? undefined,
 });
 
 const mergeCrmUiPreferences = (base: CrmUiPreferences, overrides: Partial<CrmUiPreferences>): CrmUiPreferences => {
@@ -116,6 +134,9 @@ const mergeCrmUiPreferences = (base: CrmUiPreferences, overrides: Partial<CrmUiP
     agendaInitialView: VALID_AGENDA_VIEWS.has(overrides.agendaInitialView as AgendaView) ? overrides.agendaInitialView as AgendaView : base.agendaInitialView,
     sortKey: VALID_SORT_KEYS.has(overrides.sortKey as LeadSortKey) ? overrides.sortKey as LeadSortKey : base.sortKey,
     sortDir: VALID_SORT_DIRECTIONS.has(overrides.sortDir as CrmUiPreferences['sortDir']) ? overrides.sortDir as CrmUiPreferences['sortDir'] : base.sortDir,
+    metricsPeriod: isMetricsPeriod(overrides.metricsPeriod) ? overrides.metricsPeriod : base.metricsPeriod,
+    customStart: typeof overrides.customStart === 'string' ? overrides.customStart : base.customStart,
+    customEnd: typeof overrides.customEnd === 'string' ? overrides.customEnd : base.customEnd,
   };
 };
 
@@ -154,6 +175,12 @@ const syncCrmUiPreferencesToUrl = (preferences: CrmUiPreferences) => {
   else params.delete('sort');
   if (preferences.sortKey && preferences.sortDir !== DEFAULT_CRM_UI_PREFERENCES.sortDir) params.set('dir', preferences.sortDir);
   else params.delete('dir');
+  if (preferences.metricsPeriod !== DEFAULT_CRM_UI_PREFERENCES.metricsPeriod) params.set('period', preferences.metricsPeriod);
+  else params.delete('period');
+  if (preferences.metricsPeriod === 'custom' && preferences.customStart) params.set('periodStart', preferences.customStart);
+  else params.delete('periodStart');
+  if (preferences.metricsPeriod === 'custom' && preferences.customEnd) params.set('periodEnd', preferences.customEnd);
+  else params.delete('periodEnd');
 
   const nextSearch = params.toString();
   const currentSearch = window.location.search.startsWith('?') ? window.location.search.slice(1) : window.location.search;
@@ -173,6 +200,9 @@ export const useLeadPreferences = (leads: Lead[]): UseLeadPreferencesReturn => {
   const [agendaInitialView, setAgendaInitialView] = useState<AgendaView>(DEFAULT_CRM_UI_PREFERENCES.agendaInitialView);
   const [sortKey, setSortKey] = useState<LeadSortKey>(DEFAULT_CRM_UI_PREFERENCES.sortKey);
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>(DEFAULT_CRM_UI_PREFERENCES.sortDir);
+  const [metricsPeriod, setMetricsPeriod] = useState<MetricsPeriod>(DEFAULT_CRM_UI_PREFERENCES.metricsPeriod);
+  const [customStart, setCustomStart] = useState<string | null>(DEFAULT_CRM_UI_PREFERENCES.customStart);
+  const [customEnd, setCustomEnd] = useState<string | null>(DEFAULT_CRM_UI_PREFERENCES.customEnd);
   const [uiPreferencesRestored, setUiPreferencesRestored] = useState(false);
 
   useEffect(() => {
@@ -185,6 +215,9 @@ export const useLeadPreferences = (leads: Lead[]): UseLeadPreferencesReturn => {
       setAgendaInitialView(restoredPreferences.agendaInitialView);
       setSortKey(restoredPreferences.sortKey);
       setSortDir(restoredPreferences.sortDir);
+      setMetricsPeriod(restoredPreferences.metricsPeriod);
+      setCustomStart(restoredPreferences.customStart);
+      setCustomEnd(restoredPreferences.customEnd);
       setUiPreferencesRestored(true);
     }, 0);
 
@@ -206,8 +239,8 @@ export const useLeadPreferences = (leads: Lead[]): UseLeadPreferencesReturn => {
 
   useEffect(() => {
     if (!uiPreferencesRestored || typeof window === 'undefined') return;
-    syncCrmUiPreferencesToUrl({ searchQuery, filterNeighborhood, filterStatus, viewMode, agendaInitialView, sortKey, sortDir });
-  }, [agendaInitialView, filterNeighborhood, filterStatus, searchQuery, sortDir, sortKey, uiPreferencesRestored, viewMode]);
+    syncCrmUiPreferencesToUrl({ searchQuery, filterNeighborhood, filterStatus, viewMode, agendaInitialView, sortKey, sortDir, metricsPeriod, customStart, customEnd });
+  }, [agendaInitialView, customEnd, customStart, filterNeighborhood, filterStatus, metricsPeriod, searchQuery, sortDir, sortKey, uiPreferencesRestored, viewMode]);
 
   const filteredLeads = useMemo(() => leads.filter((lead) => {
     const normalizedQuery = searchQuery.toLowerCase();
@@ -292,5 +325,6 @@ export const useLeadPreferences = (leads: Lead[]): UseLeadPreferencesReturn => {
     clearFilters, hasActiveFilters, viewMode, setViewMode, collapsedCards, visibleMonthlySeries,
     agendaInitialView, setAgendaInitialView, sortKey, sortDir, filteredLeads, sortedFilteredLeads,
     setCollapsedStateForAllLeads, toggleCollapsedCard, toggleSort, toggleMonthlySeries,
+    metricsPeriod, setMetricsPeriod, customStart, setCustomStart, customEnd, setCustomEnd,
   };
 };

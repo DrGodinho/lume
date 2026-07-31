@@ -3,6 +3,7 @@
 import { useCallback, type Dispatch, type FormEvent, type SetStateAction } from 'react';
 import { getCrmApiErrorMessage, getCrmApiHeaders, hasLeadNextAction, mapLeadRow, normalizeLeadAmounts, requiresLeadNextAction } from '../utils';
 import { applyFollowUpPlaybook } from '../utils/playbooks';
+import { leadFormSchema } from '../schemas/leadSchema';
 import type { CrmSyncState, FollowUpPlaybookRule, Lead, LeadFormValues, LeadStatusInfoUpdate, LeadSyncStatus, ServiceStatus } from '../types';
 
 interface ToastApi {
@@ -95,8 +96,10 @@ export const useLeadMutations = ({
   }, [leads, syncLeadStatusPatch, upsertLeadInState]);
 
   const handleLeadSave = useCallback(async () => {
-    if (!leadForm.name) {
-      toast.warning('Preencha o campo obrigatorio (Nome)');
+    const validation = leadFormSchema.safeParse(leadForm);
+    if (!validation.success) {
+      const messages = validation.error.issues.map((issue) => issue.message);
+      toast.error(messages.join(' '));
       return false;
     }
 

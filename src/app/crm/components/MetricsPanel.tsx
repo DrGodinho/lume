@@ -1,13 +1,22 @@
 'use client';
 
+import { format, startOfMonth } from 'date-fns';
 import { MonthlyChart } from './MonthlyChart';
 import { DEFAULT_CRM_TARGET_GOAL, LEAD_STAGE_DOT_COLORS, LEAD_STAGE_LABELS, LEAD_STAGES } from '../constants';
+import type { MetricsPeriod } from '../utils/metricsPeriod';
 import type { DashboardStats, Lead, MonthlyEvolutionData, MonthlyEvolutionSeries } from '../types';
 
 interface MetricsPanelProps {
   leads: Lead[];
   stats: DashboardStats;
   monthlyEvolution: MonthlyEvolutionData;
+  periodSummary: { revenue: number; count: number; label: string };
+  metricsPeriod: MetricsPeriod;
+  onMetricsPeriodChange: (period: MetricsPeriod) => void;
+  customStart: string | null;
+  customEnd: string | null;
+  onCustomStartChange: (value: string | null) => void;
+  onCustomEndChange: (value: string | null) => void;
   monthDifference: number;
   monthDifferencePercent: number;
   monthTrendIsPositive: boolean;
@@ -34,6 +43,13 @@ export function MetricsPanel({
   leads,
   stats,
   monthlyEvolution,
+  periodSummary,
+  metricsPeriod,
+  onMetricsPeriodChange,
+  customStart,
+  customEnd,
+  onCustomStartChange,
+  onCustomEndChange,
   monthDifference,
   monthDifferencePercent,
   monthTrendIsPositive,
@@ -60,8 +76,74 @@ export function MetricsPanel({
     setEditingTarget(true);
   };
 
+  const handlePeriodChange = (period: MetricsPeriod) => {
+    if (period === 'custom' && (!customStart || !customEnd)) {
+      const now = new Date();
+      onCustomStartChange(format(startOfMonth(now), 'yyyy-MM-dd'));
+      onCustomEndChange(format(now, 'yyyy-MM-dd'));
+    }
+    onMetricsPeriodChange(period);
+  };
+
+  const PERIOD_OPTIONS: Array<{ value: MetricsPeriod; label: string }> = [
+    { value: 'mes', label: 'Este mês' },
+    { value: '7d', label: '7 dias' },
+    { value: '30d', label: '30 dias' },
+    { value: '90d', label: '90 dias' },
+    { value: 'custom', label: 'Personalizado' },
+  ];
+
   return (
     <div className="space-y-8">
+      <section className="rounded-3xl border border-white/5 bg-[#07111d]/50 p-4 shadow-lg shadow-black/20 backdrop-blur-md sm:p-5">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#f5d77a]/75">Período das métricas</p>
+            <h3 className="mt-1 text-base font-black text-white sm:text-lg">{periodSummary.label}</h3>
+            <p className="text-xs text-white/45">Fechamentos no período: {periodSummary.count} · Faturamento: {formatDashboardCurrency(periodSummary.revenue)}</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            {PERIOD_OPTIONS.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => handlePeriodChange(option.value)}
+                aria-pressed={metricsPeriod === option.value}
+                className={`rounded-full border px-3.5 py-1.5 text-xs font-bold transition ${
+                  metricsPeriod === option.value
+                    ? 'border-[#c9a227]/60 bg-[#c9a227]/15 text-[#f5d77a]'
+                    : 'border-white/10 bg-white/[0.03] text-white/55 hover:border-white/25 hover:text-white'
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        {metricsPeriod === 'custom' && (
+          <div className="mt-3 flex flex-wrap items-end gap-3 border-t border-white/5 pt-3">
+            <label className="flex flex-col gap-1 text-[10px] font-semibold uppercase tracking-widest text-white/50">
+              De
+              <input
+                type="date"
+                value={customStart ?? ''}
+                onChange={(event) => onCustomStartChange(event.target.value)}
+                className="rounded-xl border border-white/10 bg-[#04080f] px-3 py-2 text-sm text-white focus:border-[#c9a227]/40 focus:outline-none"
+              />
+            </label>
+            <label className="flex flex-col gap-1 text-[10px] font-semibold uppercase tracking-widest text-white/50">
+              Até
+              <input
+                type="date"
+                value={customEnd ?? ''}
+                onChange={(event) => onCustomEndChange(event.target.value)}
+                className="rounded-xl border border-white/10 bg-[#04080f] px-3 py-2 text-sm text-white focus:border-[#c9a227]/40 focus:outline-none"
+              />
+            </label>
+          </div>
+        )}
+      </section>
+
       <section className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
         <div className="group rounded-xl border border-white/5 bg-[#07111d]/50 p-2.5 shadow-lg shadow-black/20 backdrop-blur-md transition-all duration-300 hover:border-[#c9a227]/20">
           <div className="flex items-start justify-between">
@@ -133,15 +215,30 @@ export function MetricsPanel({
         </div>
       </section>
 
-      <MonthlyChart
-        monthlyEvolution={monthlyEvolution}
-        monthDifference={monthDifference}
-        monthDifferencePercent={monthDifferencePercent}
-        monthTrendIsPositive={monthTrendIsPositive}
-        visibleMonthlySeries={visibleMonthlySeries}
-        onToggleSeries={onToggleMonthlySeries}
-        formatDashboardCurrency={formatDashboardCurrency}
-      />
+      {metricsPeriod === 'mes' ? (
+        <MonthlyChart
+          monthlyEvolution={monthlyEvolution}
+          monthDifference={monthDifference}
+          monthDifferencePercent={monthDifferencePercent}
+          monthTrendIsPositive={monthTrendIsPositive}
+          visibleMonthlySeries={visibleMonthlySeries}
+          onToggleSeries={onToggleMonthlySeries}
+          formatDashboardCurrency={formatDashboardCurrency}
+        />
+      ) : (
+        <section className="grid gap-3 sm:grid-cols-2">
+          <div className="rounded-3xl border border-white/5 bg-[#07111d]/50 p-6 shadow-lg shadow-black/20 backdrop-blur-md">
+            <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/40">Faturamento no período</p>
+            <p className="mt-2 text-3xl font-black text-[#f5d77a]">{formatDashboardCurrency(periodSummary.revenue)}</p>
+            <p className="mt-1 text-xs text-white/45">Leads fechados entre {periodSummary.label.toLowerCase()}</p>
+          </div>
+          <div className="rounded-3xl border border-white/5 bg-[#07111d]/50 p-6 shadow-lg shadow-black/20 backdrop-blur-md">
+            <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/40">Fechamentos no período</p>
+            <p className="mt-2 text-3xl font-black text-white">{periodSummary.count}</p>
+            <p className="mt-1 text-xs text-white/45">Contratos fechados em {periodSummary.label.toLowerCase()}</p>
+          </div>
+        </section>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="rounded-3xl border border-white/5 bg-[#07111d]/50 p-6 shadow-lg backdrop-blur-md lg:col-span-2">

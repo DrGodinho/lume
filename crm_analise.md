@@ -292,7 +292,7 @@ Quem cria o primeiro lead vê meta de R$ 10k sem nunca ter configurado. Falsa se
 
 ---
 
-### 11. [ ] Métricas do dashboard não têm período configurável
+### 11. [x] Métricas do dashboard não têm período configurável
 **Arquivo:** `src/app/crm/hooks/useMetrics.ts` (chamado em `page.tsx:155-163`).
 
 `useMetrics` consome `leads` sem intervalo. Só dá para ver "tudo". Para entender sazonalidade, é preciso ir em `ExtratosMensaisSupabase`.
@@ -303,10 +303,16 @@ Quem cria o primeiro lead vê meta de R$ 10k sem nunca ter configurado. Falsa se
 - Custom com date range picker.
 - Mostrar label no header: "Métricas (últimos 30 dias)".
 
-**Critérios de aceite:**
-- [ ] Cards de métrica recalculam ao mudar período.
-- [ ] Período persiste em URL (`?period=30d`).
-- [ ] Gráfico `MonthlyChart` se adapta ao período (ou esconde se > 90d).
+**Implementado (2026-07-31):**
+- `src/app/crm/utils/metricsPeriod.ts` — `MetricsPeriod` (`'mes' | '7d' | '30d' | '90d' | 'custom'`), `DEFAULT_METRICS_PERIOD`, `isMetricsPeriod`, `buildMetricsPeriodRange(period, customStart?, customEnd?)` puro e testado.
+- `useLeadPreferences` — novas preferências `metricsPeriod`, `customStart`, `customEnd` com parse de URL (`?period=…&periodStart=…&periodEnd=…`), merge, localStorage e sync (só persiste `periodStart`/`periodEnd` quando `custom`).
+- `useMetrics` — novo retorno `periodSummary: { revenue, count, label }` calculado sobre leads `Fechado` no range do período (via `getLeadRevenueDate`).
+- `MetricsPanel` — card de seletor de período (Este mês / 7d / 30d / 90d / Personalizado) com `<input type="date">` para custom; `MonthlyChart` só renderiza em `'mes'` (comparação mês atual vs anterior), senão mostra resumo do período.
+
+**Critérios de aceite atendidos:**
+- [x] Cards de métrica recalculam ao mudar período (`periodSummary` em `useMetrics`).
+- [x] Período persiste em URL (`?period=30d`, `periodStart`/`periodEnd` em custom) e localStorage.
+- [x] Gráfico `MonthlyChart` se adapta ao período (escondido fora de `'mes'`, substituído por resumo).
 
 ---
 
@@ -729,7 +735,7 @@ Impossível saber qual filtro é mais usado, onde o usuário trava.
 
 ---
 
-### 36. [ ] Validação de formulário inline
+### 36. [x] Validação de formulário inline
 **Arquivo:** `src/app/crm/components/LeadModal.tsx`, `src/app/api/crm/leads/route.ts`.
 
 Sem validação clara de `phone` (formato BR?), `email` (RFC), `value >= 0`, `sqm > 0`.
@@ -750,10 +756,16 @@ Sem validação clara de `phone` (formato BR?), `email` (RFC), `value >= 0`, `sq
 - Usar tanto no client (Zod + react-hook-form) quanto na API route.
 - Mensagens de erro em pt-BR.
 
-**Critérios de aceite:**
-- [ ] Submit bloqueado com erro inline.
-- [ ] API route retorna 400 com detalhes.
-- [ ] Schema único compartilhado.
+**Implementado (2026-07-31):**
+- `src/app/crm/schemas/leadSchema.ts` — `leadStatusSchema`, `serviceStatusSchema`, `leadNameSchema` (min 2), `leadPhoneSchema` (vazio ou 10-11 dígitos), `leadEmailSchema` (vazio ou regex RFC), `leadSqmSchema` (positivo), `leadValueSchema` (>= 0), `leadFormSchema` (client, exige `sqm > 0`) e `leadPayloadSchema` (API, aceita `sqm >= 0` para retrocompat, estende `id`/`createdAt`/`updatedAt`/`deletedAt`). Tipos inferidos exportados.
+- `useLeadMutations.handleLeadSave` — `safeParse` com `leadFormSchema`, bloqueia e emite `toast.error` com mensagens em pt-BR (substitui checagem apenas de `name`).
+- `LeadModal.tsx` — erros inline por campo (`name`, `phone`, `email`, `sqm`, `value`) com borda vermelha via `validationErrors`/`showValidationErrors`.
+- `src/app/api/crm/leads/route.ts` — `POST`/`PUT` validam payload normalizado com `leadPayloadSchema` e retornam `400 { error, issues: [{ path, message }] }`.
+
+**Critérios de aceite atendidos:**
+- [x] Submit bloqueado com erro inline.
+- [x] API route retorna 400 com detalhes.
+- [x] Schema único compartilhado.
 
 ---
 
@@ -941,6 +953,7 @@ Se um bug em produção sai, o único caminho é rollback.
 - **2026-07-01** — Implementado #18 (playbooks de follow-up). Criados `utils/playbooks.ts` (regras D+2/D+7/D+15, saneamento e aplicação pura), `usePlaybooks.ts` (playbooks por vendedor em `localStorage`) e `PlaybookSettings.tsx` (aba Configuracoes para editar offsets/ativacao por status). `useLeadMutations.handleLeadSave` aplica playbook em leads novos e em mudancas futuras de status via edicao; `useLeads.handleStatusChange` aplica a regra em mudancas futuras pelo funil sem retroagir leads existentes. Testes adicionados para motor de playbook e criacao D+2.
 - **2026-07-01** — Evolucao #18 para integracao celular/PC. Playbooks agora usam `/api/crm/playbooks` + tabela `public.crm_playbooks` (helper `supabase/crm_playbooks.sql` com RLS/grants explicitos e acesso direto apenas por `service_role`). `usePlaybooks` carrega/salva regras no Supabase e guarda localmente apenas o vendedor ativo; `PlaybookSettings` mostra estado `Carregando/Salvando/Sincronizado/Erro`. `/api/crm/leads` tambem aplica o playbook no servidor em `POST`, `PUT` e `PATCH` de status, sem cron/trigger: criacao e mudancas futuras ficam consistentes entre PC e celular quando ambos usam o mesmo Supabase. Mantido fallback para regras padrao se a tabela ainda nao existir.
 - **2026-07-22** — Implementado Ciclo de 5 Anos e Arquivo de Leads. Migration `supabase/leads_add_archived_column.sql` adicionou coluna `archived BOOLEAN NOT NULL DEFAULT FALSE` com indice `leads_archived_idx`. Tipos atualizados: `CrmTab` ganhou `'archive'`, `AgendaView` ganhou `'ciclo_5anos'`, `Lead`/`LeadStatusInfo` ganharam `archived?: boolean`. API `route.ts`: GET com `?archive=1` retorna apenas leads arquivados; leads ativos incluem arquivados cujo `data_servico` tem 5+ anos; auto-arquivamento de leads fechados com 14+ dias (em vez de auto-lixeira); POST/PUT/PATCH aceitam campo `archived`. Hooks: `useLeadList` gerencia estado `archivedLeads` com fetch automatico na aba `'archive'`; `useLeadMutations` implementa `handleArchiveLead` (patch `archived: true` + move entre estados) e `handleRestoreFromArchive` (PATCH `archived: false` + mapLeadRow + upsert); `useLeads` expoe novos estados e handlers; `useAgenda.agendaUrgentCount` agora soma leads arquivados com 5+ anos de servico. Componentes: `ArchiveLeadsView.tsx` criado (lista arquivados com cards premium Dark & Gold, botao Reativar); `AgendaSection.tsx` ganhou card de resumo `'Ciclo de 5 Anos'` (com `animate-pulse` dourado), filtro `leadsCincoAnos` (≥1826 dias), botao Reativar nos cards de leads arquivados, e seção dedicada; `page.tsx` ganhou aba `'Arquivo'` (icone Archive, tone gold) no grupo Dados da sidebar, header title, e renderizacao do `ArchiveLeadsView`. Typecheck passando.
+- **2026-07-31** — Implementados #11 (período configurável no dashboard) e #36 (validação Zod). Item #11: `src/app/crm/utils/metricsPeriod.ts` (`MetricsPeriod` `'mes' | '7d' | '30d' | '90d' | 'custom'`, `buildMetricsPeriodRange` puro), `useLeadPreferences` com `metricsPeriod`/`customStart`/`customEnd` persistidos em URL (`?period=…&periodStart=…&periodEnd=…`) e localStorage, `useMetrics` com novo retorno `periodSummary` (faturamento/fechamentos no período via `getLeadRevenueDate`) e `MetricsPanel` com seletor de período (Este mês / 7d / 30d / 90d / Personalizado com date picker); `MonthlyChart` só renderiza em `'mes'`. Item #36: `src/app/crm/schemas/leadSchema.ts` com `leadFormSchema` (client, `sqm > 0`) e `leadPayloadSchema` (API, `sqm >= 0` para retrocompat), `handleLeadSave` bloqueia via `safeParse` com toast pt-BR, `LeadModal` com erros inline por campo (borda vermelha), API route `POST`/`PUT` retornam `400 { error, issues: [{ path, message }] }`. 14 novos testes (`metricsPeriod.test.ts`, `leadSchema.test.ts`, +3 `useMetrics`, +2 `useLeadMutations`, +2 `useLeadPreferences`). `npm run test:crm` (79/79), typecheck e ESLint (sem novos erros) passando.
 
 ---
 

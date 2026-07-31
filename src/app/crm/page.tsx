@@ -112,6 +112,12 @@ export default function HomePage() {
     setAgendaInitialView,
     sortKey,
     sortDir,
+    metricsPeriod,
+    setMetricsPeriod,
+    customStart,
+    setCustomStart,
+    customEnd,
+    setCustomEnd,
     isModalOpen,
     selectedLead,
     leadDetail,
@@ -169,7 +175,6 @@ export default function HomePage() {
     handleLeadTableRowDoubleClick,
     handleDeleteLead,
     handleRestoreLead,
-    handleArchiveLead,
     handleRestoreFromArchive,
     handleStatusChange,
     handleKanbanReorder,
@@ -189,12 +194,13 @@ export default function HomePage() {
   const {
     stats,
     monthlyEvolution,
+    periodSummary,
     monthDifference,
     monthDifferencePercent,
     monthTrendIsPositive,
     targetPercent,
     formatDashboardCurrency,
-  } = useMetrics(leads, targetGoal, monthlySnapshots);
+  } = useMetrics(leads, targetGoal, monthlySnapshots, metricsPeriod, customStart, customEnd);
   const syncTone = crmSync.status === 'error' ? 'error' : crmSync.status === 'warning' ? 'warning' : 'ok';
   const syncStatusLabel = syncTone === 'error'
     ? 'Erro'
@@ -570,6 +576,13 @@ export default function HomePage() {
               leads={leads}
               stats={stats}
               monthlyEvolution={monthlyEvolution}
+              periodSummary={periodSummary}
+              metricsPeriod={metricsPeriod}
+              onMetricsPeriodChange={setMetricsPeriod}
+              customStart={customStart}
+              customEnd={customEnd}
+              onCustomStartChange={setCustomStart}
+              onCustomEndChange={setCustomEnd}
               monthDifference={monthDifference}
               monthDifferencePercent={monthDifferencePercent}
               monthTrendIsPositive={monthTrendIsPositive}

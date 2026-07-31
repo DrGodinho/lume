@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { addDays, differenceInDays, eachDayOfInterval, endOfMonth, format, isPast, isSameDay, isToday, startOfMonth, startOfWeek, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { formatCurrencyBRL, getLeadActivityDate, getLeadFollowUpDate, getLeadServiceDate, getLeadServiceStatus, isClosedLead, parseAgendaDate } from './useAgenda';
+import { buildMetricsPeriodRange, type MetricsPeriod } from '../utils/metricsPeriod';
 import type { MonthlySnapshot } from './useMonthlySnapshots';
 import type { DashboardStats, Lead, MonthlyEvolutionData } from '../types';
 
@@ -18,6 +19,9 @@ export const useMetrics = (
   leads: Lead[],
   targetGoal: number | null,
   historicalSnapshots: Record<string, MonthlySnapshot> = {},
+  metricsPeriod: MetricsPeriod = 'mes',
+  customStart?: string | null,
+  customEnd?: string | null,
 ) => {
   const monthlyEvolution = useMemo<MonthlyEvolutionData>(() => {
     const now = new Date();
@@ -245,6 +249,26 @@ export const useMetrics = (
     };
   }, [leads]);
 
+  const periodRange = useMemo(
+    () => buildMetricsPeriodRange(metricsPeriod, customStart, customEnd),
+    [customEnd, customStart, metricsPeriod],
+  );
+
+  const periodSummary = useMemo(() => {
+    const { start, end } = periodRange;
+    const closedInRange = leads.filter((lead) => {
+      if (lead.status !== 'Fechado') return false;
+      const date = getLeadRevenueDate(lead);
+      return !!date && date >= start && date <= end;
+    });
+
+    return {
+      revenue: closedInRange.reduce((sum, lead) => sum + lead.value, 0),
+      count: closedInRange.length,
+      label: periodRange.label,
+    };
+  }, [leads, periodRange]);
+
   const monthDifference = monthlyEvolution.currentTotal - monthlyEvolution.previousTotal;
   const monthDifferencePercent =
     monthlyEvolution.previousTotal > 0
@@ -261,6 +285,7 @@ export const useMetrics = (
   return {
     stats,
     monthlyEvolution,
+    periodSummary,
     monthDifference,
     monthDifferencePercent,
     monthTrendIsPositive,

@@ -2,14 +2,25 @@
 
 import { format } from 'date-fns';
 import { AlertTriangle, Copy, FileText, X } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import type { ZodIssue } from 'zod';
 import { ConfirmDialog } from './ConfirmDialog';
 import { DateFieldWithPicker } from './DateFieldWithPicker';
 import { DiscardChangesDialog } from './DiscardChangesDialog';
 import { WhatsAppTemplateMenu } from './WhatsAppTemplateMenu';
 import { useDirtyFormGuard } from '../hooks/useDirtyFormGuard';
+import { leadFormSchema } from '../schemas/leadSchema';
 import { hasLeadNextAction, requiresLeadNextAction } from '../utils';
 import type { CalculatorHistoryRow, CommercialActionDraft, Lead, LeadFormValues, LeadStatusHistoryEntry } from '../types';
+
+const fieldErrorsFromSchema = (issues: ZodIssue[]): Partial<Record<keyof LeadFormValues, string>> => {
+  const errors: Partial<Record<keyof LeadFormValues, string>> = {};
+  for (const issue of issues) {
+    const key = issue.path[0] as keyof LeadFormValues;
+    if (key && !errors[key]) errors[key] = issue.message;
+  }
+  return errors;
+};
 
 interface LeadFormModalProps {
   isOpen: boolean;
@@ -44,6 +55,11 @@ export function LeadFormModal({
 }: LeadFormModalProps) {
   const [showDiscardDialog, setShowDiscardDialog] = useState(false);
   const [showSaveWithoutDateConfirm, setShowSaveWithoutDateConfirm] = useState(false);
+  const [showValidationErrors, setShowValidationErrors] = useState(false);
+  const validationErrors = useMemo(() => {
+    const result = leadFormSchema.safeParse(leadForm);
+    return result.success ? null : fieldErrorsFromSchema(result.error.issues);
+  }, [leadForm]);
 
   const requestClose = useCallback(() => {
     if (isDirty) {
@@ -73,18 +89,28 @@ export function LeadFormModal({
 
   const handleSubmitAttempt = useCallback((event: React.FormEvent) => {
     event.preventDefault();
+    if (validationErrors) {
+      setShowValidationErrors(true);
+      return;
+    }
     if (requiresLeadNextAction(leadForm.status) && !hasLeadNextAction(leadForm)) {
       setShowSaveWithoutDateConfirm(true);
       return;
     }
     void onSubmit(event);
-  }, [leadForm, onSubmit]);
+  }, [leadForm, onSubmit, validationErrors]);
 
   const handleConfirmSaveWithoutDate = useCallback(() => {
     setShowSaveWithoutDateConfirm(false);
     const syntheticEvent = { preventDefault: () => undefined } as unknown as React.FormEvent;
     void onSubmit(syntheticEvent);
   }, [onSubmit]);
+
+  const fieldError = (key: keyof LeadFormValues) =>
+    showValidationErrors ? validationErrors?.[key] : undefined;
+
+  const inputClasses = (hasError: string | undefined) =>
+    `w-full rounded-2xl border ${hasError ? 'border-red-500/60 bg-red-500/[0.03]' : 'border-white/5 bg-[#04080f]'} px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none ${hasError ? 'focus:border-red-400/60' : 'focus:border-[#c9a227]/40'}`;
 
   if (!isOpen) return null;
 
@@ -119,8 +145,11 @@ export function LeadFormModal({
               placeholder="Nome completo do lead"
               value={leadForm.name}
               onChange={(event) => setLeadForm({ ...leadForm, name: event.target.value })}
-              className="w-full rounded-2xl border border-white/5 bg-[#04080f] px-4 py-3 text-sm text-white placeholder:text-white/20 focus:border-[#c9a227]/40 focus:outline-none"
+              className={inputClasses(fieldError('name'))}
             />
+            {fieldError('name') && (
+              <p className="mt-1.5 text-xs font-semibold text-red-300">{fieldError('name')}</p>
+            )}
           </div>
 
           {selectedLead && linkedOrcamento && (
@@ -184,8 +213,11 @@ export function LeadFormModal({
                 placeholder="(21) XXXXX-XXXX"
                 value={leadForm.phone}
                 onChange={(event) => setLeadForm({ ...leadForm, phone: event.target.value })}
-                className="w-full rounded-2xl border border-white/5 bg-[#04080f] px-4 py-3 text-sm text-white placeholder:text-white/20 focus:border-[#c9a227]/40 focus:outline-none"
+                className={inputClasses(fieldError('phone'))}
               />
+              {fieldError('phone') && (
+                <p className="mt-1.5 text-xs font-semibold text-red-300">{fieldError('phone')}</p>
+              )}
             </div>
             <div>
               <label className="mb-1 block text-[10px] font-semibold uppercase tracking-widest text-white/50">E-mail (Opcional)</label>
@@ -194,8 +226,11 @@ export function LeadFormModal({
                 placeholder="email@cliente.com"
                 value={leadForm.email}
                 onChange={(event) => setLeadForm({ ...leadForm, email: event.target.value })}
-                className="w-full rounded-2xl border border-white/5 bg-[#04080f] px-4 py-3 text-sm text-white placeholder:text-white/20 focus:border-[#c9a227]/40 focus:outline-none"
+                className={inputClasses(fieldError('email'))}
               />
+              {fieldError('email') && (
+                <p className="mt-1.5 text-xs font-semibold text-red-300">{fieldError('email')}</p>
+              )}
             </div>
           </div>
 
@@ -247,8 +282,11 @@ export function LeadFormModal({
                 step="0.01"
                 value={leadForm.sqm || ''}
                 onChange={(event) => setLeadForm({ ...leadForm, sqm: parseFloat(event.target.value) || 0 })}
-                className="w-full rounded-2xl border border-white/5 bg-[#04080f] px-4 py-3 text-sm text-white focus:border-[#c9a227]/40 focus:outline-none"
+                className={inputClasses(fieldError('sqm'))}
               />
+              {fieldError('sqm') && (
+                <p className="mt-1.5 text-xs font-semibold text-red-300">{fieldError('sqm')}</p>
+              )}
             </div>
             <div>
               <label className="mb-1 block text-[10px] font-semibold uppercase tracking-widest text-white/50">Valor Fechado (R$)</label>
@@ -257,8 +295,11 @@ export function LeadFormModal({
                 step="0.01"
                 value={leadForm.value || ''}
                 onChange={(event) => setLeadForm({ ...leadForm, value: parseFloat(event.target.value) || 0 })}
-                className="w-full rounded-2xl border border-white/5 bg-[#04080f] px-4 py-3 text-sm text-white focus:border-[#c9a227]/40 focus:outline-none"
+                className={inputClasses(fieldError('value'))}
               />
+              {fieldError('value') && (
+                <p className="mt-1.5 text-xs font-semibold text-red-300">{fieldError('value')}</p>
+              )}
             </div>
             <div>
               <label className="mb-1 block text-[10px] font-semibold uppercase tracking-widest text-white/50">Status Inicial</label>

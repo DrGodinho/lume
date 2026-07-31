@@ -207,4 +207,42 @@ describe('useLeadPreferences', () => {
     const ids = result.current.sortedFilteredLeads.map((lead) => lead.id);
     expect(ids).toEqual(['3', '1', '2']);
   });
+
+  it('persists metrics period and custom range to URL and localStorage', async () => {
+    const { result } = renderHook(() => useLeadPreferences(leads));
+
+    await flushRestoration();
+
+    act(() => {
+      result.current.setMetricsPeriod('custom');
+      result.current.setCustomStart('2026-06-01');
+      result.current.setCustomEnd('2026-06-30');
+    });
+
+    await act(async () => {
+      await new Promise<void>((resolve) => setTimeout(resolve, 0));
+    });
+
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    expect(stored.metricsPeriod).toBe('custom');
+    expect(stored.customStart).toBe('2026-06-01');
+    expect(stored.customEnd).toBe('2026-06-30');
+
+    const url = new URL(window.location.href);
+    expect(url.searchParams.get('period')).toBe('custom');
+    expect(url.searchParams.get('periodStart')).toBe('2026-06-01');
+    expect(url.searchParams.get('periodEnd')).toBe('2026-06-30');
+  });
+
+  it('restores metrics period and custom range from URL', async () => {
+    window.history.replaceState({}, '', '/crm?period=custom&periodStart=2026-06-01&periodEnd=2026-06-30');
+
+    const { result } = renderHook(() => useLeadPreferences(leads));
+
+    await flushRestoration();
+
+    expect(result.current.metricsPeriod).toBe('custom');
+    expect(result.current.customStart).toBe('2026-06-01');
+    expect(result.current.customEnd).toBe('2026-06-30');
+  });
 });

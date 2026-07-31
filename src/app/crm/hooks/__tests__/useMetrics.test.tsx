@@ -75,4 +75,42 @@ describe('useMetrics', () => {
     expect(result.current.monthlyEvolution.previousTotal).toBe(2500);
     expect(result.current.targetPercent).toBe(50);
   });
+
+  it('periodSummary defaults to the current month when no period is given', () => {
+    const leads = [
+      makeLead('previous-month', { status: 'Fechado', statusChangedAt: '2026-06-15', value: 2500 }),
+      makeLead('current-month', { status: 'Fechado', statusChangedAt: '2026-07-02', value: 1000 }),
+    ];
+
+    const { result } = renderHook(() => useMetrics(leads, 5000));
+
+    expect(result.current.periodSummary.revenue).toBe(1000);
+    expect(result.current.periodSummary.count).toBe(1);
+    expect(result.current.periodSummary.label).toBe('Este mês');
+  });
+
+  it('periodSummary recalculates for a 30d range', () => {
+    const leads = [
+      makeLead('june-15', { status: 'Fechado', statusChangedAt: '2026-06-15', value: 2500 }),
+      makeLead('june-28', { status: 'Fechado', statusChangedAt: '2026-06-28', value: 300 }),
+      makeLead('out-of-range', { status: 'Fechado', statusChangedAt: '2026-05-01', value: 9999 }),
+    ];
+
+    const { result } = renderHook(() => useMetrics(leads, 5000, {}, '30d'));
+
+    expect(result.current.periodSummary.revenue).toBe(2800);
+    expect(result.current.periodSummary.count).toBe(2);
+  });
+
+  it('periodSummary supports a custom date range', () => {
+    const leads = [
+      makeLead('in-range', { status: 'Fechado', statusChangedAt: '2026-06-15', value: 2500 }),
+      makeLead('out-of-range', { status: 'Fechado', statusChangedAt: '2026-07-01', value: 9999 }),
+    ];
+
+    const { result } = renderHook(() => useMetrics(leads, 5000, {}, 'custom', '2026-06-01', '2026-06-30'));
+
+    expect(result.current.periodSummary.revenue).toBe(2500);
+    expect(result.current.periodSummary.count).toBe(1);
+  });
 });

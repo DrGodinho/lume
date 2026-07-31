@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { verifyToken } from '@/lib/crm-auth';
 import { roundCurrency, roundMeasure } from '@/lib/numberPrecision';
 import { createDefaultPlaybookRules, getPlaybookFollowUpDate, normalizeSellerId, sanitizePlaybookRules } from '@/app/crm/utils/playbooks';
+import { leadPayloadSchema } from '@/app/crm/schemas/leadSchema';
 import type { FollowUpPlaybookRule } from '@/app/crm/types';
 
 type LeadStatus = 'Novo' | 'Em Contato' | 'Agendado' | 'Fechado' | 'Perdido';
@@ -65,6 +66,18 @@ const normalizeServiceStatus = (status: unknown): ServiceStatus | null => {
   }
   if (status === 'Em execução') return 'Em Execucao';
   return null;
+};
+
+const validateLeadPayload = (lead: LeadPayload) => {
+  const validation = leadPayloadSchema.safeParse(lead);
+  if (validation.success) return null;
+  return NextResponse.json(
+    {
+      error: 'Dados invalidos',
+      issues: validation.error.issues.map((issue) => ({ path: issue.path.join('.'), message: issue.message })),
+    },
+    { status: 400 },
+  );
 };
 
 const isMissingOptionalLeadColumnError = (message?: string) =>
@@ -390,9 +403,8 @@ export async function POST(request: NextRequest) {
     deletedAt: body.deletedAt || null,
   };
 
-  if (!lead.name) {
-    return NextResponse.json({ error: 'Nome e obrigatorio' }, { status: 400 });
-  }
+  const validationError = validateLeadPayload(lead);
+  if (validationError) return validationError;
 
   lead = await applyServerPlaybookToLead(supabaseClient, lead, changedBy);
 
@@ -482,9 +494,8 @@ export async function PUT(request: NextRequest) {
     deletedAt: body.deletedAt || null,
   };
 
-  if (!lead.name) {
-    return NextResponse.json({ error: 'Nome e obrigatorio' }, { status: 400 });
-  }
+  const validationError = validateLeadPayload(lead);
+  if (validationError) return validationError;
 
   const { data: existingLead, error: existingLeadError } = await supabaseClient
     .from('leads')

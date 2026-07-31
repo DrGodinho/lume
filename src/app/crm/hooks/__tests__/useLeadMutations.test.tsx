@@ -212,6 +212,39 @@ describe('useLeadMutations', () => {
     });
   });
 
+  describe('handleLeadSave (issue #36: Zod validation)', () => {
+    it('blocks saving an invalid form and shows an error toast', async () => {
+      const params = createParams({
+        leadForm: { ...leadForm, phone: 'abc' },
+      });
+      const { result } = renderHook(() => useLeadMutations(params));
+
+      let saved = true;
+      await act(async () => {
+        saved = await result.current.handleLeadSave();
+      });
+
+      expect(saved).toBe(false);
+      expect(params.toast.error).toHaveBeenCalledWith(expect.stringContaining('Telefone'));
+      expect(params.syncLeadToCloud).not.toHaveBeenCalled();
+    });
+
+    it('blocks saving a form with sqm 0', async () => {
+      const params = createParams({
+        leadForm: { ...leadForm, sqm: 0 },
+      });
+      const { result } = renderHook(() => useLeadMutations(params));
+
+      let saved = true;
+      await act(async () => {
+        saved = await result.current.handleLeadSave();
+      });
+
+      expect(saved).toBe(false);
+      expect(params.toast.error).toHaveBeenCalledWith(expect.stringContaining('Area'));
+    });
+  });
+
   describe('handleTogglePin (issue #10) — partial status info update (issue #29)', () => {
     it('toggles pinned from false to true via partial status patch (no full lead PUT)', async () => {
       const params = createParams();
