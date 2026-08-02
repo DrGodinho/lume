@@ -14,9 +14,9 @@ export const LevelDots = ({ level }: { level: number }) => (
 const filmsData = [
   { name: 'Nano Cerâmica', calor: 5, luz: 1, priv: 1, desc: 'Máxima proteção térmica sem escurecer o ambiente', link: '/nano-ceramica/' },
   { name: 'Dupla Camada', calor: 5, luz: 5, priv: 5, desc: 'Espelhada: proteção total e privacidade máxima', link: '/dupla-camada/' },
-  { name: 'Refletiva (Prateada)', calor: 4, luz: 3, priv: 4, desc: 'Alto custo-benefício térmico com bom espelhamento', link: '/refletiva/' },
-  { name: 'Carbono G5', calor: 4, luz: 4, priv: 5, desc: 'Visual escuro absoluto e excelente privacidade', link: '/carbono/' },
-  { name: 'Carbono G20', calor: 3, luz: 2, priv: 2, desc: 'Opção econômica com redução confortável', link: '/carbono/' },
+  { name: 'Refletiva (Prateada)', calor: 4, luz: 2, priv: 4, desc: 'Alto custo-benefício térmico com bom espelhamento', link: '/refletiva/' },
+  { name: 'Carbono G5', calor: 3, luz: 5, priv: 5, desc: 'Visual escuro absoluto e excelente privacidade', link: '/carbono/' },
+  { name: 'Carbono G20', calor: 2, luz: 3, priv: 2, desc: 'Opção econômica com redução confortável', link: '/carbono/' },
   { name: 'Jateado', calor: 1, luz: 2, priv: 5, desc: 'Privacidade total com luz difusa e ambiente aconchegante', link: '/jateado/' },
 ];
 

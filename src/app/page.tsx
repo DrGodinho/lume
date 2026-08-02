@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Hero } from '../sections/Hero';
+import { PriceAdjustmentBanner } from '../components/PriceAdjustmentBanner';
 import { Products } from '../sections/Products';
 import { Benefits } from '../sections/Benefits';
 import { About } from '../sections/About';
@@ -55,6 +56,7 @@ export default function Home() {
   return (
     <>
       <Hero />
+      <PriceAdjustmentBanner />
       <Benefits />
       <Products />
       <SelectionGuide />
