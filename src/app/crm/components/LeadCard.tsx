@@ -82,9 +82,9 @@ export function LeadCard({
       {...(isSortable ? sortableAttributes : {})}
       {...(isSortable ? sortableListeners : {})}
       onDoubleClick={() => onOpenEdit(lead)}
-      title={isSortable ? 'Arraste para mudar de status, duplo clique para editar' : 'Duplo clique para editar este lead'}
+      title={isSortable ? 'Segure e arraste para mudar de status, duplo clique para editar' : 'Duplo clique para editar este lead'}
       className={`group relative rounded-2xl border bg-[#04080f]/90 p-3 shadow-md transition md:p-2.5 ${
-        isInteractive ? 'cursor-grab touch-none active:cursor-grabbing' : 'cursor-pointer'
+        isInteractive ? 'cursor-grab touch-pan-y select-none active:cursor-grabbing' : 'cursor-pointer'
       } ${
         isDragging ? 'opacity-40' : ''
       } ${

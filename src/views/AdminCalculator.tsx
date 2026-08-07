@@ -386,12 +386,14 @@ const MemoBlock = React.memo(({
   isSelected,
   toggleSelection,
   selectSameSize,
+  index,
 }: {
   b: Block,
   scale: number,
   isSelected: boolean,
   toggleSelection: (id: string) => void,
   selectSameSize: (oh: number, ow: number, label?: string) => void,
+  index: number,
 }) => {
   const pos = b.fit!;
   const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
@@ -419,40 +421,54 @@ const MemoBlock = React.memo(({
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
       onDoubleClick={handleDoubleClick}
-      className="absolute flex flex-col items-center justify-center text-black font-bold"
-            style={{
-                left: pos.x * scale,
-                top: pos.y * scale,
-                width: b.rw * scale,
-                height: b.rh * scale,
-                background: b.cor,
-                fontSize: '12px',
-                border: isSelected
-                    ? '2px solid #3b82f6'
-                    : '1px solid rgba(0,0,0,0.3)',
-                boxShadow: isSelected
-                    ? '0 0 15px rgba(59,130,246,0.8)'
-                    : 'none',
-                zIndex: isSelected ? 20 : 10,
-                cursor: 'pointer',
-                transition: 'all 0.25s cubic-bezier(0.34,1.56,0.64,1)',
-                touchAction: 'pan-y',
-            }}
-        >
-            {b.label && (
-                <span className="text-[9px] font-black uppercase tracking-tighter mb-1 truncate w-full px-0.5 text-center opacity-70">{b.label}</span>
-            )}
-            <span className="text-[12px] font-black">{Math.round(b.rw)}</span>
-            <div className="w-1/2 h-px bg-black/10 my-0.5" />
-            <span className="text-[12px] font-black">{Math.round(b.rh)}</span>
+      className="absolute flex items-center justify-center text-black font-bold group rounded-sm overflow-hidden"
+      style={{
+        left: pos.x * scale,
+        top: pos.y * scale,
+        width: b.rw * scale,
+        height: b.rh * scale,
+        background: b.cor,
+        border: isSelected ? '2px solid #3b82f6' : '1px solid rgba(0,0,0,0.15)',
+        boxShadow: isSelected ? '0 0 15px rgba(59,130,246,0.8)' : 'inset 0 0 10px rgba(255,255,255,0.2)',
+        zIndex: isSelected ? 20 : 10,
+        cursor: 'pointer',
+        transition: 'all 0.25s cubic-bezier(0.34,1.56,0.64,1)',
+        touchAction: 'pan-y',
+      }}
+    >
+      {/* Background Index/Label Watermark */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-25 px-2 overflow-hidden">
+        <span className="text-[3vw] sm:text-[2vw] lg:text-[2rem] font-black text-black select-none tracking-tighter mix-blend-overlay truncate text-center max-w-full leading-none">
+          {b.label || index}
+        </span>
+      </div>
+
+      {/* Height Capsule (Left side, vertical) */}
+      <div className="absolute left-1 top-1/2 -translate-y-1/2 -translate-x-[40%] -rotate-90 pointer-events-none">
+        <div className="bg-white/90 backdrop-blur-sm text-black px-2 py-0.5 rounded-md text-[10px] sm:text-xs font-black shadow-sm flex items-center justify-center whitespace-nowrap min-w-[28px]">
+          {Number(b.rh.toFixed(2))}
         </div>
-    );
+      </div>
+
+      {/* Width Capsule (Bottom side, horizontal) */}
+      <div className="absolute bottom-1 right-1 pointer-events-none">
+        <div className="bg-white/90 backdrop-blur-sm text-black px-2 py-0.5 rounded-md text-[10px] sm:text-xs font-black shadow-sm flex items-center justify-center whitespace-nowrap min-w-[28px]">
+          {Number(b.rw.toFixed(2))}
+        </div>
+      </div>
+      
+      {/* Visual Overlay on Hover (optional) */}
+      <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 pointer-events-none transition-colors duration-200" />
+    </div>
+  );
 });
 
 // ─── COMPONENTE PRINCIPAL ─────────────────────────────────────────────────────
 
 export function AdminCalculator() {
   const [cliente, setCliente] = useState('');
+  const [isCutMode, setIsCutMode] = useState(false);
+  const [vidrosBackup, setVidrosBackup] = useState<GlassItem[]>([]);
   const [phone, setPhone] = useState('');
   const cfg = loadConfig();
   const [rollW, setRollW] = useState(cfg.rollW);
@@ -636,6 +652,16 @@ export function AdminCalculator() {
     }, []);
 
     useEffect(() => {
+        if (isCutMode) {
+            // Em modo de corte, apenas ocultamos os blocos apagados sem recalcular posições.
+            setBlocosCalculados(prev => prev.filter(b => vidros.some(v => v.id === b.id)));
+            if (vidros.length === 0) {
+                setSelectedIds([]);
+            }
+            prevVidrosLengthRef.current = vidros.length;
+            return;
+        }
+
         if (vidros.length > 0) {
             setIsCalculating(true);
             workerRef.current?.postMessage({ vidros, rollW, margin, modoOtimizacao, agressividadeCorte });
@@ -650,7 +676,7 @@ export function AdminCalculator() {
             setSelectedIds([]);
         }
         prevVidrosLengthRef.current = vidros.length;
-    }, [vidros, rollW, margin, modoOtimizacao, agressividadeCorte]);
+    }, [vidros, rollW, margin, modoOtimizacao, agressividadeCorte, isCutMode]);
 
     // ─── FORMATAÇÃO ────────────────────────────────────────────────────────────
 
@@ -676,7 +702,7 @@ export function AdminCalculator() {
 
 // ─── AUTO-SAVE DRAFT ──────────────────────────────────────────────────
   useEffect(() => {
-    if (!draftRestored) return;
+    if (!draftRestored || isCutMode) return;
     const draft = {
       cliente,
       phone,
@@ -692,11 +718,11 @@ export function AdminCalculator() {
       lastSaved: Date.now()
     };
     localStorage.setItem('lume_calculator_draft', JSON.stringify(draft));
-}, [draftRestored, cliente, phone, vidros, desconto, descontoInput, rollW, price, margin, modoOtimizacao, userName, selectedFilm]);
+}, [draftRestored, isCutMode, cliente, phone, vidros, desconto, descontoInput, rollW, price, margin, modoOtimizacao, userName, selectedFilm]);
 
   // ─── CLOUD AUTO-SAVE (debounced 5s) ──────────────────────────────────────
   useEffect(() => {
-    if (!draftRestored) return;
+    if (!draftRestored || isCutMode) return;
     if (cloudTimerRef.current) clearTimeout(cloudTimerRef.current);
     cloudTimerRef.current = setTimeout(async () => {
       setCloudStatus('syncing');
@@ -709,7 +735,7 @@ export function AdminCalculator() {
       if (ok) setTimeout(() => setCloudStatus('idle'), 3000);
     }, 5000);
     return () => { if (cloudTimerRef.current) clearTimeout(cloudTimerRef.current); };
-  }, [draftRestored, cliente, phone, vidros, desconto, descontoInput, rollW, price, margin, modoOtimizacao, userName, selectedFilm]);
+  }, [draftRestored, isCutMode, cliente, phone, vidros, desconto, descontoInput, rollW, price, margin, modoOtimizacao, userName, selectedFilm]);
 
 // ─── CLOUD CONFIG AUTO-SAVE (debounced 2s) ────────────────────────────────
   const configCloudTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -1439,11 +1465,15 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
                         <div>
                             <h1 className="text-xl sm:text-2xl font-bold font-montserrat">LUME <span className="font-light text-gray-400">Calculator</span></h1>
                         </div>
-                        <div className="flex items-center gap-1.5 ml-2" title={cloudStatus === 'synced' ? 'Sincronizado com a nuvem' : cloudStatus === 'syncing' ? 'Sincronizando...' : cloudStatus === 'error' ? 'Erro de sincronização' : 'Nuvem'}>
-                            {cloudStatus === 'syncing' && <Loader2 size={14} className="text-[#c9a227] animate-spin" />}
-                            {cloudStatus === 'synced' && <Cloud size={14} className="text-green-400" />}
-                            {cloudStatus === 'error' && <CloudOff size={14} className="text-red-400" />}
-                            {cloudStatus === 'idle' && <Cloud size={14} className="text-gray-600" />}
+                        <div className="flex items-center gap-1.5 ml-2" title={isCutMode ? 'Sincronização pausada (Modo de Corte)' : cloudStatus === 'synced' ? 'Sincronizado com a nuvem' : cloudStatus === 'syncing' ? 'Sincronizando...' : cloudStatus === 'error' ? 'Erro de sincronização' : 'Nuvem'}>
+                            {isCutMode ? <Scissors size={14} className="text-red-400" /> : (
+                                <>
+                                    {cloudStatus === 'syncing' && <Loader2 size={14} className="text-[#c9a227] animate-spin" />}
+                                    {cloudStatus === 'synced' && <Cloud size={14} className="text-green-400" />}
+                                    {cloudStatus === 'error' && <CloudOff size={14} className="text-red-400" />}
+                                    {cloudStatus === 'idle' && <Cloud size={14} className="text-gray-600" />}
+                                </>
+                            )}
                         </div>
                     </div>
                     <div className="flex items-center gap-1.5 flex-nowrap justify-end xl:justify-end overflow-x-auto pb-1 scrollbar-hide">
@@ -1790,7 +1820,31 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
                                 </div>
                             </div>
 
-<div className="flex items-center justify-end mb-4 w-full">
+<div className="flex items-center justify-end mb-4 w-full gap-2">
+                                {isCutMode ? (
+                                    <button
+                                        onClick={() => {
+                                            if (window.confirm("Deseja sair do modo de corte? Suas peças originais serão restauradas.")) {
+                                                setVidros(vidrosBackup);
+                                                setIsCutMode(false);
+                                                setVidrosBackup([]);
+                                            }
+                                        }}
+                                        className="flex items-center gap-2 bg-red-500/20 border border-red-500/50 text-red-400 px-4 py-2.5 rounded-xl font-bold text-[10px] uppercase shadow-lg hover:bg-red-500/30 transition-all active:scale-95"
+                                    >
+                                        <X size={14} /> Sair do Modo de Corte
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={() => {
+                                            setVidrosBackup(vidros);
+                                            setIsCutMode(true);
+                                        }}
+                                        className="flex items-center gap-2 bg-[#1a2c4e] text-blue-300 px-4 py-2.5 rounded-xl font-bold text-[10px] uppercase shadow-lg hover:brightness-110 transition-all active:scale-95"
+                                    >
+                                        <Scissors size={14} /> Modo de Corte
+                                    </button>
+                                )}
                                 <button
                                   onClick={criarLead}
                                   className="flex items-center gap-2 bg-gradient-to-r from-[#c9a227] to-[#d4ad30] text-black px-4 py-2.5 rounded-xl font-bold text-[10px] uppercase shadow-lg hover:brightness-110 transition-all active:scale-95"
@@ -1798,6 +1852,12 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
                                   <User size={14} /> Criar Lead
                                 </button>
                               </div>
+
+                              {isCutMode && (
+                                  <div className="w-full bg-red-500/10 border border-red-500/30 text-red-400 p-3 rounded-xl text-center text-[10px] font-bold uppercase tracking-wider mb-4 animate-pulse flex items-center justify-center gap-2 shadow-lg">
+                                      <Scissors size={14} /> Modo de Corte Ativo - Sincronização Pausada
+                                  </div>
+                              )}
 
                             <div className="flex items-center gap-2 mb-4 w-full">
                                 <div className="flex bg-[#04080f] border border-white/10 p-1.5 rounded-xl shadow-2xl flex-1 max-w-sm ml-auto">
@@ -1817,30 +1877,75 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
                                         Rolo: {rollW}cm
                                     </span>
                                 </div>
-                                <div className="w-full h-full overflow-y-auto p-4 pt-10">
-                                    <div
-                                        ref={containerRef}
-                                        className="relative mx-auto bg-white/5 shadow-inner"
-                                        style={{
-                                            width: '100%',
-                                            maxWidth: '100%',
-                                            height: `${(maxY / rollW) * containerWidth + 40}px`,
-                                            userSelect: 'none',
-                                        }}
-                                    >
-                                        <div className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: `${10 * scale}px ${10 * scale}px` }} />
-                                        {blocosCalculados.map((b) => (
-                                            b.fit && (
-                                                <MemoBlock
-                key={b.id}
-                b={b}
-                scale={scale}
-                isSelected={selectedIds.includes(b.id)}
-                toggleSelection={toggleSelection}
-                selectSameSize={selectSameSize}
-              />
-                                            )
-                                        ))}
+                                <div className="w-full h-full overflow-y-auto p-2 pt-8 pr-10 sm:pr-14 pb-12 overflow-x-hidden">
+                                    <div className="relative pl-7 sm:pl-8 pt-8 w-full max-w-full">
+                                        {/* Régua Superior (Rolo Width) */}
+                                        <div className="absolute top-0 left-8 right-0 h-8 border-b border-white/20">
+                                            {Array.from({ length: Math.floor(rollW / 10) + 1 }).map((_, i) => {
+                                                const val = i * 10;
+                                                const isMajor = val % 50 === 0 || val === rollW || val === 0;
+                                                if (val > rollW) return null;
+                                                return (
+                                                    <div key={val} className="absolute bottom-0 flex flex-col items-center -translate-x-1/2" style={{ left: `${(val / rollW) * 100}%` }}>
+                                                        {isMajor && <span className="text-[10px] text-gray-400 font-black mb-0.5">{val}</span>}
+                                                        <div className={`w-px bg-white/30 ${isMajor ? 'h-2.5' : 'h-1.5'}`} />
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+
+                                        {/* Régua Lateral (Altura Linear) */}
+                                        <div className="absolute top-8 left-0 w-8 border-r border-white/20" style={{ height: `${(maxY / rollW) * containerWidth + 40}px` }}>
+                                            {Array.from({ length: Math.floor(maxY / 10) + 1 }).map((_, i) => {
+                                                const val = i * 10;
+                                                const isMajor = val % 50 === 0 || val === 0;
+                                                return (
+                                                    <div key={val} className="absolute right-0 flex items-center translate-y-1/2" style={{ top: val * scale }}>
+                                                        {isMajor && <span className="text-[10px] text-gray-400 font-black mr-1.5">{val / 100}</span>}
+                                                        <div className={`h-px bg-white/30 ${isMajor ? 'w-2.5' : 'w-1.5'}`} />
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                        
+                                        {/* Contador de Comprimento Total (Pílula) */}
+                                        {maxY > 0 && (
+                                            <div 
+                                                className="absolute right-[-45px] origin-center flex items-center justify-center z-20 pointer-events-none"
+                                                style={{ top: 32 + ((maxY * scale) / 2), transform: 'translateY(-50%) rotate(90deg)' }}
+                                            >
+                                                <div className="bg-white/95 backdrop-blur-md rounded-full shadow-lg border border-white/20 flex items-center pr-1 pl-3 py-1 gap-2">
+                                                    <span className="text-[10px] font-black tracking-widest text-black/50 uppercase">Compr.</span>
+                                                    <span className="bg-black text-white px-2 py-0.5 rounded-full text-xs font-black">
+                                                        {(maxY / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} m
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        <div
+                                            ref={containerRef}
+                                            className="relative w-full bg-white/5 shadow-inner"
+                                            style={{
+                                                height: `${(maxY / rollW) * containerWidth + 40}px`,
+                                                userSelect: 'none',
+                                            }}
+                                        >
+                                            <div className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: `${10 * scale}px ${10 * scale}px` }} />
+                                            {blocosCalculados.map((b, idx) => (
+                                                b.fit && (
+                                                    <MemoBlock
+                    key={b.id}
+                    b={b}
+                    scale={scale}
+                    isSelected={selectedIds.includes(b.id)}
+                    toggleSelection={toggleSelection}
+                    selectSameSize={selectSameSize}
+                    index={idx + 1}
+                  />
+                                                )
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
                             </div>

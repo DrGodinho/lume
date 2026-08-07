@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   trailingSlash: true,
-  allowedDevOrigins: ['192.168.0.7', '192.168.0.0/24'],
+  allowedDevOrigins: ['192.168.0.7', '192.168.0.0/24', '192.168.0.10'],
 
   // Disable React strict mode to avoid double-rendering GSAP animations
   reactStrictMode: false,
