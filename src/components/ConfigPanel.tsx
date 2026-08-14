@@ -1,5 +1,5 @@
 import React from 'react';
-import { Cloud, CloudOff, Loader2, Settings, X } from 'lucide-react';
+import { Cloud, CloudOff, Loader2, LogOut, Settings, X } from 'lucide-react';
 
 type FilmTypeKey = 'carbono_g5' | 'carbono_g20' | 'refletiva' | 'dupla_camada' | 'nano_ceramica' | 'nano_ceramica_g20' | 'jateado';
 type OptimizationMode = 'densidade' | 'facilidade' | 'facilidade_v2';
@@ -41,6 +41,8 @@ interface ConfigPanelProps {
   config: AppConfig;
   onUpdate: <K extends keyof AppConfig>(key: K, value: AppConfig[K]) => void;
   cloudStatus: CloudStatus;
+  onLogout?: () => void | Promise<void>;
+  loggingOut?: boolean;
 }
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
@@ -134,6 +136,8 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
   config,
   onUpdate,
   cloudStatus,
+  onLogout,
+  loggingOut = false,
 }) => {
   return (
     <>
@@ -311,6 +315,18 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
                 Valores menores aproximam bordas em linhas horizontais. Valores maiores apertam mais as peças para economizar rolo.
               </HelpText>
             </div>
+            {onLogout && (
+              <div className="pt-2 border-t border-white/10">
+                <button
+                  onClick={onLogout}
+                  disabled={loggingOut}
+                  className="w-full flex items-center justify-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-[10px] font-black uppercase tracking-wider text-red-300 transition-colors hover:bg-red-500/15 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <LogOut size={14} />
+                  {loggingOut ? 'Saindo...' : 'Sair da Conta'}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

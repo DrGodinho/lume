@@ -13,6 +13,7 @@ import { createScopedLogger } from '../lib/logger';
 const logger = createScopedLogger('AdminCalculator');
 import { ConfigPanel } from '../components/ConfigPanel';
 import { HistoryPanel } from '../components/HistoryPanel';
+import { buildCalculatorStorageKey, resolveCalculatorScopeKey } from '../lib/calculatorScope';
 import {
     saveDraftToCloud, loadDraftFromCloud,
     saveHistoryItemToCloud, loadHistoryFromCloud, deleteHistoryItemFromCloud,
@@ -236,9 +237,9 @@ const stableRoomColor = (label: string) => {
   return ROOM_SWATCHES[Math.abs(hash) % ROOM_SWATCHES.length];
 };
 
-function loadConfig(): AppConfig {
+function loadConfig(scopeKey?: string): AppConfig {
     try {
-        const saved = localStorage.getItem('lume_config');
+        const saved = localStorage.getItem(scopeKey ? buildCalculatorStorageKey('lume_config', scopeKey) : 'lume_config');
         if (saved) {
           const parsed = JSON.parse(saved);
           return {
@@ -254,8 +255,8 @@ function loadConfig(): AppConfig {
     return DEFAULT_CONFIG;
 }
 
-function saveConfig(cfg: AppConfig) {
-    localStorage.setItem('lume_config', JSON.stringify(cfg));
+function saveConfig(cfg: AppConfig, scopeKey?: string) {
+    localStorage.setItem(scopeKey ? buildCalculatorStorageKey('lume_config', scopeKey) : 'lume_config', JSON.stringify(cfg));
 }
 
 // ─── TIPOS ────────────────────────────────────────────────────────────────────
@@ -548,6 +549,8 @@ export function AdminCalculator() {
 
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
     const [cloudStatus, setCloudStatus] = useState<'idle' | 'syncing' | 'synced' | 'error'>('idle');
+    const [authRefreshKey, setAuthRefreshKey] = useState(0);
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
     const cloudTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 
@@ -596,21 +599,22 @@ export function AdminCalculator() {
 
     useEffect(() => {
         const load = async () => {
+            const scopeKey = await resolveCalculatorScopeKey();
             const cloudHistory = await loadHistoryFromCloud();
             if (cloudHistory.length > 0) {
                 setHistorico(cloudHistory as OrcamentoSalvo[]);
-                localStorage.setItem('lume_historico', JSON.stringify(cloudHistory));
+                localStorage.setItem(buildCalculatorStorageKey('lume_historico', scopeKey), JSON.stringify(cloudHistory));
                 return;
             }
             try {
-                const saved = localStorage.getItem('lume_historico');
+                const saved = localStorage.getItem(buildCalculatorStorageKey('lume_historico', scopeKey));
                 if (saved) setHistorico(JSON.parse(saved));
             } catch {
                 setHistorico([]);
             }
         };
         load();
-    }, []);
+    }, [authRefreshKey]);
 
     useEffect(() => {
         gsap.fromTo('.admin-entrance',
@@ -678,6 +682,26 @@ export function AdminCalculator() {
         prevVidrosLengthRef.current = vidros.length;
     }, [vidros, rollW, margin, modoOtimizacao, agressividadeCorte, isCutMode]);
 
+    const currentAuthUserRef = useRef<string | null>(null);
+
+    useEffect(() => {
+        if (!supabase) return;
+
+        const {
+            data: { subscription },
+        } = supabase.auth.onAuthStateChange((_event, session) => {
+            const nextUserId = session?.user?.id ?? null;
+            if (currentAuthUserRef.current !== null && currentAuthUserRef.current !== nextUserId) {
+                setAuthRefreshKey((value) => value + 1);
+            }
+            currentAuthUserRef.current = nextUserId;
+        });
+
+        return () => {
+            subscription.unsubscribe();
+        };
+    }, []);
+
     // ─── FORMATAÇÃO ────────────────────────────────────────────────────────────
 
     const formatBRL = (num: number) =>
@@ -717,7 +741,9 @@ export function AdminCalculator() {
       selectedFilm,
       lastSaved: Date.now()
     };
-    localStorage.setItem('lume_calculator_draft', JSON.stringify(draft));
+    resolveCalculatorScopeKey().then((scopeKey) => {
+      localStorage.setItem(buildCalculatorStorageKey('lume_calculator_draft', scopeKey), JSON.stringify(draft));
+    }).catch(() => null);
 }, [draftRestored, isCutMode, cliente, phone, vidros, desconto, descontoInput, rollW, price, margin, modoOtimizacao, userName, selectedFilm]);
 
   // ─── CLOUD AUTO-SAVE (debounced 5s) ──────────────────────────────────────
@@ -752,8 +778,9 @@ export function AdminCalculator() {
   useEffect(() => {
     const restoreConfig = async () => {
       try {
+        const scopeKey = await resolveCalculatorScopeKey();
         const cloud = await loadConfigFromCloud();
-        const source = cloud || loadConfig();
+        const source = cloud || loadConfig(scopeKey);
 
         if (source.rollW) setRollW(source.rollW);
         if (source.price) setPrice(source.price);
@@ -776,19 +803,20 @@ export function AdminCalculator() {
             modoCorConfig: isColorMode(source.modoCorConfig) ? source.modoCorConfig : DEFAULT_CONFIG.modoCorConfig,
             selectedFilm: normalizeFilmTypeKey(source.selectedFilm),
             filmTypes: normalizeFilmTypes(source.filmTypes),
-          });
+          }, scopeKey);
         }
       } finally {
         setConfigRestored(true);
       }
     };
     restoreConfig();
-  }, []);
+  }, [authRefreshKey]);
 
   // RESTORE DRAFT ON MOUNT (cloud-first, localStorage fallback)
     useEffect(() => {
         const restoreDraft = async () => {
           try {
+            const scopeKey = await resolveCalculatorScopeKey();
             // Try cloud first
             const cloud = await loadDraftFromCloud();
             if (cloud && Array.isArray(cloud.vidros) && cloud.vidros.length > 0) {
@@ -800,15 +828,15 @@ export function AdminCalculator() {
                 if (cloud.roll_w) setRollW(cloud.roll_w);
                 if (cloud.price) setPrice(cloud.price);
                 if (cloud.margin !== undefined) setMargin(cloud.margin);
-    if (isOptimizationMode(cloud.modo_otimizacao)) setModoOtimizacao(cloud.modo_otimizacao);
-      if (cloud.user_name) setUserName(cloud.user_name);
-      setSelectedFilm(normalizeFilmTypeKey(cloud.selected_film));
+                if (isOptimizationMode(cloud.modo_otimizacao)) setModoOtimizacao(cloud.modo_otimizacao);
+                if (cloud.user_name) setUserName(cloud.user_name);
+                setSelectedFilm(normalizeFilmTypeKey(cloud.selected_film));
                 setCloudStatus('synced');
                 setTimeout(() => setCloudStatus('idle'), 3000);
                 return;
             }
             // Fallback to localStorage
-            const saved = localStorage.getItem('lume_calculator_draft');
+            const saved = localStorage.getItem(buildCalculatorStorageKey('lume_calculator_draft', scopeKey));
             if (saved) {
                 try {
                     const draft = JSON.parse(saved);
@@ -821,9 +849,9 @@ export function AdminCalculator() {
                         if (draft.rollW) setRollW(draft.rollW);
                         if (draft.price) setPrice(draft.price);
                         if (draft.margin !== undefined) setMargin(draft.margin);
-      if (isOptimizationMode(draft.modoOtimizacao)) setModoOtimizacao(draft.modoOtimizacao);
-      if (draft.userName) setUserName(draft.userName);
-      setSelectedFilm(normalizeFilmTypeKey(draft.selectedFilm));
+                        if (isOptimizationMode(draft.modoOtimizacao)) setModoOtimizacao(draft.modoOtimizacao);
+                        if (draft.userName) setUserName(draft.userName);
+                        setSelectedFilm(normalizeFilmTypeKey(draft.selectedFilm));
                     }
                 } catch (e) {
                     logger.error('Erro ao carregar rascunho local', e);
@@ -834,7 +862,7 @@ export function AdminCalculator() {
           }
         };
         restoreDraft();
-    }, []); 
+    }, [authRefreshKey]); 
 
     // ─── ENTER NOS INPUTS ──────────────────────────────────────────────────────
 
@@ -1059,7 +1087,9 @@ export function AdminCalculator() {
         };
         const atualizado = [novo, ...historico].slice(0, 20);
         setHistorico(atualizado);
-        localStorage.setItem('lume_historico', JSON.stringify(atualizado));
+        resolveCalculatorScopeKey().then((scopeKey) => {
+            localStorage.setItem(buildCalculatorStorageKey('lume_historico', scopeKey), JSON.stringify(atualizado));
+        }).catch(() => null);
         saveHistoryItemToCloud(novo);
         setShowSaveToast(true);
         setTimeout(() => setShowSaveToast(false), 3000);
@@ -1088,6 +1118,27 @@ export function AdminCalculator() {
         }),
       });
       if (res.ok) {
+        const createdLead = await res.json().catch(() => null);
+        const leadId = createdLead?.id || null;
+
+        if (vidros.length > 0) {
+          const orcId = Date.now().toString();
+          await saveHistoryItemToCloud({
+            id: orcId,
+            cliente: cliente || `Cliente ${phone}`,
+            phone,
+            data: new Date().toLocaleDateString('pt-BR'),
+            valor: finalPrice,
+            qtd: vidros.length,
+            vidros: vidros.map(v => ({ h: v.oh, w: v.ow, label: v.label || '' })),
+            config: { rollW, price, margin },
+            desconto,
+            modoOtimizacao: modoOtimizacao,
+            selectedFilm,
+            leadId,
+          });
+        }
+
         setShowSaveToast(true);
         setTimeout(() => setShowSaveToast(false), 3000);
       } else {
@@ -1095,7 +1146,7 @@ export function AdminCalculator() {
         const details = [err.error, err.details, err.hint].filter(Boolean).join(' - ');
         alert('Erro ao criar lead: ' + (details || 'desconhecido'));
       }
-    }, [cliente, phone, vidros, selectedFilm, finalPrice]);
+    }, [cliente, phone, vidros, selectedFilm, finalPrice, rollW, price, margin, desconto, modoOtimizacao]);
 
 const carregarDoHistorico = (orc: OrcamentoSalvo) => {
     setCliente(orc.cliente);
@@ -1116,8 +1167,10 @@ const carregarDoHistorico = (orc: OrcamentoSalvo) => {
     const deletarDoHistorico = (id: string) => {
         const atualizado = historico.filter(o => o.id !== id);
         setHistorico(atualizado);
-        localStorage.setItem('lume_historico', JSON.stringify(atualizado));
-        deleteHistoryItemFromCloud(id);
+        resolveCalculatorScopeKey().then((scopeKey) => {
+            localStorage.setItem(buildCalculatorStorageKey('lume_historico', scopeKey), JSON.stringify(atualizado));
+            deleteHistoryItemFromCloud(id);
+        }).catch(() => null);
     };
 
     // ─── IMPORTAR / SALVAR / ABRIR ─────────────────────────────────────────────
@@ -1319,8 +1372,31 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
     }
     const normalizedValue = key === 'perdasFixas' ? Math.min(100, Math.max(0, value as number)) : value;
     const updated = { ...currentConfig, [key]: normalizedValue };
-    saveConfig(updated);
+    resolveCalculatorScopeKey().then((scopeKey) => saveConfig(updated, scopeKey)).catch(() => saveConfig(updated));
   }, [currentConfig, getColorForItem, setVidros]);
+
+  const handleLogout = useCallback(async () => {
+    if (isLoggingOut) return;
+
+    setIsLoggingOut(true);
+    setConfigAberto(false);
+
+    try {
+      if (supabase) {
+        await supabase.auth.signOut();
+      }
+    } catch (error) {
+      logger.warn('Falha ao encerrar a sessao do Supabase', { error });
+    }
+
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (error) {
+      logger.warn('Falha ao limpar cookies da sessao', { error });
+    }
+
+    window.location.href = '/login';
+  }, [isLoggingOut]);
 
     // ─── MEMOS ─────────────────────────────────────────────────────────────────
 
@@ -1381,6 +1457,8 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
         config={{ rollW, price, margin, modoOtimizacao, userName, modoPerdas, perdasFixas, modoCorConfig: usarCoresPorAmbiente ? 'ambiente' : 'tamanho', agressividadeCorte, filmTypes, selectedFilm }}
         onUpdate={atualizarConfig}
         cloudStatus={cloudStatus}
+        onLogout={handleLogout}
+        loggingOut={isLoggingOut}
       />
 
             {/* PAINEL LATERAL: HISTÓRICO (EXTRAÍDO) */}

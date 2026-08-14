@@ -13,12 +13,15 @@ interface HistoricoSupabaseProps {
   openCreateModal: (options?: CreateLeadModalOptions) => void;
 }
 
+type HistoryFilterMode = 'todos' | 'pendentes' | 'vinculados';
+
 export function HistoricoSupabase({ setActiveTab, openCreateModal }: HistoricoSupabaseProps) {
   const [history, setHistory] = useState<CalculatorHistoryRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [lastSyncedAt, setLastSyncedAt] = useState<Date | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [filterMode, setFilterMode] = useState<HistoryFilterMode>('todos');
   const [selectedOrcamento, setSelectedOrcamento] = useState<CalculatorHistoryRow | null>(null);
 
   const fetchData = useCallback(async ({ silent = false }: { silent?: boolean } = {}) => {
@@ -42,6 +45,25 @@ export function HistoricoSupabase({ setActiveTab, openCreateModal }: HistoricoSu
   useEffect(() => {
     void fetchData();
 
+    if (supabase) {
+      const channel = supabase
+        .channel('calculator-history-crm-sync')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'calculator_history' },
+          () => {
+            void fetchData({ silent: true });
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [fetchData]);
+
+  useEffect(() => {
     const intervalId = window.setInterval(() => {
       void fetchData({ silent: true });
     }, HISTORY_REFRESH_INTERVAL_MS);
@@ -62,23 +84,30 @@ export function HistoricoSupabase({ setActiveTab, openCreateModal }: HistoricoSu
     };
   }, [fetchData]);
 
-  const pendingHistory = useMemo(() => history.filter((item) => !item.lead_id), [history]);
+  const pendingCount = useMemo(() => history.filter((item) => !item.lead_id).length, [history]);
+  const linkedCount = useMemo(() => history.filter((item) => Boolean(item.lead_id)).length, [history]);
+
+  const displayedHistory = useMemo(() => {
+    if (filterMode === 'pendentes') return history.filter((item) => !item.lead_id);
+    if (filterMode === 'vinculados') return history.filter((item) => Boolean(item.lead_id));
+    return history;
+  }, [filterMode, history]);
 
   const filteredHistory = useMemo(() => {
-    if (!searchQuery.trim()) return pendingHistory;
-    const query = searchQuery.toLowerCase();
-    return pendingHistory.filter((item) =>
+    if (!searchQuery.trim()) return displayedHistory;
+    const query = searchQuery.toLowerCase().trim();
+    return displayedHistory.filter((item) =>
       (item.cliente || '').toLowerCase().includes(query) ||
       getHistoryFilmLabel(item).toLowerCase().includes(query),
     );
-  }, [pendingHistory, searchQuery]);
+  }, [displayedHistory, searchQuery]);
 
   const stats = useMemo(() => {
-    const total = pendingHistory.length;
-    const totalValue = pendingHistory.reduce((sum, item) => sum + (item.valor || 0), 0);
+    const total = history.length;
+    const totalValue = history.reduce((sum, item) => sum + (item.valor || 0), 0);
     const avgValue = total > 0 ? totalValue / total : 0;
     return { total, totalValue, avgValue };
-  }, [pendingHistory]);
+  }, [history]);
 
   const exportToCSV = useCallback(() => {
     const headers = ['Cliente', 'Película', 'Valor', 'Qtd Vidros', 'Data'];
@@ -189,10 +218,18 @@ export function HistoricoSupabase({ setActiveTab, openCreateModal }: HistoricoSu
         </button>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3 grid-cols-2 sm:grid-cols-4">
         <div className="rounded-xl border border-white/5 bg-[#07111d]/50 p-3">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-white/50">Total de Orçamentos</span>
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-white/50">Total Geral</span>
           <p className="mt-1 text-xl font-black text-white">{stats.total}</p>
+        </div>
+        <div className="rounded-xl border border-white/5 bg-[#07111d]/50 p-3">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-white/50">Pendentes</span>
+          <p className="mt-1 text-xl font-black text-amber-400">{pendingCount}</p>
+        </div>
+        <div className="rounded-xl border border-white/5 bg-[#07111d]/50 p-3">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-white/50">Vinculados</span>
+          <p className="mt-1 text-xl font-black text-emerald-400">{linkedCount}</p>
         </div>
         <div className="rounded-xl border border-white/5 bg-[#07111d]/50 p-3">
           <span className="text-[10px] font-semibold uppercase tracking-wider text-white/50">Valor Total</span>
@@ -200,11 +237,49 @@ export function HistoricoSupabase({ setActiveTab, openCreateModal }: HistoricoSu
         </div>
       </div>
 
-      {lastSyncedAt && (
-        <p className="text-right text-[10px] font-semibold uppercase tracking-wider text-white/35">
-          Atualizado às {lastSyncedAt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-        </p>
-      )}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-1.5 rounded-2xl border border-white/5 bg-[#07111d]/50 p-1.5">
+          <button
+            type="button"
+            onClick={() => setFilterMode('todos')}
+            className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition ${
+              filterMode === 'todos'
+                ? 'bg-[#c9a227] text-[#04080f] shadow-md shadow-[#c9a227]/20'
+                : 'text-white/60 hover:text-white'
+            }`}
+          >
+            Todos ({history.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setFilterMode('pendentes')}
+            className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition ${
+              filterMode === 'pendentes'
+                ? 'bg-amber-400 text-[#04080f] shadow-md shadow-amber-400/20'
+                : 'text-white/60 hover:text-white'
+            }`}
+          >
+            Pendentes ({pendingCount})
+          </button>
+          <button
+            type="button"
+            onClick={() => setFilterMode('vinculados')}
+            className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition ${
+              filterMode === 'vinculados'
+                ? 'bg-emerald-400 text-[#04080f] shadow-md shadow-emerald-400/20'
+                : 'text-white/60 hover:text-white'
+            }`}
+          >
+            Vinculados a Leads ({linkedCount})
+          </button>
+        </div>
+
+        {lastSyncedAt && (
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-white/35">
+            Atualizado às {lastSyncedAt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+          </p>
+        )}
+      </div>
 
       <div className="overflow-x-auto rounded-3xl border border-white/5 bg-[#07111d]/50 p-6 shadow-lg backdrop-blur-md">
         <table className="w-full border-collapse text-left text-sm text-white/80">
@@ -214,6 +289,7 @@ export function HistoricoSupabase({ setActiveTab, openCreateModal }: HistoricoSu
               <th className="pb-3 font-semibold">Película</th>
               <th className="pb-3 text-right font-semibold">Valor</th>
               <th className="pb-3 text-center font-semibold">Qtd</th>
+              <th className="pb-3 font-semibold">Status</th>
               <th className="pb-3 font-semibold">Data</th>
               <th className="pb-3 text-right font-semibold">Ações</th>
             </tr>
@@ -221,7 +297,7 @@ export function HistoricoSupabase({ setActiveTab, openCreateModal }: HistoricoSu
           <tbody className="divide-y divide-white/5">
             {filteredHistory.length === 0 ? (
               <tr>
-                <td colSpan={6} className="py-10 text-center font-semibold text-white/30">
+                <td colSpan={7} className="py-10 text-center font-semibold text-white/30">
                   {searchQuery ? 'Nenhum resultado encontrado' : 'Nenhum orçamento no histórico'}
                 </td>
               </tr>
@@ -238,6 +314,17 @@ export function HistoricoSupabase({ setActiveTab, openCreateModal }: HistoricoSu
                   </td>
                   <td className="py-3.5 text-right font-bold text-[#c9a227]">{formatCurrency(item.valor || 0)}</td>
                   <td className="py-3.5 text-center font-mono">{item.qtd || 0}</td>
+                  <td className="py-3.5">
+                    {item.lead_id ? (
+                      <span className="inline-flex rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-emerald-300">
+                        Vinculado
+                      </span>
+                    ) : (
+                      <span className="inline-flex rounded-lg border border-amber-400/25 bg-amber-400/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-amber-300">
+                        Pendente
+                      </span>
+                    )}
+                  </td>
                   <td className="py-3.5 text-white/50">
                     {item.created_at ? new Date(item.created_at).toLocaleDateString('pt-BR') : '—'}
                   </td>

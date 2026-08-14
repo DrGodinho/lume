@@ -7,6 +7,7 @@ import {
     BarChart3, TrendingUp, Layers
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { resolveCalculatorScopeKey } from '../lib/calculatorScope';
 
 interface GlassItem {
     label?: string;
@@ -92,11 +93,12 @@ export function AdminDados() {
     const loadData = async (showLoading = true) => {
         if (!supabase) return;
         if (showLoading) setLoading(true);
+        const scopeKey = await resolveCalculatorScopeKey();
 
         const [histRes, draftRes, cfgRes] = await Promise.all([
-            supabase.from('calculator_history').select('*').order('created_at', { ascending: false }),
-            supabase.from('calculator_draft').select('*').eq('id', 'default').single(),
-            supabase.from('calculator_config').select('*').eq('id', 'default').single(),
+            supabase.from('calculator_history').select('*').eq('owner_key', scopeKey).order('created_at', { ascending: false }),
+            supabase.from('calculator_draft').select('*').eq('id', scopeKey).single(),
+            supabase.from('calculator_config').select('*').eq('id', scopeKey).single(),
         ]);
 
         if (histRes.data) setHistory(histRes.data);
@@ -110,11 +112,12 @@ export function AdminDados() {
 
         const loadInitialData = async () => {
             if (!supabase) return;
+            const scopeKey = await resolveCalculatorScopeKey();
 
             const [histRes, draftRes, cfgRes] = await Promise.all([
-                supabase.from('calculator_history').select('*').order('created_at', { ascending: false }),
-                supabase.from('calculator_draft').select('*').eq('id', 'default').single(),
-                supabase.from('calculator_config').select('*').eq('id', 'default').single(),
+                supabase.from('calculator_history').select('*').eq('owner_key', scopeKey).order('created_at', { ascending: false }),
+                supabase.from('calculator_draft').select('*').eq('id', scopeKey).single(),
+                supabase.from('calculator_config').select('*').eq('id', scopeKey).single(),
             ]);
 
             if (!active) return;
@@ -134,7 +137,8 @@ export function AdminDados() {
     const deleteHistoryItem = async (id: string) => {
         if (!supabase) return;
         if (!window.confirm('Deletar este orçamento permanentemente?')) return;
-        await supabase.from('calculator_history').delete().eq('id', id);
+        const scopeKey = await resolveCalculatorScopeKey();
+        await supabase.from('calculator_history').delete().eq('id', id).eq('owner_key', scopeKey);
         setHistory(prev => prev.filter(h => h.id !== id));
     };
 

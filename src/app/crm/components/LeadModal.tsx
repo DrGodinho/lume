@@ -10,7 +10,7 @@ import { DiscardChangesDialog } from './DiscardChangesDialog';
 import { WhatsAppTemplateMenu } from './WhatsAppTemplateMenu';
 import { useDirtyFormGuard } from '../hooks/useDirtyFormGuard';
 import { leadFormSchema } from '../schemas/leadSchema';
-import { hasLeadNextAction, requiresLeadNextAction } from '../utils';
+import { getHistoryFilmLabel, hasLeadNextAction, requiresLeadNextAction } from '../utils';
 import type { CalculatorHistoryRow, CommercialActionDraft, Lead, LeadFormValues, LeadStatusHistoryEntry } from '../types';
 
 const fieldErrorsFromSchema = (issues: ZodIssue[]): Partial<Record<keyof LeadFormValues, string>> => {
@@ -168,7 +168,7 @@ export function LeadFormModal({
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-white/50">Película:</span>
-                  <span className="font-semibold text-white">{linkedOrcamento.modo_otimizacao || '—'}</span>
+                  <span className="font-semibold text-white">{getHistoryFilmLabel(linkedOrcamento)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-white/50">Valor:</span>
@@ -514,7 +514,7 @@ export function LeadDetailModal({
             <div className="grid grid-cols-2 gap-2 text-[11px]">
               <div>
                 <p className="text-[9px] uppercase tracking-wider text-white/40">Película</p>
-                <p className="font-semibold text-white">{linkedOrcamento.modo_otimizacao || '—'}</p>
+                <p className="font-semibold text-white">{getHistoryFilmLabel(linkedOrcamento)}</p>
               </div>
               <div>
                 <p className="text-[9px] uppercase tracking-wider text-white/40">Valor</p>

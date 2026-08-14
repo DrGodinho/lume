@@ -2,6 +2,13 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { createToken } from '@/lib/crm-auth';
 
+function normalizeLoginIdentifier(value: string) {
+  const identifier = value.trim().toLowerCase();
+  if (!identifier) return '';
+  if (identifier.includes('@')) return identifier;
+  return `${identifier}@lume.local`;
+}
+
 function getSafeRedirectFromRequest(request: Request) {
   const fallback = '/crm/';
   const referer = request.headers.get('referer');
@@ -34,8 +41,13 @@ export async function POST(request: Request) {
   const credentials = isFormPost
     ? Object.fromEntries(await request.formData())
     : await request.json();
-  const email = String(credentials.email || '');
+  const login = String(credentials.login || credentials.email || '');
   const password = String(credentials.password || '');
+  const email = normalizeLoginIdentifier(login);
+
+  if (!email || !password) {
+    return NextResponse.json({ error: 'Credenciais invalidas' }, { status: 401 });
+  }
 
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

@@ -86,14 +86,17 @@ export default function LoginPage() {
           <form action="/api/auth/login/" method="post" onSubmit={handleLogin} className="flex flex-col gap-5">
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-semibold text-white/60 uppercase tracking-wider">
-                E-mail
+                E-mail ou login
               </label>
               <input
-                type="email"
+                type="text"
                 name="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="seu@email.com"
+                placeholder="jrquintans ou seu@email.com"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
                 className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/30 outline-none transition focus:border-[#c9a227] focus:ring-1 focus:ring-[#c9a227]/40"
               />
             </div>

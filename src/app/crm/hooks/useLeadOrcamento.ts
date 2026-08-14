@@ -36,7 +36,8 @@ export const useLeadOrcamento = (): UseLeadOrcamentoReturn => {
       return linkedByLeadId as CalculatorHistoryRow;
     }
 
-    if (!lead.name) {
+    const trimmedName = lead.name.trim();
+    if (!trimmedName) {
       return null;
     }
 
@@ -44,7 +45,7 @@ export const useLeadOrcamento = (): UseLeadOrcamentoReturn => {
       .from('calculator_history')
       .select('*')
       .is('lead_id', null)
-      .ilike('cliente', `%${lead.name}%`)
+      .ilike('cliente', `%${trimmedName}%`)
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();

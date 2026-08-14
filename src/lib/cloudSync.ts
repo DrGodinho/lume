@@ -1,4 +1,8 @@
 import { supabase } from './supabase';
+import {
+  normalizeCalculatorScopeKey,
+  resolveCalculatorScopeKey,
+} from './calculatorScope';
 import { createScopedLogger } from './logger';
 
 const logger = createScopedLogger('cloud-sync');
@@ -22,22 +26,35 @@ interface DraftData {
 
 export async function saveDraftToCloud(draft: DraftData): Promise<boolean> {
   if (!supabase) return false;
+  const ownerKey = normalizeCalculatorScopeKey(await resolveCalculatorScopeKey());
   const { error } = await supabase
     .from('calculator_draft')
-    .upsert({ id: 'default', ...draft, updated_at: new Date().toISOString() });
+    .upsert({ id: ownerKey, ...draft, updated_at: new Date().toISOString() });
   if (error) logger.error('Draft save failed', undefined, { message: error.message });
   return !error;
 }
 
 export async function loadDraftFromCloud(): Promise<DraftData | null> {
   if (!supabase) return null;
+  const ownerKey = normalizeCalculatorScopeKey(await resolveCalculatorScopeKey());
   const { data, error } = await supabase
     .from('calculator_draft')
     .select('*')
-    .eq('id', 'default')
+    .eq('id', ownerKey)
     .single();
-  if (error || !data) return null;
-  return data as DraftData;
+
+  if (!error && data) return data as DraftData;
+
+  if (ownerKey !== 'default') {
+    const { data: defaultData } = await supabase
+      .from('calculator_draft')
+      .select('*')
+      .eq('id', 'default')
+      .single();
+    if (defaultData) return defaultData as DraftData;
+  }
+
+  return null;
 }
 
 interface HistoryItem {
@@ -72,10 +89,12 @@ interface CalculatorHistoryRow {
 
 export async function saveHistoryItemToCloud(item: HistoryItem): Promise<boolean> {
   if (!supabase) return false;
+  const ownerKey = normalizeCalculatorScopeKey(await resolveCalculatorScopeKey());
   const { error } = await supabase
     .from('calculator_history')
     .upsert({
       id: item.id,
+      owner_key: ownerKey,
       cliente: item.cliente,
       phone: item.phone || null,
       data: item.data,
@@ -94,11 +113,27 @@ export async function saveHistoryItemToCloud(item: HistoryItem): Promise<boolean
 
 export async function loadHistoryFromCloud(): Promise<HistoryItem[]> {
   if (!supabase) return [];
-  const { data, error } = await supabase
+  const ownerKey = normalizeCalculatorScopeKey(await resolveCalculatorScopeKey());
+  let { data, error } = await supabase
     .from('calculator_history')
     .select('*')
+    .eq('owner_key', ownerKey)
     .order('created_at', { ascending: false })
     .limit(20);
+
+  if ((error || !data || data.length === 0) && ownerKey !== 'default') {
+    const fallbackRes = await supabase
+      .from('calculator_history')
+      .select('*')
+      .eq('owner_key', 'default')
+      .order('created_at', { ascending: false })
+      .limit(20);
+    if (!fallbackRes.error && fallbackRes.data && fallbackRes.data.length > 0) {
+      data = fallbackRes.data;
+      error = null;
+    }
+  }
+
   if (error || !data) return [];
   return (data as CalculatorHistoryRow[]).map((row) => ({
     id: row.id,
@@ -118,10 +153,12 @@ export async function loadHistoryFromCloud(): Promise<HistoryItem[]> {
 
 export async function deleteHistoryItemFromCloud(id: string): Promise<boolean> {
   if (!supabase) return false;
+  const ownerKey = normalizeCalculatorScopeKey(await resolveCalculatorScopeKey());
   const { error } = await supabase
     .from('calculator_history')
     .delete()
-    .eq('id', id);
+    .eq('id', id)
+    .eq('owner_key', ownerKey);
   if (error) logger.error('History delete failed', undefined, { message: error.message });
   return !error;
 }
@@ -185,9 +222,10 @@ const CONFIG_OPTIONAL_COLUMNS = {
 
 export async function saveConfigToCloud(config: ConfigData): Promise<boolean> {
   if (!supabase) return false;
+  const ownerKey = normalizeCalculatorScopeKey(await resolveCalculatorScopeKey());
 
   const row: Record<string, unknown> = {
-    id: 'default',
+    id: ownerKey,
     roll_w: config.rollW,
     price: config.price,
     margin: config.margin,
@@ -224,11 +262,25 @@ export async function saveConfigToCloud(config: ConfigData): Promise<boolean> {
 
 export async function loadConfigFromCloud(): Promise<ConfigData | null> {
   if (!supabase) return null;
-  const { data, error } = await supabase
+  const ownerKey = normalizeCalculatorScopeKey(await resolveCalculatorScopeKey());
+  let { data, error } = await supabase
     .from('calculator_config')
     .select('*')
-    .eq('id', 'default')
+    .eq('id', ownerKey)
     .single();
+
+  if ((error || !data) && ownerKey !== 'default') {
+    const fallbackRes = await supabase
+      .from('calculator_config')
+      .select('*')
+      .eq('id', 'default')
+      .single();
+    if (!fallbackRes.error && fallbackRes.data) {
+      data = fallbackRes.data;
+      error = null;
+    }
+  }
+
   if (error || !data) return null;
   return {
     rollW: data.roll_w,
