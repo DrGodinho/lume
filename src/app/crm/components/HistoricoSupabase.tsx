@@ -45,22 +45,23 @@ export function HistoricoSupabase({ setActiveTab, openCreateModal }: HistoricoSu
   useEffect(() => {
     void fetchData();
 
-    if (supabase) {
-      const channel = supabase
-        .channel('calculator-history-crm-sync')
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'calculator_history' },
-          () => {
-            void fetchData({ silent: true });
-          }
-        )
-        .subscribe();
+    if (!supabase) return;
 
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    }
+    const client = supabase;
+    const channel = client
+      .channel('calculator-history-crm-sync')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'calculator_history' },
+        () => {
+          void fetchData({ silent: true });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      client.removeChannel(channel);
+    };
   }, [fetchData]);
 
   useEffect(() => {
