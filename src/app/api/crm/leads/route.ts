@@ -312,6 +312,7 @@ export async function GET(request: NextRequest) {
 
   const trashOnly = request.nextUrl.searchParams.get('trash') === '1';
   const archiveOnly = request.nextUrl.searchParams.get('archive') === '1';
+  const includeAll = request.nextUrl.searchParams.get('include_all') === '1';
   const thirtyDaysAgoIso = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
   let query = supabaseClient
@@ -328,7 +329,13 @@ export async function GET(request: NextRequest) {
       .is('deleted_at', null)
       .eq('archived', true)
       .order('status_changed_at', { ascending: false });
+  } else if (includeAll) {
+    // Include all non-trashed leads (both archived and non-archived)
+    query = query
+      .is('deleted_at', null)
+      .order('created_at', { ascending: false });
   } else {
+    // Default: show active leads and recently archived leads (within 5 years)
     const fourteenDaysAgoIso = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
     const nowIso = new Date().toISOString();
     

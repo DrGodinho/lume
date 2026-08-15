@@ -332,11 +332,11 @@ export function ExtratosMensaisSupabase() {
       const inicio = startOfMonth(dataReferencia);
       const fim = endOfMonth(dataReferencia);
 
-      const leadsResponse = await fetch('/api/crm/leads', {
-        headers: await getCrmApiHeaders(),
-        credentials: 'same-origin',
-        cache: 'no-store',
-      });
+const leadsResponse = await fetch('/api/crm/leads?include_all=1', {
+  headers: await getCrmApiHeaders(),
+  credentials: 'same-origin',
+  cache: 'no-store',
+});
       const leadsPayload = await leadsResponse.json().catch(() => null);
 
       if (cancelled) return;

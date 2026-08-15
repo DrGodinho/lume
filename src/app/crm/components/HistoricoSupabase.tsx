@@ -42,48 +42,27 @@ export function HistoricoSupabase({ setActiveTab, openCreateModal }: HistoricoSu
     }
   }, []);
 
-  useEffect(() => {
-    void fetchData();
+useEffect(() => {
+      void fetchData();
 
-    if (!supabase) return;
+      if (!supabase) return;
 
-    const client = supabase;
-    const channel = client
-      .channel('calculator-history-crm-sync')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'calculator_history' },
-        () => {
-          void fetchData({ silent: true });
-        }
-      )
-      .subscribe();
+      const client = supabase;
+      const channel = client
+        .channel('calculator-history-crm-sync')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'calculator_history' },
+          () => {
+            void fetchData({ silent: true });
+          }
+        )
+        .subscribe();
 
-    return () => {
-      client.removeChannel(channel);
-    };
-  }, [fetchData]);
-
-  useEffect(() => {
-    const intervalId = window.setInterval(() => {
-      void fetchData({ silent: true });
-    }, HISTORY_REFRESH_INTERVAL_MS);
-
-    const refreshWhenVisible = () => {
-      if (document.visibilityState === 'visible') {
-        void fetchData({ silent: true });
-      }
-    };
-
-    window.addEventListener('focus', refreshWhenVisible);
-    document.addEventListener('visibilitychange', refreshWhenVisible);
-
-    return () => {
-      window.clearInterval(intervalId);
-      window.removeEventListener('focus', refreshWhenVisible);
-      document.removeEventListener('visibilitychange', refreshWhenVisible);
-    };
-  }, [fetchData]);
+      return () => {
+        client.removeChannel(channel);
+      };
+    }, [fetchData, supabase]);
 
   const pendingCount = useMemo(() => history.filter((item) => !item.lead_id).length, [history]);
   const linkedCount = useMemo(() => history.filter((item) => Boolean(item.lead_id)).length, [history]);
