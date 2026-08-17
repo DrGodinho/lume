@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { leadFormSchema, leadPayloadSchema } from '../../schemas/leadSchema';
+import { leadFormSchema, leadPayloadSchema, normalizeLeadPhoneInput } from '../../schemas/leadSchema';
 
 const validForm = {
   name: 'Cliente Teste',
@@ -41,6 +41,28 @@ describe('leadFormSchema', () => {
     if (!invalid.success) {
       expect(invalid.error.issues.some((issue) => issue.path[0] === 'phone')).toBe(true);
     }
+  });
+
+  it('accepts flexible phone formats (+55, parens, dashes, spaces)', () => {
+    expect(leadFormSchema.safeParse({ ...validForm, phone: '+5521999999999' }).success).toBe(true);
+    expect(leadFormSchema.safeParse({ ...validForm, phone: '+55 21 99999-9999' }).success).toBe(true);
+    expect(leadFormSchema.safeParse({ ...validForm, phone: '(21) 99999-9999' }).success).toBe(true);
+    expect(leadFormSchema.safeParse({ ...validForm, phone: '21-99999-9999' }).success).toBe(true);
+    expect(leadFormSchema.safeParse({ ...validForm, phone: '21 9999 9999' }).success).toBe(true);
+  });
+
+  it('rejects phone with too few digits even if formatted', () => {
+    const invalid = leadFormSchema.safeParse({ ...validForm, phone: '+55 21 999-99' });
+    expect(invalid.success).toBe(false);
+  });
+
+  it('normalizes phone input by stripping non-digits and leading 55', () => {
+    expect(normalizeLeadPhoneInput('+5521999999999')).toBe('21999999999');
+    expect(normalizeLeadPhoneInput('+55 21 99999-9999')).toBe('21999999999');
+    expect(normalizeLeadPhoneInput('(21) 99999-9999')).toBe('21999999999');
+    expect(normalizeLeadPhoneInput('21-99999-9999')).toBe('21999999999');
+    expect(normalizeLeadPhoneInput('21999999999')).toBe('21999999999');
+    expect(normalizeLeadPhoneInput('')).toBe('');
   });
 
   it('rejects an invalid email', () => {

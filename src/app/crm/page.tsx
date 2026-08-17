@@ -35,6 +35,7 @@ import { useLeads } from './hooks/useLeads';
 import { useLogout } from './hooks/useLogout';
 import { useMetrics } from './hooks/useMetrics';
 import { useMonthlySnapshots } from './hooks/useMonthlySnapshots';
+import { useCrmSettings } from './hooks/useCrmSettings';
 import { formatLeadCurrency } from './utils';
 import type { CrmTab } from './types';
 
@@ -192,6 +193,13 @@ export default function HomePage() {
   const { agendaUrgentCount } = useAgenda(leads);
   const { snapshots: monthlySnapshots } = useMonthlySnapshots();
   const {
+    archiveAfterDays,
+    loadingArchiveAfterDays,
+    savingArchiveAfterDays,
+    archiveAfterDaysError,
+    updateArchiveAfterDays,
+  } = useCrmSettings();
+  const {
     stats,
     monthlyEvolution,
     periodSummary,
@@ -200,7 +208,7 @@ export default function HomePage() {
     monthTrendIsPositive,
     targetPercent,
     formatDashboardCurrency,
-  } = useMetrics(leads, targetGoal, monthlySnapshots, metricsPeriod, customStart, customEnd);
+  } = useMetrics(leads, targetGoal, monthlySnapshots, metricsPeriod, customStart, customEnd, archivedLeads);
   const syncTone = crmSync.status === 'error' ? 'error' : crmSync.status === 'warning' ? 'warning' : 'ok';
   const syncStatusLabel = syncTone === 'error'
     ? 'Erro'
@@ -705,6 +713,11 @@ export default function HomePage() {
               onUpdateRule={updatePlaybookRule}
               onResetPlaybook={resetActivePlaybook}
               onReload={reloadPlaybooks}
+              archiveAfterDays={archiveAfterDays}
+              loadingArchiveAfterDays={loadingArchiveAfterDays}
+              savingArchiveAfterDays={savingArchiveAfterDays}
+              archiveAfterDaysError={archiveAfterDaysError}
+              onUpdateArchiveAfterDays={updateArchiveAfterDays}
             />
           </TabErrorBoundary>
         )}

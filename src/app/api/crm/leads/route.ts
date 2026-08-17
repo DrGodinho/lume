@@ -4,6 +4,7 @@ import { verifyToken } from '@/lib/crm-auth';
 import { roundCurrency, roundMeasure } from '@/lib/numberPrecision';
 import { createDefaultPlaybookRules, getPlaybookFollowUpDate, normalizeSellerId, sanitizePlaybookRules } from '@/app/crm/utils/playbooks';
 import { leadPayloadSchema } from '@/app/crm/schemas/leadSchema';
+import { CRM_ARCHIVE_AFTER_DAYS_CONFIG_KEY, DEFAULT_CRM_ARCHIVE_AFTER_DAYS, MAX_CRM_ARCHIVE_AFTER_DAYS, MIN_CRM_ARCHIVE_AFTER_DAYS } from '@/app/crm/constants/targets';
 import type { FollowUpPlaybookRule } from '@/app/crm/types';
 
 type LeadStatus = 'Novo' | 'Em Contato' | 'Agendado' | 'Fechado' | 'Perdido';
@@ -283,6 +284,26 @@ async function loadSellerPlaybookRules(
   return sanitizePlaybookRules(data.rules as FollowUpPlaybookRule[]);
 }
 
+async function loadArchiveAfterDays(
+  supabaseClient: Awaited<ReturnType<typeof createSupabaseRequestClient>>,
+): Promise<number> {
+  if (!supabaseClient) return DEFAULT_CRM_ARCHIVE_AFTER_DAYS;
+
+  const { data, error } = await supabaseClient
+    .from('configuracoes')
+    .select('meta_valor')
+    .eq('id', CRM_ARCHIVE_AFTER_DAYS_CONFIG_KEY)
+    .maybeSingle();
+
+  if (error || !data) return DEFAULT_CRM_ARCHIVE_AFTER_DAYS;
+
+  const stored = Number(data.meta_valor);
+  if (!Number.isFinite(stored) || stored < MIN_CRM_ARCHIVE_AFTER_DAYS) {
+    return DEFAULT_CRM_ARCHIVE_AFTER_DAYS;
+  }
+  return Math.min(Math.floor(stored), MAX_CRM_ARCHIVE_AFTER_DAYS);
+}
+
 const applyServerPlaybookToLead = async (
   supabaseClient: Awaited<ReturnType<typeof createSupabaseRequestClient>>,
   lead: LeadPayload,
@@ -336,21 +357,22 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false });
   } else {
     // Default: show active leads and recently archived leads (within 5 years)
-    const fourteenDaysAgoIso = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
+    const archiveAfterDays = await loadArchiveAfterDays(supabaseClient);
+    const archiveCutoffIso = new Date(Date.now() - archiveAfterDays * 24 * 60 * 60 * 1000).toISOString();
     const nowIso = new Date().toISOString();
-    
+
     // Auto-archive old 'Fechado' leads before fetching active list
     await Promise.resolve(
       supabaseClient
         .from('leads')
-        .update({ 
+        .update({
           archived: true,
           updated_at: nowIso
         })
         .is('deleted_at', null)
         .eq('archived', false)
         .eq('status', 'Fechado')
-        .lt('status_changed_at', fourteenDaysAgoIso)
+        .lt('status_changed_at', archiveCutoffIso)
     ).catch(() => {}); // Ignore errors if columns are missing
 
     const fiveYearsAgoDate = new Date();

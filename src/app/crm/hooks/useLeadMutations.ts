@@ -3,7 +3,7 @@
 import { useCallback, type Dispatch, type FormEvent, type SetStateAction } from 'react';
 import { getCrmApiErrorMessage, getCrmApiHeaders, hasLeadNextAction, mapLeadRow, normalizeLeadAmounts, requiresLeadNextAction } from '../utils';
 import { applyFollowUpPlaybook } from '../utils/playbooks';
-import { leadFormSchema } from '../schemas/leadSchema';
+import { leadFormSchema, normalizeLeadPhoneInput } from '../schemas/leadSchema';
 import type { CrmSyncState, FollowUpPlaybookRule, Lead, LeadFormValues, LeadStatusInfoUpdate, LeadSyncStatus, ServiceStatus } from '../types';
 
 interface ToastApi {
@@ -103,11 +103,16 @@ export const useLeadMutations = ({
       return false;
     }
 
+    const normalizedForm = {
+      ...leadForm,
+      phone: normalizeLeadPhoneInput(leadForm.phone),
+    };
+
     let resultLead: Lead;
     let isCreate = false;
 
     if (selectedLead) {
-      const baseLead = normalizeLeadAmounts({ ...selectedLead, ...leadForm, updatedAt: new Date().toISOString() });
+      const baseLead = normalizeLeadAmounts({ ...selectedLead, ...normalizedForm, updatedAt: new Date().toISOString() });
       const updatedLead = selectedLead.status === baseLead.status
         ? baseLead
         : applyFollowUpPlaybook(baseLead, playbookRules, { overwriteExisting: true });
@@ -123,7 +128,7 @@ export const useLeadMutations = ({
       isCreate = true;
       const baseLead = normalizeLeadAmounts({
         id: `lead_${Date.now()}`,
-        ...leadForm,
+        ...normalizedForm,
         createdAt: new Date().toISOString().split('T')[0],
         updatedAt: new Date().toISOString(),
       });

@@ -8,10 +8,29 @@ export const serviceStatusSchema = z.enum(LEAD_SERVICE_STATUSES);
 
 export const leadNameSchema = z.string().trim().min(2, 'Nome deve ter pelo menos 2 caracteres.');
 
+const normalizePhoneDigits = (value: string) => value.replace(/\D/g, '');
+
 export const leadPhoneSchema = z.string().trim().refine(
-  (value) => value === '' || /^\d{10,11}$/.test(value),
-  'Telefone deve conter 10 ou 11 digitos (ex.: 21999999999).',
+  (value) => {
+    if (value === '') return true;
+    const digits = normalizePhoneDigits(value);
+    if (!digits) return false;
+    const isLocal = /^\d{10,11}$/.test(digits);
+    const hasDdi = digits.length === 12 || digits.length === 13;
+    const startsWith55 = digits.startsWith('55');
+    return isLocal || (hasDdi && startsWith55);
+  },
+  'Telefone invalido. Use 10 ou 11 digitos (ex.: 21999999999) ou inclua o DDI 55.',
 );
+
+export const normalizeLeadPhoneInput = (value: string) => {
+  const digits = normalizePhoneDigits(value);
+  if (!digits) return '';
+  if ((digits.length === 12 || digits.length === 13) && digits.startsWith('55')) {
+    return digits.slice(2);
+  }
+  return digits;
+};
 
 export const leadEmailSchema = z.string().trim().refine(
   (value) => value === '' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),

@@ -7,6 +7,14 @@ import type { Lead } from '../../types';
 vi.mock('@/lib/supabase', () => ({ supabase: null }));
 vi.mock('@/lib/cloudSync', () => ({ loadConfigFromCloud: vi.fn() }));
 
+vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => {
+  const url = typeof input === 'string' ? input : (input as URL).toString();
+  if (url.includes('archive=1') || url.includes('trash=1') || url.includes('/api/crm/leads')) {
+    return new Response(JSON.stringify([]), { status: 200, headers: { 'Content-Type': 'application/json' } });
+  }
+  return new Response(JSON.stringify([]), { status: 200, headers: { 'Content-Type': 'application/json' } });
+}) as typeof fetch);
+
 const toast = {
   error: vi.fn(),
 };

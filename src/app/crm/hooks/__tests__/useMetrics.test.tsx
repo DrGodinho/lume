@@ -113,4 +113,41 @@ describe('useMetrics', () => {
     expect(result.current.periodSummary.revenue).toBe(2500);
     expect(result.current.periodSummary.count).toBe(1);
   });
+
+  it('includes archived leads in the previous-month chart even when not in active leads', () => {
+    const leads: Lead[] = [];
+    const archivedLeads = [
+      makeLead('archived-july-1', { status: 'Fechado', statusChangedAt: '2026-06-15', value: 1200, archived: true }),
+      makeLead('archived-july-2', { status: 'Fechado', statusChangedAt: '2026-06-20', value: 800, archived: true }),
+    ];
+
+    const { result } = renderHook(() => useMetrics(leads, 5000, {}, 'mes', null, null, archivedLeads));
+
+    expect(result.current.monthlyEvolution.previousTotal).toBe(2000);
+    expect(result.current.monthlyEvolution.previousCount).toBe(2);
+  });
+
+  it('does not double-count leads that appear in both active and archived snapshots', () => {
+    const overlappingLead = makeLead('shared', { status: 'Fechado', statusChangedAt: '2026-06-15', value: 1500 });
+    const leads = [overlappingLead];
+    const archivedLeads = [makeLead('shared', { status: 'Fechado', statusChangedAt: '2026-06-15', value: 1500, archived: true })];
+
+    const { result } = renderHook(() => useMetrics(leads, 5000, {}, 'mes', null, null, archivedLeads));
+
+    expect(result.current.monthlyEvolution.previousTotal).toBe(1500);
+    expect(result.current.monthlyEvolution.previousCount).toBe(1);
+  });
+
+  it('does not inflate active-lead stats with archived leads', () => {
+    const activeLead = makeLead('active', { status: 'Fechado', statusChangedAt: '2026-07-02', value: 1000 });
+    const archivedLeads = [
+      makeLead('archived-prev', { status: 'Fechado', statusChangedAt: '2026-06-10', value: 2000, archived: true }),
+    ];
+
+    const { result } = renderHook(() => useMetrics([activeLead], 5000, {}, 'mes', null, null, archivedLeads));
+
+    expect(result.current.stats.closed).toBe(1);
+    expect(result.current.stats.total).toBe(1);
+    expect(result.current.monthlyEvolution.previousTotal).toBe(2000);
+  });
 });

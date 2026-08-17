@@ -162,7 +162,7 @@ export const useLeadList = (
   useEffect(() => {
     if (activeTab === 'trash') {
       void loadTrashLeads();
-    } else if (activeTab === 'archive') {
+    } else if (activeTab === 'archive' || activeTab === 'dashboard') {
       void loadArchivedLeads();
     }
   }, [activeTab, loadTrashLeads, loadArchivedLeads]);

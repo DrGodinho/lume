@@ -20,4 +20,10 @@ export { CRM_FILM_TYPE_LABELS, DEFAULT_CRM_FILM_OPTIONS } from './filmTypes';
 export { RJ_NEIGHBORHOODS } from './neighborhoods';
 export type { RjNeighborhood } from './neighborhoods';
 
-export { DEFAULT_CRM_TARGET_GOAL } from './targets';
+export {
+  DEFAULT_CRM_TARGET_GOAL,
+  CRM_ARCHIVE_AFTER_DAYS_CONFIG_KEY,
+  DEFAULT_CRM_ARCHIVE_AFTER_DAYS,
+  MIN_CRM_ARCHIVE_AFTER_DAYS,
+  MAX_CRM_ARCHIVE_AFTER_DAYS,
+} from './targets';

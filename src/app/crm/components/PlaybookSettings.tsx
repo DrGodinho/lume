@@ -1,7 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { RefreshCw, RotateCcw, SlidersHorizontal, UserRound } from 'lucide-react';
+import { Archive, RefreshCw, RotateCcw, SlidersHorizontal, UserRound } from 'lucide-react';
+import {
+  DEFAULT_CRM_ARCHIVE_AFTER_DAYS,
+  MAX_CRM_ARCHIVE_AFTER_DAYS,
+  MIN_CRM_ARCHIVE_AFTER_DAYS,
+} from '../constants';
 import type { FollowUpPlaybookRule, SellerPlaybook } from '../types';
 
 interface PlaybookSettingsProps {
@@ -15,6 +20,11 @@ interface PlaybookSettingsProps {
   onUpdateRule: (ruleId: string, patch: Partial<FollowUpPlaybookRule>) => void;
   onResetPlaybook: () => void;
   onReload: () => Promise<void>;
+  archiveAfterDays: number;
+  loadingArchiveAfterDays: boolean;
+  savingArchiveAfterDays: boolean;
+  archiveAfterDaysError: string | null;
+  onUpdateArchiveAfterDays: (next: number) => void;
 }
 
 const statusLabels: Record<FollowUpPlaybookRule['triggerStatus'], string> = {
@@ -36,15 +46,36 @@ export function PlaybookSettings({
   onUpdateRule,
   onResetPlaybook,
   onReload,
+  archiveAfterDays,
+  loadingArchiveAfterDays,
+  savingArchiveAfterDays,
+  archiveAfterDaysError,
+  onUpdateArchiveAfterDays,
 }: PlaybookSettingsProps) {
   const [sellerInput, setSellerInput] = useState(activeSellerId);
+  const [archiveInput, setArchiveInput] = useState<string>(String(archiveAfterDays || DEFAULT_CRM_ARCHIVE_AFTER_DAYS));
 
   useEffect(() => {
     setSellerInput(activeSellerId);
   }, [activeSellerId]);
 
+  useEffect(() => {
+    setArchiveInput(String(archiveAfterDays || DEFAULT_CRM_ARCHIVE_AFTER_DAYS));
+  }, [archiveAfterDays]);
+
   const commitSellerInput = () => {
     onChangeSeller(sellerInput);
+  };
+
+  const commitArchiveInput = (raw: string) => {
+    const parsed = Number(raw);
+    if (!Number.isFinite(parsed) || parsed < MIN_CRM_ARCHIVE_AFTER_DAYS) {
+      setArchiveInput(String(archiveAfterDays || DEFAULT_CRM_ARCHIVE_AFTER_DAYS));
+      return;
+    }
+    const clamped = Math.min(Math.floor(parsed), MAX_CRM_ARCHIVE_AFTER_DAYS);
+    setArchiveInput(String(clamped));
+    onUpdateArchiveAfterDays(clamped);
   };
 
   return (
@@ -188,6 +219,46 @@ export function PlaybookSettings({
                 </label>
               </div>
             ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-5 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <span className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-white/38">
+              <Archive className="h-3.5 w-3.5 text-[#f5d77a]" />
+              Auto-arquivamento
+            </span>
+            <p className="mt-1 text-sm text-white/45">
+              Leads fechados há mais de N dias saem da lista ativa e vão para o Arquivo. Padrao: 14 dias.
+            </p>
+            {archiveAfterDaysError && (
+              <p className="mt-1 text-xs font-semibold text-red-300">{archiveAfterDaysError}</p>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <input
+              type="number"
+              min={MIN_CRM_ARCHIVE_AFTER_DAYS}
+              max={MAX_CRM_ARCHIVE_AFTER_DAYS}
+              value={archiveInput}
+              onChange={(event) => setArchiveInput(event.target.value)}
+              onBlur={(event) => commitArchiveInput(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') {
+                  event.preventDefault();
+                  commitArchiveInput((event.target as HTMLInputElement).value);
+                }
+              }}
+              disabled={loadingArchiveAfterDays}
+              className="h-10 w-24 rounded-xl border border-white/10 bg-[#03060b] px-3 text-center text-sm font-black text-white outline-none transition focus:border-[#c9a227]/40 disabled:cursor-not-allowed disabled:opacity-50"
+              aria-label="Dias para auto-arquivamento"
+            />
+            <span className="text-xs font-semibold uppercase tracking-[0.16em] text-white/45">
+              {savingArchiveAfterDays ? 'Salvando...' : loadingArchiveAfterDays ? 'Carregando...' : 'dias'}
+            </span>
           </div>
         </div>
       </div>

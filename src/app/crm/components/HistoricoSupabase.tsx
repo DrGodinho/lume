@@ -319,26 +319,31 @@ useEffect(() => {
                           <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                         </svg>
                       </button>
-                      <button
-                        type="button"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          convertToLead(item);
-                        }}
-                        disabled={!!item.lead_id}
-                        className="text-[#c9a227]/60 hover:text-[#c9a227] disabled:cursor-not-allowed disabled:text-emerald-300/45"
-                        title={item.lead_id ? 'Já vinculado a um lead' : 'Converter em Lead'}
-                      >
-                        {item.lead_id ? (
-                          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                          </svg>
-                        ) : (
-                          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                          </svg>
-                        )}
-                      </button>
+<button
+  type="button"
+  onClick={(event) => {
+    event.stopPropagation();
+    const orc = item;
+    setSelectedOrcamento(null);
+    // Use setTimeout to ensure modal closing is processed before opening lead creation modal
+    setTimeout(() => {
+      convertToLead(orc);
+    }, 0);
+  }}
+  disabled={!!item.lead_id}
+  className="text-[#c9a227]/60 hover:text-[#c9a227] disabled:cursor-not-allowed disabled:text-emerald-300/45"
+  title={item.lead_id ? 'Já vinculado a um lead' : 'Converter em Lead'}
+>
+  {item.lead_id ? (
+    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+    </svg>
+  ) : (
+    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+    </svg>
+  )}
+</button>
                       <button type="button" onClick={(event) => {
                         event.stopPropagation();
                         void deleteOrcamento(item.id);
@@ -419,17 +424,20 @@ useEffect(() => {
               <button onClick={() => setSelectedOrcamento(null)} className="flex-1 rounded-xl border border-white/5 bg-white/[0.01] py-2.5 text-sm font-semibold text-white/60 transition hover:bg-white/5">
                 Fechar
               </button>
-              <button
-                onClick={() => {
-                  const orc = selectedOrcamento;
-                  setSelectedOrcamento(null);
-                  convertToLead(orc);
-                }}
-                disabled={!!selectedOrcamento.lead_id}
-                className="flex-1 rounded-xl bg-gradient-to-r from-[#c9a227] to-[#d4ad30] py-2.5 text-sm font-bold text-[#04080f] shadow-lg shadow-[#c9a227]/10 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {selectedOrcamento.lead_id ? 'Lead já vinculado' : 'Converter em Lead'}
-              </button>
+<button
+  onClick={() => {
+    const orc = selectedOrcamento;
+    setSelectedOrcamento(null);
+    // Use setTimeout to ensure modal closing is processed before opening lead creation modal
+    setTimeout(() => {
+      convertToLead(orc);
+    }, 0);
+  }}
+  disabled={!!selectedOrcamento.lead_id}
+  className="flex-1 rounded-xl bg-gradient-to-r from-[#c9a227] to-[#d4ad30] py-2.5 text-sm font-bold text-[#04080f] shadow-lg shadow-[#c9a227]/10 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+>
+  {selectedOrcamento.lead_id ? 'Lead já vinculado' : 'Converter em Lead'}
+</button>
             </div>
           </div>
         </div>

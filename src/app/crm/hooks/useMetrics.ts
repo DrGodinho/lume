@@ -22,6 +22,7 @@ export const useMetrics = (
   metricsPeriod: MetricsPeriod = 'mes',
   customStart?: string | null,
   customEnd?: string | null,
+  archivedLeads: Lead[] = [],
 ) => {
   const monthlyEvolution = useMemo<MonthlyEvolutionData>(() => {
     const now = new Date();
@@ -37,7 +38,11 @@ export const useMetrics = (
     const previousByDay: Record<string, { value: number; count: number }> = {};
     const futureByDay: Record<string, { value: number; count: number }> = {};
 
-    leads.filter((lead) => lead.status === 'Fechado').forEach((lead) => {
+    const closedLeadsForChart = [...leads, ...archivedLeads].filter((lead) => lead.status === 'Fechado');
+    const seenIds = new Set<string>();
+    closedLeadsForChart.forEach((lead) => {
+      if (seenIds.has(lead.id)) return;
+      seenIds.add(lead.id);
       const date = getLeadRevenueDate(lead);
       if (!date) return;
 
@@ -150,7 +155,7 @@ export const useMetrics = (
       futureTotal,
       futureCount,
     };
-  }, [leads, historicalSnapshots]);
+  }, [leads, historicalSnapshots, archivedLeads]);
 
   const stats = useMemo<DashboardStats>(() => {
     const today = new Date();
