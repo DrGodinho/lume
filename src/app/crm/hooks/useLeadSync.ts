@@ -1,5 +1,6 @@
 'use client';
 
+import { fetchWithTimeout } from '@/lib/fetchWithTimeout';
 import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from 'react';
 import { format } from 'date-fns';
 import { areLeadCollectionsEquivalent, getCrmApiErrorMessage, getCrmApiHeaders, mapLeadRow, normalizeLeadAmounts } from '../utils';
@@ -35,7 +36,7 @@ const wait = (ms: number) => new Promise((resolve) => {
 });
 
 const fetchCloudLeadsSnapshot = async (): Promise<CloudSnapshotResult> => {
-  const response = await fetch('/api/crm/leads', {
+  const response = await fetchWithTimeout('/api/crm/leads', {
     headers: await getCrmApiHeaders(),
     credentials: 'same-origin',
     cache: 'no-store',
@@ -51,7 +52,7 @@ const fetchCloudLeadsSnapshot = async (): Promise<CloudSnapshotResult> => {
 
 const requestLeadSync = async (lead: Lead, method: 'POST' | 'PUT'): Promise<SyncLeadResult> => {
   try {
-    const response = await fetch('/api/crm/leads', {
+    const response = await fetchWithTimeout('/api/crm/leads', {
       method,
       headers: await getCrmApiHeaders(),
       credentials: 'same-origin',
@@ -214,7 +215,7 @@ export const useLeadSync = (
       }
 
       try {
-        const response = await fetch('/api/crm/leads', {
+        const response = await fetchWithTimeout('/api/crm/leads', {
           method: 'PATCH',
           headers: await getCrmApiHeaders(),
           credentials: 'same-origin',

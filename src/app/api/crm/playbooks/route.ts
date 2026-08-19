@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { verifyToken } from '@/lib/crm-auth';
+import { verifyAccessToken } from '@/lib/crm-auth';
 import { createDefaultSellerPlaybook, normalizeSellerId, sanitizePlaybookRules } from '@/app/crm/utils/playbooks';
 import type { FollowUpPlaybookRule, SellerPlaybook } from '@/app/crm/types';
 
@@ -62,7 +62,7 @@ async function ensureAuthorized(request: NextRequest) {
   const crmToken = request.cookies.get('crm-token')?.value;
 
   if (crmToken) {
-    const payload = await verifyToken(crmToken);
+    const payload = await verifyAccessToken(crmToken);
     if (payload) return null;
   }
 
@@ -74,7 +74,7 @@ async function ensureAuthorized(request: NextRequest) {
 async function resolveActor(request: NextRequest) {
   const crmToken = request.cookies.get('crm-token')?.value;
   if (crmToken) {
-    const payload = await verifyToken(crmToken);
+    const payload = await verifyAccessToken(crmToken);
     if (payload?.email) return payload.email;
   }
 

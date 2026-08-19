@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { createSupabaseBrowserClient } from '@/lib/supabase-server';
 import { format, isThisMonth, isBefore, startOfDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import toast from 'react-hot-toast';
@@ -463,8 +462,6 @@ export default function AdminCrm() {
 
   const draggedIdRef = useRef<string | null>(null);
 
-  const supabaseRef = useRef(createSupabaseBrowserClient());
-
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
@@ -473,53 +470,32 @@ export default function AdminCrm() {
   }, []);
 
   const fetchOrcamentos = useCallback(async () => {
-    const { data, error } = await supabaseRef.current
-      .from('calculator_history')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(100);
-
-    if (error) {
+    try {
+      const response = await fetch('/api/calculator/history?scope=all', {
+        credentials: 'include',
+        cache: 'no-store',
+      });
+      if (!response.ok) {
+        toast.error('Erro ao carregar orçamentos.');
+        setLoading(false);
+        return;
+      }
+      const result = await response.json();
+      const items = Array.isArray(result?.items) ? result.items : [];
+      setOrcamentos(items.map(normalizeOrcamento));
+    } catch {
       toast.error('Erro ao carregar orçamentos.');
+    } finally {
       setLoading(false);
-      return;
     }
-
-    setOrcamentos((data as OrcamentoRow[] | null)?.map(normalizeOrcamento) || []);
-    setLoading(false);
   }, []);
 
   useEffect(() => {
-    const supabase = supabaseRef.current;
-
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch inicial de dados externos (Supabase)
     fetchOrcamentos();
-
-    const channel = supabase
-      .channel('crm-realtime')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'calculator_history' },
-        (payload) => {
-          if (payload.eventType === 'INSERT') {
-            const newRecord = normalizeOrcamento(payload.new as OrcamentoRow);
-            setOrcamentos((prev) => [newRecord, ...prev]);
-          } else if (payload.eventType === 'UPDATE') {
-            const updated = normalizeOrcamento(payload.new as OrcamentoRow);
-            setOrcamentos((prev) =>
-              prev.map((o) => (o.id === updated.id ? updated : o))
-            );
-          } else if (payload.eventType === 'DELETE') {
-            const deleted = payload.old as { id: string };
-            setOrcamentos((prev) => prev.filter((o) => o.id !== deleted.id));
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    const interval = setInterval(() => {
+      fetchOrcamentos();
+    }, 15000);
+    return () => clearInterval(interval);
   }, [fetchOrcamentos]);
 
   const handleSaveModal = useCallback(
@@ -530,23 +506,33 @@ export default function AdminCrm() {
       );
       setSelectedOrcamento(null);
 
-      const { error } = await supabaseRef.current
-        .from('calculator_history')
-        .update(updates)
-        .eq('id', id);
-
-      if (error) {
+      try {
+        const response = await fetch('/api/calculator/history', {
+          method: 'PATCH',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, updates }),
+        });
+        if (!response.ok) {
+          setOrcamentos(previous);
+          toast.error('Erro ao salvar. Tente novamente.');
+        } else {
+          toast.success('Orçamento atualizado!');
+        }
+      } catch {
         setOrcamentos(previous);
         toast.error('Erro ao salvar. Tente novamente.');
-      } else {
-        toast.success('Orçamento atualizado!');
       }
     },
     [orcamentos]
   );
 
   const handleLogout = async () => {
-    await supabaseRef.current.auth.signOut();
+    try {
+      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+    } catch {
+      /* ignore */
+    }
     window.location.href = '/login';
   };
 
@@ -556,16 +542,20 @@ export default function AdminCrm() {
       setOrcamentos((prev) => prev.filter((o) => o.id !== id));
       setSelectedOrcamento(null);
 
-      const { error } = await supabaseRef.current
-        .from('calculator_history')
-        .delete()
-        .eq('id', id);
-
-      if (error) {
+      try {
+        const response = await fetch(
+          `/api/calculator/history?id=${encodeURIComponent(id)}&scope=all`,
+          { method: 'DELETE', credentials: 'include' }
+        );
+        if (!response.ok) {
+          setOrcamentos(previous);
+          toast.error('Erro ao excluir. Tente novamente.');
+        } else {
+          toast.success('Orçamento excluído.');
+        }
+      } catch {
         setOrcamentos(previous);
         toast.error('Erro ao excluir. Tente novamente.');
-      } else {
-        toast.success('Orçamento excluído.');
       }
     },
     [orcamentos]
@@ -609,17 +599,27 @@ export default function AdminCrm() {
         )
       );
 
-      const { error } = await supabaseRef.current
-        .from('calculator_history')
-        .update({ status: newStatus, data_ultimo_contato: new Date().toISOString() })
-        .eq('id', id);
+      try {
+        const response = await fetch('/api/calculator/history', {
+          method: 'PATCH',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id,
+            updates: { status: newStatus, data_ultimo_contato: new Date().toISOString() },
+          }),
+        });
 
-      if (error) {
+        if (!response.ok) {
+          setOrcamentos(previous);
+          toast.error('Erro ao mover. Tente novamente.');
+        } else {
+          const colLabel = KANBAN_COLUMNS.find((c) => c.status === newStatus)?.label;
+          toast.success(`Movido para "${colLabel}"`);
+        }
+      } catch {
         setOrcamentos(previous);
         toast.error('Erro ao mover. Tente novamente.');
-      } else {
-        const colLabel = KANBAN_COLUMNS.find((c) => c.status === newStatus)?.label;
-        toast.success(`Movido para "${colLabel}"`);
       }
 
       draggedIdRef.current = null;

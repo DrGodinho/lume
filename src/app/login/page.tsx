@@ -1,62 +1,44 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import toast, { Toaster } from 'react-hot-toast';
 import { Sun, Loader2 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const searchParams = useSearchParams();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  useEffect(() => {
+    const error = searchParams.get('error');
+    const redirectTo = searchParams.get('redirectTo');
+    if (error === 'invalid') {
+      toast.error('Credenciais invalidas. Tente novamente.');
+    } else if (error === 'rate_limit') {
+      toast.error('Muitas tentativas de login. Tente novamente mais tarde.');
+    } else if (error === 'session_failed') {
+      toast.error('Login realizado, mas a sessao nao foi restaurada. Tente novamente.');
+    }
+    if (redirectTo) {
+      const cleanUrl = new URL(window.location.href);
+      cleanUrl.searchParams.delete('error');
+      cleanUrl.searchParams.delete('redirectTo');
+      window.history.replaceState({}, '', cleanUrl.toString());
+    }
+  }, [searchParams]);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get('login')?.toString().trim() || '';
+    const password = formData.get('password')?.toString() || '';
+
     if (!email || !password) {
+      e.preventDefault();
       toast.error('Preencha todos os campos.');
       return;
     }
 
     setLoading(true);
-
-    try {
-      const response = await fetch('/api/auth/login/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json().catch(() => null);
-
-      if (!response.ok) {
-        toast.error(data?.error || 'Credenciais invalidas. Tente novamente.');
-        setLoading(false);
-        return;
-      }
-
-      if (supabase && data?.session?.accessToken && data?.session?.refreshToken) {
-        const { error } = await supabase.auth.setSession({
-          access_token: data.session.accessToken,
-          refresh_token: data.session.refreshToken,
-        });
-
-        if (error) {
-          await fetch('/api/auth/logout', { method: 'POST' }).catch(() => null);
-          toast.error('Login realizado, mas a sessao do Supabase nao foi restaurada.');
-          setLoading(false);
-          return;
-        }
-      }
-
-      const redirectTo = new URLSearchParams(window.location.search).get('redirectTo');
-      const nextPath = redirectTo && redirectTo.startsWith('/') && !redirectTo.startsWith('//')
-        ? redirectTo
-        : '/crm/';
-      window.location.href = nextPath;
-    } catch {
-      toast.error('Erro inesperado. Tente novamente.');
-      setLoading(false);
-    }
   };
 
   return (
@@ -83,20 +65,20 @@ export default function LoginPage() {
             <p className="text-sm text-white/50">Controle Solar - CRM</p>
           </div>
 
-          <form action="/api/auth/login/" method="post" onSubmit={handleLogin} className="flex flex-col gap-5">
+          <form action="/api/auth/login" method="post" onSubmit={handleSubmit} className="flex flex-col gap-5">
+            <input type="hidden" name="redirectTo" value={searchParams.get('redirectTo') || '/crm/'} />
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-semibold text-white/60 uppercase tracking-wider">
                 E-mail ou login
               </label>
               <input
                 type="text"
-                name="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="jrquintans ou seu@email.com"
+                name="login"
+                placeholder="seu@email.com"
                 autoCapitalize="none"
                 autoCorrect="off"
                 spellCheck={false}
+                autoComplete="username"
                 className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/30 outline-none transition focus:border-[#c9a227] focus:ring-1 focus:ring-[#c9a227]/40"
               />
             </div>
@@ -108,9 +90,8 @@ export default function LoginPage() {
               <input
                 type="password"
                 name="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
                 placeholder="********"
+                autoComplete="current-password"
                 className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/30 outline-none transition focus:border-[#c9a227] focus:ring-1 focus:ring-[#c9a227]/40"
               />
             </div>

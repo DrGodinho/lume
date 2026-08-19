@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import { useTokenRefresh } from '../crm/hooks/useTokenRefresh';
 
 const AdminCalculator = dynamic(() => import('../../views/AdminCalculator').then(mod => mod.AdminCalculator), {
   ssr: false,
@@ -14,5 +15,6 @@ const AdminCalculator = dynamic(() => import('../../views/AdminCalculator').then
 });
 
 export function AdminWrapper() {
+  useTokenRefresh();
   return <AdminCalculator />;
 }

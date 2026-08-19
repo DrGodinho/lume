@@ -1,5 +1,6 @@
 'use client';
 
+import { fetchWithTimeout } from '@/lib/fetchWithTimeout';
 import { useCallback, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useToastApi } from './useToast';
@@ -29,7 +30,7 @@ export function useLogout(redirectTo: string = '/login'): UseLogoutResult {
     }
 
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      await fetchWithTimeout('/api/auth/logout', { method: 'POST' });
     } catch (error) {
       apiError = error;
     }

@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { verifyToken } from '@/lib/crm-auth';
+import { verifyAccessToken } from '@/lib/crm-auth';
 
 function createSupabaseAdmin() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -44,7 +44,7 @@ async function ensureAuthorized(request: NextRequest) {
   const crmToken = request.cookies.get('crm-token')?.value;
 
   if (crmToken) {
-    const payload = await verifyToken(crmToken);
+    const payload = await verifyAccessToken(crmToken);
     if (payload) return null;
   }
 

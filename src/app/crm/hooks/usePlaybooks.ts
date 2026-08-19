@@ -1,5 +1,6 @@
 'use client';
 
+import { fetchWithTimeout } from '@/lib/fetchWithTimeout';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CRM_PLAYBOOKS_STORAGE_KEY } from '../constants';
 import { getCrmApiErrorMessage, getCrmApiHeaders } from '../utils';
@@ -91,7 +92,7 @@ export const usePlaybooks = (): UsePlaybooksReturn => {
     setPlaybookError(null);
 
     try {
-      const response = await fetch(`/api/crm/playbooks?sellerId=${encodeURIComponent(sellerId)}`, {
+      const response = await fetchWithTimeout(`/api/crm/playbooks?sellerId=${encodeURIComponent(sellerId)}`, {
         headers: await getCrmApiHeaders(),
         credentials: 'same-origin',
         cache: 'no-store',
@@ -125,7 +126,7 @@ export const usePlaybooks = (): UsePlaybooksReturn => {
     setPlaybookError(null);
 
     try {
-      const response = await fetch('/api/crm/playbooks', {
+      const response = await fetchWithTimeout('/api/crm/playbooks', {
         method: 'PUT',
         headers: await getCrmApiHeaders(),
         credentials: 'same-origin',

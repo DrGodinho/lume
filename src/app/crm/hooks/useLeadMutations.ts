@@ -1,5 +1,6 @@
 'use client';
 
+import { fetchWithTimeout } from '@/lib/fetchWithTimeout';
 import { useCallback, type Dispatch, type FormEvent, type SetStateAction } from 'react';
 import { getCrmApiErrorMessage, getCrmApiHeaders, hasLeadNextAction, mapLeadRow, normalizeLeadAmounts, requiresLeadNextAction } from '../utils';
 import { applyFollowUpPlaybook } from '../utils/playbooks';
@@ -175,7 +176,7 @@ export const useLeadMutations = ({
     markLeadSyncState(id, 'pending');
     setCrmSync({ status: 'warning', message: 'Excluindo lead no Supabase...' });
 
-    const response = await fetch(`/api/crm/leads?id=${encodeURIComponent(id)}`, {
+    const response = await fetchWithTimeout(`/api/crm/leads?id=${encodeURIComponent(id)}`, {
       method: 'DELETE',
       headers: await getCrmApiHeaders(),
       credentials: 'same-origin',
@@ -199,7 +200,7 @@ export const useLeadMutations = ({
 
   const handleRestoreLead = useCallback(async (lead: Lead) => {
     setCrmSync({ status: 'warning', message: 'Restaurando lead da lixeira...' });
-    const response = await fetch('/api/crm/leads', {
+    const response = await fetchWithTimeout('/api/crm/leads', {
       method: 'PATCH',
       headers: await getCrmApiHeaders(),
       credentials: 'same-origin',
@@ -260,7 +261,7 @@ export const useLeadMutations = ({
   const handleDormantStateChange = useCallback(async (leadId: string, dormant: boolean) => {
     markLeadSyncState(leadId, 'pending');
     setCrmSync({ status: 'warning', message: dormant ? 'Marcando lead como dormente...' : 'Reativando lead dormente...' });
-    const response = await fetch('/api/crm/leads', {
+    const response = await fetchWithTimeout('/api/crm/leads', {
       method: 'PATCH',
       headers: await getCrmApiHeaders(),
       credentials: 'same-origin',
@@ -315,7 +316,7 @@ export const useLeadMutations = ({
 
   const handleRestoreFromArchive = useCallback(async (lead: Lead) => {
     setCrmSync({ status: 'warning', message: 'Restaurando lead do arquivo...' });
-    const response = await fetch('/api/crm/leads', {
+    const response = await fetchWithTimeout('/api/crm/leads', {
       method: 'PATCH',
       headers: await getCrmApiHeaders(),
       credentials: 'same-origin',

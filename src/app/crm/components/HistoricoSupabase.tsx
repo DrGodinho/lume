@@ -1,7 +1,7 @@
 'use client';
 
+import { fetchWithTimeout } from '@/lib/fetchWithTimeout';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { supabase } from '@/lib/supabase';
 import { roundCurrency, roundMeasure } from '@/lib/numberPrecision';
 import { getHistoryFilmLabel } from '../utils';
 import type { CalculatorHistoryRow, CreateLeadModalOptions, CrmTab, Lead } from '../types';
@@ -25,44 +25,33 @@ export function HistoricoSupabase({ setActiveTab, openCreateModal }: HistoricoSu
   const [selectedOrcamento, setSelectedOrcamento] = useState<CalculatorHistoryRow | null>(null);
 
   const fetchData = useCallback(async ({ silent = false }: { silent?: boolean } = {}) => {
-    if (!supabase) {
-      setLoading(false);
-      return;
-    }
-
     if (silent) setRefreshing(true);
     try {
-      const { data } = await supabase.from('calculator_history').select('*').order('created_at', { ascending: false }).limit(100);
-
-      if (data) setHistory(data as CalculatorHistoryRow[]);
+      const response = await fetchWithTimeout('/api/calculator/history?scope=all', {
+        credentials: 'include',
+        cache: 'no-store',
+      });
+      if (response.ok) {
+        const result = await response.json();
+        if (Array.isArray(result?.items)) setHistory(result.items as CalculatorHistoryRow[]);
+      }
       setLastSyncedAt(new Date());
+    } catch {
+      // Falha silenciosa - mantem o ultimo estado conhecido
     } finally {
       setLoading(false);
       if (silent) setRefreshing(false);
     }
   }, []);
 
-useEffect(() => {
-      void fetchData();
+  useEffect(() => {
+    void fetchData();
+  }, [fetchData]);
 
-      if (!supabase) return;
-
-      const client = supabase;
-      const channel = client
-        .channel('calculator-history-crm-sync')
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'calculator_history' },
-          () => {
-            void fetchData({ silent: true });
-          }
-        )
-        .subscribe();
-
-      return () => {
-        client.removeChannel(channel);
-      };
-    }, [fetchData, supabase]);
+  useEffect(() => {
+    const interval = window.setInterval(() => void fetchData({ silent: true }), HISTORY_REFRESH_INTERVAL_MS);
+    return () => window.clearInterval(interval);
+  }, [fetchData]);
 
   const pendingCount = useMemo(() => history.filter((item) => !item.lead_id).length, [history]);
   const linkedCount = useMemo(() => history.filter((item) => Boolean(item.lead_id)).length, [history]);
@@ -110,10 +99,11 @@ useEffect(() => {
 
   const deleteOrcamento = useCallback(async (id: string) => {
     if (!confirm('Excluir este orçamento do histórico?')) return;
-    if (!supabase) return;
-
-    const { error } = await supabase.from('calculator_history').delete().eq('id', id);
-    if (!error) {
+    const response = await fetchWithTimeout(`/api/calculator/history?id=${encodeURIComponent(id)}&scope=all`, {
+      method: 'DELETE',
+      credentials: 'include',
+    });
+    if (response.ok) {
       setHistory((current) => current.filter((item) => item.id !== id));
     }
   }, []);
@@ -149,15 +139,6 @@ useEffect(() => {
     return (
       <div className="flex h-64 items-center justify-center">
         <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#c9a227]" />
-      </div>
-    );
-  }
-
-  if (!supabase) {
-    return (
-      <div className="rounded-3xl border border-red-500/20 bg-red-500/5 p-6 text-center">
-        <p className="font-semibold text-red-400">Supabase não configurado</p>
-        <p className="mt-2 text-sm text-white/50">Adicione as variáveis NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY no .env.local</p>
       </div>
     );
   }
@@ -319,7 +300,7 @@ useEffect(() => {
                           <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                         </svg>
                       </button>
-<button
+ <button
   type="button"
   onClick={(event) => {
     event.stopPropagation();

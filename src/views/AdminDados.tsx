@@ -6,8 +6,7 @@ import {
     DollarSign, Package, User, Clock, RefreshCw, Download,
     BarChart3, TrendingUp, Layers
 } from 'lucide-react';
-import { supabase } from '../lib/supabase';
-import { resolveCalculatorScopeKey } from '../lib/calculatorScope';
+// Data is loaded via server API routes (authenticated with crm-token cookie).
 
 interface GlassItem {
     label?: string;
@@ -91,55 +90,42 @@ export function AdminDados() {
     };
 
     const loadData = async (showLoading = true) => {
-        if (!supabase) return;
         if (showLoading) setLoading(true);
-        const scopeKey = await resolveCalculatorScopeKey();
 
         const [histRes, draftRes, cfgRes] = await Promise.all([
-            supabase.from('calculator_history').select('*').eq('owner_key', scopeKey).order('created_at', { ascending: false }),
-            supabase.from('calculator_draft').select('*').eq('id', scopeKey).single(),
-            supabase.from('calculator_config').select('*').eq('id', scopeKey).single(),
+            fetch('/api/calculator/history', { credentials: 'include', cache: 'no-store' }),
+            fetch('/api/calculator/draft', { credentials: 'include', cache: 'no-store' }),
+            fetch('/api/calculator/config', { credentials: 'include', cache: 'no-store' }),
         ]);
 
-        if (histRes.data) setHistory(histRes.data);
-        if (draftRes.data) setDraft(draftRes.data as DraftRow);
-        if (cfgRes.data) setConfig(cfgRes.data as ConfigRow);
+        if (histRes.ok) {
+            const result = await histRes.json();
+            if (Array.isArray(result?.items)) setHistory(result.items as HistoryRow[]);
+        }
+        if (draftRes.ok) {
+            const result = await draftRes.json();
+            if (result?.draft) setDraft(result.draft as DraftRow);
+        }
+        if (cfgRes.ok) {
+            const result = await cfgRes.json();
+            if (result?.config) setConfig(result.config as ConfigRow);
+        }
         setLoading(false);
     };
 
     useEffect(() => {
-        let active = true;
-
-        const loadInitialData = async () => {
-            if (!supabase) return;
-            const scopeKey = await resolveCalculatorScopeKey();
-
-            const [histRes, draftRes, cfgRes] = await Promise.all([
-                supabase.from('calculator_history').select('*').eq('owner_key', scopeKey).order('created_at', { ascending: false }),
-                supabase.from('calculator_draft').select('*').eq('id', scopeKey).single(),
-                supabase.from('calculator_config').select('*').eq('id', scopeKey).single(),
-            ]);
-
-            if (!active) return;
-            if (histRes.data) setHistory(histRes.data as HistoryRow[]);
-            if (draftRes.data) setDraft(draftRes.data as DraftRow);
-            if (cfgRes.data) setConfig(cfgRes.data as ConfigRow);
-            setLoading(false);
-        };
-
-        void loadInitialData();
-
-        return () => {
-            active = false;
-        };
+        void loadData();
     }, []);
 
     const deleteHistoryItem = async (id: string) => {
-        if (!supabase) return;
         if (!window.confirm('Deletar este orçamento permanentemente?')) return;
-        const scopeKey = await resolveCalculatorScopeKey();
-        await supabase.from('calculator_history').delete().eq('id', id).eq('owner_key', scopeKey);
-        setHistory(prev => prev.filter(h => h.id !== id));
+        const response = await fetch(`/api/calculator/history?id=${encodeURIComponent(id)}`, {
+            method: 'DELETE',
+            credentials: 'include',
+        });
+        if (response.ok) {
+            setHistory(prev => prev.filter(h => h.id !== id));
+        }
     };
 
     const filteredHistory = useMemo(() => {
@@ -192,14 +178,6 @@ export function AdminDados() {
             ? (sortDir === 'desc' ? <ChevronDown size={12} /> : <ChevronUp size={12} />)
             : <ChevronDown size={12} className="opacity-30" />
     );
-
-    if (!supabase) {
-        return (
-            <div className="min-h-screen bg-[#040811] text-white flex items-center justify-center">
-                <p className="text-red-400">Supabase não configurado. Verifique o .env.local</p>
-            </div>
-        );
-    }
 
     return (
         <div className="min-h-screen bg-[#040811] text-white py-6 px-3 sm:px-6">

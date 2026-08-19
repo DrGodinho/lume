@@ -1,5 +1,6 @@
 'use client';
 
+import { fetchWithTimeout } from '@/lib/fetchWithTimeout';
 import { useEffect, useState } from 'react';
 import { getCrmApiHeaders } from '../utils';
 import type { Lead, LeadStatusHistoryEntry } from '../types';
@@ -25,7 +26,7 @@ export const useLeadStatusHistory = (leadDetail: Lead | null): UseLeadStatusHist
       setLoadingLeadStatusHistory(true);
 
       try {
-        const response = await fetch(`/api/crm/lead-status-history?leadId=${encodeURIComponent(leadDetail.id)}`, {
+        const response = await fetchWithTimeout(`/api/crm/lead-status-history?leadId=${encodeURIComponent(leadDetail.id)}`, {
           headers: await getCrmApiHeaders(),
           credentials: 'same-origin',
           cache: 'no-store',

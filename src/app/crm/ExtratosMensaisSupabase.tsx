@@ -1,8 +1,8 @@
 'use client';
 
+import { fetchWithTimeout } from '@/lib/fetchWithTimeout';
 import { useEffect, useMemo, useState } from 'react';
 import type { ComponentType } from 'react';
-import { supabase } from '@/lib/supabase';
 import { getCrmApiErrorMessage, getCrmApiHeaders } from './utils';
 import {
   endOfMonth,
@@ -317,14 +317,6 @@ export function ExtratosMensaisSupabase() {
     let cancelled = false;
 
     async function carregarExtrato() {
-      if (!supabase) {
-        if (cancelled) return;
-        setRegistros([]);
-        setLoading(false);
-        setErrorMessage('Supabase não configurado.');
-        return;
-      }
-
       setLoading(true);
       setErrorMessage(null);
 
@@ -332,11 +324,11 @@ export function ExtratosMensaisSupabase() {
       const inicio = startOfMonth(dataReferencia);
       const fim = endOfMonth(dataReferencia);
 
-const leadsResponse = await fetch('/api/crm/leads?include_all=1', {
-  headers: await getCrmApiHeaders(),
-  credentials: 'same-origin',
-  cache: 'no-store',
-});
+      const leadsResponse = await fetchWithTimeout('/api/crm/leads?include_all=1', {
+        headers: await getCrmApiHeaders(),
+        credentials: 'same-origin',
+        cache: 'no-store',
+      });
       const leadsPayload = await leadsResponse.json().catch(() => null);
 
       if (cancelled) return;
@@ -360,15 +352,15 @@ const leadsResponse = await fetch('/api/crm/leads?include_all=1', {
         return;
       }
 
-      const { data: historyData, error: historyError } = await supabase
-        .from('calculator_history')
-        .select('*')
-        .in('lead_id', serviceLeadIds)
-        .order('created_at', { ascending: false });
+      const historyResponse = await fetchWithTimeout(
+        `/api/calculator/history?leadIds=${encodeURIComponent(serviceLeadIds.join(','))}`,
+        { credentials: 'include', cache: 'no-store' }
+      );
+      const historyPayload = await historyResponse.json().catch(() => null);
 
       if (cancelled) return;
 
-      if (historyError) {
+      if (!historyResponse.ok || !historyPayload || !Array.isArray(historyPayload.items)) {
         setRegistros([]);
         setErrorMessage('Erro ao carregar orçamentos vinculados aos serviços.');
         toast.error('Erro ao carregar orçamentos vinculados');
@@ -376,11 +368,13 @@ const leadsResponse = await fetch('/api/crm/leads?include_all=1', {
         return;
       }
 
+      const historyData = historyPayload.items as Record<string, unknown>[];
+
       const historyByLeadId = new Map<string, Record<string, unknown>>();
       (historyData || []).forEach((row) => {
-        const leadId = asNullableString((row as Record<string, unknown>).lead_id);
+        const leadId = asNullableString(row.lead_id);
         if (leadId && !historyByLeadId.has(leadId)) {
-          historyByLeadId.set(leadId, row as Record<string, unknown>);
+          historyByLeadId.set(leadId, row);
         }
       });
 

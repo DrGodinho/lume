@@ -1104,6 +1104,7 @@ export function AdminCalculator() {
       const res = await fetch('/api/crm/leads', {
         method: 'POST',
         headers: await getCrmLeadHeaders(),
+        credentials: 'include',
         body: JSON.stringify({
           name: cliente || `Cliente ${phone}`,
           phone,

@@ -1,0 +1,1024 @@
+openapi: 3.1.0
+info:
+  title: Lume CRM API
+  version: 1.0.0
+  description: |
+    API specification for Lume CRM - a customer relationship management system for window film sales.
+    
+    ## Authentication
+    
+    The API uses cookie-based authentication with JWT tokens:
+    - `crm-token` - Short-lived access token (15 min)
+    - `crm-refresh-token` - Long-lived refresh token (7 days)
+    
+    Alternatively, Bearer tokens can be used via the `Authorization` header.
+    
+    ## Rate Limiting
+    
+    Login endpoint is rate-limited to 10 requests per 15 minutes per IP.
+    
+    ## Error Responses
+    
+    All endpoints return consistent error responses:
+    ```json
+    {
+      "error": "string",
+      "code": "string",
+      "details": "string",
+      "hint": "string"
+    }
+    ```
+servers:
+  - url: http://localhost:3000
+    description: Development server
+  - url: https://lume-crm.vercel.app
+    description: Production server
+
+security:
+  - cookieAuth: []
+  - bearerAuth: []
+
+tags:
+  - name: Authentication
+    description: User authentication and session management
+  - name: Leads
+    description: CRM lead management operations
+  - name: Playbooks
+    description: Follow-up playbook configuration
+  - name: Lead Status History
+    description: Lead status change audit trail
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: crm-token
+      description: JWT access token stored in httpOnly cookie
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT access token in Authorization header
+
+  schemas:
+    # Auth schemas
+    LoginRequest:
+      type: object
+      required:
+        - login
+        - password
+      properties:
+        login:
+          type: string
+          description: Email or username (will be normalized to email format)
+        password:
+          type: string
+          format: password
+          description: User password
+        redirectTo:
+          type: string
+          description: Optional redirect path after successful login
+      example:
+        login: "vendedor@lume.local"
+        password: "senha123"
+
+    LoginResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        session:
+          type: object
+          nullable: true
+          properties:
+            accessToken:
+              type: string
+            refreshToken:
+              type: string
+      example:
+        success: true
+        session:
+          accessToken: "eyJhbGciOiJIUzI1NiIs..."
+          refreshToken: "eyJhbGciOiJIUzI1NiIs..."
+
+    LoginErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        retryAfter:
+          type: integer
+          description: Seconds until rate limit resets
+      example:
+        error: "Muitas tentativas de login. Tente novamente mais tarde."
+        retryAfter: 900
+
+    LogoutResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+      example:
+        success: true
+
+    MeResponse:
+      type: object
+      properties:
+        authenticated:
+          type: boolean
+        email:
+          type: string
+      example:
+        authenticated: true
+        email: "vendedor@lume.local"
+
+    MeErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      example:
+        error: "Token nao fornecido"
+
+    RefreshRequest:
+      type: object
+      description: Refresh token is read from httpOnly cookie automatically
+
+    RefreshResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        accessToken:
+          type: string
+      example:
+        success: true
+        accessToken: "eyJhbGciOiJIUzI1NiIs..."
+
+    RefreshErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      example:
+        error: "Refresh token invalido ou expirado"
+
+    # Lead schemas
+    LeadStatus:
+      type: string
+      enum: ["Novo", "Em Contato", "Agendado", "Fechado", "Perdido"]
+      description: Lead pipeline status
+
+    ServiceStatus:
+      type: string
+      enum: ["Marcado", "Confirmado", "Em Execucao", "Concluido", "Reagendar"]
+      description: Service appointment status
+
+    Lead:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique lead identifier
+        name:
+          type: string
+          description: Customer full name
+        phone:
+          type: string
+          description: Phone number (WhatsApp format)
+        email:
+          type: string
+          format: email
+          description: Customer email
+        address:
+          type: string
+          description: Installation address
+        neighborhood:
+          type: string
+          description: Neighborhood/region
+        filmType:
+          type: string
+          description: Type of window film
+        sqm:
+          type: number
+          description: Square meters for installation
+        value:
+          type: number
+          description: Total value in BRL
+        status:
+          $ref: '#/components/schemas/LeadStatus'
+        notes:
+          type: string
+          description: Internal notes
+        createdAt:
+          type: string
+          format: date
+          description: Lead creation date (YYYY-MM-DD)
+        statusChangedAt:
+          type: string
+          format: date
+          description: Last status change date (YYYY-MM-DD)
+        proximoContato:
+          type: string
+          format: date
+          nullable: true
+          description: Next follow-up date (YYYY-MM-DD)
+        dataServico:
+          type: string
+          format: date
+          nullable: true
+          description: Scheduled service date (YYYY-MM-DD)
+        serviceStatus:
+          $ref: '#/components/schemas/ServiceStatus'
+          nullable: true
+        dormant:
+          type: boolean
+          description: Lead is dormant (inactive)
+        pinned:
+          type: boolean
+          description: Lead is pinned to top
+        archived:
+          type: boolean
+          description: Lead is archived
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update timestamp
+        deletedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Soft delete timestamp
+
+    LeadListResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/Lead'
+
+    LeadCreateRequest:
+      type: object
+      required:
+        - name
+        - phone
+        - email
+        - address
+        - neighborhood
+        - filmType
+        - sqm
+        - value
+        - status
+      properties:
+        id:
+          type: string
+          description: Optional custom ID (auto-generated if omitted)
+        name:
+          type: string
+          minLength: 1
+        phone:
+          type: string
+          minLength: 1
+        email:
+          type: string
+          format: email
+        address:
+          type: string
+          minLength: 1
+        neighborhood:
+          type: string
+          default: "Barra da Tijuca"
+        filmType:
+          type: string
+          default: "Nano Ceramica"
+        sqm:
+          type: number
+          minimum: 0
+        value:
+          type: number
+          minimum: 0
+        status:
+          $ref: '#/components/schemas/LeadStatus'
+        notes:
+          type: string
+          default: ""
+        createdAt:
+          type: string
+          format: date
+        statusChangedAt:
+          type: string
+          format: date
+        proximoContato:
+          type: string
+          format: date
+          nullable: true
+        dataServico:
+          type: string
+          format: date
+          nullable: true
+        serviceStatus:
+          $ref: '#/components/schemas/ServiceStatus'
+          nullable: true
+        dormant:
+          type: boolean
+          default: false
+        pinned:
+          type: boolean
+          default: false
+        archived:
+          type: boolean
+          default: false
+        updatedAt:
+          type: string
+          format: date-time
+        deletedAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    LeadUpdateRequest:
+      allOf:
+        - $ref: '#/components/schemas/LeadCreateRequest'
+        - type: object
+          required:
+            - id
+
+    LeadPatchRequest:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+        action:
+          type: string
+          enum: ["restore", "dormant", "activate"]
+          description: Special actions for lead state management
+        status:
+          $ref: '#/components/schemas/LeadStatus'
+        statusChangedAt:
+          type: string
+          format: date
+        notes:
+          type: string
+        proximoContato:
+          type: string
+          format: date
+          nullable: true
+        dataServico:
+          type: string
+          format: date
+          nullable: true
+        serviceStatus:
+          $ref: '#/components/schemas/ServiceStatus'
+          nullable: true
+        dormant:
+          type: boolean
+        pinned:
+          type: boolean
+        archived:
+          type: boolean
+        updatedAt:
+          type: string
+          format: date-time
+
+    LeadDeleteResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        lead:
+          $ref: '#/components/schemas/Lead'
+          nullable: true
+
+    LeadPatchResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        partial:
+          type: boolean
+          description: Indicates partial update (some columns may be missing)
+        lead:
+          $ref: '#/components/schemas/Lead'
+          nullable: true
+
+    ValidationErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        issues:
+          type: array
+          items:
+            type: object
+            properties:
+              path:
+                type: string
+              message:
+                type: string
+
+    # Playbook schemas
+    FollowUpPlaybookRule:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/LeadStatus'
+        days:
+          type: integer
+          minimum: 0
+        description:
+          type: string
+
+    SellerPlaybook:
+      type: object
+      properties:
+        sellerId:
+          type: string
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/FollowUpPlaybookRule'
+
+    PlaybookResponse:
+      type: object
+      properties:
+        activeSellerId:
+          type: string
+        activePlaybook:
+          $ref: '#/components/schemas/SellerPlaybook'
+        sellerIds:
+          type: array
+          items:
+            type: string
+
+    PlaybookUpdateRequest:
+      type: object
+      properties:
+        sellerId:
+          type: string
+          default: "equipe-lume"
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/FollowUpPlaybookRule'
+
+    # Lead Status History schemas
+    LeadStatusHistoryEntry:
+      type: object
+      properties:
+        id:
+          type: string
+        lead_id:
+          type: string
+        from_status:
+          $ref: '#/components/schemas/LeadStatus'
+          nullable: true
+        to_status:
+          $ref: '#/components/schemas/LeadStatus'
+        changed_at:
+          type: string
+          format: date-time
+        changed_by:
+          type: string
+          nullable: true
+
+    LeadStatusHistoryResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/LeadStatusHistoryEntry'
+
+    # Generic error response
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        code:
+          type: string
+        details:
+          type: string
+        hint:
+          type: string
+
+  parameters:
+    leadsTrashParam:
+      name: trash
+      in: query
+      schema:
+        type: string
+        enum: ["1"]
+      description: Show only trashed (soft-deleted) leads from last 30 days
+
+    leadsArchiveParam:
+      name: archive
+      in: query
+      schema:
+        type: string
+        enum: ["1"]
+      description: Show only archived leads
+
+    leadsIncludeAllParam:
+      name: include_all
+      in: query
+      schema:
+        type: string
+        enum: ["1"]
+      description: Include all non-trashed leads (archived and active)
+
+    playbookSellerIdParam:
+      name: sellerId
+      in: query
+      schema:
+        type: string
+        default: "equipe-lume"
+      description: Seller identifier for playbook
+
+    historyLeadIdParam:
+      name: leadId
+      in: query
+      required: true
+      schema:
+        type: string
+      description: Lead ID to fetch history for
+
+paths:
+  /api/auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      description: |
+        Authenticates user with email/password and sets httpOnly cookies with JWT tokens.
+        Supports both JSON and form-encoded requests.
+        Rate limited to 10 requests per 15 minutes per IP.
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+              description: Sets crm-token and crm-refresh-token cookies
+            X-RateLimit-Limit:
+              schema:
+                type: string
+            X-RateLimit-Remaining:
+              schema:
+                type: string
+        '303':
+          description: Form submission redirect on success
+          headers:
+            Location:
+              schema:
+                type: string
+            Set-Cookie:
+              schema:
+                type: string
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginErrorResponse'
+          headers:
+            X-RateLimit-Limit:
+              schema:
+                type: string
+            X-RateLimit-Remaining:
+              schema:
+                type: string
+        '429':
+          description: Rate limited
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginErrorResponse'
+          headers:
+            Retry-After:
+              schema:
+                type: string
+            X-RateLimit-Limit:
+              schema:
+                type: string
+            X-RateLimit-Remaining:
+              schema:
+                type: string
+            X-RateLimit-Reset:
+              schema:
+                type: string
+
+  /api/auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: User logout
+      description: Clears authentication cookies and ends session
+      operationId: logout
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogoutResponse'
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+              description: Clears crm-token, crm-refresh-token, and crm_session cookies
+
+  /api/auth/me:
+    get:
+      tags:
+        - Authentication
+      summary: Get current user
+      description: Returns authenticated user info from JWT token (cookie or Bearer header)
+      operationId: getCurrentUser
+      responses:
+        '200':
+          description: User authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeResponse'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeErrorResponse'
+
+  /api/auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh access token
+      description: Uses refresh token from cookie to issue new access token pair
+      operationId: refreshToken
+      responses:
+        '200':
+          description: Token refreshed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshResponse'
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+              description: Updates crm-token and crm-refresh-token cookies
+        '401':
+          description: Invalid or missing refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshErrorResponse'
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+              description: Clears invalid cookies
+
+  /api/crm/leads:
+    get:
+      tags:
+        - Leads
+      summary: List leads
+      description: |
+        Retrieves leads with various filtering options.
+        Requires authentication via cookie or Bearer token.
+      operationId: listLeads
+      parameters:
+        - $ref: '#/components/parameters/leadsTrashParam'
+        - $ref: '#/components/parameters/leadsArchiveParam'
+        - $ref: '#/components/parameters/leadsIncludeAllParam'
+      responses:
+        '200':
+          description: List of leads
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeadListResponse'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - Leads
+      summary: Create lead
+      description: |
+        Creates a new lead. Automatically applies follow-up playbook rules
+        to set `proximoContato` based on lead status.
+      operationId: createLead
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeadCreateRequest'
+      responses:
+        '201':
+          description: Lead created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lead'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Missing optional columns in database
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - Leads
+      summary: Update lead (full update)
+      description: |
+        Updates an existing lead (upsert). Applies playbook rules on status change.
+        Also updates monthly revenue snapshots for 'Fechado' leads.
+      operationId: updateLead
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeadUpdateRequest'
+      responses:
+        '200':
+          description: Lead updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lead'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Missing optional columns in database
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - Leads
+      summary: Soft delete lead
+      description: |
+        Marks lead as deleted (soft delete) by setting `deleted_at` timestamp.
+        Lead can be restored within 30 days.
+      operationId: deleteLead
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Lead ID to delete
+      responses:
+        '200':
+          description: Lead deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeadDeleteResponse'
+        '400':
+          description: Missing lead ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    patch:
+      tags:
+        - Leads
+      summary: Partial update lead
+      description: |
+        Performs partial updates on lead fields. Supports special actions:
+        - `restore`: Restore soft-deleted lead (within 30 days)
+        - `dormant`: Mark lead as dormant
+        - `activate`: Reactivate dormant lead
+        - Field updates: status, notes, proximo_contato, data_servico, service_status, dormant, pinned, archived
+        Automatically applies playbook rules on status change.
+      operationId: patchLead
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeadPatchRequest'
+      responses:
+        '200':
+          description: Lead patched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeadPatchResponse'
+        '400':
+          description: Invalid request (missing ID or action/fields)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Missing optional columns (e.g., dormant column not in DB)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/crm/playbooks:
+    get:
+      tags:
+        - Playbooks
+      summary: Get playbooks
+      description: |
+        Retrieves all seller playbooks and identifies the active one for the requested seller.
+        Requires Supabase service role key (admin access).
+      operationId: getPlaybooks
+      parameters:
+        - $ref: '#/components/parameters/playbookSellerIdParam'
+      responses:
+        '200':
+          description: Playbooks retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaybookResponse'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Playbooks table not created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error or admin not configured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - Playbooks
+      summary: Update playbook
+      description: |
+        Creates or updates a seller's follow-up playbook rules.
+        Requires Supabase service role key (admin access).
+      operationId: updatePlaybook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlaybookUpdateRequest'
+      responses:
+        '200':
+          description: Playbook updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaybookResponse'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Playbooks table not created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error or admin not configured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/crm/lead-status-history:
+    get:
+      tags:
+        - Lead Status History
+      summary: Get lead status history
+      description: |
+        Retrieves the status change audit trail for a specific lead.
+        Requires Supabase service role key (admin access).
+      operationId: getLeadStatusHistory
+      parameters:
+        - $ref: '#/components/parameters/historyLeadIdParam'
+      responses:
+        '200':
+          description: Status history entries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeadStatusHistoryResponse'
+        '400':
+          description: Missing leadId parameter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error or admin not available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'

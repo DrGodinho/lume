@@ -26,6 +26,7 @@ import {
 import { WhatsAppButton } from '../components/WhatsAppButton';
 import { Particles } from '../components/Particles';
 import { NavigationBreadcrumbs } from '../components/NavigationBreadcrumbs';
+import { HeroEntrance } from '../components/HeroEntrance';
 import { GoogleReviews } from '../components/GoogleReviews';
 
 const whatsapp =
@@ -215,13 +216,6 @@ export function InsulfilmPortasVidro() {
     gsap.registerPlugin(ScrollTrigger);
 
     const ctx = gsap.context(() => {
-      const heroTl = gsap.timeline({ defaults: { ease: 'expo.out' } });
-      heroTl.fromTo(
-        '.animate-hero',
-        { opacity: 0, y: 26, clipPath: 'inset(0 0 100% 0)' },
-        { opacity: 1, y: 0, clipPath: 'inset(0 0 0% 0)', duration: 0.75, stagger: 0.12 }
-      );
-
       gsap.utils.toArray<HTMLElement>('.page-entrance').forEach((element) => {
         gsap.fromTo(
           element,
@@ -290,27 +284,31 @@ export function InsulfilmPortasVidro() {
         <Particles />
 
         <div className="container-lume relative z-10">
-          <div className="max-w-4xl">
+          <HeroEntrance className="max-w-4xl">
             <NavigationBreadcrumbs
               showVisualTrail={false}
               items={[{ label: 'Início', href: '/' }, { label: 'Portas de vidro' }]}
             />
-            <div className="animate-hero mb-6 inline-flex items-center gap-2 rounded-full border border-[#c9a227]/30 bg-[#c9a227]/10 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[#c9a227] shadow-[0_0_25px_rgba(201,162,39,0.2)] sm:px-4 sm:text-xs sm:tracking-[0.28em]">
+            <div className="animate-hero opacity-0 mb-6 inline-flex items-center gap-2 rounded-full border border-[#c9a227]/30 bg-[#c9a227]/10 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[#c9a227] shadow-[0_0_25px_rgba(201,162,39,0.2)] sm:px-4 sm:text-xs sm:tracking-[0.28em]">
               <Sun size={16} />
               Residencial e comercial no Rio
             </div>
-            <h1 className="animate-hero font-montserrat text-[2.45rem] font-black leading-[1.02] sm:text-5xl md:text-6xl lg:text-7xl">
-              Insulfilm para <span className="text-gradient-gold">Portas de Vidro</span>
+            <h1 className="font-montserrat text-[2.45rem] font-black leading-[1.02] sm:text-5xl md:text-6xl lg:text-7xl">
+              <span className="word opacity-0 inline-block">Insulfilm</span>{' '}
+              <span className="word opacity-0 inline-block">para</span>{' '}
+              <span className="word opacity-0 inline-block text-gradient-gold">Portas</span>{' '}
+              <span className="word opacity-0 inline-block text-gradient-gold">de</span>{' '}
+              <span className="word opacity-0 inline-block text-gradient-gold">Vidro</span>
             </h1>
-            <p className="animate-hero mt-6 max-w-3xl text-base leading-relaxed text-gray-300 sm:mt-7 sm:text-lg md:text-xl">
+            <p className="animate-hero opacity-0 mt-6 max-w-3xl text-base leading-relaxed text-gray-300 sm:mt-7 sm:text-lg md:text-xl">
               Mais privacidade, conforto térmico e proteção solar para portas de vidro
               residenciais e comerciais, com instalação profissional no Rio de Janeiro.
             </p>
-            <p className="animate-hero mt-5 max-w-3xl text-sm leading-relaxed text-gray-400 sm:text-base md:text-lg">
+            <p className="animate-hero opacity-0 mt-5 max-w-3xl text-sm leading-relaxed text-gray-400 sm:text-base md:text-lg">
               Transforme sua porta de vidro sem trocar o vidro: películas de controle solar,
               privacidade, segurança e acabamento decorativo com aplicação limpa e precisa.
             </p>
-            <div className="animate-hero mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:gap-4">
+            <div className="animate-hero opacity-0 mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:gap-4">
               <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="btn-primary inline-flex w-full items-center justify-center gap-3 sm:w-auto">
                 Solicitar orçamento <MessageCircle size={19} />
               </a>
@@ -318,7 +316,7 @@ export function InsulfilmPortasVidro() {
                 Ver tipos de película <ArrowRight size={18} />
               </a>
             </div>
-            <div className="animate-hero mt-8 grid gap-3 sm:mt-10 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="animate-hero opacity-0 mt-8 grid gap-3 sm:mt-10 sm:grid-cols-2 lg:grid-cols-4">
               {['Garantia de 2 anos', 'Zona Oeste do Rio', 'Instalação limpa', 'Orçamento gratuito'].map((item) => (
                 <div key={item} className="flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-3 text-xs text-gray-200 backdrop-blur sm:justify-start sm:px-4 sm:text-sm">
                   <CheckCircle size={16} className="shrink-0 text-[#c9a227]" />
@@ -326,7 +324,7 @@ export function InsulfilmPortasVidro() {
                 </div>
               ))}
             </div>
-          </div>
+          </HeroEntrance>
         </div>
       </section>
 

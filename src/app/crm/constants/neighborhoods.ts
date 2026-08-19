@@ -5,6 +5,9 @@ export const RJ_NEIGHBORHOODS = [
   'Bangu',
   'Realengo',
   'Campo Grande',
+  'Padre Miguel',
+  'Senador Camará',
+  'Sulacap',
   'Outro',
 ] as const;
 

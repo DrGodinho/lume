@@ -1,8 +1,3 @@
-import { supabase } from './supabase';
-import {
-  normalizeCalculatorScopeKey,
-  resolveCalculatorScopeKey,
-} from './calculatorScope';
 import { createScopedLogger } from './logger';
 
 const logger = createScopedLogger('cloud-sync');
@@ -25,36 +20,36 @@ interface DraftData {
 }
 
 export async function saveDraftToCloud(draft: DraftData): Promise<boolean> {
-  if (!supabase) return false;
-  const ownerKey = normalizeCalculatorScopeKey(await resolveCalculatorScopeKey());
-  const { error } = await supabase
-    .from('calculator_draft')
-    .upsert({ id: ownerKey, ...draft, updated_at: new Date().toISOString() });
-  if (error) logger.error('Draft save failed', undefined, { message: error.message });
-  return !error;
+  try {
+    const response = await fetch('/api/calculator/draft', {
+      method: 'PUT',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(draft),
+    });
+    if (!response.ok) {
+      logger.error('Draft save failed', undefined, { status: response.status });
+      return false;
+    }
+    return true;
+  } catch (error) {
+    logger.error('Draft save failed', undefined, { message: String(error) });
+    return false;
+  }
 }
 
 export async function loadDraftFromCloud(): Promise<DraftData | null> {
-  if (!supabase) return null;
-  const ownerKey = normalizeCalculatorScopeKey(await resolveCalculatorScopeKey());
-  const { data, error } = await supabase
-    .from('calculator_draft')
-    .select('*')
-    .eq('id', ownerKey)
-    .single();
-
-  if (!error && data) return data as DraftData;
-
-  if (ownerKey !== 'default') {
-    const { data: defaultData } = await supabase
-      .from('calculator_draft')
-      .select('*')
-      .eq('id', 'default')
-      .single();
-    if (defaultData) return defaultData as DraftData;
+  try {
+    const response = await fetch('/api/calculator/draft', {
+      credentials: 'include',
+      cache: 'no-store',
+    });
+    if (!response.ok) return null;
+    const result = await response.json();
+    return (result?.draft as DraftData) ?? null;
+  } catch {
+    return null;
   }
-
-  return null;
 }
 
 interface HistoryItem {
@@ -72,95 +67,68 @@ interface HistoryItem {
   leadId?: string | null;
 }
 
-interface CalculatorHistoryRow {
-  id: string;
-  cliente: string;
-  phone?: string | null;
-  data: string;
-  valor: number;
-  qtd: number;
-  vidros: CloudGlass[];
-  config: CloudConfig;
-  desconto: number;
-  modo_otimizacao: string;
-  selected_film?: string | null;
-  lead_id?: string | null;
-}
-
 export async function saveHistoryItemToCloud(item: HistoryItem): Promise<boolean> {
-  if (!supabase) return false;
-  const ownerKey = normalizeCalculatorScopeKey(await resolveCalculatorScopeKey());
-  const { error } = await supabase
-    .from('calculator_history')
-    .upsert({
-      id: item.id,
-      owner_key: ownerKey,
-      cliente: item.cliente,
-      phone: item.phone || null,
-      data: item.data,
-      valor: item.valor,
-      qtd: item.qtd,
-      vidros: item.vidros,
-      config: item.config,
-      desconto: item.desconto,
-      modo_otimizacao: item.modoOtimizacao,
-      selected_film: item.selectedFilm || null,
-      lead_id: item.leadId || null,
+  try {
+    const response = await fetch('/api/calculator/history', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(item),
     });
-  if (error) logger.error('History save failed', undefined, { message: error.message });
-  return !error;
+    if (!response.ok) {
+      logger.error('History save failed', undefined, { status: response.status });
+      return false;
+    }
+    return true;
+  } catch (error) {
+    logger.error('History save failed', undefined, { message: String(error) });
+    return false;
+  }
 }
 
 export async function loadHistoryFromCloud(): Promise<HistoryItem[]> {
-  if (!supabase) return [];
-  const ownerKey = normalizeCalculatorScopeKey(await resolveCalculatorScopeKey());
-  let { data, error } = await supabase
-    .from('calculator_history')
-    .select('*')
-    .eq('owner_key', ownerKey)
-    .order('created_at', { ascending: false })
-    .limit(20);
-
-  if ((error || !data || data.length === 0) && ownerKey !== 'default') {
-    const fallbackRes = await supabase
-      .from('calculator_history')
-      .select('*')
-      .eq('owner_key', 'default')
-      .order('created_at', { ascending: false })
-      .limit(20);
-    if (!fallbackRes.error && fallbackRes.data && fallbackRes.data.length > 0) {
-      data = fallbackRes.data;
-      error = null;
-    }
+  try {
+    const response = await fetch('/api/calculator/history', {
+      credentials: 'include',
+      cache: 'no-store',
+    });
+    if (!response.ok) return [];
+    const result = await response.json();
+    const rows = (result?.items as Array<Record<string, unknown>>) ?? [];
+    return rows.map((row) => ({
+      id: String(row.id),
+      cliente: String(row.cliente ?? ''),
+      phone: row.phone ? String(row.phone) : undefined,
+      data: String(row.data ?? ''),
+      valor: Number(row.valor) || 0,
+      qtd: Number(row.qtd) || 0,
+      vidros: (row.vidros as CloudGlass[]) ?? [],
+      config: (row.config as CloudConfig) ?? {},
+      desconto: Number(row.desconto) || 0,
+      modoOtimizacao: String(row.modo_otimizacao ?? ''),
+      selectedFilm: row.selected_film ? String(row.selected_film) : undefined,
+      leadId: row.lead_id ? String(row.lead_id) : null,
+    }));
+  } catch {
+    return [];
   }
-
-  if (error || !data) return [];
-  return (data as CalculatorHistoryRow[]).map((row) => ({
-    id: row.id,
-    cliente: row.cliente,
-    phone: row.phone || undefined,
-    data: row.data,
-    valor: row.valor,
-    qtd: row.qtd,
-    vidros: row.vidros,
-    config: row.config,
-    desconto: row.desconto,
-    modoOtimizacao: row.modo_otimizacao,
-    selectedFilm: row.selected_film || undefined,
-    leadId: row.lead_id || null,
-  }));
 }
 
 export async function deleteHistoryItemFromCloud(id: string): Promise<boolean> {
-  if (!supabase) return false;
-  const ownerKey = normalizeCalculatorScopeKey(await resolveCalculatorScopeKey());
-  const { error } = await supabase
-    .from('calculator_history')
-    .delete()
-    .eq('id', id)
-    .eq('owner_key', ownerKey);
-  if (error) logger.error('History delete failed', undefined, { message: error.message });
-  return !error;
+  try {
+    const response = await fetch(`/api/calculator/history?id=${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    });
+    if (!response.ok) {
+      logger.error('History delete failed', undefined, { status: response.status });
+      return false;
+    }
+    return true;
+  } catch (error) {
+    logger.error('History delete failed', undefined, { message: String(error) });
+    return false;
+  }
 }
 
 interface ConfigData {
@@ -211,21 +179,8 @@ const normalizeFilmTypes = (value: unknown): Record<string, number> => {
   return next;
 };
 
-const CONFIG_OPTIONAL_COLUMNS = {
-  modo_perdas: "ALTER TABLE calculator_config ADD COLUMN modo_perdas text DEFAULT 'dinamico';",
-  perdas_fixas: "ALTER TABLE calculator_config ADD COLUMN perdas_fixas numeric DEFAULT 20;",
-  modo_cor_config: "ALTER TABLE calculator_config ADD COLUMN modo_cor_config text DEFAULT 'tamanho';",
-  agressividade_corte: "ALTER TABLE calculator_config ADD COLUMN agressividade_corte numeric DEFAULT 35;",
-  film_types: "ALTER TABLE calculator_config ADD COLUMN film_types jsonb DEFAULT '{\"carbono_g5\":90,\"carbono_g20\":90,\"refletiva\":110,\"dupla_camada\":140,\"nano_ceramica\":240,\"nano_ceramica_g20\":180,\"jateado\":99}';",
-  selected_film: "ALTER TABLE calculator_config ADD COLUMN selected_film text DEFAULT 'carbono_g20';",
-} as const;
-
 export async function saveConfigToCloud(config: ConfigData): Promise<boolean> {
-  if (!supabase) return false;
-  const ownerKey = normalizeCalculatorScopeKey(await resolveCalculatorScopeKey());
-
-  const row: Record<string, unknown> = {
-    id: ownerKey,
+  const row = {
     roll_w: config.rollW,
     price: config.price,
     margin: config.margin,
@@ -237,62 +192,56 @@ export async function saveConfigToCloud(config: ConfigData): Promise<boolean> {
     agressividade_corte: config.agressividadeCorte,
     film_types: normalizeFilmTypes(config.filmTypes),
     selected_film: normalizeSelectedFilm(config.selectedFilm),
-    updated_at: new Date().toISOString(),
   };
 
-  while (true) {
-    const { error } = await supabase
-      .from('calculator_config')
-      .upsert(row);
-
-    if (!error) return true;
-
-    const missingColumn = (Object.keys(CONFIG_OPTIONAL_COLUMNS) as Array<keyof typeof CONFIG_OPTIONAL_COLUMNS>)
-      .find((column) => error.message?.includes(column));
-
-    if (!missingColumn || !(missingColumn in row)) {
-      logger.error('Config save failed', undefined, { message: error.message });
+  try {
+    const response = await fetch('/api/calculator/config', {
+      method: 'PUT',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(row),
+    });
+    if (!response.ok) {
+      const result = await response.json().catch(() => null);
+      logger.error('Config save failed', undefined, {
+        status: response.status,
+        error: result?.error || response.statusText,
+        body: row,
+      });
       return false;
     }
-
-    delete row[missingColumn];
-    logger.warn(`Column ${missingColumn} missing - run: ${CONFIG_OPTIONAL_COLUMNS[missingColumn]}`);
+    return true;
+  } catch (error) {
+    logger.error('Config save failed', undefined, { message: String(error), body: row });
+    return false;
   }
 }
 
 export async function loadConfigFromCloud(): Promise<ConfigData | null> {
-  if (!supabase) return null;
-  const ownerKey = normalizeCalculatorScopeKey(await resolveCalculatorScopeKey());
-  let { data, error } = await supabase
-    .from('calculator_config')
-    .select('*')
-    .eq('id', ownerKey)
-    .single();
+  try {
+    const response = await fetch('/api/calculator/config', {
+      credentials: 'include',
+      cache: 'no-store',
+    });
+    if (!response.ok) return null;
+    const result = await response.json();
+    const data = result?.config;
+    if (!data) return null;
 
-  if ((error || !data) && ownerKey !== 'default') {
-    const fallbackRes = await supabase
-      .from('calculator_config')
-      .select('*')
-      .eq('id', 'default')
-      .single();
-    if (!fallbackRes.error && fallbackRes.data) {
-      data = fallbackRes.data;
-      error = null;
-    }
+    return {
+      rollW: data.roll_w,
+      price: data.price,
+      margin: data.margin,
+      modoOtimizacao: data.modo_otimizacao,
+      userName: data.user_name,
+      modoPerdas: data.modo_perdas ?? 'dinamico',
+      perdasFixas: data.perdas_fixas ?? 20,
+      modoCorConfig: data.modo_cor_config ?? 'tamanho',
+      agressividadeCorte: data.agressividade_corte ?? 35,
+      filmTypes: normalizeFilmTypes(data.film_types),
+      selectedFilm: normalizeSelectedFilm(data.selected_film),
+    };
+  } catch {
+    return null;
   }
-
-  if (error || !data) return null;
-  return {
-    rollW: data.roll_w,
-    price: data.price,
-    margin: data.margin,
-    modoOtimizacao: data.modo_otimizacao,
-    userName: data.user_name,
-    modoPerdas: data.modo_perdas ?? 'dinamico',
-    perdasFixas: data.perdas_fixas ?? 20,
-    modoCorConfig: data.modo_cor_config ?? 'tamanho',
-    agressividadeCorte: data.agressividade_corte ?? 35,
-    filmTypes: normalizeFilmTypes(data.film_types),
-    selectedFilm: normalizeSelectedFilm(data.selected_film),
-  };
 }

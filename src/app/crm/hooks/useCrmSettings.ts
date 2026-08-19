@@ -1,7 +1,7 @@
 'use client';
 
+import { fetchWithTimeout } from '@/lib/fetchWithTimeout';
 import { useCallback, useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
 import { createScopedLogger } from '@/lib/logger';
 import {
   CRM_ARCHIVE_AFTER_DAYS_CONFIG_KEY,
@@ -37,25 +37,27 @@ export const useCrmSettings = (): UseCrmSettingsReturn => {
     const load = async () => {
       setLoadingArchiveAfterDays(true);
       try {
-        if (!supabase) {
-          setArchiveAfterDays(DEFAULT_CRM_ARCHIVE_AFTER_DAYS);
-          return;
-        }
-        const { data, error } = await supabase
-          .from('configuracoes')
-          .select('meta_valor')
-          .eq('id', CRM_ARCHIVE_AFTER_DAYS_CONFIG_KEY)
-          .maybeSingle();
+        const response = await fetchWithTimeout(
+          `/api/crm/settings?id=${encodeURIComponent(CRM_ARCHIVE_AFTER_DAYS_CONFIG_KEY)}`,
+          { credentials: 'include', cache: 'no-store' }
+        );
 
-        if (error) {
-          logger.warn('Failed to load archive-after-days', { message: error.message });
+        if (!response.ok) {
+          logger.warn('Failed to load archive-after-days', { status: response.status });
           setArchiveAfterDays(DEFAULT_CRM_ARCHIVE_AFTER_DAYS);
           return;
         }
 
+        const result = await response.json().catch(() => null);
         if (cancelled) return;
-        const stored = Number(data?.meta_valor);
-        setArchiveAfterDays(Number.isFinite(stored) && stored > 0 ? clampArchiveDays(stored) : DEFAULT_CRM_ARCHIVE_AFTER_DAYS);
+
+        const stored = Number(result?.meta_valor);
+        setArchiveAfterDays(
+          Number.isFinite(stored) && stored > 0 ? clampArchiveDays(stored) : DEFAULT_CRM_ARCHIVE_AFTER_DAYS
+        );
+      } catch (error) {
+        logger.warn('Failed to load archive-after-days', { message: String(error) });
+        setArchiveAfterDays(DEFAULT_CRM_ARCHIVE_AFTER_DAYS);
       } finally {
         if (!cancelled) setLoadingArchiveAfterDays(false);
       }
@@ -73,14 +75,21 @@ export const useCrmSettings = (): UseCrmSettingsReturn => {
     setSavingArchiveAfterDays(true);
     setArchiveAfterDaysError(null);
     try {
-      if (!supabase) return;
-      const { error } = await supabase
-        .from('configuracoes')
-        .upsert({ id: CRM_ARCHIVE_AFTER_DAYS_CONFIG_KEY, meta_valor: clamped }, { onConflict: 'id' });
-      if (error) {
-        setArchiveAfterDaysError(error.message);
-        logger.error('Failed to save archive-after-days', undefined, { message: error.message });
+      const response = await fetchWithTimeout('/api/crm/settings', {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: CRM_ARCHIVE_AFTER_DAYS_CONFIG_KEY, meta_valor: clamped }),
+      });
+
+      if (!response.ok) {
+        const result = await response.json().catch(() => null);
+        setArchiveAfterDaysError(result?.error || 'Falha ao salvar configuracao.');
+        logger.error('Failed to save archive-after-days', undefined, { message: result?.error });
       }
+    } catch (error) {
+      setArchiveAfterDaysError('Falha ao salvar configuracao.');
+      logger.error('Failed to save archive-after-days', undefined, { message: String(error) });
     } finally {
       setSavingArchiveAfterDays(false);
     }

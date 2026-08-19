@@ -1,7 +1,7 @@
 'use client';
 
+import { fetchWithTimeout } from '@/lib/fetchWithTimeout';
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
 
 export interface MonthlySnapshot {
   month: string; // 'yyyy-MM'
@@ -12,19 +12,22 @@ export interface MonthlySnapshot {
 type SnapshotMap = Record<string, MonthlySnapshot>;
 
 const fetchSnapshotsDirectly = async (): Promise<MonthlySnapshot[]> => {
-  if (!supabase) return [];
-  const { data, error } = await supabase
-    .from('crm_monthly_snapshots')
-    .select('month, revenue, lead_count')
-    .order('month', { ascending: false })
-    .limit(24);
-
-  if (error || !data) return [];
-  return data.map((row) => ({
-    month: String(row.month),
-    revenue: Number(row.revenue) || 0,
-    lead_count: Number(row.lead_count) || 0,
-  }));
+  try {
+    const response = await fetchWithTimeout('/api/crm/monthly-snapshots', {
+      credentials: 'include',
+      cache: 'no-store',
+    });
+    if (!response.ok) return [];
+    const result = await response.json();
+    const data = Array.isArray(result?.snapshots) ? result.snapshots : [];
+    return data.map((row: Record<string, unknown>) => ({
+      month: String(row.month),
+      revenue: Number(row.revenue) || 0,
+      lead_count: Number(row.lead_count) || 0,
+    }));
+  } catch {
+    return [];
+  }
 };
 
 export const useMonthlySnapshots = () => {

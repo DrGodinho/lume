@@ -1,7 +1,7 @@
 'use client';
 
+import { fetchWithTimeout } from '@/lib/fetchWithTimeout';
 import { useCallback } from 'react';
-import { supabase } from '@/lib/supabase';
 import type { CalculatorHistoryRow, Lead } from '../types';
 
 export interface UseLeadOrcamentoReturn {
@@ -9,49 +9,57 @@ export interface UseLeadOrcamentoReturn {
   fetchLinkedOrcamento: (lead: Lead) => Promise<CalculatorHistoryRow | null>;
 }
 
+const mapRow = (row: Record<string, unknown>): CalculatorHistoryRow =>
+  row as unknown as CalculatorHistoryRow;
+
 export const useLeadOrcamento = (): UseLeadOrcamentoReturn => {
   const linkCalculatorHistoryToLead = useCallback(async (calculatorHistoryId: string, leadId: string) => {
-    if (!supabase) return false;
-
-    const { error } = await supabase
-      .from('calculator_history')
-      .update({ lead_id: leadId })
-      .eq('id', calculatorHistoryId);
-
-    return !error;
+    try {
+      const response = await fetchWithTimeout('/api/calculator/history', {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: calculatorHistoryId, updates: { lead_id: leadId } }),
+      });
+      return response.ok;
+    } catch {
+      return false;
+    }
   }, []);
 
   const fetchLinkedOrcamento = useCallback(async (lead: Lead): Promise<CalculatorHistoryRow | null> => {
-    if (!supabase) return null;
+    try {
+      const byLeadResponse = await fetchWithTimeout(
+        `/api/calculator/history?leadId=${encodeURIComponent(lead.id)}`,
+        { credentials: 'include', cache: 'no-store' }
+      );
 
-    const { data: linkedByLeadId } = await supabase
-      .from('calculator_history')
-      .select('*')
-      .eq('lead_id', lead.id)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
+      if (byLeadResponse.ok) {
+        const payload = await byLeadResponse.json();
+        const items = Array.isArray(payload?.items) ? payload.items : [];
+        if (items.length > 0) return mapRow(items[0]);
+      }
 
-    if (linkedByLeadId) {
-      return linkedByLeadId as CalculatorHistoryRow;
-    }
+      const trimmedName = lead.name.trim();
+      if (!trimmedName) return null;
 
-    const trimmedName = lead.name.trim();
-    if (!trimmedName) {
+      const byNameResponse = await fetchWithTimeout(
+        `/api/calculator/history?cliente=${encodeURIComponent(trimmedName)}&unlinked=1`,
+        { credentials: 'include', cache: 'no-store' }
+      );
+
+      if (byNameResponse.ok) {
+        const payload = await byNameResponse.json();
+        const items = Array.isArray(payload?.items) ? payload.items : [];
+        if (items.length > 0) return mapRow(items[0]);
+      }
+
+      return null;
+    } catch {
       return null;
     }
-
-    const { data: linkedByName } = await supabase
-      .from('calculator_history')
-      .select('*')
-      .is('lead_id', null)
-      .ilike('cliente', `%${trimmedName}%`)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    return (linkedByName as CalculatorHistoryRow | null) || null;
   }, []);
 
   return { linkCalculatorHistoryToLead, fetchLinkedOrcamento };
 };
+

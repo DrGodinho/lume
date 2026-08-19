@@ -1,5 +1,6 @@
 'use client';
 
+import { fetchWithTimeout } from '@/lib/fetchWithTimeout';
 import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from 'react';
 import { format } from 'date-fns';
 import { supabase } from '@/lib/supabase';
@@ -41,7 +42,7 @@ export interface UseLeadListReturn {
 }
 
 const fetchTrashLeadsSnapshot = async (): Promise<TrashSnapshotResult> => {
-  const response = await fetch('/api/crm/leads?trash=1', {
+  const response = await fetchWithTimeout('/api/crm/leads?trash=1', {
     headers: await getCrmApiHeaders(),
     credentials: 'same-origin',
     cache: 'no-store',
@@ -56,7 +57,7 @@ const fetchTrashLeadsSnapshot = async (): Promise<TrashSnapshotResult> => {
 };
 
 const fetchArchiveLeadsSnapshot = async (): Promise<TrashSnapshotResult> => {
-  const response = await fetch('/api/crm/leads?archive=1', {
+  const response = await fetchWithTimeout('/api/crm/leads?archive=1', {
     headers: await getCrmApiHeaders(),
     credentials: 'same-origin',
     cache: 'no-store',
@@ -108,15 +109,19 @@ export const useLeadList = (
 
     void loadCalculatorConfig();
 
-    if (supabase) {
-      supabase.from('configuracoes').select('meta_valor').eq('id', getMonthlyTargetConfigId()).maybeSingle().then(({ data }) => {
-        if (data?.meta_valor) {
-          const monthlyGoal = Number(data.meta_valor);
+    fetchWithTimeout(`/api/crm/settings?id=${encodeURIComponent(getMonthlyTargetConfigId())}`, {
+      credentials: 'include',
+      cache: 'no-store',
+    })
+      .then((response) => response.json())
+      .then((result) => {
+        const monthlyGoal = Number(result?.meta_valor);
+        if (Number.isFinite(monthlyGoal) && monthlyGoal > 0) {
           setTargetGoal(monthlyGoal);
           setTargetInput(String(monthlyGoal));
         }
-      });
-    }
+      })
+      .catch(() => {});
   }, []);
 
   const saveTargetGoal = useCallback(async (value: number) => {
@@ -124,7 +129,12 @@ export const useLeadList = (
     setTargetInput(String(value));
     setEditingTarget(false);
     if (!supabase) return;
-    await supabase.from('configuracoes').upsert({ id: getMonthlyTargetConfigId(), meta_valor: value }, { onConflict: 'id' });
+    await fetchWithTimeout('/api/crm/settings', {
+      method: 'PUT',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: getMonthlyTargetConfigId(), meta_valor: value }),
+    }).catch(() => {});
   }, []);
 
   const loadTrashLeads = useCallback(async () => {
