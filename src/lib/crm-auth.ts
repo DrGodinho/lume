@@ -1,13 +1,15 @@
 import { SignJWT, jwtVerify } from 'jose';
 
-const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) {
-  throw new Error('JWT_SECRET environment variable is required');
-}
-const SECRET = new TextEncoder().encode(JWT_SECRET);
-
 const ACCESS_TOKEN_EXPIRY = '15m';
 const REFRESH_TOKEN_EXPIRY = '7d';
+
+function getSecret(): Uint8Array {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error('JWT_SECRET environment variable is required');
+  }
+  return new TextEncoder().encode(secret);
+}
 
 export interface TokenPayload {
   email: string;
@@ -21,15 +23,15 @@ export async function createAccessToken(payload: { email: string }): Promise<str
     .setProtectedHeader({ alg: 'HS256' })
     .setExpirationTime(ACCESS_TOKEN_EXPIRY)
     .setIssuedAt()
-    .sign(SECRET);
+    .sign(getSecret());
 }
 
 export async function createRefreshToken(payload: { email: string }): Promise<string> {
-  return new SignJWT({ ...payload, type: 'refresh' })
+  return new SignJWT({ ...payload, type: 'refresh' as const })
     .setProtectedHeader({ alg: 'HS256' })
     .setExpirationTime(REFRESH_TOKEN_EXPIRY)
     .setIssuedAt()
-    .sign(SECRET);
+    .sign(getSecret());
 }
 
 export async function createTokenPair(payload: { email: string }): Promise<{ accessToken: string; refreshToken: string }> {
@@ -41,7 +43,7 @@ export async function createTokenPair(payload: { email: string }): Promise<{ acc
 
 export async function verifyToken(token: string): Promise<TokenPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, SECRET);
+    const { payload } = await jwtVerify(token, getSecret());
     return payload as unknown as TokenPayload;
   } catch {
     return null;
