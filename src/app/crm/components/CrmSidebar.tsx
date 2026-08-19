@@ -1,6 +1,6 @@
 'use client';
 
-import { Archive, BarChart3, CalendarClock, Database, LogOut, Plus, ReceiptText, Settings, Trash2, UsersRound, type LucideIcon } from 'lucide-react';
+import { Archive, BarChart3, Calculator, CalendarClock, Database, LogOut, Plus, ReceiptText, Settings, Trash2, UsersRound, type LucideIcon } from 'lucide-react';
 import type { CrmTab } from '../types';
 
 type NavTone = 'gold' | 'red' | 'slate';
@@ -203,9 +203,17 @@ export function CrmSidebar({
             </div>
           </div>
         ))}
-      </nav>
+        </nav>
 
-      <div className="hidden lg:mt-3 lg:block lg:space-y-2 lg:border-t lg:border-white/10 lg:pt-3">
+        <a
+          href="/admin/"
+          className="flex w-full items-center gap-3 rounded-xl border-l-4 border-[#c9a227] bg-[#c9a227]/12 px-3 py-2.5 text-sm font-semibold tracking-wide text-[#f5d77a] transition-all hover:bg-[#c9a227]/18 hover:text-white active:scale-95 lg:mt-3"
+        >
+          <Calculator className="h-4.5 w-4.5" strokeWidth={2.5} />
+          Calculadora
+        </a>
+
+        <div className="hidden lg:mt-3 lg:block lg:space-y-2 lg:border-t lg:border-white/10 lg:pt-3">
         <button
           onClick={onOpenCreateModal}
           className="flex w-full items-center gap-3 rounded-xl border-l-4 border-[#c9a227] bg-[#c9a227]/12 px-3 py-2.5 text-sm font-semibold tracking-wide text-[#f5d77a] transition-all hover:bg-[#c9a227]/18 hover:text-white active:scale-95"

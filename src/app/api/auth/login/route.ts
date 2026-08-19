@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { createTokenPair } from '@/lib/crm-auth';
 
@@ -31,21 +31,40 @@ function normalizeLoginIdentifier(value: string) {
   return `${identifier}@lume.local`;
 }
 
-function getSafeRedirectFromRequest(request: Request, formRedirectTo?: string) {
+function isSafeLocalPath(value: string | null | undefined): value is string {
+  return (
+    !!value &&
+    value.startsWith('/') &&
+    !value.startsWith('//') &&
+    !value.includes('//')
+  );
+}
+
+function getSafeRedirectFromRequest(request: NextRequest, formRedirectTo?: string) {
   const fallback = '/crm/';
-  if (formRedirectTo && formRedirectTo.startsWith('/') && !formRedirectTo.startsWith('//')) {
+
+  // Prioridade 1: cookie gravado pelo middleware (survive mobile/sem referer)
+  const destFromCookie = request.cookies.get('crm-login-dest')?.value;
+  if (isSafeLocalPath(destFromCookie) && destFromCookie !== '/login/') {
+    return destFromCookie;
+  }
+
+  // Prioridade 2: redirectTo do form/URL
+  if (isSafeLocalPath(formRedirectTo) && formRedirectTo !== '/login/') {
     return formRedirectTo;
   }
-  const referer = request.headers.get('referer');
-  if (!referer) return fallback;
 
-  try {
-    const redirectTo = new URL(referer).searchParams.get('redirectTo');
-    if (redirectTo && redirectTo.startsWith('/') && !redirectTo.startsWith('//')) {
-      return redirectTo;
+  // Prioridade 3: redirectTo vindo no referer (desktop)
+  const referer = request.headers.get('referer');
+  if (referer) {
+    try {
+      const redirectTo = new URL(referer).searchParams.get('redirectTo');
+      if (isSafeLocalPath(redirectTo) && redirectTo !== '/login/') {
+        return redirectTo;
+      }
+    } catch {
+      // ignora referer invalido
     }
-  } catch {
-    return fallback;
   }
 
   return fallback;
@@ -60,7 +79,7 @@ function redirectRelative(path: string, status = 303) {
   });
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   const contentType = request.headers.get('content-type') || '';
   const isFormPost = contentType.includes('application/x-www-form-urlencoded') || contentType.includes('multipart/form-data');
   const credentials = isFormPost
@@ -153,6 +172,9 @@ export async function POST(request: Request) {
     maxAge: 60 * 60 * 24 * 7,
     path: '/',
   });
+
+  // Limpa o destino temporario gravado pelo middleware apos login bem-sucedido
+  response.cookies.set('crm-login-dest', '', { maxAge: 0, path: '/' });
 
   response.headers.set('X-RateLimit-Limit', String(RATE_LIMIT_MAX_REQUESTS));
   response.headers.set('X-RateLimit-Remaining', String(rateLimit.remaining));

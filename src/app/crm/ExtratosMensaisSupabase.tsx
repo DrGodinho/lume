@@ -320,66 +320,76 @@ export function ExtratosMensaisSupabase() {
       setLoading(true);
       setErrorMessage(null);
 
-      const dataReferencia = setYear(setMonth(new Date(), mesSelecionado), anoSelecionado);
-      const inicio = startOfMonth(dataReferencia);
-      const fim = endOfMonth(dataReferencia);
+      try {
+        const dataReferencia = setYear(setMonth(new Date(), mesSelecionado), anoSelecionado);
+        const inicio = startOfMonth(dataReferencia);
+        const fim = endOfMonth(dataReferencia);
 
-      const leadsResponse = await fetchWithTimeout('/api/crm/leads?include_all=1', {
-        headers: await getCrmApiHeaders(),
-        credentials: 'same-origin',
-        cache: 'no-store',
-      });
-      const leadsPayload = await leadsResponse.json().catch(() => null);
+        const leadsResponse = await fetchWithTimeout('/api/crm/leads?include_all=1', {
+          headers: await getCrmApiHeaders(),
+          credentials: 'same-origin',
+          cache: 'no-store',
+        });
+        const leadsPayload = await leadsResponse.json().catch(() => null);
 
-      if (cancelled) return;
+        if (cancelled) return;
 
-      if (!leadsResponse.ok || !Array.isArray(leadsPayload)) {
-        const details = getCrmApiErrorMessage(leadsPayload, leadsResponse.statusText);
-        setRegistros([]);
-        setErrorMessage(`Erro ao carregar serviços do CRM: ${details}`);
-        toast.error('Erro ao carregar serviços do CRM');
-        setLoading(false);
-        return;
-      }
-
-      const serviceLeads = (leadsPayload as LeadServiceRecord[])
-        .filter((lead) => isServiceLeadInPeriod(lead, inicio, fim));
-      const serviceLeadIds = serviceLeads.map((lead) => lead.id).filter(Boolean);
-
-      if (serviceLeadIds.length === 0) {
-        setRegistros([]);
-        setLoading(false);
-        return;
-      }
-
-      const historyResponse = await fetchWithTimeout(
-        `/api/calculator/history?leadIds=${encodeURIComponent(serviceLeadIds.join(','))}`,
-        { credentials: 'include', cache: 'no-store' }
-      );
-      const historyPayload = await historyResponse.json().catch(() => null);
-
-      if (cancelled) return;
-
-      if (!historyResponse.ok || !historyPayload || !Array.isArray(historyPayload.items)) {
-        setRegistros([]);
-        setErrorMessage('Erro ao carregar orçamentos vinculados aos serviços.');
-        toast.error('Erro ao carregar orçamentos vinculados');
-        setLoading(false);
-        return;
-      }
-
-      const historyData = historyPayload.items as Record<string, unknown>[];
-
-      const historyByLeadId = new Map<string, Record<string, unknown>>();
-      (historyData || []).forEach((row) => {
-        const leadId = asNullableString(row.lead_id);
-        if (leadId && !historyByLeadId.has(leadId)) {
-          historyByLeadId.set(leadId, row);
+        if (!leadsResponse.ok || !Array.isArray(leadsPayload)) {
+          const details = getCrmApiErrorMessage(leadsPayload, leadsResponse.statusText);
+          setRegistros([]);
+          setErrorMessage(`Erro ao carregar serviços do CRM: ${details}`);
+          toast.error('Erro ao carregar serviços do CRM');
+          return;
         }
-      });
 
-      setRegistros(serviceLeads.map((lead) => normalizeRecord(historyByLeadId.get(lead.id) || {}, lead)));
-      setLoading(false);
+        const serviceLeads = (leadsPayload as LeadServiceRecord[])
+          .filter((lead) => isServiceLeadInPeriod(lead, inicio, fim));
+        const serviceLeadIds = serviceLeads.map((lead) => lead.id).filter(Boolean);
+
+        if (serviceLeadIds.length === 0) {
+          setRegistros([]);
+          return;
+        }
+
+        const historyResponse = await fetchWithTimeout(
+          `/api/calculator/history?leadIds=${encodeURIComponent(serviceLeadIds.join(','))}`,
+          { credentials: 'include', cache: 'no-store' }
+        );
+        const historyPayload = await historyResponse.json().catch(() => null);
+
+        if (cancelled) return;
+
+        if (!historyResponse.ok || !historyPayload || !Array.isArray(historyPayload.items)) {
+          setRegistros([]);
+          setErrorMessage('Erro ao carregar orçamentos vinculados aos serviços.');
+          toast.error('Erro ao carregar orçamentos vinculados');
+          return;
+        }
+
+        const historyData = historyPayload.items as Record<string, unknown>[];
+
+        const historyByLeadId = new Map<string, Record<string, unknown>>();
+        (historyData || []).forEach((row) => {
+          const leadId = asNullableString(row.lead_id);
+          if (leadId && !historyByLeadId.has(leadId)) {
+            historyByLeadId.set(leadId, row);
+          }
+        });
+
+        setRegistros(serviceLeads.map((lead) => normalizeRecord(historyByLeadId.get(lead.id) || {}, lead)));
+      } catch (error) {
+        if (!cancelled) {
+          setRegistros([]);
+          setErrorMessage(
+            error instanceof Error && error.name === 'AbortError'
+              ? 'A consulta demorou muito (timeout). Tente novamente.'
+              : 'Erro inesperado ao carregar o extrato. Tente novamente.',
+          );
+          toast.error('Erro ao carregar o extrato mensal');
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     }
 
     carregarExtrato();

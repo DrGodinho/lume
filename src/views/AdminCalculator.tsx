@@ -446,14 +446,14 @@ const MemoBlock = React.memo(({
 
       {/* Height Capsule (Left side, vertical) */}
       <div className="absolute left-1 top-1/2 -translate-y-1/2 -translate-x-[40%] -rotate-90 pointer-events-none">
-        <div className="bg-white/90 backdrop-blur-sm text-black px-2 py-0.5 rounded-md text-[10px] sm:text-xs font-black shadow-sm flex items-center justify-center whitespace-nowrap min-w-[28px]">
+        <div className="bg-white/90 backdrop-blur-sm text-black px-3 py-1 rounded-md text-[30px] sm:text-[36px] font-black shadow-sm flex items-center justify-center whitespace-nowrap min-w-[44px]">
           {Number(b.rh.toFixed(2))}
         </div>
       </div>
 
       {/* Width Capsule (Bottom side, horizontal) */}
       <div className="absolute bottom-1 right-1 pointer-events-none">
-        <div className="bg-white/90 backdrop-blur-sm text-black px-2 py-0.5 rounded-md text-[10px] sm:text-xs font-black shadow-sm flex items-center justify-center whitespace-nowrap min-w-[28px]">
+        <div className="bg-white/90 backdrop-blur-sm text-black px-3 py-1 rounded-md text-[30px] sm:text-[36px] font-black shadow-sm flex items-center justify-center whitespace-nowrap min-w-[44px]">
           {Number(b.rw.toFixed(2))}
         </div>
       </div>
@@ -1563,6 +1563,13 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
                         >
                             <Settings size={14} /> <span className="hidden sm:inline">Config</span>
                         </button>
+                        <a
+                            href="/crm/"
+                            className="flex items-center gap-1 px-2.5 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10 hover:text-white transition-all shrink-0"
+                            title="Abrir CRM"
+                        >
+                            <User size={14} /> <span className="hidden sm:inline">CRM</span>
+                        </a>
                         <button
                             onClick={limparTudo}
                             disabled={vidros.length === 0}
