@@ -1,4 +1,4 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import { ToastProvider } from './hooks/useToast';
 
 export const dynamic = 'force-dynamic';

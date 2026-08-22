@@ -1,6 +1,6 @@
 import React from 'react';
 import { History, X, Clock, ChevronRight, Trash2 } from 'lucide-react';
-import { OrcamentoSalvo } from '../views/AdminCalculator';
+import type { OrcamentoSalvo } from '../views/AdminCalculator';
 
 
 interface HistoryPanelProps {

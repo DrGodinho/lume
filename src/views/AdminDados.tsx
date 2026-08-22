@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
     Database, ArrowLeft, Search, Trash2, Eye, ChevronDown, ChevronUp,
     DollarSign, Package, User, Clock, RefreshCw, Download,

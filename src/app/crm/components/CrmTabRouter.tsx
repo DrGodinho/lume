@@ -70,7 +70,7 @@ interface CrmTabRouterProps {
   onSelectTab: (tab: CrmTab) => void;
   metrics: ReturnType<typeof useMetrics>;
   crmSettings: ReturnType<typeof useCrmSettings>;
-  searchInputRef?: React.RefObject<HTMLInputElement>;
+  searchInputRef?: React.RefObject<HTMLInputElement | null>;
 }
 
 export function CrmTabRouter({ activeTab, onSelectTab, metrics, crmSettings, searchInputRef }: CrmTabRouterProps) {

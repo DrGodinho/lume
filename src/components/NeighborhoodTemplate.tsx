@@ -4,7 +4,7 @@ import { GoogleReviews } from './GoogleReviews';
 import { Particles } from './Particles';
 import { AnimatedCounter } from './AnimatedCounter';
 import { NavigationBreadcrumbs } from './NavigationBreadcrumbs';
-import { NeighborhoodData } from '../data/neighborhoods';
+import type { NeighborhoodData } from '../data/neighborhoods';
 import { NeighborhoodAnimations } from './NeighborhoodAnimations';
 import Image from 'next/image';
 import { businessAddressSchema, businessInfo } from '@/lib/businessInfo';

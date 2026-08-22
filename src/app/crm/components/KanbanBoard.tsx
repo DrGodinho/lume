@@ -49,7 +49,7 @@ interface KanbanBoardProps {
   getLeadServiceDate: (lead: Lead) => Date | null;
   getLeadStatusClasses: (status: Lead['status']) => string;
   leadSyncState: Record<string, LeadSyncStatus>;
-  searchInputRef?: React.RefObject<HTMLInputElement>;
+  searchInputRef?: React.RefObject<HTMLInputElement | null>;
 }
 
 const STATUS_OPTIONS = LEAD_STAGES as unknown as readonly LeadStatus[];
