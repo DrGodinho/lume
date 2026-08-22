@@ -104,20 +104,20 @@ export function MonthlyChart({
           type="button"
           onClick={() => onToggleSeries('anterior')}
           aria-pressed={visibleMonthlySeries.anterior}
-          className={`inline-flex items-center gap-2 rounded-full transition hover:text-white focus:outline-none focus:ring-2 focus:ring-white/25 ${visibleMonthlySeries.anterior ? 'text-white/55' : 'text-white/25'}`}
+          className={`inline-flex items-center gap-2 rounded-full transition hover:text-white focus:outline-none focus:ring-2 focus:ring-purple-400/40 ${visibleMonthlySeries.anterior ? 'text-purple-300' : 'text-white'}`}
           title="Mostrar ou ocultar Mês anterior diário"
         >
-          <span className="h-0 w-8 border-t border-dashed border-white/35" />
+          <span className={`h-0 w-8 border-t-2 border-dashed ${visibleMonthlySeries.anterior ? 'border-purple-400 shadow-[0_0_18px_rgba(168,85,247,0.55)]' : 'border-white/70'}`} />
           Mês anterior diário
         </button>
         <button
           type="button"
           onClick={() => onToggleSeries('anteriorAcumulado')}
           aria-pressed={visibleMonthlySeries.anteriorAcumulado}
-          className={`inline-flex items-center gap-2 rounded-full transition hover:text-white focus:outline-none focus:ring-2 focus:ring-white/25 ${visibleMonthlySeries.anteriorAcumulado ? 'text-white/55' : 'text-white/25'}`}
+          className={`inline-flex items-center gap-2 rounded-full transition hover:text-white focus:outline-none focus:ring-2 focus:ring-red-400/40 ${visibleMonthlySeries.anteriorAcumulado ? 'text-red-300' : 'text-white'}`}
           title="Mostrar ou ocultar Mês anterior acumulado"
         >
-          <span className="h-0 w-8 border-t-2 border-dotted border-white/60" />
+          <span className={`h-0 w-8 border-t-2 border-dotted ${visibleMonthlySeries.anteriorAcumulado ? 'border-red-400 shadow-[0_0_18px_rgba(239,68,68,0.55)]' : 'border-white/70'}`} />
           Mês anterior acumulado
         </button>
         <button
@@ -188,14 +188,14 @@ export function MonthlyChart({
                           <div className="border-t border-white/10 pt-2">
                             {visibleMonthlySeries.anteriorAcumulado && (
                               <div className="flex items-center justify-between gap-5">
-                                <span className="text-white/45">Anterior acumulado</span>
-                                <span className="font-bold text-white/70">{point.anterior === null ? '--' : formatDashboardCurrency(point.anterior)}</span>
+                                <span className="text-red-300">Anterior acumulado</span>
+                                <span className="font-bold text-white/90">{point.anterior === null ? '--' : formatDashboardCurrency(point.anterior)}</span>
                               </div>
                             )}
                             {visibleMonthlySeries.anterior && (
                               <div className={`${visibleMonthlySeries.anteriorAcumulado ? 'mt-2' : ''} flex items-center justify-between gap-5`}>
-                                <span className="text-white/35">Anterior em {point.diaAnterior}</span>
-                                <span className="font-semibold text-white/55">{point.anteriorDia === null ? '--' : formatDashboardCurrency(point.anteriorDia)}</span>
+                                <span className="text-purple-300">Anterior em {point.diaAnterior}</span>
+                                <span className="font-semibold text-white/80">{point.anteriorDia === null ? '--' : formatDashboardCurrency(point.anteriorDia)}</span>
                               </div>
                             )}
                           </div>
@@ -206,8 +206,8 @@ export function MonthlyChart({
                 }}
               />
               {visibleMonthlySeries.atual && <Area type="monotone" dataKey="atual" stroke="none" fill="url(#currentMonthRevenue)" />}
-              {visibleMonthlySeries.anterior && <Line type="monotone" dataKey="anteriorDia" stroke="rgba(255,255,255,0.34)" strokeWidth={2} strokeDasharray="6 7" dot={false} activeDot={{ r: 4, fill: '#ffffff' }} />}
-              {visibleMonthlySeries.anteriorAcumulado && <Line type="monotone" dataKey="anterior" stroke="rgba(255,255,255,0.58)" strokeWidth={2.4} strokeDasharray="2 5" dot={false} activeDot={{ r: 4, fill: '#ffffff' }} />}
+              {visibleMonthlySeries.anterior && <Line type="monotone" dataKey="anteriorDia" stroke="#c084fc" strokeWidth={2.6} strokeDasharray="6 7" dot={false} activeDot={{ r: 5, fill: '#c084fc', stroke: '#07111d', strokeWidth: 3 }} />}
+              {visibleMonthlySeries.anteriorAcumulado && <Line type="monotone" dataKey="anterior" stroke="#ef4444" strokeWidth={2.8} strokeDasharray="2 5" dot={false} activeDot={{ r: 5, fill: '#ef4444', stroke: '#07111d', strokeWidth: 3 }} />}
               {visibleMonthlySeries.previsto && <Line type="monotone" dataKey="previsto" stroke="#7dd3fc" strokeWidth={3} strokeDasharray="5 7" dot={false} activeDot={{ r: 6, fill: '#7dd3fc', stroke: '#07111d', strokeWidth: 3 }} />}
               {visibleMonthlySeries.atual && <Line type="monotone" dataKey="atual" stroke="#f5d77a" strokeWidth={2} strokeOpacity={0.88} dot={false} activeDot={{ r: 5, fill: '#f5d77a', stroke: '#07111d', strokeWidth: 3 }} />}
               {visibleMonthlySeries.atualDia && <Line type="monotone" dataKey="atualDia" stroke="#38bdf8" strokeWidth={4} dot={false} activeDot={{ r: 7, fill: '#38bdf8', stroke: '#07111d', strokeWidth: 3 }} />}

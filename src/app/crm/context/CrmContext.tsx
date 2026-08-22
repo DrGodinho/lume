@@ -1,22 +1,34 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { normalizeLeadStatus } from './useAgenda';
-import { useLeadCommercialAction } from './useLeadCommercialAction';
-import { useLeadList } from './useLeadList';
-import { useLeadModal } from './useLeadModal';
-import { useLeadMutations } from './useLeadMutations';
-import { useLeadOrcamento } from './useLeadOrcamento';
-import { useLeadPreferences } from './useLeadPreferences';
-import { useLeadStatusHistory } from './useLeadStatusHistory';
-import { useLeadSync } from './useLeadSync';
-import { usePlaybooks } from './usePlaybooks';
-import { useToastApi } from './useToast';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
+import { normalizeLeadStatus } from '../hooks/useAgenda';
+import { useLeadCommercialAction } from '../hooks/useLeadCommercialAction';
+import { useLeadList } from '../hooks/useLeadList';
+import { useLeadModal } from '../hooks/useLeadModal';
+import { useLeadMutations } from '../hooks/useLeadMutations';
+import { useLeadOrcamento } from '../hooks/useLeadOrcamento';
+import { useLeadPreferences } from '../hooks/useLeadPreferences';
+import { useLeadStatusHistory } from '../hooks/useLeadStatusHistory';
+import { useLeadSync } from '../hooks/useLeadSync';
+import { usePlaybooks } from '../hooks/usePlaybooks';
+import { useToastApi } from '../hooks/useToast';
 import { reorderKanbanItems } from '../utils/kanbanDnd';
 import { applyFollowUpPlaybook } from '../utils/playbooks';
 import type { CrmTab, Lead, LeadStatus } from '../types';
 
-export const useLeads = (activeTab: CrmTab) => {
+/**
+ * Composição central do CRM. Substitui o antigo `useLeads` "god hook": orquestra
+ * os hooks de fatia (já separados) e expõe o estado via Context.
+ */
+export function useCrmState(activeTab: CrmTab) {
   const toast = useToastApi();
   const leadTableClickTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [renderTime] = useState(() => Date.now());
@@ -228,4 +240,171 @@ export const useLeads = (activeTab: CrmTab) => {
     commercialActionLabel: commercialAction.commercialActionLabel,
     setLeadDetail: leadModal.setLeadDetail,
   };
-};
+}
+
+export type CrmContextValue = ReturnType<typeof useCrmState>;
+
+const CrmContext = createContext<CrmContextValue | null>(null);
+
+export function CrmProvider({
+  activeTab,
+  children,
+}: {
+  activeTab: CrmTab;
+  children: ReactNode;
+}) {
+  const value = useCrmState(activeTab);
+  return <CrmContext.Provider value={value}>{children}</CrmContext.Provider>;
+}
+
+export function useCrm(): CrmContextValue {
+  const ctx = useContext(CrmContext);
+  if (!ctx) {
+    throw new Error('useCrm deve ser usado dentro de <CrmProvider>');
+  }
+  return ctx;
+}
+
+/* ---- Selectors por fatia (evita importar o objeto inteiro) ---- */
+
+export function useCrmLeads() {
+  const crm = useCrm();
+  return {
+    leads: crm.leads,
+    trashedLeads: crm.trashedLeads,
+    loadingTrashLeads: crm.loadingTrashLeads,
+    archivedLeads: crm.archivedLeads,
+    loadingArchivedLeads: crm.loadingArchivedLeads,
+    loadTrashLeads: crm.loadTrashLeads,
+    loadArchivedLeads: crm.loadArchivedLeads,
+    targetGoal: crm.targetGoal,
+    editingTarget: crm.editingTarget,
+    setEditingTarget: crm.setEditingTarget,
+    targetInput: crm.targetInput,
+    setTargetInput: crm.setTargetInput,
+    saveTargetGoal: crm.saveTargetGoal,
+    handleKanbanReorder: crm.handleKanbanReorder,
+    handleStatusChange: crm.handleStatusChange,
+  };
+}
+
+export function useCrmFilters() {
+  const crm = useCrm();
+  return {
+    searchQuery: crm.searchQuery,
+    setSearchQuery: crm.setSearchQuery,
+    filterNeighborhood: crm.filterNeighborhood,
+    setFilterNeighborhood: crm.setFilterNeighborhood,
+    filterStatus: crm.filterStatus,
+    setFilterStatus: crm.setFilterStatus,
+    hasActiveFilters: crm.hasActiveFilters,
+    clearFilters: crm.clearFilters,
+    viewMode: crm.viewMode,
+    setViewMode: crm.setViewMode,
+    collapsedCards: crm.collapsedCards,
+    visibleMonthlySeries: crm.visibleMonthlySeries,
+    toggleMonthlySeries: crm.toggleMonthlySeries,
+    agendaInitialView: crm.agendaInitialView,
+    setAgendaInitialView: crm.setAgendaInitialView,
+    sortKey: crm.sortKey,
+    sortDir: crm.sortDir,
+    metricsPeriod: crm.metricsPeriod,
+    setMetricsPeriod: crm.setMetricsPeriod,
+    customStart: crm.customStart,
+    setCustomStart: crm.setCustomStart,
+    customEnd: crm.customEnd,
+    setCustomEnd: crm.setCustomEnd,
+    setCollapsedStateForAllLeads: crm.setCollapsedStateForAllLeads,
+    toggleCollapsedCard: crm.toggleCollapsedCard,
+    toggleSort: crm.toggleSort,
+    filteredLeads: crm.filteredLeads,
+    sortedFilteredLeads: crm.sortedFilteredLeads,
+  };
+}
+
+export function useCrmModal() {
+  const crm = useCrm();
+  return {
+    isModalOpen: crm.isModalOpen,
+    selectedLead: crm.selectedLead,
+    leadDetail: crm.leadDetail,
+    isLeadFormDirty: crm.isLeadFormDirty,
+    initialLeadForm: crm.initialLeadForm,
+    setInitialLeadForm: crm.setInitialLeadForm,
+    linkedOrcamento: crm.linkedOrcamento,
+    linkedDetailOrcamento: crm.linkedDetailOrcamento,
+    availableFilmTypeOptions: crm.availableFilmTypeOptions,
+    leadForm: crm.leadForm,
+    setLeadForm: crm.setLeadForm,
+    openCreateModal: crm.openCreateModal,
+    openEditModal: crm.openEditModal,
+    closeLeadModal: crm.closeLeadModal,
+    closeLeadDetailModal: crm.closeLeadDetailModal,
+    setLeadDetail: crm.setLeadDetail,
+  };
+}
+
+export function useCrmSync() {
+  const crm = useCrm();
+  return {
+    crmSync: crm.crmSync,
+    leadSyncState: crm.leadSyncState,
+    isVerifyingCloud: crm.isVerifyingCloud,
+    lastCloudCheckAt: crm.lastCloudCheckAt,
+    handleVerifyCloudLeads: crm.handleVerifyCloudLeads,
+  };
+}
+
+export function useCrmPlaybooks() {
+  const crm = useCrm();
+  return {
+    activeSellerId: crm.activeSellerId,
+    activePlaybook: crm.activePlaybook,
+    sellerIds: crm.sellerIds,
+    playbookLoading: crm.playbookLoading,
+    playbookSaving: crm.playbookSaving,
+    playbookError: crm.playbookError,
+    setActiveSellerId: crm.setActiveSellerId,
+    updatePlaybookRule: crm.updatePlaybookRule,
+    resetActivePlaybook: crm.resetActivePlaybook,
+    reloadPlaybooks: crm.reloadPlaybooks,
+  };
+}
+
+export function useCrmMutations() {
+  const crm = useCrm();
+  return {
+    handleLeadSubmit: crm.handleLeadSubmit,
+    handleLeadSave: crm.handleLeadSave,
+    patchLeadStatusInfo: crm.patchLeadStatusInfo,
+    handleDeleteLead: crm.handleDeleteLead,
+    handleRestoreLead: crm.handleRestoreLead,
+    handleArchiveLead: crm.handleArchiveLead,
+    handleRestoreFromArchive: crm.handleRestoreFromArchive,
+    handleAgendaSchedule: crm.handleAgendaSchedule,
+    handleServiceStatusChange: crm.handleServiceStatusChange,
+    handleAgendaMarkDone: crm.handleAgendaMarkDone,
+    handleDormantStateChange: crm.handleDormantStateChange,
+    handleTogglePin: crm.handleTogglePin,
+  };
+}
+
+export function useCrmCommercial() {
+  const crm = useCrm();
+  return {
+    commercialAction: crm.commercialAction,
+    setCommercialAction: crm.setCommercialAction,
+    openCommercialAction: crm.openCommercialAction,
+    applyCommercialAction: crm.applyCommercialAction,
+    commercialActionTitle: crm.commercialActionTitle,
+    commercialActionLabel: crm.commercialActionLabel,
+  };
+}
+
+export function useCrmStatusHistory() {
+  const crm = useCrm();
+  return {
+    leadStatusHistory: crm.leadStatusHistory,
+    loadingLeadStatusHistory: crm.loadingLeadStatusHistory,
+  };
+}

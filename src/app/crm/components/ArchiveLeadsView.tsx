@@ -1,7 +1,7 @@
 'use client';
 
 import { format, parseISO } from 'date-fns';
-import { Archive, RefreshCw } from 'lucide-react';
+import { Archive } from 'lucide-react';
 import type { Lead } from '../types';
 
 interface ArchiveLeadsViewProps {
@@ -25,9 +25,23 @@ export function ArchiveLeadsView({
 }: ArchiveLeadsViewProps) {
   if (loading) {
     return (
-      <div className="rounded-3xl border border-white/5 bg-[#07111d]/50 p-8 text-center text-white/45 flex items-center justify-center gap-2">
-        <RefreshCw className="h-4 w-4 animate-spin text-[#c9a227]" />
-        Carregando arquivo...
+      <div className="space-y-3" aria-hidden="true">
+        {Array.from({ length: 5 }).map((_, index) => (
+          <div
+            key={index}
+            className="flex flex-col gap-4 rounded-2xl border border-white/5 bg-[#04080f]/80 p-4 sm:flex-row sm:items-center sm:justify-between"
+          >
+            <div className="min-w-0 flex-1 space-y-2">
+              <div className="skeleton-shimmer h-4 w-40 rounded" />
+              <div className="skeleton-shimmer h-3 w-56 rounded" />
+              <div className="flex flex-wrap gap-2">
+                <div className="skeleton-shimmer h-5 w-32 rounded-full" />
+                <div className="skeleton-shimmer h-5 w-24 rounded-full" />
+              </div>
+            </div>
+            <div className="skeleton-shimmer h-9 w-28 rounded-2xl" />
+          </div>
+        ))}
       </div>
     );
   }

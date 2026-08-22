@@ -13,8 +13,8 @@ import {
   isClosedLead,
   SERVICE_STATUS_META,
 } from '../hooks/useAgenda';
+import { useCrm } from '../context/CrmContext';
 import { useCrmSettings } from '../hooks/useCrmSettings';
-import { useLeads } from '../hooks/useLeads';
 import { useMetrics } from '../hooks/useMetrics';
 import { formatLeadCurrency } from '../utils';
 import { RJ_NEIGHBORHOODS } from '../constants';
@@ -48,10 +48,19 @@ const ExtratosMensaisSupabase = dynamic(() => import('../ExtratosMensaisSupabase
 
 function TabSkeleton() {
   return (
-    <div className="flex min-h-[40vh] items-center justify-center">
-      <span className="animate-pulse text-sm font-semibold uppercase tracking-[0.2em] text-[#c9a227]/70">
-        Carregando...
-      </span>
+    <div className="space-y-4 p-1" aria-hidden="true">
+      <div className="flex gap-3 overflow-hidden">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div
+            key={index}
+            className="flex-1 space-y-3 rounded-2xl border border-white/5 bg-white/[0.02] p-3"
+          >
+            <div className="skeleton-shimmer h-4 w-24 rounded" />
+            <div className="skeleton-shimmer h-20 w-full rounded-xl" />
+            <div className="skeleton-shimmer h-20 w-full rounded-xl" />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -59,12 +68,13 @@ function TabSkeleton() {
 interface CrmTabRouterProps {
   activeTab: CrmTab;
   onSelectTab: (tab: CrmTab) => void;
-  crm: ReturnType<typeof useLeads>;
   metrics: ReturnType<typeof useMetrics>;
   crmSettings: ReturnType<typeof useCrmSettings>;
+  searchInputRef?: React.RefObject<HTMLInputElement>;
 }
 
-export function CrmTabRouter({ activeTab, onSelectTab, crm, metrics, crmSettings }: CrmTabRouterProps) {
+export function CrmTabRouter({ activeTab, onSelectTab, metrics, crmSettings, searchInputRef }: CrmTabRouterProps) {
+  const crm = useCrm();
   if (activeTab === 'dashboard') {
     return (
       <TabErrorBoundary fallbackTitle="Painel Geral">
@@ -132,13 +142,13 @@ export function CrmTabRouter({ activeTab, onSelectTab, crm, metrics, crmSettings
           onCollapseAll={() => crm.setCollapsedStateForAllLeads(true)}
           onExpandAll={() => crm.setCollapsedStateForAllLeads(false)}
           onToggleCollapse={crm.toggleCollapsedCard}
-          onOpenCreateModal={() => crm.openCreateModal()}
+          onOpenCreateModal={crm.openCreateModal}
           onOpenDetail={crm.setLeadDetail}
-          onOpenEdit={(lead) => void crm.openEditModal(lead)}
-          onDelete={(leadId) => void crm.handleDeleteLead(leadId)}
-          onStatusChange={(leadId, status) => void crm.handleStatusChange(leadId, status)}
+          onOpenEdit={crm.openEditModal}
+          onDelete={crm.handleDeleteLead}
+          onStatusChange={crm.handleStatusChange}
           onReorderLead={crm.handleKanbanReorder}
-          onTogglePin={(leadId) => void crm.handleTogglePin(leadId)}
+          onTogglePin={crm.handleTogglePin}
           onTableRowClick={crm.handleLeadTableRowClick}
           onTableRowDoubleClick={crm.handleLeadTableRowDoubleClick}
           sortKey={crm.sortKey}
@@ -148,6 +158,7 @@ export function CrmTabRouter({ activeTab, onSelectTab, crm, metrics, crmSettings
           formatCurrency={formatLeadCurrency}
           getLeadServiceDate={getLeadServiceDate}
           getLeadStatusClasses={getLeadStatusClasses}
+          searchInputRef={searchInputRef}
           leadSyncState={crm.leadSyncState}
         />
       </TabErrorBoundary>

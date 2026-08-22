@@ -142,6 +142,37 @@ export const areLeadCollectionsEquivalent = (left: Lead[], right: Lead[]) => {
 
 export const formatLeadCurrency = (value: number) => value.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
 
+const normalizePhoneDigits = (value: string) => value.replace(/\D/g, '');
+
+const normalizeEmailValue = (value: string) => value.trim().toLowerCase();
+
+export const findDuplicateLead = (
+  leads: Lead[],
+  phone: string,
+  email: string,
+  excludeLeadId?: string | null,
+): Lead | null => {
+  const phoneDigits = normalizePhoneDigits(phone);
+  const emailNormalized = normalizeEmailValue(email);
+
+  if (phoneDigits.length < 8 && !emailNormalized) return null;
+
+  for (const lead of leads) {
+    if (excludeLeadId && lead.id === excludeLeadId) continue;
+
+    const leadPhone = normalizePhoneDigits(lead.phone);
+    const leadEmail = normalizeEmailValue(lead.email);
+
+    const phoneMatch =
+      phoneDigits.length >= 8 && leadPhone.length >= 8 && phoneDigits === leadPhone;
+    const emailMatch = Boolean(emailNormalized) && emailNormalized === leadEmail;
+
+    if (phoneMatch || emailMatch) return lead;
+  }
+
+  return null;
+};
+
 export const appendCommercialNote = (currentNotes: string, note: string) => {
   const cleanNote = note.trim();
   if (!cleanNote) return currentNotes;

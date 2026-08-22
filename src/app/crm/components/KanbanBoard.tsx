@@ -49,6 +49,7 @@ interface KanbanBoardProps {
   getLeadServiceDate: (lead: Lead) => Date | null;
   getLeadStatusClasses: (status: Lead['status']) => string;
   leadSyncState: Record<string, LeadSyncStatus>;
+  searchInputRef?: React.RefObject<HTMLInputElement>;
 }
 
 const STATUS_OPTIONS = LEAD_STAGES as unknown as readonly LeadStatus[];
@@ -89,7 +90,17 @@ export function KanbanBoard({
   getLeadServiceDate,
   getLeadStatusClasses,
   leadSyncState,
+  searchInputRef,
 }: KanbanBoardProps) {
+  const [tableVisibleCount, setTableVisibleCount] = useState(KANBAN_COLUMN_PAGE_SIZE);
+  const visibleTableLeads = sortedFilteredLeads.slice(0, tableVisibleCount);
+  const hiddenTableCount = sortedFilteredLeads.length - visibleTableLeads.length;
+
+  const loadMoreTable = useCallback(
+    () => setTableVisibleCount((current) => current + KANBAN_COLUMN_PAGE_SIZE),
+    [],
+  );
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 rounded-2xl border border-white/5 bg-[#07111d]/50 p-4 shadow-lg backdrop-blur-md sm:rounded-3xl sm:p-6 lg:flex-row lg:items-center">
@@ -98,6 +109,7 @@ export function KanbanBoard({
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
+            ref={searchInputRef}
             type="text"
             placeholder="Pesquisar por nome, telefone, observações..."
             value={searchQuery}
@@ -242,7 +254,7 @@ export function KanbanBoard({
       {viewMode === 'table' && (
         <div className="rounded-2xl border border-white/5 bg-[#07111d]/50 p-4 shadow-lg backdrop-blur-md sm:rounded-3xl sm:p-6 md:overflow-x-auto">
           <div className="space-y-3 md:hidden">
-            {sortedFilteredLeads.map((lead) => (
+            {visibleTableLeads.map((lead) => (
               <article key={lead.id} className="rounded-2xl border border-white/5 bg-[#04080f]/85 p-4">
                 <button type="button" onClick={() => onOpenDetail(lead)} className="w-full text-left">
                   <div className="flex items-start justify-between gap-3">
@@ -274,6 +286,15 @@ export function KanbanBoard({
                 </div>
               </article>
             ))}
+            {hiddenTableCount > 0 && (
+              <button
+                type="button"
+                onClick={loadMoreTable}
+                className="w-full rounded-2xl border border-white/5 bg-white/[0.02] py-2.5 text-sm font-semibold text-white/50 transition hover:border-[#c9a227]/30 hover:text-[#f5d77a]"
+              >
+                Mostrar mais {hiddenTableCount} lead{hiddenTableCount === 1 ? '' : 's'}
+              </button>
+            )}
             {filteredLeads.length === 0 && (
               <div className="rounded-2xl border border-dashed border-white/10 p-6 text-center">
                 <p className="text-sm font-semibold text-white/30">
@@ -321,7 +342,7 @@ export function KanbanBoard({
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {sortedFilteredLeads.map((lead) => (
+              {visibleTableLeads.map((lead) => (
                 <tr
                   key={lead.id}
                   className="group cursor-pointer hover:bg-white/[0.01]"
@@ -408,6 +429,15 @@ export function KanbanBoard({
               )}
             </tbody>
           </table>
+          {hiddenTableCount > 0 && (
+            <button
+              type="button"
+              onClick={loadMoreTable}
+              className="mt-4 w-full rounded-2xl border border-white/5 bg-white/[0.02] py-2.5 text-sm font-semibold text-white/50 transition hover:border-[#c9a227]/30 hover:text-[#f5d77a]"
+            >
+              Mostrar mais {hiddenTableCount} lead{hiddenTableCount === 1 ? '' : 's'}
+            </button>
+          )}
         </div>
       )}
     </div>
@@ -419,6 +449,10 @@ const KANBAN_DND_FALLBACK_STYLE = {
   headerBg: 'bg-white/5 text-white/50',
   badge: 'bg-white/5 text-white/80',
 };
+
+const NOOP_MOVE = () => undefined;
+
+const KANBAN_COLUMN_PAGE_SIZE = 25;
 
 interface KanbanDnDProps {
   leads: Lead[];
@@ -597,8 +631,8 @@ function KanbanDnD({
             onOpenEdit={onOpenEdit}
             onDelete={onDelete}
             onTogglePin={onTogglePin}
-            onMoveLeft={() => undefined}
-            onMoveRight={() => undefined}
+            onMoveLeft={NOOP_MOVE}
+            onMoveRight={NOOP_MOVE}
             isDragOverlay
             disableMoveLeft={false}
             disableMoveRight={false}
@@ -644,6 +678,26 @@ function KanbanColumn({
 }: KanbanColumnProps) {
   const { setNodeRef, isOver } = useDroppable({ id: `column-${stage}`, data: { type: 'column', stage } });
   const stageIndex = LEAD_STAGES.indexOf(stage);
+  const handleMoveLeft = useCallback(
+    (leadId: string) => {
+      if (stageIndex > 0) onStatusChange(leadId, LEAD_STAGES[stageIndex - 1]);
+    },
+    [stageIndex, onStatusChange],
+  );
+  const handleMoveRight = useCallback(
+    (leadId: string) => {
+      if (stageIndex < LEAD_STAGES.length - 1) onStatusChange(leadId, LEAD_STAGES[stageIndex + 1]);
+    },
+    [stageIndex, onStatusChange],
+  );
+  const [visibleCount, setVisibleCount] = useState(KANBAN_COLUMN_PAGE_SIZE);
+  const visibleStageLeads = stageLeads.slice(0, visibleCount);
+  const hiddenStageCount = stageLeads.length - visibleStageLeads.length;
+
+  const loadMoreStage = useCallback(
+    () => setVisibleCount((current) => current + KANBAN_COLUMN_PAGE_SIZE),
+    [],
+  );
 
   return (
     <div
@@ -658,9 +712,9 @@ function KanbanColumn({
         <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${style.badge}`}>{stageLeads.length}</span>
       </div>
 
-      <SortableContext items={stageLeads.map((lead) => lead.id)} strategy={verticalListSortingStrategy}>
+      <SortableContext items={visibleStageLeads.map((lead) => lead.id)} strategy={verticalListSortingStrategy}>
         <div className="flex-1 space-y-3 overflow-y-auto">
-          {stageLeads.map((lead) => (
+          {visibleStageLeads.map((lead) => (
             <SortableLeadCard
               key={lead.id}
               lead={lead}
@@ -675,18 +729,24 @@ function KanbanColumn({
               onOpenEdit={onOpenEdit}
               onDelete={onDelete}
               onTogglePin={onTogglePin}
-              onMoveLeft={() => {
-                if (stageIndex > 0) onStatusChange(lead.id, LEAD_STAGES[stageIndex - 1]);
-              }}
-              onMoveRight={() => {
-                if (stageIndex < LEAD_STAGES.length - 1) onStatusChange(lead.id, LEAD_STAGES[stageIndex + 1]);
-              }}
+              onMoveLeft={handleMoveLeft}
+              onMoveRight={handleMoveRight}
               disableMoveLeft={stage === 'Novo'}
               disableMoveRight={stage === 'Perdido'}
             />
           ))}
 
-          {stageLeads.length === 0 && (
+          {hiddenStageCount > 0 && (
+            <button
+              type="button"
+              onClick={loadMoreStage}
+              className="w-full rounded-2xl border border-white/5 bg-white/[0.02] py-2 text-xs font-semibold text-white/50 transition hover:border-[#c9a227]/30 hover:text-[#f5d77a]"
+            >
+              Mostrar mais {hiddenStageCount} lead{hiddenStageCount === 1 ? '' : 's'}
+            </button>
+          )}
+
+          {visibleStageLeads.length === 0 && (
             <div className="rounded-2xl border-2 border-dashed border-white/5 p-6 text-center text-xs text-white/20 select-none">
               {isOver ? 'Solte aqui' : 'Coluna Vazia'}
             </div>

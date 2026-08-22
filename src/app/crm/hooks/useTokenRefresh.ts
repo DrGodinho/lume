@@ -4,6 +4,7 @@ import { fetchWithTimeout } from '@/lib/fetchWithTimeout';
 import { useEffect } from 'react';
 
 let refreshPromise: Promise<boolean> | null = null;
+let isRedirecting = false;
 let activeConsumers = 0;
 let patchedFetch: ((input: RequestInfo | URL, init?: RequestInit) => Promise<Response>) | null = null;
 let originalFetch: ((input: RequestInfo | URL, init?: RequestInit) => Promise<Response>) | null = null;
@@ -42,9 +43,12 @@ export function useTokenRefresh() {
         if (refreshed) {
           return 'retry';
         }
-        const loginUrl = new URL('/login', window.location.origin);
-        loginUrl.searchParams.set('redirectTo', window.location.pathname);
-        window.location.href = loginUrl.toString();
+        if (!isRedirecting) {
+          isRedirecting = true;
+          const loginUrl = new URL('/login', window.location.origin);
+          loginUrl.searchParams.set('redirectTo', window.location.pathname);
+          window.location.href = loginUrl.toString();
+        }
       }
       return 'error';
     };

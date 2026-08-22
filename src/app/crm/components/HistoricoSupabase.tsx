@@ -1,12 +1,19 @@
 'use client';
 
 import { fetchWithTimeout } from '@/lib/fetchWithTimeout';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { roundCurrency, roundMeasure } from '@/lib/numberPrecision';
 import { getHistoryFilmLabel } from '../utils';
 import type { CalculatorHistoryRow, CreateLeadModalOptions, CrmTab, Lead } from '../types';
 
 const HISTORY_REFRESH_INTERVAL_MS = 5 * 60 * 1000;
+const HISTORY_MONTH_PAGE_SIZE = 25;
+
+const formatMonthLabel = (monthKey: string) => {
+  if (monthKey === 'sem-data') return 'Sem data';
+  const [year, month] = monthKey.split('-').map(Number);
+  return new Date(year, month - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+};
 
 interface HistoricoSupabaseProps {
   setActiveTab: (tab: CrmTab) => void;
@@ -70,6 +77,53 @@ export function HistoricoSupabase({ setActiveTab, openCreateModal }: HistoricoSu
       getHistoryFilmLabel(item).toLowerCase().includes(query),
     );
   }, [displayedHistory, searchQuery]);
+
+  const groupedByMonth = useMemo(() => {
+    const buckets = new Map<string, CalculatorHistoryRow[]>();
+    for (const item of filteredHistory) {
+      const date = item.created_at ? new Date(item.created_at) : null;
+      const key = date
+        ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+        : 'sem-data';
+      const bucket = buckets.get(key);
+      if (bucket) bucket.push(item);
+      else buckets.set(key, [item]);
+    }
+    return Array.from(buckets.entries())
+      .map(([monthKey, items]) => ({
+        monthKey,
+        items: items.sort(
+          (a, b) => new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime(),
+        ),
+      }))
+      .sort((a, b) => b.monthKey.localeCompare(a.monthKey));
+  }, [filteredHistory]);
+
+  const [expandedMonths, setExpandedMonths] = useState<Set<string>>(new Set());
+  const [visibleCounts, setVisibleCounts] = useState<Record<string, number>>({});
+  const initializedExpandedRef = useRef(false);
+
+  useEffect(() => {
+    if (initializedExpandedRef.current || groupedByMonth.length === 0) return;
+    initializedExpandedRef.current = true;
+    setExpandedMonths(new Set([groupedByMonth[0].monthKey]));
+  }, [groupedByMonth]);
+
+  const toggleMonth = useCallback((monthKey: string) => {
+    setExpandedMonths((current) => {
+      const next = new Set(current);
+      if (next.has(monthKey)) next.delete(monthKey);
+      else next.add(monthKey);
+      return next;
+    });
+  }, []);
+
+  const showMoreMonth = useCallback((monthKey: string) => {
+    setVisibleCounts((current) => ({
+      ...current,
+      [monthKey]: (current[monthKey] ?? HISTORY_MONTH_PAGE_SIZE) + HISTORY_MONTH_PAGE_SIZE,
+    }));
+  }, []);
 
   const stats = useMemo(() => {
     const total = history.length;
@@ -137,8 +191,14 @@ export function HistoricoSupabase({ setActiveTab, openCreateModal }: HistoricoSu
 
   if (loading) {
     return (
-      <div className="flex h-64 items-center justify-center">
-        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#c9a227]" />
+      <div className="space-y-3" aria-hidden="true">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <div key={index} className="flex items-center gap-4 rounded-2xl border border-white/5 bg-[#07111d]/50 p-4">
+            <div className="skeleton-shimmer h-4 w-40 rounded" />
+            <div className="skeleton-shimmer h-4 w-24 rounded" />
+            <div className="skeleton-shimmer ml-auto h-4 w-20 rounded" />
+          </div>
+        ))}
       </div>
     );
   }
@@ -243,103 +303,152 @@ export function HistoricoSupabase({ setActiveTab, openCreateModal }: HistoricoSu
       </div>
 
       <div className="overflow-x-auto rounded-3xl border border-white/5 bg-[#07111d]/50 p-6 shadow-lg backdrop-blur-md">
-        <table className="w-full border-collapse text-left text-sm text-white/80">
-          <thead>
-            <tr className="border-b border-white/5 text-xs uppercase tracking-widest text-white/40">
-              <th className="pb-3 font-semibold">Cliente</th>
-              <th className="pb-3 font-semibold">Película</th>
-              <th className="pb-3 text-right font-semibold">Valor</th>
-              <th className="pb-3 text-center font-semibold">Qtd</th>
-              <th className="pb-3 font-semibold">Status</th>
-              <th className="pb-3 font-semibold">Data</th>
-              <th className="pb-3 text-right font-semibold">Ações</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-white/5">
-            {filteredHistory.length === 0 ? (
-              <tr>
-                <td colSpan={7} className="py-10 text-center font-semibold text-white/30">
-                  {searchQuery ? 'Nenhum resultado encontrado' : 'Nenhum orçamento no histórico'}
-                </td>
+        {groupedByMonth.length === 0 ? (
+          <p className="py-10 text-center font-semibold text-white/30">
+            {searchQuery ? 'Nenhum resultado encontrado' : 'Nenhum orçamento no histórico'}
+          </p>
+        ) : (
+          <table className="w-full border-collapse text-left text-sm text-white/80">
+            <thead>
+              <tr className="border-b border-white/5 text-xs uppercase tracking-widest text-white/40">
+                <th className="pb-3 font-semibold">Cliente</th>
+                <th className="pb-3 font-semibold">Película</th>
+                <th className="pb-3 text-right font-semibold">Valor</th>
+                <th className="pb-3 text-center font-semibold">Qtd</th>
+                <th className="pb-3 font-semibold">Status</th>
+                <th className="pb-3 font-semibold">Data</th>
+                <th className="pb-3 text-right font-semibold">Ações</th>
               </tr>
-            ) : (
-              filteredHistory.map((item) => (
-                <tr key={item.id} className="cursor-pointer hover:bg-white/[0.01]" onClick={() => setSelectedOrcamento(item)}>
-                  <td className="group py-3.5 font-semibold text-white">
-                    <span className="border-b border-dotted border-white/20 transition hover:border-[#c9a227]/60">{item.cliente || '—'}</span>
-                  </td>
-                  <td className="py-3.5">
-                    <span className="inline-flex rounded-lg border border-white/5 bg-white/[0.02] px-2.5 py-0.5 text-xs text-white/70">
-                      {getHistoryFilmLabel(item)}
-                    </span>
-                  </td>
-                  <td className="py-3.5 text-right font-bold text-[#c9a227]">{formatCurrency(item.valor || 0)}</td>
-                  <td className="py-3.5 text-center font-mono">{item.qtd || 0}</td>
-                  <td className="py-3.5">
-                    {item.lead_id ? (
-                      <span className="inline-flex rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-emerald-300">
-                        Vinculado
-                      </span>
-                    ) : (
-                      <span className="inline-flex rounded-lg border border-amber-400/25 bg-amber-400/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-amber-300">
-                        Pendente
-                      </span>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {groupedByMonth.map(({ monthKey, items }) => {
+                const isExpanded = expandedMonths.has(monthKey);
+                const monthTotal = items.reduce((sum, item) => sum + (item.valor || 0), 0);
+                const visible = visibleCounts[monthKey] ?? HISTORY_MONTH_PAGE_SIZE;
+                const shownItems = isExpanded ? items.slice(0, visible) : [];
+                const remaining = items.length - shownItems.length;
+
+                return (
+                  <Fragment key={monthKey}>
+                    <tr
+                      className="cursor-pointer bg-white/[0.02] hover:bg-white/[0.04]"
+                      onClick={() => toggleMonth(monthKey)}
+                    >
+                      <td colSpan={7} className="py-2.5">
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="flex items-center gap-2 font-bold uppercase tracking-wider text-white/80">
+                            <svg
+                              className={`h-3.5 w-3.5 text-white/40 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                            </svg>
+                            {formatMonthLabel(monthKey)}
+                          </span>
+                          <span className="text-[11px] font-semibold text-white/45">
+                            {items.length} {items.length === 1 ? 'orçamento' : 'orçamentos'} · {formatCurrency(monthTotal)}
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                    {shownItems.map((item) => (
+                      <tr key={item.id} className="cursor-pointer hover:bg-white/[0.01]" onClick={() => setSelectedOrcamento(item)}>
+                        <td className="group py-3.5 font-semibold text-white">
+                          <span className="border-b border-dotted border-white/20 transition hover:border-[#c9a227]/60">{item.cliente || '—'}</span>
+                        </td>
+                        <td className="py-3.5">
+                          <span className="inline-flex rounded-lg border border-white/5 bg-white/[0.02] px-2.5 py-0.5 text-xs text-white/70">
+                            {getHistoryFilmLabel(item)}
+                          </span>
+                        </td>
+                        <td className="py-3.5 text-right font-bold text-[#c9a227]">{formatCurrency(item.valor || 0)}</td>
+                        <td className="py-3.5 text-center font-mono">{item.qtd || 0}</td>
+                        <td className="py-3.5">
+                          {item.lead_id ? (
+                            <span className="inline-flex rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-emerald-300">
+                              Vinculado
+                            </span>
+                          ) : (
+                            <span className="inline-flex rounded-lg border border-amber-400/25 bg-amber-400/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-amber-300">
+                              Pendente
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-3.5 text-white/50">
+                          {item.created_at ? new Date(item.created_at).toLocaleDateString('pt-BR') : '—'}
+                        </td>
+                        <td className="py-3.5 text-right">
+                          <div className="flex justify-end gap-3">
+                            <button type="button" onClick={(event) => {
+                              event.stopPropagation();
+                              setSelectedOrcamento(item);
+                            }} className="text-white/40 hover:text-white" title="Ver detalhes">
+                              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 0 016 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              </svg>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                const orc = item;
+                                setSelectedOrcamento(null);
+                                setTimeout(() => {
+                                  convertToLead(orc);
+                                }, 0);
+                              }}
+                              disabled={!!item.lead_id}
+                              className="text-[#c9a227]/60 hover:text-[#c9a227] disabled:cursor-not-allowed disabled:text-emerald-300/45"
+                              title={item.lead_id ? 'Já vinculado a um lead' : 'Converter em Lead'}
+                            >
+                              {item.lead_id ? (
+                                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                </svg>
+                              ) : (
+                                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                                </svg>
+                              )}
+                            </button>
+                            <button type="button" onClick={(event) => {
+                              event.stopPropagation();
+                              void deleteOrcamento(item.id);
+                            }} className="text-white/30 hover:text-red-400" title="Excluir">
+                              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                    {isExpanded && remaining > 0 && (
+                      <tr>
+                        <td colSpan={7} className="py-2 text-center">
+                          <button
+                            type="button"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              showMoreMonth(monthKey);
+                            }}
+                            className="rounded-xl border border-white/10 px-4 py-1.5 text-xs font-semibold text-white/70 transition hover:border-[#c9a227]/40 hover:text-[#f5d77a]"
+                          >
+                            Mostrar mais {remaining} orçamento{remaining === 1 ? '' : 's'}
+                          </button>
+                        </td>
+                      </tr>
                     )}
-                  </td>
-                  <td className="py-3.5 text-white/50">
-                    {item.created_at ? new Date(item.created_at).toLocaleDateString('pt-BR') : '—'}
-                  </td>
-                  <td className="py-3.5 text-right">
-                    <div className="flex justify-end gap-3">
-                      <button type="button" onClick={(event) => {
-                        event.stopPropagation();
-                        setSelectedOrcamento(item);
-                      }} className="text-white/40 hover:text-white" title="Ver detalhes">
-                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        </svg>
-                      </button>
- <button
-  type="button"
-  onClick={(event) => {
-    event.stopPropagation();
-    const orc = item;
-    setSelectedOrcamento(null);
-    // Use setTimeout to ensure modal closing is processed before opening lead creation modal
-    setTimeout(() => {
-      convertToLead(orc);
-    }, 0);
-  }}
-  disabled={!!item.lead_id}
-  className="text-[#c9a227]/60 hover:text-[#c9a227] disabled:cursor-not-allowed disabled:text-emerald-300/45"
-  title={item.lead_id ? 'Já vinculado a um lead' : 'Converter em Lead'}
->
-  {item.lead_id ? (
-    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-    </svg>
-  ) : (
-    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-    </svg>
-  )}
-</button>
-                      <button type="button" onClick={(event) => {
-                        event.stopPropagation();
-                        void deleteOrcamento(item.id);
-                      }} className="text-white/30 hover:text-red-400" title="Excluir">
-                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+                  </Fragment>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {selectedOrcamento && (

@@ -9,8 +9,9 @@ import { DateFieldWithPicker } from './DateFieldWithPicker';
 import { DiscardChangesDialog } from './DiscardChangesDialog';
 import { WhatsAppTemplateMenu } from './WhatsAppTemplateMenu';
 import { useDirtyFormGuard } from '../hooks/useDirtyFormGuard';
+import { useLeadNotes } from '../hooks/useLeadNotes';
 import { leadFormSchema } from '../schemas/leadSchema';
-import { getHistoryFilmLabel, hasLeadNextAction, requiresLeadNextAction } from '../utils';
+import { getHistoryFilmLabel, hasLeadNextAction, requiresLeadNextAction, findDuplicateLead } from '../utils';
 import type { CalculatorHistoryRow, CommercialActionDraft, Lead, LeadFormValues, LeadStatusHistoryEntry } from '../types';
 
 const fieldErrorsFromSchema = (issues: ZodIssue[]): Partial<Record<keyof LeadFormValues, string>> => {
@@ -36,6 +37,8 @@ interface LeadFormModalProps {
   onSave: () => Promise<boolean>;
   onOpenHistory: () => void;
   formatDateInputValue: (value?: string | null) => string;
+  leads: Lead[];
+  onOpenLead: (lead: Lead) => void;
 }
 
 export function LeadFormModal({
@@ -52,6 +55,8 @@ export function LeadFormModal({
   onSave,
   onOpenHistory,
   formatDateInputValue,
+  leads,
+  onOpenLead,
 }: LeadFormModalProps) {
   const [showDiscardDialog, setShowDiscardDialog] = useState(false);
   const [showSaveWithoutDateConfirm, setShowSaveWithoutDateConfirm] = useState(false);
@@ -60,6 +65,11 @@ export function LeadFormModal({
     const result = leadFormSchema.safeParse(leadForm);
     return result.success ? null : fieldErrorsFromSchema(result.error.issues);
   }, [leadForm]);
+
+  const duplicateLead = useMemo(
+    () => findDuplicateLead(leads, leadForm.phone, leadForm.email, selectedLead?.id),
+    [leads, leadForm.phone, leadForm.email, selectedLead?.id],
+  );
 
   const requestClose = useCallback(() => {
     if (isDirty) {
@@ -201,6 +211,24 @@ export function LeadFormModal({
               )}
               <button type="button" onClick={onOpenHistory} className="mt-2 w-full text-xs font-semibold text-[#c9a227] hover:underline">
                 Ver todos os orçamentos no Histórico →
+              </button>
+            </div>
+          )}
+
+          {duplicateLead && (
+            <div className="flex flex-col gap-2 rounded-2xl border border-amber-400/30 bg-amber-500/10 p-3 sm:flex-row sm:items-center sm:justify-between">
+              <p className="flex items-center gap-2 text-[13px] font-semibold text-amber-200">
+                <AlertTriangle className="h-4 w-4 shrink-0" />
+                Este contato já existe:{' '}
+                <span className="font-bold text-white">{duplicateLead.name}</span>
+                {duplicateLead.status ? ` (${duplicateLead.status})` : ''}
+              </p>
+              <button
+                type="button"
+                onClick={() => onOpenLead(duplicateLead)}
+                className="shrink-0 rounded-xl border border-amber-400/30 bg-amber-400/15 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-amber-100 transition hover:bg-amber-400/25"
+              >
+                Abrir lead existente
               </button>
             </div>
           )}
@@ -439,6 +467,14 @@ export function LeadDetailModal({
   onOpenCommercialAction,
   onOpenHistory,
 }: LeadDetailModalProps) {
+  const { notes: leadNotes, loading: loadingLeadNotes, adding: addingLeadNote, error: leadNotesError, addNote } =
+    useLeadNotes(leadDetail?.id ?? '');
+  const [newNoteText, setNewNoteText] = useState('');
+  const handleAddNote = useCallback(async () => {
+    const ok = await addNote(newNoteText);
+    if (ok) setNewNoteText('');
+  }, [addNote, newNoteText]);
+
   if (!leadDetail) return null;
 
   return (
@@ -557,9 +593,63 @@ export function LeadDetailModal({
         )}
 
         <div className="mt-3 rounded-xl border border-white/5 bg-white/[0.02] p-3">
+          <span className="mb-2 block text-[10px] font-semibold uppercase tracking-wider text-white/50">Notas relacionais</span>
+          {loadingLeadNotes ? (
+            <div className="space-y-2" aria-hidden="true">
+              {Array.from({ length: 2 }).map((_, index) => (
+                <div key={index} className="rounded-lg border border-white/5 bg-[#04080f]/70 px-3 py-2">
+                  <div className="skeleton-shimmer h-3.5 w-full rounded" />
+                </div>
+              ))}
+            </div>
+          ) : leadNotes.length === 0 ? (
+            <p className="text-sm text-white/45">Nenhuma nota relacional ainda.</p>
+          ) : (
+            <div className="space-y-2">
+              {leadNotes.map((note) => (
+                <div key={note.id} className="rounded-lg border border-white/5 bg-[#04080f]/70 px-3 py-2">
+                  <p className="whitespace-pre-wrap text-sm text-white/80">{note.body}</p>
+                  <p className="mt-1 text-[11px] text-white/40">
+                    {note.createdAt ? new Date(note.createdAt).toLocaleString('pt-BR') : ''}
+                    {note.createdBy ? ` · ${note.createdBy}` : ''}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+          {leadNotesError && <p className="mt-2 text-[11px] text-red-300">{leadNotesError}</p>}
+          <div className="mt-3 flex flex-col gap-2">
+            <textarea
+              value={newNoteText}
+              onChange={(event) => setNewNoteText(event.target.value)}
+              placeholder="Adicionar uma nota..."
+              rows={2}
+              className="w-full resize-none rounded-xl border border-white/5 bg-[#04080f] px-3 py-2 text-sm text-white placeholder:text-white/20 focus:border-[#c9a227]/40 focus:outline-none"
+            />
+            <button
+              type="button"
+              onClick={() => void handleAddNote()}
+              disabled={addingLeadNote || !newNoteText.trim()}
+              className="self-end rounded-xl border border-[#c9a227]/20 bg-[#c9a227]/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-[#f5d77a] transition hover:bg-[#c9a227]/15 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {addingLeadNote ? 'Salvando...' : 'Adicionar nota'}
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-3 rounded-xl border border-white/5 bg-white/[0.02] p-3">
           <span className="mb-2 block text-[10px] font-semibold uppercase tracking-wider text-white/50">Histórico de status</span>
           {loadingLeadStatusHistory ? (
-            <p className="text-sm text-white/45">Carregando histórico...</p>
+            <div className="space-y-2" aria-hidden="true">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className="rounded-lg border border-white/5 bg-[#04080f]/70 px-3 py-2">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="skeleton-shimmer h-3.5 w-40 rounded" />
+                    <div className="skeleton-shimmer h-3 w-24 rounded" />
+                  </div>
+                </div>
+              ))}
+            </div>
           ) : leadStatusHistory.length === 0 ? (
             <p className="text-sm text-white/45">Nenhuma transição registrada ainda.</p>
           ) : (

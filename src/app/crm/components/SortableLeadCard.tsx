@@ -2,6 +2,7 @@
 
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { memo } from 'react';
 import { LeadCard } from './LeadCard';
 import type { Lead, LeadSyncStatus } from '../types';
 
@@ -18,13 +19,13 @@ interface SortableLeadCardProps {
   onOpenEdit: (lead: Lead) => void;
   onDelete: (leadId: string) => void;
   onTogglePin: (leadId: string) => void;
-  onMoveLeft: () => void;
-  onMoveRight: () => void;
+  onMoveLeft: (leadId: string) => void;
+  onMoveRight: (leadId: string) => void;
   disableMoveLeft: boolean;
   disableMoveRight: boolean;
 }
 
-export function SortableLeadCard({
+export const SortableLeadCard = memo(function SortableLeadCard({
   lead,
   stage,
   collapsed,
@@ -74,4 +75,4 @@ export function SortableLeadCard({
       isDragging={isDragging}
     />
   );
-}
+});

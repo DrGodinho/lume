@@ -387,7 +387,31 @@ export async function GET(request: NextRequest) {
 
   const { data, error } = await query;
 
-  if (error) return crmErrorResponse(error);
+  if (error) {
+    // The default branch filters by the optional `archived`/`data_servico` columns.
+    // If those columns do not exist yet in the schema, retry without them so the
+    // leads still load (same resilience the write handlers already have).
+    if (!trashOnly && !archiveOnly && !includeAll && isMissingOptionalLeadColumnError(error.message)) {
+      const { data: fallbackData, error: fallbackError } = await supabaseClient
+        .from('leads')
+        .select('*')
+        .is('deleted_at', null)
+        .order('created_at', { ascending: false });
+
+      if (fallbackError) return crmErrorResponse(fallbackError);
+
+      return NextResponse.json(
+        (fallbackData || []).map((lead) => ({
+          ...lead,
+          sqm: roundMeasure(lead.sqm),
+          value: roundCurrency(lead.value),
+        }))
+      );
+    }
+
+    return crmErrorResponse(error);
+  }
+
   return NextResponse.json(
     (data || []).map((lead) => ({
       ...lead,

@@ -109,7 +109,7 @@ const DEFAULT_ROOM_COLORS: Record<string, string> = {
   suite: '#e879f9',
   closet: '#fb7185',
   corredor: '#a3e635',
-  terraço: '#f59e0b',
+  terraco: '#f59e0b',
   jardim: '#4ade80',
 };
 const ROOM_COLOR_SWATCHES = [
@@ -445,7 +445,7 @@ const MemoBlock = React.memo(({
       </div>
 
       {/* Height Capsule (Left side, vertical) */}
-      <div className="absolute left-1 top-1/2 -translate-y-1/2 -translate-x-[40%] -rotate-90 pointer-events-none">
+      <div className="absolute left-1 top-1/2 -translate-y-1/2 -rotate-90 pointer-events-none">
         <div className="bg-white/90 backdrop-blur-sm text-black px-3 py-1 rounded-md text-[30px] sm:text-[36px] font-black shadow-sm flex items-center justify-center whitespace-nowrap min-w-[44px]">
           {Number(b.rh.toFixed(2))}
         </div>

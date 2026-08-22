@@ -2,7 +2,7 @@
 
 import { format } from 'date-fns';
 import { AlertTriangle, CheckCircle2, RefreshCw, Star } from 'lucide-react';
-import type { CSSProperties } from 'react';
+import { memo, type CSSProperties } from 'react';
 import type { Lead, LeadSyncStatus } from '../types';
 
 interface LeadCardProps {
@@ -17,8 +17,8 @@ interface LeadCardProps {
   onOpenEdit: (lead: Lead) => void;
   onDelete: (leadId: string) => void;
   onTogglePin: (leadId: string) => void;
-  onMoveLeft: () => void;
-  onMoveRight: () => void;
+  onMoveLeft: (leadId: string) => void;
+  onMoveRight: (leadId: string) => void;
   sortableRef?: (node: HTMLElement | null) => void;
   sortableStyle?: CSSProperties;
   sortableAttributes?: Record<string, unknown>;
@@ -29,7 +29,7 @@ interface LeadCardProps {
   disableMoveRight: boolean;
 }
 
-export function LeadCard({
+export const LeadCard = memo(function LeadCard({
   lead,
   collapsed,
   daysInStatus,
@@ -193,7 +193,7 @@ export function LeadCard({
               disabled={disableMoveLeft}
               onClick={(event) => {
                 event.stopPropagation();
-                onMoveLeft();
+                onMoveLeft(lead.id);
               }}
               onDoubleClick={(event) => event.stopPropagation()}
               className="rounded bg-white/5 p-0.5 text-[11px] leading-none text-white/50 disabled:opacity-20 hover:text-[#c9a227]"
@@ -238,7 +238,7 @@ export function LeadCard({
               disabled={disableMoveRight}
               onClick={(event) => {
                 event.stopPropagation();
-                onMoveRight();
+                onMoveRight(lead.id);
               }}
               onDoubleClick={(event) => event.stopPropagation()}
               className="rounded bg-white/5 p-0.5 text-[11px] leading-none text-white/50 disabled:opacity-20 hover:text-[#c9a227]"
@@ -246,9 +246,9 @@ export function LeadCard({
             >
               &rarr;
             </button>
-          </div>
-        </>
+      </div>
+    </>
       )}
     </div>
   );
-}
+});

@@ -1,6 +1,7 @@
 'use client';
 
 import { format } from 'date-fns';
+import { useEffect, useState } from 'react';
 import { CheckCircle2, RefreshCw, XCircle } from 'lucide-react';
 import type { CrmSyncState, CrmTab } from '../types';
 
@@ -23,13 +24,34 @@ const TAB_TITLES: Record<CrmTab, string> = {
   settings: 'Configuracoes do CRM',
 };
 
+function formatRelativeSync(iso: string | null, now: number): string {
+  if (!iso) return 'ainda nao';
+  const diffMs = now - new Date(iso).getTime();
+  if (diffMs < 0) return 'agora';
+  const minutes = Math.floor(diffMs / 60000);
+  if (minutes < 1) return 'agora';
+  if (minutes < 60) return `há ${minutes} min`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `há ${hours} h`;
+  const days = Math.floor(hours / 24);
+  return `há ${days} d`;
+}
+
 export function CrmHeader({ activeTab, crmSync, lastCloudCheckAt, isVerifyingCloud, onVerifyCloud }: CrmHeaderProps) {
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const interval = window.setInterval(() => setNow(Date.now()), 30000);
+    return () => window.clearInterval(interval);
+  }, []);
+
   const syncTone = crmSync.status === 'error' ? 'error' : crmSync.status === 'warning' ? 'warning' : 'ok';
   const syncStatusLabel = syncTone === 'error'
     ? 'Erro'
     : syncTone === 'warning'
       ? 'Sincronizando'
       : 'Sincronizado';
+  const lastSyncRelative = formatRelativeSync(lastCloudCheckAt, now);
   const lastCloudCheckLabel = lastCloudCheckAt
     ? format(new Date(lastCloudCheckAt), 'HH:mm')
     : '--:--';
@@ -77,8 +99,15 @@ export function CrmHeader({ activeTab, crmSync, lastCloudCheckAt, isVerifyingClo
               <span className={`h-1.5 w-1.5 rounded-full ${syncClasses.dot}`} />
               <p className={`truncate text-[11px] font-black uppercase tracking-[0.14em] ${syncClasses.text}`}>
                 {syncStatusLabel}
+                {syncTone === 'ok' && (
+                  <span className="ml-1 font-normal normal-case tracking-normal text-white/55">
+                    {lastSyncRelative}
+                  </span>
+                )}
               </p>
-              <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-white/38">{lastCloudCheckLabel}</span>
+              <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-white/38" title={lastCloudCheckAt ? `Ultima conferencia: ${lastCloudCheckLabel}` : 'Sem conferencia registrada'}>
+                {lastCloudCheckLabel}
+              </span>
             </div>
           </div>
         </div>
