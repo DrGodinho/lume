@@ -5,7 +5,7 @@ import { AnimatedCounter } from '../components/AnimatedCounter';
 import { NeighborhoodAnimations } from '../components/NeighborhoodAnimations';
 import Image from 'next/image';
 
-export function BanguPage() {
+export function BanguPage({ faqs }: { faqs: { q: string; a: string }[] }) {
     return (
         <div className="bg-[#04080f] text-white min-h-screen">
             <NeighborhoodAnimations />
@@ -38,7 +38,7 @@ export function BanguPage() {
                     </h1>
 
                     <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto md:mx-0 mb-10 leading-relaxed font-light">
-                        Aplicação profissional de insulfilm de controle solar para residências e empresas em Bangu e toda a região da Zona Oeste. Proteção contra o calor intenso e privacidade garantida.
+                        Aplicação profissional de insulfilm de controle solar para residências e empresas em Bangu e toda a região da Zona Oeste, com películas a partir de R$ 90/m². Proteção contra o calor intenso, privacidade garantida e orçamento grátis pelo WhatsApp.
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
@@ -313,21 +313,49 @@ export function BanguPage() {
                                 <div className="space-y-6 relative z-10">
                                     <p className="text-gray-300 font-bold text-lg mb-4">Atendemos plenamente os bairros:</p>
                                     <div className="grid grid-cols-2 gap-4 text-sm font-medium text-gray-400 uppercase tracking-wider">
-                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Bangu</div>
-                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Realengo</div>
-                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Padre Miguel</div>
-                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Campo Grande</div>
-                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Santíssimo</div>
-                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Cosmos</div>
-                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Inhoiba</div>
-                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Santa Cruz</div>
-                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Senador Camará</div>
-                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Sulacap</div>
+                                        {[
+                                            { name: 'Bangu', href: '/insulfilm-em-bangu/' },
+                                            { name: 'Realengo', href: '/insulfilm-em-realengo/' },
+                                            { name: 'Padre Miguel' },
+                                            { name: 'Campo Grande', href: '/insulfilm-em-campo-grande/' },
+                                            { name: 'Santíssimo' },
+                                            { name: 'Cosmos' },
+                                            { name: 'Inhoiba' },
+                                            { name: 'Santa Cruz' },
+                                            { name: 'Senador Camará' },
+                                            { name: 'Sulacap', href: '/insulfilm-em-sulacap/' },
+                                        ].map((b) => (
+                                            b.href ? (
+                                                <a key={b.name} href={b.href} className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> {b.name}</a>
+                                            ) : (
+                                                <div key={b.name} className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> {b.name}</div>
+                                            )
+                                        ))}
                                     </div>
                                     <p className="text-xs text-gray-500 mt-6 pt-6 border-t border-white/5">Levamos a estrutura completa da Lume Controle Solar até o seu local com agendamento flexível.</p>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Preço de Insulfilm em Bangu - Cross-link para o post campeão de conversão */}
+            <section className="py-16 bg-[#070f1a] border-y border-white/5 px-4">
+                <div className="container-lume page-entrance max-w-4xl mx-auto">
+                    <div className="glass-card p-8 md:p-10 rounded-3xl border border-[#c9a227]/30 flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
+                        <div className="flex-1">
+                            <h2 className="text-2xl lg:text-3xl font-bold font-montserrat mb-3 text-white">Preço de insulfilm em Bangu em 2026</h2>
+                            <p className="text-gray-400 font-light leading-relaxed">
+                                As películas variam de <strong className="text-white">R$ 90/m²</strong> (carbono) a <strong className="text-white">R$ 240/m²</strong> (nano cerâmica); janela a partir de R$ 90 e porta de vidro de ~R$ 176. Veja a tabela completa com exemplos por tipo de vidro e película.
+                            </p>
+                        </div>
+                        <a
+                            href="/blog/preco-insulfilm-residencial-rio-de-janeiro/"
+                            className="btn-primary inline-flex items-center justify-center gap-3 text-sm py-4 px-6 shrink-0 transform transition hover:scale-105"
+                        >
+                            Ver tabela de preços <ArrowRight size={18} />
+                        </a>
                     </div>
                 </div>
             </section>
@@ -348,40 +376,7 @@ export function BanguPage() {
                     </div>
 
                     <div className="space-y-4">
-                        {[
-                            {
-                                q: "1. Quanto custa instalar insulfilm residencial em Bangu?",
-                                a: "O valor varia conforme o tipo de película escolhida e a quantidade de metros quadrados de vidro. Películas básicas custam menos do que as linhas nano cerâmica ou de segurança. Ofereço orçamento gratuito e sem compromisso pelo WhatsApp — basta enviar uma mensagem com as medidas ou agendar uma visita para medição no local."
-                            },
-                            {
-                                q: "2. Qual o melhor tipo de insulfilm para casas em Bangu?",
-                                a: "Para o clima quente da Zona Oeste, recomendo as películas nano cerâmica ou nano carbono para máxima rejeição de calor. Se privacidade for a prioridade, o G5 fumê é o mais indicado. Para quem não quer alterar a aparência do vidro, a linha IR transparente é a melhor opção."
-                            },
-                            {
-                                q: "3. O insulfilm residencial danifica o vidro?",
-                                a: "Não. A aplicação é feita com produtos específicos para limpeza e adesão, sem riscos ao vidro. A instalação profissional garante que não fiquem arranhados ou manchas residuais."
-                            },
-                            {
-                                q: "4. Quanto tempo dura o insulfilm residencial?",
-                                a: "Trabalhamos exclusivamente com películas originais que mantêm suas propriedades térmicas e estabilidade de cor por muito mais tempo que as versões comuns. Elas são resistentes a riscos e não criam as bolhas típicas de materiais inferiores."
-                            },
-                            {
-                                q: "5. Qual o tempo de garantia do serviço?",
-                                a: "Oferecemos garantia contratual de 2 anos em todos os nossos serviços de aplicação. Isso cobre bolhas, delaminação e defeitos de instalação, garantindo sua total tranquilidade."
-                            },
-                            {
-                                q: "6. Posso instalar insulfilm em vidro temperado?",
-                                a: "Sim, desde que seja usada a película correta. Vidros temperados requerem películas com taxa de absorção de calor adequada para evitar estresse térmico. Avaliamos o tipo de vidro antes da recomendação."
-                            },
-                            {
-                                q: "7. O insulfilm escurece muito o ambiente?",
-                                a: "Depende da sua escolha. Películas como o Carbono G5 reduzem bastante a luminosidade (ideal para quartos). Já a Nano Cerâmica rejeita o calor mantendo a transparência quase total do vidro."
-                            },
-                            {
-                                q: "8. Atendem condomínios e empresas em Bangu?",
-                                a: "Sim. Atendemos residências em condomínios, lojas de rua, centros comerciais, clínicas, escritórios e qualquer ambiente comercial arquitetônico na região."
-                            }
-                        ].map((faq, idx) => (
+                        {faqs.map((faq, idx) => (
                             <details key={idx} className="group glass-card border border-white/5 rounded-2xl overflow-hidden cursor-pointer transition-all hover:bg-white/[0.03]">
                                 <summary className="font-bold text-lg p-7 flex justify-between items-center list-none outline-none group-open:text-[#c9a227] transition-colors">
                                     {faq.q}

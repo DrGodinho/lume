@@ -5,7 +5,7 @@ import { AnimatedCounter } from '../components/AnimatedCounter';
 import { NeighborhoodAnimations } from '../components/NeighborhoodAnimations';
 import Image from 'next/image';
 
-export function BarraPage() {
+export function BarraPage({ faqs }: { faqs: { q: string; a: string }[] }) {
     return (
         <div className="bg-[#04080f] text-white min-h-screen">
             <NeighborhoodAnimations />
@@ -45,7 +45,7 @@ export function BarraPage() {
                     </h1>
 
                     <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto md:mx-0 mb-10 leading-relaxed font-light">
-                        Eleve o padrão de conforto térmico do seu imóvel na Barra da Tijuca. Películas de alta tecnologia para residências de luxo e ambientes corporativos modernos.
+                        Eleve o padrão de conforto térmico do seu imóvel na Barra da Tijuca. Películas de alta tecnologia para residências de luxo e ambientes corporativos modernos, com películas a partir de R$ 90/m².
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
@@ -319,9 +319,35 @@ export function BarraPage() {
                                 <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Marapendi</div>
                                 <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Joá</div>
                                 <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Itanhangá</div>
-                                <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Cidade das Artes</div>
+                                <div className="flex items-center gap-2">                                <div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Cidade das Artes</div>
+                                        <a href="/insulfilm-no-recreio/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Recreio</a>
+                                        <a href="/insulfilm-em-jacarepagua/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Jacarepaguá</a>
+                                        <a href="/insulfilm-em-bangu/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Bangu</a>
+                                        <a href="/insulfilm-em-campo-grande/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Campo Grande</a>
+                                        <a href="/insulfilm-em-realengo/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Realengo</a>
+                                        <a href="/insulfilm-em-sulacap/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Sulacap</a>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Preço de Insulfilm na Barra - Cross-link para o post campeão de conversão */}
+            <section className="py-16 bg-[#070f1a] border-y border-white/5 px-4">
+                <div className="container-lume page-entrance max-w-4xl mx-auto">
+                    <div className="glass-card p-8 md:p-10 rounded-3xl border border-[#c9a227]/30 flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
+                        <div className="flex-1">
+                            <h2 className="text-2xl lg:text-3xl font-bold font-montserrat mb-3 text-white">Preço de insulfilm na Barra da Tijuca em 2026</h2>
+                            <p className="text-gray-400 font-light leading-relaxed">
+                                As películas variam de <strong className="text-white">R$ 90/m²</strong> (carbono) a <strong className="text-white">R$ 240/m²</strong> (nano cerâmica); janela a partir de R$ 90 e porta de vidro de ~R$ 176. Veja a tabela completa com exemplos por tipo de vidro e película.
+                            </p>
+                        </div>
+                        <a
+                            href="/blog/preco-insulfilm-residencial-rio-de-janeiro/"
+                            className="btn-primary inline-flex items-center justify-center gap-3 text-sm py-4 px-6 shrink-0 transform transition hover:scale-105"
+                        >
+                            Ver tabela de preços <ArrowRight size={18} />
+                        </a>
                     </div>
                 </div>
             </section>
@@ -342,40 +368,7 @@ export function BarraPage() {
                     </div>
 
                     <div className="space-y-4">
-                        {[
-                            {
-                                q: "1. Quanto custa instalar insulfilm residencial na Barra da Tijuca?",
-                                a: "O valor é calculado por metro quadrado e depende da tecnologia de película escolhida. Trabalhamos desde linhas de excelente custo-benefício até nanotecnologia premium para controle solar total. Solicite um orçamento em 5 minutos pelo nosso WhatsApp."
-                            },
-                            {
-                                q: "2. Qual o melhor tipo de insulfilm para apartamentos de frente para o mar?",
-                                a: "Nesses casos, recomendamos películas que não possuem metais (Metal-free), como as nossas linhas de Nano Cerâmica. Elas não sofrem oxidação com a maresia e garantem a visão clara da praia mesmo com alto controle de calor."
-                            },
-                            {
-                                q: "3. O insulfilm residencial altera a estética da fachada do prédio?",
-                                a: "Temos opções de películas 'invisíveis' (incolor e térmica) que mantêm 100% da transparência original do vidro, aprovadas em condomínios rigorosos como os da Península e Jardim Oceânico."
-                            },
-                            {
-                                q: "4. Quanto tempo dura a proteção térmica das películas LUME?",
-                                a: "Nossas películas de padrão elite mantêm a eficiência de rejeição infravermelha e estabilidade de cor por 8 a 15 anos. Elas são resistentes a riscos e ao clima salino da Barra."
-                            },
-                            {
-                                q: "5. O serviço na Barra tem garantia oficial?",
-                                a: "Sim. Oferecemos garantia oficial de 2 anos cobrindo qualquer defeito de instalação ou material. Sua tranquilidade e satisfação na Barra são prioridade para a LUME."
-                            },
-                            {
-                                q: "6. Posso instalar insulfilm em coberturas ou varandas envidraçadas?",
-                                a: "Sim, somos especialistas em grandes vãos de vidro. A aplicação em varandas gourmet é um de nossos serviços mais solicitados para viabilizar o uso do espaço durante o sol da tarde."
-                            },
-                            {
-                                q: "7. O insulfilm realmente reduz o brilho no monitor e TV?",
-                                a: "Com certeza. Além do calor, nossas películas filtram o excesso de luminosidade, eliminando reflexos incômodos em telas, ideal para home-offices e salas de cinema particulares."
-                            },
-                            {
-                                q: "8. Atendem clínicas e escritórios em centros empresariais na Barra?",
-                                a: "Sim. Atendemos todo o setor corporativo da região, garantindo privacidade e conforto térmico para seus clientes e colaboradores com instalação rápida e discreta."
-                            }
-                        ].map((faq, idx) => (
+                        {faqs.map((faq, idx) => (
                             <details key={idx} className="group glass-card border border-white/5 rounded-2xl overflow-hidden cursor-pointer transition-all hover:bg-white/[0.03]">
                                 <summary className="font-bold text-lg p-7 flex justify-between items-center list-none outline-none group-open:text-[#c9a227] transition-colors">
                                     {faq.q}

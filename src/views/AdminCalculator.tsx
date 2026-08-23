@@ -13,6 +13,11 @@ import { createScopedLogger } from '../lib/logger';
 const logger = createScopedLogger('AdminCalculator');
 import { ConfigPanel } from '../components/ConfigPanel';
 import { HistoryPanel } from '../components/HistoryPanel';
+import { InputPanel } from '../components/calculator/InputPanel';
+import { CutMap } from '../components/calculator/CutMap';
+import { ResumeList } from '../components/calculator/ResumeList';
+import { ColarModal } from '../components/calculator/ColarModal';
+import { CutModeToolbar } from '../components/calculator/CutModeToolbar';
 import { buildCalculatorStorageKey, resolveCalculatorScopeKey } from '../lib/calculatorScope';
 import {
     saveDraftToCloud, loadDraftFromCloud,
@@ -24,7 +29,7 @@ import { supabase } from '../lib/supabase';
 
 // ─── CONFIGURAÇÕES PADRÃO ─────────────────────────────────────────────────────
 
-type FilmTypeKey = 'carbono_g5' | 'carbono_g20' | 'refletiva' | 'dupla_camada' | 'nano_ceramica' | 'nano_ceramica_g20' | 'jateado';
+export type FilmTypeKey = 'carbono_g5' | 'carbono_g20' | 'refletiva' | 'dupla_camada' | 'nano_ceramica' | 'nano_ceramica_g20' | 'jateado';
 type OptimizationMode = 'densidade' | 'facilidade' | 'facilidade_v2';
 type LossMode = 'dinamico' | 'fixo';
 type ColorMode = 'ambiente' | 'tamanho';
@@ -32,9 +37,9 @@ type ColorMode = 'ambiente' | 'tamanho';
 const OPTIMIZATION_MODES: OptimizationMode[] = ['densidade', 'facilidade', 'facilidade_v2'];
 const LOSS_MODES: LossMode[] = ['dinamico', 'fixo'];
 const COLOR_MODES: ColorMode[] = ['ambiente', 'tamanho'];
-const FILM_TYPE_KEYS: FilmTypeKey[] = ['carbono_g5', 'carbono_g20', 'refletiva', 'dupla_camada', 'nano_ceramica', 'nano_ceramica_g20', 'jateado'];
+export const FILM_TYPE_KEYS: FilmTypeKey[] = ['carbono_g5', 'carbono_g20', 'refletiva', 'dupla_camada', 'nano_ceramica', 'nano_ceramica_g20', 'jateado'];
 
-const FILM_TYPE_LABELS: Record<FilmTypeKey, string> = {
+export const FILM_TYPE_LABELS: Record<FilmTypeKey, string> = {
   carbono_g5: 'Carbono G5',
   carbono_g20: 'Carbono G20',
   refletiva: 'Refletiva',
@@ -111,8 +116,15 @@ const DEFAULT_ROOM_COLORS: Record<string, string> = {
   corredor: '#a3e635',
   terraco: '#f59e0b',
   jardim: '#4ade80',
+  lavabo: '#22c55e',
+  sacada: '#f97316',
+  homeoffice: '#0ea5e9',
+  sala_jantar: '#d97706',
+  sala_tv: '#3b82f6',
+  area_gourmet: '#f59e0b',
+  area_servico: '#14b8a6',
 };
-const ROOM_COLOR_SWATCHES = [
+export const ROOM_COLOR_SWATCHES = [
   '#60a5fa', '#facc15', '#c084fc', '#34d399', '#fb923c',
   '#f87171', '#38bdf8', '#a78bfa', '#2dd4bf', '#fbbf24',
   '#e879f9', '#fb7185', '#a3e635', '#f59e0b', '#4ade80',
@@ -171,31 +183,6 @@ const getSizeColor = (h?: number, w?: number) => {
   return `hsl(${hue.toFixed(1)}, ${saturation}%, ${lightness}%)`;
 };
 
-const ROOM_PALETTE: Record<string, string> = {
-  sala: '#60a5fa',
-  cozinha: '#eab308',
-  quarto: '#c084fc',
-  banheiro: '#34d399',
-  varanda: '#fb923c',
-  area: '#f87171',
-  escritorio: '#38bdf8',
-  garagem: '#a78bfa',
-  lavanderia: '#2dd4bf',
-  hall: '#fbbf24',
-  suite: '#e879f9',
-  closet: '#fb7185',
-  corredor: '#a3e635',
-  terraco: '#f59e0b',
-  jardim: '#4ade80',
-  lavabo: '#22c55e',
-  sacada: '#f97316',
-  homeoffice: '#0ea5e9',
-  sala_jantar: '#d97706',
-  sala_tv: '#3b82f6',
-  area_gourmet: '#f59e0b',
-  area_servico: '#14b8a6',
-};
-
 const ROOM_ALIAS_RULES: Array<{ test: RegExp; key: string }> = [
   { test: /\bsala\b.*\b(jantar|tv|estar)?\b/, key: 'sala' },
   { test: /\bcozinha\b/, key: 'cozinha' },
@@ -228,7 +215,7 @@ const resolveRoomKey = (label: string) => {
 const stableRoomColor = (label: string) => {
   const key = resolveRoomKey(label);
   if (!key) return '#94a3b8';
-  if (ROOM_PALETTE[key]) return ROOM_PALETTE[key];
+  if (DEFAULT_ROOM_COLORS[key]) return DEFAULT_ROOM_COLORS[key];
   let hash = ROOM_ALIAS_RULES.length;
   for (let i = 0; i < key.length; i++) {
     hash = ((hash << 5) - hash) + key.charCodeAt(i);
@@ -274,7 +261,7 @@ export interface GlassItem {
     sortOrder: number;
 }
 
-interface Block {
+export interface Block {
     id: string;
     w: number;
     h: number;
@@ -302,6 +289,7 @@ export interface OrcamentoSalvo {
   desconto: number;
   modoOtimizacao: 'densidade' | 'facilidade' | 'facilidade_v2';
   selectedFilm?: string;
+  leadId?: string | null;
 }
 
 type ImportedGlass = Partial<GlassItem> & {
@@ -321,6 +309,7 @@ interface SavedProjectPayload {
   config?: {
     cliente?: string;
     phone?: string;
+    neighborhood?: string;
     rolo?: number | string;
     preco?: number | string;
     selectedFilm?: string;
@@ -379,91 +368,6 @@ function historyReducer(state: HistoryState, action: HistoryAction): HistoryStat
     }
 }
 
-// ─── COMPONENTES AUXILIARES MEMOIZADOS ────────────────────────────────────────
-
-const MemoBlock = React.memo(({
-  b,
-  scale,
-  isSelected,
-  toggleSelection,
-  selectSameSize,
-  index,
-}: {
-  b: Block,
-  scale: number,
-  isSelected: boolean,
-  toggleSelection: (id: string) => void,
-  selectSameSize: (oh: number, ow: number, label?: string) => void,
-  index: number,
-}) => {
-  const pos = b.fit!;
-  const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
-
-  const handlePointerDown = (e: React.PointerEvent) => {
-    pointerStartRef.current = { x: e.clientX, y: e.clientY };
-  };
-
-  const handlePointerUp = (e: React.PointerEvent) => {
-    if (!pointerStartRef.current) return;
-    const dx = Math.abs(e.clientX - pointerStartRef.current.x);
-    const dy = Math.abs(e.clientY - pointerStartRef.current.y);
-    pointerStartRef.current = null;
-    if (dx < 10 && dy < 10) {
-      toggleSelection(b.id);
-    }
-  };
-
-  const handleDoubleClick = () => {
-    selectSameSize(b.rh, b.rw, b.label);
-  };
-
-    return (
-    <div
-      onPointerDown={handlePointerDown}
-      onPointerUp={handlePointerUp}
-      onDoubleClick={handleDoubleClick}
-      className="absolute flex items-center justify-center text-black font-bold group rounded-sm overflow-hidden"
-      style={{
-        left: pos.x * scale,
-        top: pos.y * scale,
-        width: b.rw * scale,
-        height: b.rh * scale,
-        background: b.cor,
-        border: isSelected ? '2px solid #3b82f6' : '1px solid rgba(0,0,0,0.15)',
-        boxShadow: isSelected ? '0 0 15px rgba(59,130,246,0.8)' : 'inset 0 0 10px rgba(255,255,255,0.2)',
-        zIndex: isSelected ? 20 : 10,
-        cursor: 'pointer',
-        transition: 'all 0.25s cubic-bezier(0.34,1.56,0.64,1)',
-        touchAction: 'pan-y',
-      }}
-    >
-      {/* Background Index/Label Watermark */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-25 px-2 overflow-hidden">
-        <span className="text-[3vw] sm:text-[2vw] lg:text-[2rem] font-black text-black select-none tracking-tighter mix-blend-overlay truncate text-center max-w-full leading-none">
-          {b.label || index}
-        </span>
-      </div>
-
-      {/* Height Capsule (Left side, vertical) */}
-      <div className="absolute left-1 top-1/2 -translate-y-1/2 -rotate-90 pointer-events-none">
-        <div className="bg-white/90 backdrop-blur-sm text-black px-3 py-1 rounded-md text-[30px] sm:text-[36px] font-black shadow-sm flex items-center justify-center whitespace-nowrap min-w-[44px]">
-          {Number(b.rh.toFixed(2))}
-        </div>
-      </div>
-
-      {/* Width Capsule (Bottom side, horizontal) */}
-      <div className="absolute bottom-1 right-1 pointer-events-none">
-        <div className="bg-white/90 backdrop-blur-sm text-black px-3 py-1 rounded-md text-[30px] sm:text-[36px] font-black shadow-sm flex items-center justify-center whitespace-nowrap min-w-[44px]">
-          {Number(b.rw.toFixed(2))}
-        </div>
-      </div>
-      
-      {/* Visual Overlay on Hover (optional) */}
-      <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 pointer-events-none transition-colors duration-200" />
-    </div>
-  );
-});
-
 // ─── COMPONENTE PRINCIPAL ─────────────────────────────────────────────────────
 
 export function AdminCalculator() {
@@ -471,7 +375,8 @@ export function AdminCalculator() {
   const [isCutMode, setIsCutMode] = useState(false);
   const [vidrosBackup, setVidrosBackup] = useState<GlassItem[]>([]);
   const [phone, setPhone] = useState('');
-  const cfg = loadConfig();
+  const [neighborhood, setNeighborhood] = useState('');
+  const cfg = useMemo(() => loadConfig(), []);
   const [rollW, setRollW] = useState(cfg.rollW);
   const [margin, setMargin] = useState(cfg.margin);
   const [price, setPrice] = useState(cfg.price);
@@ -573,6 +478,7 @@ export function AdminCalculator() {
 
     const [historicoAberto, setHistoricoAberto] = useState(false);
     const [historico, setHistorico] = useState<OrcamentoSalvo[]>([]);
+    const [currentLeadId, setCurrentLeadId] = useState<string | null>(null);
     const [showSaveToast, setShowSaveToast] = useState(false);
 
     // Estados para edição de nomes de ambientes
@@ -583,12 +489,26 @@ export function AdminCalculator() {
     // Estados para copiar e colar peças
     const [itensCopiados, setItensCopiados] = useState<GlassItem[] | null>(null);
     const [showColarModal, setShowColarModal] = useState(false);
+    const CLIPBOARD_KEY = 'lume_calculator_clipboard';
 
     useEffect(() => {
         if (editingAmbiente !== null && editInputRef.current) {
             editInputRef.current.focus();
         }
     }, [editingAmbiente, editNome]);
+
+    // ─── RESTAURA CLIPBOARD GLOBAL DE PEÇAS (copiar/colar persiste reload) ───
+    useEffect(() => {
+        try {
+            const saved = localStorage.getItem(CLIPBOARD_KEY);
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    setItensCopiados(parsed as GlassItem[]);
+                }
+            }
+        } catch { /* ignore */ }
+    }, []);
 
     const invoiceRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -725,11 +645,13 @@ export function AdminCalculator() {
     }, [descontoInput]);
 
 // ─── AUTO-SAVE DRAFT ──────────────────────────────────────────────────
+  // ─── AUTO-SAVE (local imediato + nuvem debounced 5s) ───────────────────────
   useEffect(() => {
     if (!draftRestored || isCutMode) return;
     const draft = {
       cliente,
       phone,
+      neighborhood,
       vidros,
       desconto,
       descontoInput,
@@ -739,16 +661,13 @@ export function AdminCalculator() {
       modoOtimizacao,
       userName,
       selectedFilm,
+      roomColors,
       lastSaved: Date.now()
     };
     resolveCalculatorScopeKey().then((scopeKey) => {
       localStorage.setItem(buildCalculatorStorageKey('lume_calculator_draft', scopeKey), JSON.stringify(draft));
     }).catch(() => null);
-}, [draftRestored, isCutMode, cliente, phone, vidros, desconto, descontoInput, rollW, price, margin, modoOtimizacao, userName, selectedFilm]);
 
-  // ─── CLOUD AUTO-SAVE (debounced 5s) ──────────────────────────────────────
-  useEffect(() => {
-    if (!draftRestored || isCutMode) return;
     if (cloudTimerRef.current) clearTimeout(cloudTimerRef.current);
     cloudTimerRef.current = setTimeout(async () => {
       setCloudStatus('syncing');
@@ -761,7 +680,7 @@ export function AdminCalculator() {
       if (ok) setTimeout(() => setCloudStatus('idle'), 3000);
     }, 5000);
     return () => { if (cloudTimerRef.current) clearTimeout(cloudTimerRef.current); };
-  }, [draftRestored, isCutMode, cliente, phone, vidros, desconto, descontoInput, rollW, price, margin, modoOtimizacao, userName, selectedFilm]);
+  }, [draftRestored, isCutMode, cliente, phone, neighborhood, vidros, desconto, descontoInput, rollW, price, margin, modoOtimizacao, userName, selectedFilm, roomColors]);
 
 // ─── CLOUD CONFIG AUTO-SAVE (debounced 2s) ────────────────────────────────
   const configCloudTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -817,6 +736,17 @@ export function AdminCalculator() {
         const restoreDraft = async () => {
           try {
             const scopeKey = await resolveCalculatorScopeKey();
+            // Local draft (source of roomColors, which aren't synced to cloud)
+            const saved = localStorage.getItem(buildCalculatorStorageKey('lume_calculator_draft', scopeKey));
+            let localDraft: { roomColors?: Record<string, string> } | null = null;
+            if (saved) {
+                try { localDraft = JSON.parse(saved); } catch { localDraft = null; }
+            }
+            const applyLocalRoomColors = () => {
+                if (localDraft?.roomColors && typeof localDraft.roomColors === 'object') {
+                    setRoomColors(localDraft.roomColors);
+                }
+            };
             // Try cloud first
             const cloud = await loadDraftFromCloud();
             if (cloud && Array.isArray(cloud.vidros) && cloud.vidros.length > 0) {
@@ -831,12 +761,12 @@ export function AdminCalculator() {
                 if (isOptimizationMode(cloud.modo_otimizacao)) setModoOtimizacao(cloud.modo_otimizacao);
                 if (cloud.user_name) setUserName(cloud.user_name);
                 setSelectedFilm(normalizeFilmTypeKey(cloud.selected_film));
+                applyLocalRoomColors();
                 setCloudStatus('synced');
                 setTimeout(() => setCloudStatus('idle'), 3000);
                 return;
             }
             // Fallback to localStorage
-            const saved = localStorage.getItem(buildCalculatorStorageKey('lume_calculator_draft', scopeKey));
             if (saved) {
                 try {
                     const draft = JSON.parse(saved);
@@ -844,6 +774,7 @@ export function AdminCalculator() {
                         dispatch({ type: 'SET', payload: draft.vidros });
                         if (draft.cliente) setCliente(draft.cliente);
                         if (draft.phone) setPhone(draft.phone);
+                        if (draft.neighborhood) setNeighborhood(draft.neighborhood);
                         if (draft.desconto !== undefined) setDesconto(draft.desconto);
                         if (draft.descontoInput !== undefined) setDescontoInput(draft.descontoInput);
                         if (draft.rollW) setRollW(draft.rollW);
@@ -852,6 +783,7 @@ export function AdminCalculator() {
                         if (isOptimizationMode(draft.modoOtimizacao)) setModoOtimizacao(draft.modoOtimizacao);
                         if (draft.userName) setUserName(draft.userName);
                         setSelectedFilm(normalizeFilmTypeKey(draft.selectedFilm));
+                        applyLocalRoomColors();
                     }
                 } catch (e) {
                     logger.error('Erro ao carregar rascunho local', e);
@@ -930,10 +862,13 @@ export function AdminCalculator() {
         if (vidros.length === 0) return;
         if (window.confirm('Tem certeza que deseja remover TODAS as peças?')) {
             setVidros([]);
+            try { localStorage.removeItem(CLIPBOARD_KEY); } catch { /* ignore */ }
+            setItensCopiados(null);
             setDesconto(0);
             setDescontoInput('0');
             setCliente('');
             setPhone('');
+            setNeighborhood('');
             setRollW(DEFAULT_CONFIG.rollW);
             setPrice(DEFAULT_CONFIG.price);
             setMargin(DEFAULT_CONFIG.margin);
@@ -1014,7 +949,9 @@ export function AdminCalculator() {
     const handleCopiarSelecionados = () => {
         const selecionados = vidros.filter(v => selectedIds.includes(v.id));
         if (selecionados.length === 0) return;
-        setItensCopiados([...selecionados]);
+        const copia = [...selecionados];
+        setItensCopiados(copia);
+        try { localStorage.setItem(CLIPBOARD_KEY, JSON.stringify(copia)); } catch { /* ignore */ }
         setSelectedIds([]);
     };
 
@@ -1034,6 +971,7 @@ export function AdminCalculator() {
         setVidros(prev => [...prev, ...novos]);
         setSelectedIds([]);
         setItensCopiados(null);
+        try { localStorage.removeItem(CLIPBOARD_KEY); } catch { /* ignore */ }
         setShowColarModal(false);
     };
 
@@ -1080,12 +1018,13 @@ export function AdminCalculator() {
             valor: finalPrice,
             qtd: vidros.length,
             vidros: [...vidros],
-    config: { rollW, price, margin },
-      desconto,
-      modoOtimizacao,
-      selectedFilm,
+            config: { rollW, price, margin },
+            desconto,
+            modoOtimizacao,
+            selectedFilm,
+            leadId: currentLeadId ?? undefined,
         };
-        const atualizado = [novo, ...historico].slice(0, 20);
+        const atualizado = [novo, ...historico].slice(0, 100);
         setHistorico(atualizado);
         resolveCalculatorScopeKey().then((scopeKey) => {
             localStorage.setItem(buildCalculatorStorageKey('lume_historico', scopeKey), JSON.stringify(atualizado));
@@ -1093,7 +1032,7 @@ export function AdminCalculator() {
         saveHistoryItemToCloud(novo);
         setShowSaveToast(true);
         setTimeout(() => setShowSaveToast(false), 3000);
-    }, [vidros, cliente, phone, finalPrice, rollW, price, margin, historico, desconto, modoOtimizacao, selectedFilm]);
+    }, [vidros, cliente, phone, finalPrice, rollW, price, margin, historico, desconto, modoOtimizacao, selectedFilm, currentLeadId]);
 
     const criarLead = useCallback(async () => {
       if (!cliente && !phone) {
@@ -1110,7 +1049,7 @@ export function AdminCalculator() {
           phone,
           email: '',
           address: '',
-          neighborhood: 'Barra da Tijuca',
+          neighborhood: neighborhood || '',
           filmType: FILM_TYPE_LABELS[selectedFilm] || 'Nano Cerâmica',
             sqm: totalM2,
             value: finalPrice,
@@ -1121,23 +1060,54 @@ export function AdminCalculator() {
       if (res.ok) {
         const createdLead = await res.json().catch(() => null);
         const leadId = createdLead?.id || null;
+        setCurrentLeadId(leadId);
 
-        if (vidros.length > 0) {
-          const orcId = Date.now().toString();
-          await saveHistoryItemToCloud({
-            id: orcId,
-            cliente: cliente || `Cliente ${phone}`,
-            phone,
-            data: new Date().toLocaleDateString('pt-BR'),
-            valor: finalPrice,
-            qtd: vidros.length,
-            vidros: vidros.map(v => ({ h: v.oh, w: v.ow, label: v.label || '' })),
-            config: { rollW, price, margin },
-            desconto,
-            modoOtimizacao: modoOtimizacao,
-            selectedFilm,
-            leadId,
-          });
+        if (vidros.length > 0 && leadId) {
+          const clienteNome = cliente || `Cliente ${phone}`;
+          const existing = historico.find(h => h.cliente === clienteNome && !h.leadId);
+          if (existing) {
+            const atualizado = historico.map(h => (h.id === existing.id ? { ...h, leadId } : h));
+            setHistorico(atualizado);
+            saveHistoryItemToCloud({ ...existing, leadId });
+            resolveCalculatorScopeKey().then((scopeKey) => {
+              localStorage.setItem(buildCalculatorStorageKey('lume_historico', scopeKey), JSON.stringify(atualizado));
+            }).catch(() => null);
+          } else {
+            const orcId = crypto.randomUUID();
+            await saveHistoryItemToCloud({
+              id: orcId,
+              cliente: clienteNome,
+              phone,
+              data: new Date().toLocaleDateString('pt-BR'),
+              valor: finalPrice,
+              qtd: vidros.length,
+              vidros: vidros.map(v => ({ h: v.oh, w: v.ow, label: v.label || '' })),
+              config: { rollW, price, margin },
+              desconto,
+              modoOtimizacao: modoOtimizacao,
+              selectedFilm,
+              leadId,
+            });
+            const novoLocal: OrcamentoSalvo = {
+              id: orcId,
+              cliente: clienteNome,
+              phone,
+              data: new Date().toLocaleDateString('pt-BR'),
+              valor: finalPrice,
+              qtd: vidros.length,
+              vidros: [...vidros],
+              config: { rollW, price, margin },
+              desconto,
+              modoOtimizacao: modoOtimizacao,
+              selectedFilm,
+              leadId,
+            };
+            const atualizado = [novoLocal, ...historico].slice(0, 100);
+            setHistorico(atualizado);
+            resolveCalculatorScopeKey().then((scopeKey) => {
+              localStorage.setItem(buildCalculatorStorageKey('lume_historico', scopeKey), JSON.stringify(atualizado));
+            }).catch(() => null);
+          }
         }
 
         setShowSaveToast(true);
@@ -1147,7 +1117,7 @@ export function AdminCalculator() {
         const details = [err.error, err.details, err.hint].filter(Boolean).join(' - ');
         alert('Erro ao criar lead: ' + (details || 'desconhecido'));
       }
-    }, [cliente, phone, vidros, selectedFilm, finalPrice, rollW, price, margin, desconto, modoOtimizacao]);
+    }, [cliente, phone, neighborhood, vidros, selectedFilm, finalPrice, rollW, price, margin, desconto, modoOtimizacao, historico]);
 
 const carregarDoHistorico = (orc: OrcamentoSalvo) => {
     setCliente(orc.cliente);
@@ -1161,6 +1131,7 @@ const carregarDoHistorico = (orc: OrcamentoSalvo) => {
         }
   if (orc.modoOtimizacao) setModoOtimizacao(orc.modoOtimizacao);
     setSelectedFilm(normalizeFilmTypeKey(orc.selectedFilm));
+    if (orc.leadId) setCurrentLeadId(orc.leadId);
     dispatch({ type: 'SET', payload: orc.vidros });
         setHistoricoAberto(false);
     };
@@ -1192,13 +1163,13 @@ const carregarDoHistorico = (orc: OrcamentoSalvo) => {
 
     const salvarProjeto = () => {
         const dados = {
-            config: { cliente, phone, rolo: rollW, preco: price, selectedFilm },
+            config: { cliente, phone, neighborhood, rolo: rollW, preco: price, selectedFilm },
             vidros: [...vidros],
         };
         const blob = new Blob([JSON.stringify(dados)], { type: 'application/json' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = `${cliente || 'projeto'}.insul`;
+        a.download = `${cliente.replace(/\W+/g, '_') || 'projeto'}.insul`;
         a.click();
     };
 
@@ -1212,6 +1183,7 @@ const carregarDoHistorico = (orc: OrcamentoSalvo) => {
                 const d = JSON.parse(ev.target?.result as string) as SavedProjectPayload;
                 setCliente(d.config?.cliente || '');
                 setPhone(d.config?.phone || '');
+                if (d.config?.neighborhood) setNeighborhood(d.config.neighborhood);
                 setRollW(parseFloat(String(d.config?.rolo ?? '')) || 152);
                 setPrice(parseFloat(String(d.config?.preco ?? '')) || 80);
                 setSelectedFilm(normalizeFilmTypeKey(d.config?.selectedFilm));
@@ -1608,214 +1580,70 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
 
                 {/* COLUNA ESQUERDA */}
                 <div className="col-span-1 xl:col-span-4 space-y-6">
-                    <div className="admin-entrance bg-[#0a0e17] border-2 border-[#c9a227]/30 rounded-2xl p-5 shadow-2xl">
-                        <label className="block text-[10px] uppercase text-[#c9a227] mb-2 font-bold">Cliente</label>
-                        <input type="text" value={cliente} onChange={(e) => setCliente(e.target.value)} className="w-full bg-[#040811] border border-white/10 rounded-xl px-4 py-3 outline-none text-sm mb-3" />
-                        <label className="block text-[10px] uppercase text-gray-500 mb-2 font-bold">Telefone</label>
-                        <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full bg-[#040811] border border-white/10 rounded-xl px-4 py-3 outline-none text-sm mb-4" />
-                        <div className="grid grid-cols-1 gap-2">
-                            <button onClick={importarZap} className="w-full bg-[#25d366]/20 text-[#25d366] py-3 rounded-xl font-semibold text-xs uppercase tracking-wider flex items-center justify-center gap-2">
-                                <Smartphone size={16} /> Zap
-                            </button>
-                            <div className="flex gap-2">
-                                <button onClick={salvarProjeto} className="flex-1 bg-[#1a2c4e] text-blue-300 py-3 rounded-xl font-semibold text-[10px] uppercase tracking-wider flex items-center justify-center gap-2"><Save size={14} /> Salvar</button>
-                                <button onClick={() => fileInputRef.current?.click()} className="flex-1 bg-[#1a2c4e] text-blue-300 py-3 rounded-xl font-semibold text-[10px] uppercase tracking-wider flex items-center justify-center gap-2"><FolderOpen size={14} /> Abrir</button>
-                                <input type="file" ref={fileInputRef} className="hidden" accept=".insul" onChange={abrirProjeto} />
-                            </div>
-                        </div>
-                    </div>
-
-<div className="admin-entrance bg-[#070c14] border-2 border-[#c9a227]/25 rounded-2xl p-5 shadow-2xl">
-      <div className="grid grid-cols-3 gap-2">
-        <div><label className="block text-[10px] text-gray-400 mb-1 text-center font-bold uppercase">Rolo</label><input type="number" value={rollW} onChange={(e) => setRollW(parseFloat(e.target.value))} onFocus={(e) => e.target.select()} className="w-full bg-[#040811] border border-white/10 rounded-lg p-3 text-sm text-center font-bold" /></div>
-        <div>
-          <label className="block text-[10px] text-gray-400 mb-1 text-center font-bold uppercase">Película</label>
-          <select value={selectedFilm} onChange={(e) => setSelectedFilm(e.target.value as FilmTypeKey)} className="w-full bg-[#040811] border border-white/10 rounded-lg p-3 text-sm text-center font-bold appearance-none cursor-pointer">
-            {(Object.keys(FILM_TYPE_LABELS) as FilmTypeKey[]).map((key) => (
-              <option key={key} value={key}>{FILM_TYPE_LABELS[key]}</option>
-            ))}
-          </select>
-        </div>
-        <div><label className="block text-[10px] text-gray-400 mb-1 text-center font-bold uppercase">Margem</label><input type="number" value={margin} onChange={(e) => setMargin(parseFloat(e.target.value))} onFocus={(e) => e.target.select()} className="w-full bg-[#040811] border border-white/10 rounded-lg p-3 text-sm text-center font-bold" /></div>
-      </div>
-      <div className="mt-2 text-center">
-        <span className="text-[10px] text-gray-500">R$/m²: </span>
-        <span className="text-[10px] text-[#c9a227] font-bold">{price}</span>
-      </div>
-    </div>
-
-                    <div className="admin-entrance bg-[#0d1018] border-2 border-[#c9a227]/35 rounded-2xl p-5 shadow-2xl">
-                        <label className="block text-[10px] uppercase text-[#c9a227] mb-4 font-bold flex items-center gap-2"><Layers size={14} /> Medidas</label>
-
-                        <div className="space-y-1 mb-4">
-                            <span className="text-[9px] text-gray-500 font-bold uppercase">Ambiente / Identificação</span>
-                            <div className="relative">
-                                <input
-                                    type="text"
-                                    value={labelIn}
-                                    onChange={(e) => setLabelIn(e.target.value)}
-                                    className="w-full bg-[#040811] border border-white/10 rounded-xl p-3 pr-10 text-sm outline-none focus:border-[#c9a227]/50"
-                                    placeholder="Ex: Sala, Varanda..."
-                                />
-                                {labelIn && (
-                                    <button 
-                                        onClick={() => setLabelIn('')} 
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-white transition-colors rounded-full hover:bg-white/10"
-                                        title="Limpar ambiente"
-                                    >
-                                        <X size={14} />
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-
-                        <button
-                            type="button"
-                            onClick={() => {
-                                const next = !usarCoresPorAmbiente;
-                                setUsarCoresPorAmbiente(next);
-                                setVidros(prev => prev.map(v => ({
-                                    ...v,
-                                    cor: getColorForItem(v.label, v.oh, v.ow, next)
-                                })));
-                            }}
-                            className={`w-full mb-4 py-2.5 rounded-xl font-bold text-[10px] uppercase tracking-wider border transition-all ${
-                                usarCoresPorAmbiente
-                                    ? 'bg-[#c9a227]/15 border-[#c9a227]/50 text-[#c9a227]'
-                                    : 'bg-[#1a2c4e] border-white/10 text-blue-300'
-                            }`}
-                            title="Alterna entre cor por tamanho e cor por ambiente"
-                        >
-                            {usarCoresPorAmbiente ? 'Esquema: Cor por Ambiente (ON)' : 'Esquema: Cor por Tamanho (ON)'}
-                        </button>
-
-                        <div className="hidden">
-                            <div className="flex items-center justify-between">
-                                <span className="text-[9px] text-gray-500 font-bold uppercase">Cor do Ambiente</span>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[9px] text-gray-400 uppercase">Atual</span>
-                                    <span className="w-4 h-4 rounded-full border border-white/40" style={{ backgroundColor: currentRoomColor }} />
-                                </div>
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                                {ROOM_COLOR_SWATCHES.map((swatch) => (
-                                    <button
-                                        key={swatch}
-                                        type="button"
-                                        onClick={() => {
-                                            if (!currentRoomLabel) return;
-                                            setRoomColors(prev => ({ ...prev, [currentRoomKey]: swatch }));
-                                        }}
-                                        disabled={!currentRoomLabel}
-                                        className={`w-6 h-6 rounded-full border transition-all ${currentRoomColor === swatch ? 'border-[#c9a227] scale-110' : 'border-white/20'} ${!currentRoomLabel ? 'opacity-40 cursor-not-allowed' : 'hover:scale-105'}`}
-                                        style={{ backgroundColor: swatch }}
-                                        title={currentRoomLabel ? `Aplicar cor em ${currentRoomLabel}` : 'Digite o ambiente para escolher cor'}
-                                    />
-                                ))}
-                            </div>
-                            <button
-                                type="button"
-                                onClick={() => aplicarCorNoAmbiente(currentRoomLabel)}
-                                disabled={!currentRoomLabel || !hasCurrentRoomPieces}
-                                className="w-full bg-[#1a2c4e] text-blue-300 py-2 rounded-lg font-semibold text-[10px] uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed"
-                                title={!currentRoomLabel ? 'Digite o ambiente' : 'Reaplicar cor nas peças já adicionadas deste ambiente'}
-                            >
-                                Aplicar Cor nas Peças Deste Ambiente
-                            </button>
-                        </div>
-
-                        <div className="grid grid-cols-3 gap-2 mb-4">
-                            <input ref={heightRef} type="number" value={heightIn} onChange={(e) => setHeightIn(e.target.value)} onKeyDown={handleKeyDownHeight} placeholder="Altura" className="bg-[#040811] border border-white/10 rounded-xl p-2.5 text-sm md:text-base text-center" />
-                            <input ref={widthRef} type="number" value={widthIn} onChange={(e) => setWidthIn(e.target.value)} onKeyDown={handleKeyDownWidth} placeholder="Largura" className="bg-[#040811] border border-white/10 rounded-xl p-2.5 text-sm md:text-base text-center" />
-                            <input ref={qtyRef} type="number" value={qtyIn} onChange={(e) => setQtyIn(e.target.value)} onKeyDown={handleKeyDownQty} onFocus={(e) => e.target.select()} placeholder="Qtd" className="bg-[#040811] border border-white/10 rounded-xl p-2.5 text-sm md:text-base text-center" />
-                        </div>
-                        <button onClick={adicionar} className="w-full bg-[#c9a227] text-black py-3 rounded-xl font-bold text-xs uppercase flex items-center justify-center gap-2">
-                            <Plus size={16} /> Adicionar
-                        </button>
-
-                        {vidros.length > 0 && (
-                            <button 
-                                onClick={limparTudo} 
-                                className="w-full flex items-center justify-center gap-1.5 py-2 text-[10px] font-bold text-red-400/60 hover:text-red-400 transition-colors uppercase tracking-widest"
-                            >
-                                <Trash2 size={12} /> Limpar Tudo
-                            </button>
-                        )}
-                    </div>
+                    <InputPanel
+                        vidros={vidros}
+                        cliente={cliente}
+                        setCliente={setCliente}
+                        phone={phone}
+                        setPhone={setPhone}
+                        neighborhood={neighborhood}
+                        setNeighborhood={setNeighborhood}
+                        importarZap={importarZap}
+                        salvarProjeto={salvarProjeto}
+                        fileInputRef={fileInputRef}
+                        abrirProjeto={abrirProjeto}
+                        rollW={rollW}
+                        setRollW={setRollW}
+                        selectedFilm={selectedFilm}
+                        setSelectedFilm={setSelectedFilm}
+                        margin={margin}
+                        setMargin={setMargin}
+                        price={price}
+                        labelIn={labelIn}
+                        setLabelIn={setLabelIn}
+                        usarCoresPorAmbiente={usarCoresPorAmbiente}
+                        setUsarCoresPorAmbiente={setUsarCoresPorAmbiente}
+                        setVidros={setVidros}
+                        getColorForItem={getColorForItem}
+                        currentRoomColor={currentRoomColor}
+                        currentRoomKey={currentRoomKey}
+                        currentRoomLabel={currentRoomLabel}
+                        roomColors={roomColors}
+                        setRoomColors={setRoomColors}
+                        aplicarCorNoAmbiente={aplicarCorNoAmbiente}
+                        hasCurrentRoomPieces={hasCurrentRoomPieces}
+                        heightRef={heightRef}
+                        widthRef={widthRef}
+                        qtyRef={qtyRef}
+                        onHeightKeyDown={handleKeyDownHeight}
+                        onWidthKeyDown={handleKeyDownWidth}
+                        onQtyKeyDown={handleKeyDownQty}
+                        heightIn={heightIn}
+                        setHeightIn={setHeightIn}
+                        widthIn={widthIn}
+                        setWidthIn={setWidthIn}
+                        qtyIn={qtyIn}
+                        setQtyIn={setQtyIn}
+                        adicionar={adicionar}
+                        limparTudo={limparTudo}
+                    />
 
                     {resumo.length > 0 && (
-                        <div className="admin-entrance bg-[#080d16] border-2 border-[#c9a227]/20 rounded-2xl p-3 max-h-60 overflow-y-auto space-y-4">
-                            {Object.entries(
-                                resumo.reduce((acc, item) => {
-                                    const lbl = item.label || 'Sem Ambiente';
-                                    if (!acc[lbl]) acc[lbl] = [];
-                                    acc[lbl].push(item);
-                                    return acc;
-                                }, {} as globalThis.Record<string, typeof resumo>)
-                            ).map(([ambiente, itens], idxGrp) => (
-                                <div key={idxGrp} className="space-y-1">
-                                    <div className="text-[9px] font-bold text-[#c9a227] uppercase tracking-widest px-1 mb-1.5 opacity-90 flex items-center justify-between">
-                                        {editingAmbiente === ambiente ? (
-                                            <input
-                                                ref={editInputRef}
-                                                type="text"
-                                                value={editNome}
-                                                onChange={(e) => setEditNome(e.target.value)}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === 'Enter') { e.preventDefault(); confirmarRenomeacao(); }
-                                                    if (e.key === 'Escape') { setEditingAmbiente(null); setEditNome(''); }
-                                                }}
-                                                onBlur={confirmarRenomeacao}
-                                                autoFocus
-                                                className="bg-[#040811] border border-[#c9a227]/50 rounded px-2 py-0.5 text-[#c9a227] text-[9px] uppercase tracking-widest font-bold outline-none min-w-[80px] flex-1"
-                                            />
-                                        ) : (
-                                            <div
-                                                className="flex items-center gap-1.5 cursor-pointer"
-                                                onClick={() => {
-                                                    const tgt = ambiente === 'Sem Ambiente' ? '' : ambiente;
-                                                    const pts = vidros.filter(v => (v.label || '') === tgt);
-                                                    const allSelected = pts.length > 0 && pts.every(v => selectedIds.includes(v.id));
-                                                    if (allSelected) {
-                                                        iniciarRenomeacao(pts[0].label || '');
-                                                    } else {
-                                                        toggleAmbienteSelection(ambiente);
-                                                    }
-                                                }}
-                                            >
-                                                <span
-                                                    className="w-2.5 h-2.5 rounded-full border border-white/40"
-                                                    style={{
-                                                        backgroundColor: (() => {
-                                                            const tgt = ambiente === 'Sem Ambiente' ? '' : ambiente;
-                                                            const first = vidros.find(v => (v.label || '') === tgt);
-                                                            return first?.cor || getColorForItem(tgt);
-                                                        })()
-                                                    }}
-                                                />
-                                                <Layers size={10} /> {ambiente}
-                                            </div>
-                                        )}
-                                        <input
-                                            type="checkbox"
-                                            className="w-3 h-3 accent-[#c9a227] cursor-pointer"
-                                            checked={(() => {
-                                                const tgt = ambiente === 'Sem Ambiente' ? '' : ambiente;
-                                                const pts = vidros.filter(v => (v.label || '') === tgt);
-                                                return pts.length > 0 && pts.every(v => selectedIds.includes(v.id));
-                                            })()}
-                                            onChange={() => toggleAmbienteSelection(ambiente)}
-                                        />
-                                    </div>
-                                    {itens.map((item, idx) => (
-                                        <div key={idx} className="flex items-center justify-between p-2 bg-[#040811] rounded-lg border border-white/5">
-                                            <span className="text-xs"><b>{item.q}x</b> {item.h} x {item.w} cm</span>
-                                            <button onClick={() => removerTudoTipo(item.h, item.w, item.label)} className="text-red-400 hover:bg-red-400/10 p-1.5 rounded-lg transition-colors"><Trash2 size={14} /></button>
-                                        </div>
-                                    ))}
-                                </div>
-                            ))}
-                        </div>
+                        <ResumeList
+                            resumo={resumo}
+                            vidros={vidros}
+                            selectedIds={selectedIds}
+                            editingAmbiente={editingAmbiente}
+                            editNome={editNome}
+                            setEditNome={setEditNome}
+                            setEditingAmbiente={setEditingAmbiente}
+                            editInputRef={editInputRef}
+                            confirmarRenomeacao={confirmarRenomeacao}
+                            iniciarRenomeacao={iniciarRenomeacao}
+                            toggleAmbienteSelection={toggleAmbienteSelection}
+                            removerTudoTipo={removerTudoTipo}
+                            getColorForItem={getColorForItem}
+                        />
                     )}
                 </div>
 
@@ -1906,38 +1734,15 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
                                 </div>
                             </div>
 
-<div className="flex items-center justify-end mb-4 w-full gap-2">
-                                {isCutMode ? (
-                                    <button
-                                        onClick={() => {
-                                            if (window.confirm("Deseja sair do modo de corte? Suas peças originais serão restauradas.")) {
-                                                setVidros(vidrosBackup);
-                                                setIsCutMode(false);
-                                                setVidrosBackup([]);
-                                            }
-                                        }}
-                                        className="flex items-center gap-2 bg-red-500/20 border border-red-500/50 text-red-400 px-4 py-2.5 rounded-xl font-bold text-[10px] uppercase shadow-lg hover:bg-red-500/30 transition-all active:scale-95"
-                                    >
-                                        <X size={14} /> Sair do Modo de Corte
-                                    </button>
-                                ) : (
-                                    <button
-                                        onClick={() => {
-                                            setVidrosBackup(vidros);
-                                            setIsCutMode(true);
-                                        }}
-                                        className="flex items-center gap-2 bg-[#1a2c4e] text-blue-300 px-4 py-2.5 rounded-xl font-bold text-[10px] uppercase shadow-lg hover:brightness-110 transition-all active:scale-95"
-                                    >
-                                        <Scissors size={14} /> Modo de Corte
-                                    </button>
-                                )}
-                                <button
-                                  onClick={criarLead}
-                                  className="flex items-center gap-2 bg-gradient-to-r from-[#c9a227] to-[#d4ad30] text-black px-4 py-2.5 rounded-xl font-bold text-[10px] uppercase shadow-lg hover:brightness-110 transition-all active:scale-95"
-                                >
-                                  <User size={14} /> Criar Lead
-                                </button>
-                              </div>
+                            <CutModeToolbar
+                                isCutMode={isCutMode}
+                                vidros={vidros}
+                                vidrosBackup={vidrosBackup}
+                                setVidros={setVidros}
+                                setIsCutMode={setIsCutMode}
+                                setVidrosBackup={setVidrosBackup}
+                                criarLead={criarLead}
+                            />
 
                               {isCutMode && (
                                   <div className="w-full bg-red-500/10 border border-red-500/30 text-red-400 p-3 rounded-xl text-center text-[10px] font-bold uppercase tracking-wider mb-4 animate-pulse flex items-center justify-center gap-2 shadow-lg">
@@ -1953,88 +1758,19 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
                                 </div>
                             </div>
 
-                            <div className="admin-entrance bg-[#111827] border-2 border-[#c9a227]/25 rounded-xl overflow-hidden shadow-2xl relative min-h-[500px]">
-                                <div className="absolute top-0 left-0 w-full bg-[#1f2937] text-gray-400 text-[10px] uppercase font-bold flex justify-between px-3 py-1.5 z-10 border-b border-gray-700">
-                                    <span className="flex items-center gap-2">
-                                        0cm
-                                    </span>
-                                    <span className="flex items-center gap-2">
-                                        {isCalculating && <span className="w-2 h-2 rounded-full bg-[#c9a227] animate-pulse inline-block" title="Calculando..." />}
-                                        Rolo: {rollW}cm
-                                    </span>
-                                </div>
-                                <div className="w-full h-full overflow-y-auto p-2 pt-8 pr-10 sm:pr-14 pb-12 overflow-x-hidden">
-                                    <div className="relative pl-7 sm:pl-8 pt-8 w-full max-w-full">
-                                        {/* Régua Superior (Rolo Width) */}
-                                        <div className="absolute top-0 left-8 right-0 h-8 border-b border-white/20">
-                                            {Array.from({ length: Math.floor(rollW / 10) + 1 }).map((_, i) => {
-                                                const val = i * 10;
-                                                const isMajor = val % 50 === 0 || val === rollW || val === 0;
-                                                if (val > rollW) return null;
-                                                return (
-                                                    <div key={val} className="absolute bottom-0 flex flex-col items-center -translate-x-1/2" style={{ left: `${(val / rollW) * 100}%` }}>
-                                                        {isMajor && <span className="text-[10px] text-gray-400 font-black mb-0.5">{val}</span>}
-                                                        <div className={`w-px bg-white/30 ${isMajor ? 'h-2.5' : 'h-1.5'}`} />
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-
-                                        {/* Régua Lateral (Altura Linear) */}
-                                        <div className="absolute top-8 left-0 w-8 border-r border-white/20" style={{ height: `${(maxY / rollW) * containerWidth + 40}px` }}>
-                                            {Array.from({ length: Math.floor(maxY / 10) + 1 }).map((_, i) => {
-                                                const val = i * 10;
-                                                const isMajor = val % 50 === 0 || val === 0;
-                                                return (
-                                                    <div key={val} className="absolute right-0 flex items-center translate-y-1/2" style={{ top: val * scale }}>
-                                                        {isMajor && <span className="text-[10px] text-gray-400 font-black mr-1.5">{val / 100}</span>}
-                                                        <div className={`h-px bg-white/30 ${isMajor ? 'w-2.5' : 'w-1.5'}`} />
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                        
-                                        {/* Contador de Comprimento Total (Pílula) */}
-                                        {maxY > 0 && (
-                                            <div 
-                                                className="absolute right-[-45px] origin-center flex items-center justify-center z-20 pointer-events-none"
-                                                style={{ top: 32 + ((maxY * scale) / 2), transform: 'translateY(-50%) rotate(90deg)' }}
-                                            >
-                                                <div className="bg-white/95 backdrop-blur-md rounded-full shadow-lg border border-white/20 flex items-center pr-1 pl-3 py-1 gap-2">
-                                                    <span className="text-[10px] font-black tracking-widest text-black/50 uppercase">Compr.</span>
-                                                    <span className="bg-black text-white px-2 py-0.5 rounded-full text-xs font-black">
-                                                        {(maxY / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} m
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        <div
-                                            ref={containerRef}
-                                            className="relative w-full bg-white/5 shadow-inner"
-                                            style={{
-                                                height: `${(maxY / rollW) * containerWidth + 40}px`,
-                                                userSelect: 'none',
-                                            }}
-                                        >
-                                            <div className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: `${10 * scale}px ${10 * scale}px` }} />
-                                            {blocosCalculados.map((b, idx) => (
-                                                b.fit && (
-                                                    <MemoBlock
-                    key={b.id}
-                    b={b}
-                    scale={scale}
-                    isSelected={selectedIds.includes(b.id)}
-                    toggleSelection={toggleSelection}
-                    selectSameSize={selectSameSize}
-                    index={idx + 1}
-                  />
-                                                )
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <CutMap
+                                isCutMode={isCutMode}
+                                rollW={rollW}
+                                maxY={maxY}
+                                scale={scale}
+                                isCalculating={isCalculating}
+                                containerWidth={containerWidth}
+                                blocosCalculados={blocosCalculados}
+                                selectedIds={selectedIds}
+                                toggleSelection={toggleSelection}
+                                selectSameSize={selectSameSize}
+                                containerRef={containerRef}
+                            />
                         </>
                     )}
                 </div>
@@ -2066,57 +1802,13 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
             )}
 
             {/* MODAL: COLAR EM... */}
-            {showColarModal && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowColarModal(false)} />
-                    <div className="relative bg-[#111e33] border border-white/10 rounded-2xl shadow-2xl w-full max-w-sm p-5 max-h-[80vh] overflow-y-auto">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                                <ClipboardPaste size={16} className="text-[#c9a227]" />
-                                Colar em...
-                            </h3>
-                            <button onClick={() => setShowColarModal(false)} className="p-1 text-gray-400 hover:text-white transition-colors">
-                                <X size={18} />
-                            </button>
-                        </div>
-                        <div className="space-y-2">
-                            {Object.entries(
-                                resumo.reduce((acc, item) => {
-                                    const lbl = item.label || 'Sem Ambiente';
-                                    if (!acc[lbl]) acc[lbl] = [];
-                                    acc[lbl].push(item);
-                                    return acc;
-                                }, {} as globalThis.Record<string, typeof resumo>)
-                            ).map(([ambiente]) => (
-                                <button
-                                    key={ambiente}
-                                    onClick={() => colarItens(ambiente === 'Sem Ambiente' ? '' : ambiente)}
-                                    className="w-full text-left p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-[#c9a227]/30 text-white transition-all flex items-center gap-2 active:scale-[0.98]"
-                                >
-                                    <Layers size={14} className="text-[#c9a227]" />
-                                    <span className="text-sm font-bold">{ambiente}</span>
-                                    <span className="text-[10px] text-gray-400 ml-auto">existente</span>
-                                </button>
-                            ))}
-                            <div className="pt-2 border-t border-white/10 mt-2">
-                                <button
-                                    onClick={() => {
-                                        const novoLabel = labelIn.trim();
-                                        if (novoLabel) {
-                                            colarItens(novoLabel);
-                                        }
-                                    }}
-                                    disabled={!labelIn.trim()}
-                                    className="w-full text-left p-3 rounded-xl bg-[#c9a227]/10 hover:bg-[#c9a227]/20 border border-[#c9a227]/30 text-[#c9a227] transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
-                                >
-                                    <Plus size={14} />
-                                    <span className="text-sm font-bold">Novo: {labelIn || 'Digite o nome acima'}</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <ColarModal
+                show={showColarModal}
+                onClose={() => setShowColarModal(false)}
+                resumo={resumo}
+                colarItens={colarItens}
+                labelIn={labelIn}
+            />
         </div>
     );
 }

@@ -5,7 +5,7 @@ import { AnimatedCounter } from '../components/AnimatedCounter';
 import { NeighborhoodAnimations } from '../components/NeighborhoodAnimations';
 import Image from 'next/image';
 
-export function SulacapPage() {
+export function SulacapPage({ faqs }: { faqs: { q: string; a: string }[] }) {
     return (
         <div className="bg-[#04080f] text-white min-h-screen">
             <NeighborhoodAnimations />
@@ -37,7 +37,7 @@ export function SulacapPage() {
                     </h1>
 
                     <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto md:mx-0 mb-10 leading-relaxed font-light">
-                        Eleve o conforto da sua casa com películas de controle solar de alta performance. Proteção contra o calor intenso, privacidade absoluta e economia real para moradores do Jardim Sulacap e adjacências.
+                        Eleve o conforto da sua casa com películas de controle solar de alta performance. Proteção contra o calor intenso, privacidade absoluta e economia real para moradores do Jardim Sulacap e adjacências, com películas a partir de R$ 90/m².
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
@@ -315,14 +315,36 @@ export function SulacapPage() {
                                         <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Jardim Sulacap</div>
                                         <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Vila Valqueire</div>
                                         <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Magalhães Bastos</div>
-                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Realengo</div>
+                                        <a href="/insulfilm-em-realengo/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Realengo</a>
                                         <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Taquara</div>
                                         <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Campo dos Afonsos</div>
+                                        <a href="/insulfilm-em-bangu/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Bangu</a>
+                                        <a href="/insulfilm-em-campo-grande/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Campo Grande</a>
                                     </div>
                                     <p className="text-xs text-gray-500 mt-6 pt-6 border-t border-white/5">Equipe sediada estrategicamente para atender a Zona Oeste com máxima agilidade e compromisso.</p>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Preço de Insulfilm em Sulacap - Cross-link para o post campeão de conversão */}
+            <section className="py-16 bg-[#070f1a] border-y border-white/5 px-4">
+                <div className="container-lume page-entrance max-w-4xl mx-auto">
+                    <div className="glass-card p-8 md:p-10 rounded-3xl border border-[#c9a227]/30 flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
+                        <div className="flex-1">
+                            <h2 className="text-2xl lg:text-3xl font-bold font-montserrat mb-3 text-white">Preço de insulfilm em Sulacap em 2026</h2>
+                            <p className="text-gray-400 font-light leading-relaxed">
+                                As películas variam de <strong className="text-white">R$ 90/m²</strong> (carbono) a <strong className="text-white">R$ 240/m²</strong> (nano cerâmica); janela a partir de R$ 90 e porta de vidro de ~R$ 176. Veja a tabela completa com exemplos por tipo de vidro e película.
+                            </p>
+                        </div>
+                        <a
+                            href="/blog/preco-insulfilm-residencial-rio-de-janeiro/"
+                            className="btn-primary inline-flex items-center justify-center gap-3 text-sm py-4 px-6 shrink-0 transform transition hover:scale-105"
+                        >
+                            Ver tabela de preços <ArrowRight size={18} />
+                        </a>
                     </div>
                 </div>
             </section>
@@ -343,28 +365,7 @@ export function SulacapPage() {
                     </div>
 
                     <div className="space-y-4">
-                        {[
-                            {
-                                q: "1. Vocês cobram a visita técnica em Sulacap?",
-                                a: "Não. A visita técnica para medição e orçamento no Jardim Sulacap e redondezas é totalmente gratuita e não gera compromisso algum para o cliente."
-                            },
-                            {
-                                q: "2. Posso lavar os vidros após a aplicação do insulfilm?",
-                                a: "Sim, porém é necessário aguardar um período de secagem e cura de cerca de 7 dias após a instalação. Depois desse prazo, você pode limpá-los normalmente utilizando sabão neutro e pano macio, evitando abrasivos."
-                            },
-                            {
-                                q: "3. O insulfilm resolve o problema de calor sem escurecer a sala?",
-                                a: "Completamente. Para essa finalidade, nós utilizamos a tecnologia Nano Cerâmica (linhas IR). Elas rejeitam uma enorme quantidade de calor infravermelho mantendo uma tonalidade muito clara, o que preserva a visão e a iluminação original da sua janela ou varanda."
-                            },
-                            {
-                                q: "4. Quanto tempo leva a instalação em um apartamento padrão?",
-                                a: "O tempo varia de acordo com a quantidade de vidros. Para a maioria dos apartamentos residenciais, o serviço é concluído em algumas horas (geralmente entre 2 a 4 horas), de forma limpa e muito ágil."
-                            },
-                            {
-                                q: "5. A garantia de 2 anos cobre o quê?",
-                                a: "A garantia Lume cobre defeitos de instalação, descolamento natural, surgimento de bolhas inesperadas e perda agressiva de coloração (desbotamento acentuado), assegurando que seu investimento dure por anos."
-                            }
-                        ].map((faq, idx) => (
+                        {faqs.map((faq, idx) => (
                             <details key={idx} className="group glass-card border border-white/5 rounded-2xl overflow-hidden cursor-pointer transition-all hover:bg-white/[0.03]">
                                 <summary className="font-bold text-lg p-7 flex justify-between items-center list-none outline-none group-open:text-[#c9a227] transition-colors">
                                     {faq.q}

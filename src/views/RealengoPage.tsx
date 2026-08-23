@@ -5,7 +5,7 @@ import { AnimatedCounter } from '../components/AnimatedCounter';
 import { NeighborhoodAnimations } from '../components/NeighborhoodAnimations';
 import Image from 'next/image';
 
-export function RealengoPage() {
+export function RealengoPage({ faqs }: { faqs: { q: string; a: string }[] }) {
     return (
         <div className="bg-[#04080f] text-white min-h-screen">
             <NeighborhoodAnimations />
@@ -38,7 +38,7 @@ export function RealengoPage() {
                     </h1>
 
                     <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto md:mx-0 mb-10 leading-relaxed font-light">
-                        Aplicação profissional de películas de controle solar em Realengo. Proteção contra o calor extremo, privacidade absoluta e <strong>instalação rápida em até 24 horas</strong>.
+                        Aplicação profissional de insulfilm de controle solar para residências e empresas em Realengo e toda a região da Zona Oeste, com películas a partir de R$ 90/m². Proteção contra o calor extremo, privacidade absoluta e <strong>instalação rápida em até 24 horas</strong>.
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
@@ -318,16 +318,37 @@ export function RealengoPage() {
                                         <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Magalhães Bastos</div>
                                         <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Vila Militar</div>
                                         <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Padre Miguel</div>
-                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Bangu</div>
+                                        <a href="/insulfilm-em-bangu/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Bangu</a>
+                                        <a href="/insulfilm-em-campo-grande/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Campo Grande</a>
                                         <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Senador Camará</div>
                                         <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Deodoro</div>
                                         <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Vila Valqueire</div>
-                                        <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Marechal Hermes</div>
+                                        <a href="/insulfilm-em-sulacap/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Sulacap</a>
                                     </div>
                                     <p className="text-xs text-gray-500 mt-6 pt-6 border-t border-white/5">Equipe dedicada para instalação rápida e profissional em toda a Zona Oeste.</p>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Preço de Insulfilm em Realengo - Cross-link para o post campeão de conversão */}
+            <section className="py-16 bg-[#070f1a] border-y border-white/5 px-4">
+                <div className="container-lume page-entrance max-w-4xl mx-auto">
+                    <div className="glass-card p-8 md:p-10 rounded-3xl border border-[#c9a227]/30 flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
+                        <div className="flex-1">
+                            <h2 className="text-2xl lg:text-3xl font-bold font-montserrat mb-3 text-white">Preço de insulfilm em Realengo em 2026</h2>
+                            <p className="text-gray-400 font-light leading-relaxed">
+                                As películas variam de <strong className="text-white">R$ 90/m²</strong> (carbono) a <strong className="text-white">R$ 240/m²</strong> (nano cerâmica); janela a partir de R$ 90 e porta de vidro de ~R$ 176. Veja a tabela completa com exemplos por tipo de vidro e película.
+                            </p>
+                        </div>
+                        <a
+                            href="/blog/preco-insulfilm-residencial-rio-de-janeiro/"
+                            className="btn-primary inline-flex items-center justify-center gap-3 text-sm py-4 px-6 shrink-0 transform transition hover:scale-105"
+                        >
+                            Ver tabela de preços <ArrowRight size={18} />
+                        </a>
                     </div>
                 </div>
             </section>
@@ -348,28 +369,7 @@ export function RealengoPage() {
                     </div>
 
                     <div className="space-y-4">
-                        {[
-                            {
-                                q: "1. Quanto custa instalar insulfilm residencial em Realengo?",
-                                a: "O valor é calculado por metro quadrado e depende da tecnologia da película (Nano Cerâmica, Carbono ou Refletiva). Oferecemos orçamento gratuito via WhatsApp: basta nos enviar as medidas aproximadas dos vidros para receber o valor na hora."
-                            },
-                            {
-                                q: "2. Qual a velocidade do atendimento em Realengo?",
-                                a: "Nosso grande diferencial é a agilidade. Temos equipes prontas para atuar na Zona Oeste e conseguimos realizar a instalação em Realengo em até 24 horas após a aprovação do orçamento."
-                            },
-                            {
-                                q: "3. Qual o melhor insulfilm para reduzir o calor forte de Realengo?",
-                                a: "Para residências que sofrem com o sol da tarde, indicamos as películas de Nano Cerâmica ou Refletivas. Elas barram até 80% do calor infravermelho, permitindo uma redução térmica real e economia no uso de ar-condicionado."
-                            },
-                            {
-                                q: "4. Quanto tempo dura o insulfilm e qual a garantia?",
-                                a: "Trabalhamos exclusivamente com películas originais que mantêm suas propriedades térmicas e estabilidade de cor por longos períodos, superando as versões comuns. Elas são resistentes a riscos e possuem garantia oficial de 2 anos."
-                            },
-                            {
-                                q: "5. Atendem condomínios e comércios em Realengo?",
-                                a: "Sim. Atendemos casas de rua, condomínios fechados, lojas, clínicas e escritórios em todo o bairro de Realengo e bairros vizinhos como Vila Militar e Sulacap."
-                            }
-                        ].map((faq, idx) => (
+                        {faqs.map((faq, idx) => (
                             <details key={idx} className="group glass-card border border-white/5 rounded-2xl overflow-hidden cursor-pointer transition-all hover:bg-white/[0.03]">
                                 <summary className="font-bold text-lg p-7 flex justify-between items-center list-none outline-none group-open:text-[#c9a227] transition-colors">
                                     {faq.q}

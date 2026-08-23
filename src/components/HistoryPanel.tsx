@@ -1,5 +1,5 @@
-import React from 'react';
-import { History, X, Clock, ChevronRight, Trash2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { History, X, Clock, ChevronRight, Trash2, ChevronDown } from 'lucide-react';
 import type { OrcamentoSalvo } from '../views/AdminCalculator';
 
 
@@ -12,6 +12,8 @@ interface HistoryPanelProps {
     onDeletar: (id: string) => void;
 }
 
+const PAGE_SIZE = 15;
+
 export const HistoryPanel: React.FC<HistoryPanelProps> = ({
     aberto,
     setAberto,
@@ -20,6 +22,15 @@ export const HistoryPanel: React.FC<HistoryPanelProps> = ({
     onCarregar,
     onDeletar
 }) => {
+    const [visible, setVisible] = useState(PAGE_SIZE);
+
+    useEffect(() => {
+        if (aberto) setVisible(PAGE_SIZE);
+    }, [aberto, historico.length]);
+
+    const visiveis = historico.slice(0, visible);
+    const temMais = visible < historico.length;
+
     return (
         <>
             <div className={`fixed inset-y-0 right-0 z-50 w-80 bg-[#070f1f] border-l border-white/10 shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col ${aberto ? 'translate-x-0' : 'translate-x-full'}`}>
@@ -27,6 +38,9 @@ export const HistoryPanel: React.FC<HistoryPanelProps> = ({
                     <div className="flex items-center gap-3">
                         <History size={18} className="text-[#c9a227]" />
                         <span className="font-bold text-sm uppercase tracking-wider">Orçamentos Salvos</span>
+                        {historico.length > 0 && (
+                            <span className="text-[10px] text-gray-500 bg-white/5 rounded-full px-2 py-0.5">{historico.length}</span>
+                        )}
                     </div>
                     <button onClick={() => setAberto(false)} className="p-1.5 hover:bg-white/10 rounded-lg transition-colors">
                         <X size={18} />
@@ -40,24 +54,34 @@ export const HistoryPanel: React.FC<HistoryPanelProps> = ({
                             <p className="text-xs mt-1 opacity-60">Clique em "Salvar no Histórico" após calcular.</p>
                         </div>
                     ) : (
-                        historico.map(orc => (
-                            <div key={orc.id} className="bg-[#04080f] border border-white/5 rounded-xl p-3 hover:border-[#c9a227]/30 transition-colors">
-                                <div className="flex items-start justify-between mb-1">
-                                    <p className="font-bold text-sm text-white leading-tight truncate max-w-[160px]">{orc.cliente}</p>
-                                    <span className="text-[10px] text-gray-500 shrink-0 ml-2">{orc.data}</span>
+                        <>
+                            {visiveis.map(orc => (
+                                <div key={orc.id} className="bg-[#04080f] border border-white/5 rounded-xl p-3 hover:border-[#c9a227]/30 transition-colors">
+                                    <div className="flex items-start justify-between mb-1">
+                                        <p className="font-bold text-sm text-white leading-tight truncate max-w-[160px]">{orc.cliente}</p>
+                                        <span className="text-[10px] text-gray-500 shrink-0 ml-2">{orc.data}</span>
+                                    </div>
+                                    <p className="text-green-400 font-bold text-base">{formatBRL(orc.valor)}</p>
+                                    <p className="text-[11px] text-gray-500 mb-3">{orc.qtd} peças · rolo {orc.config.rollW}cm</p>
+                                    <div className="flex gap-2">
+                                        <button onClick={() => onCarregar(orc)} className="flex-1 flex items-center justify-center gap-1.5 bg-[#c9a227]/10 hover:bg-[#c9a227]/20 text-[#c9a227] text-[11px] font-bold py-1.5 rounded-lg transition-colors">
+                                            <ChevronRight size={13} /> Carregar
+                                        </button>
+                                        <button onClick={() => onDeletar(orc.id)} className="p-1.5 text-red-500/50 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
+                                            <Trash2 size={14} />
+                                        </button>
+                                    </div>
                                 </div>
-                                <p className="text-green-400 font-bold text-base">{formatBRL(orc.valor)}</p>
-                                <p className="text-[11px] text-gray-500 mb-3">{orc.qtd} peças · rolo {orc.config.rollW}cm</p>
-                                <div className="flex gap-2">
-                                    <button onClick={() => onCarregar(orc)} className="flex-1 flex items-center justify-center gap-1.5 bg-[#c9a227]/10 hover:bg-[#c9a227]/20 text-[#c9a227] text-[11px] font-bold py-1.5 rounded-lg transition-colors">
-                                        <ChevronRight size={13} /> Carregar
-                                    </button>
-                                    <button onClick={() => onDeletar(orc.id)} className="p-1.5 text-red-500/50 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
-                                        <Trash2 size={14} />
-                                    </button>
-                                </div>
-                            </div>
-                        ))
+                            ))}
+                            {temMais && (
+                                <button
+                                    onClick={() => setVisible(v => v + PAGE_SIZE)}
+                                    className="w-full flex items-center justify-center gap-1.5 text-[11px] font-bold text-gray-400 hover:text-[#c9a227] py-2 rounded-lg border border-white/5 hover:border-[#c9a227]/30 transition-colors"
+                                >
+                                    <ChevronDown size={14} /> Carregar mais ({historico.length - visible})
+                                </button>
+                            )}
+                        </>
                     )}
                 </div>
             </div>

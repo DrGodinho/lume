@@ -2,7 +2,7 @@ import type { BlogPost } from '@/lib/blog';
 
 export const precoInsulfilmResidencialRioDeJaneiro: BlogPost = {
   id: 'preco-insulfilm-residencial-rio-de-janeiro',
-  title: 'Quanto custa insulfilm residencial no Rio de Janeiro em 2026? (Com exemplos reais)',
+  title: 'Quanto custa insulfilm residencial no Rio de Janeiro em 2026? Preço por m², janela e porta de vidro (com exemplos reais)',
   slug: 'preco-insulfilm-residencial-rio-de-janeiro',
   excerpt:
     'Insulfilm residencial no Rio de Janeiro em 2026 é mais barato do que você imagina — e pode te fazer economizar centenas de reais por ano em energia. Veja exemplos reais de preço atualizado para janela e porta de vidro, carbono, refletiva e nano cerâmica.',
@@ -24,17 +24,17 @@ export const precoInsulfilmResidencialRioDeJaneiro: BlogPost = {
     'Janela residencial com insulfilm e exemplo visual de preço para instalação no Rio de Janeiro',
   authorName: 'LUME Controle Solar',
   publishedAt: '2026-06-18T12:00:00.000Z',
-  updatedAt: '2026-08-07T12:00:00.000Z',
+  updatedAt: '2026-08-23T12:00:00.000Z',
   seoTitle:
-    'Preço de Insulfilm Residencial no Rio de Janeiro em 2026 | Janela, Porta de Vidro e Economia Real',
+    'Preço de Insulfilm Residencial no Rio de Janeiro em 2026: a partir de R$ 90/m² (Janela e Porta de Vidro)',
   seoDescription:
-    'Quanto custa insulfilm residencial no Rio de Janeiro em 2026? Veja preços atualizados para janela e porta de vidro (carbono, refletiva, nano cerâmica), exemplos de economia de energia e por que vale muito mais do que parece.',
+    'Quanto custa insulfilm residencial no Rio de Janeiro em 2026? Varia de R$ 90/m² (carbono) a R$ 240/m² (nano cerâmica): janela a partir de R$ 90 e porta de vidro de ~R$ 176. Veja preços por tipo de película, exemplos de economia e calcule seu orçamento.',
   featured: true,
   content: [
     // --- HOOK: abre com a dor real do carioca ---
     {
       type: 'paragraph',
-      text: 'Você mora no Rio de Janeiro. O sol bate forte no seu apartamento ou casa desde cedo. O ar-condicionado fica ligado horas a mais do que deveria. O sofá da sala começou a desbotar. A conta de energia subiu de novo. E uma película de insulfilm residencial continua parecendo um gasto que pode esperar.',
+      text: 'O preço de insulfilm residencial no Rio de Janeiro em 2026 é mais baixo do que a maioria imagina — e pode pagar a conta de luz em poucos meses. Você mora no Rio de Janeiro e o sol bate forte no seu apartamento ou casa desde cedo. O ar-condicionado fica ligado horas a mais do que deveria. O sofá da sala começou a desbotar. A conta de energia subiu de novo. E uma película de insulfilm residencial continua parecendo um gasto que pode esperar.',
     },
     {
       type: 'paragraph',
@@ -44,6 +44,22 @@ export const precoInsulfilmResidencialRioDeJaneiro: BlogPost = {
       type: 'callout',
       title: '💡 Resposta rápida para quem está pesquisando preço',
       text: 'Em 2026, insulfilm residencial no Rio de Janeiro começa em torno de R$ 90 para uma janela pequena com película carbono e pode chegar a R$ 240 ou mais na nano cerâmica para a mesma área. Uma porta de vidro de 200 × 80 cm sai por cerca de R$ 176 na refletiva. Em projetos com várias janelas, o preço médio por peça fica ainda menor — e a economia em energia pode pagar o investimento em poucos meses.',
+    },
+
+    // --- BLOCO 0: PREÇO POR M² (keyword) ---
+    {
+      type: 'heading',
+      level: 2,
+      text: 'Preço de insulfilm por m² em 2026 (carbono, refletiva e nano cerâmica)',
+    },
+    {
+      type: 'paragraph',
+      text: 'Antes de falar de janela e porta, vale trazer o insulfilm à medida que todo mundo busca: o preço por metro quadrado. No Rio de Janeiro em 2026, a referência prática por m² é: película carbono a partir de R$ 90/m², refletiva a partir de R$ 110/m² e nano cerâmica a partir de R$ 240/m². Quanto maior a área protegida de uma vez, melhor o custo médio por m² do projeto.',
+    },
+    {
+      type: 'callout',
+      title: '📐 Referência rápida de preço por m² em 2026',
+      text: 'Carbono: a partir de R$ 90/m² · Refletiva: a partir de R$ 110/m² · Nano cerâmica: a partir de R$ 240/m². Esses valores consideram instalação padrão; projetos com várias janelas no mesmo endereço costumam ter preço por m² inferior.',
     },
 
     // --- BLOCO 1: Exemplos concretos de preço ---
@@ -100,6 +116,28 @@ export const precoInsulfilmResidencialRioDeJaneiro: BlogPost = {
           values: ['200 × 80 cm', '1,60 m²', 'Jateada (privacidade)', 'R$ 158'],
         },
       ],
+    },
+
+    // --- BLOCO 1B: PREÇO PARA JANELA (keyword) ---
+    {
+      type: 'heading',
+      level: 2,
+      text: 'Preço de insulfilm para janela no Rio de Janeiro',
+    },
+    {
+      type: 'paragraph',
+      text: 'A janela é o ponto de partida da maioria dos projetos — e no Rio, onde apartamentos e casas têm vidros voltados para norte e oeste, proteger a janela é o que mais reduz calor e conta de luz. Uma janela com 2 folhas de 100 × 50 cm (1 m²) sai a partir de R$ 90 na carbono e chega a R$ 240 na nano cerâmica. Em apartamentos com várias janelas iguais, o preço médio por janela cai bastante porque o técnico aproveita a mesma visita.',
+    },
+
+    // --- BLOCO 1C: PREÇO PARA PORTA DE VIDRO (keyword) ---
+    {
+      type: 'heading',
+      level: 2,
+      text: 'Preço de insulfilm para porta de vidro',
+    },
+    {
+      type: 'paragraph',
+      text: 'A porta de vidro é a maior entrada de calor da casa e, por isso, uma das peças mais procuradas. Uma porta de vidro de 200 × 80 cm (1,60 m²) fica em torno de R$ 176 na refletiva, R$ 158 na jateada e R$ 384 na nano cerâmica. Na sala, varanda, quarto ou corredor, proteger a porta de vidro com insulfilm transforma a temperatura do ambiente sem obra.',
     },
 
     // --- BLOCO 2: ARGUMENTO DE ECONOMIA ---
@@ -204,11 +242,11 @@ export const precoInsulfilmResidencialRioDeJaneiro: BlogPost = {
     {
       type: 'heading',
       level: 2,
-      text: 'Por que o preço do insulfilm residencial varia tanto?',
+      text: 'Por que o preço do insulfilm residencial varia (película, instalação e acesso)?',
     },
     {
       type: 'paragraph',
-      text: 'O mesmo tipo de película pode ter orçamentos diferentes dependendo do projeto. Isso não é inconsistência — é personalização. O valor final reflete a realidade do seu vidro, do seu imóvel e do que será necessário para entregar um resultado duradouro.',
+      text: 'O serviço de instalação de insulfilm no Rio de Janeiro é o que define boa parte da durabilidade do resultado — e o mesmo tipo de película pode ter orçamentos diferentes dependendo do projeto. Isso não é inconsistência — é personalização. O valor final reflete a realidade do seu vidro, do seu imóvel e do que será necessário para entregar um resultado duradouro.',
     },
     {
       type: 'comparison_table',
@@ -464,6 +502,36 @@ export const precoInsulfilmResidencialRioDeJaneiro: BlogPost = {
           question: 'Qual é a vida útil do insulfilm residencial?',
           answer:
             'Películas de qualidade com instalação correta têm vida útil de 10 a 15 anos ou mais, dependendo da exposição solar, tipo de vidro e linha do produto. Isso torna o custo mensal real do insulfilm muito menor do que parece na hora do investimento inicial.',
+        },
+        {
+          question: 'Dá para instalar insulfilm à noite ou em qualquer horário?',
+          answer:
+            'Sim. A instalação de insulfilm é feita por dentro do vidro, com iluminação controlada, então pode ser agendada à noite ou nos finais de semana sem problema. O importante é o vidro estar limpo e seco; a LUME confirma o melhor horário na hora de fechar o orçamento.',
+        },
+        {
+          question: 'Posso instalar insulfilm eu mesmo (faça você mesmo)?',
+          answer:
+            'Não recomendamos. Película aparentemente simples exige superfície sem partículas, recorte milimétrico e aplicação sem bolhas ou dobras. Instalação caseira errada deixa marcas permanentes e pode desperdiçar o material. A instalação profissional de insulfilm garante o acabamento e ativa a garantia do produto.',
+        },
+        {
+          question: 'Insulfilm é proibido ou ilegal no Rio de Janeiro?',
+          answer:
+            'Não. O insulfilm residencial é permitido. Há apenas limitações para vidros de frente em alguns prédios com regramento de condomínio, mas películas que mantêm a visão de fora para dentro (como refletiva e carbono) costumam estar liberadas. Vale checar a convenção do condomínio antes de instalar.',
+        },
+        {
+          question: 'Quanto tempo leva para instalar insulfilm?',
+          answer:
+            'A instalação de insulfilm de uma janela leva minutos; um projeto de casa ou apartamento inteiro costuma ser concluído no mesmo dia. Quanto mais vidros no mesmo endereço, melhor o aproveitamento de tempo e o custo médio por peça.',
+        },
+        {
+          question: 'O insulfilm tem garantia?',
+          answer:
+            'Películas de qualidade com instalação correta têm garantia do fabricante e da instaladora, cobrindo descolamento, bolhas e desbotamento precoce. Por isso, pedir orçamento de insulfilm com garantia por escrito é tão importante quanto comparar o preço por m².',
+        },
+        {
+          question: 'Insulfilm faz mal para plantas ou animais?',
+          answer:
+            'Pelo contrário. Ao bloquear até 99% dos raios UV e reduzir o calor excessivo, o insulfilm deixa o ambiente mais estável para plantas e pets, sem eliminar a luz natural. Películas claras, como a nano cerâmica, mantêm a claridade que as plantas precisam.',
         },
       ],
     },

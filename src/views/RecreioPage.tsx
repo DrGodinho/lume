@@ -5,7 +5,7 @@ import { AnimatedCounter } from '../components/AnimatedCounter';
 import { NeighborhoodAnimations } from '../components/NeighborhoodAnimations';
 import Image from 'next/image';
 
-export function RecreioPage() {
+export function RecreioPage({ faqs }: { faqs: { q: string; a: string }[] }) {
     return (
         <div className="bg-[#04080f] text-white min-h-screen">
             <NeighborhoodAnimations />
@@ -45,7 +45,7 @@ export function RecreioPage() {
                     </h1>
 
                     <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto md:mx-0 mb-10 leading-relaxed font-light">
-                        Conforto térmico absoluto para quem vive o melhor do Rio. Aplicação de películas residenciais e comerciais no Recreio com padrão de elite LUME.
+                        Conforto térmico absoluto para quem vive o melhor do Rio. Aplicação de películas residenciais e comerciais no Recreio com padrão de elite LUME, com películas a partir de R$ 90/m².
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
@@ -312,9 +312,35 @@ export function RecreioPage() {
                                 <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Vargem Grande</div>
                                 <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Vargem Pequena</div>
                                 <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Guiomar de Novaes</div>
-                                <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Estrada do Pontal</div>
+                                <div className="flex items-center gap-2">                                <div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Estrada do Pontal</div>
+                                        <a href="/insulfilm-na-barra-da-tijuca/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Barra da Tijuca</a>
+                                        <a href="/insulfilm-em-jacarepagua/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Jacarepaguá</a>
+                                        <a href="/insulfilm-em-bangu/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Bangu</a>
+                                        <a href="/insulfilm-em-campo-grande/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Campo Grande</a>
+                                        <a href="/insulfilm-em-realengo/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Realengo</a>
+                                        <a href="/insulfilm-em-sulacap/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Sulacap</a>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Preço de Insulfilm no Recreio - Cross-link para o post campeão de conversão */}
+            <section className="py-16 bg-[#070f1a] border-y border-white/5 px-4">
+                <div className="container-lume page-entrance max-w-4xl mx-auto">
+                    <div className="glass-card p-8 md:p-10 rounded-3xl border border-[#c9a227]/30 flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
+                        <div className="flex-1">
+                            <h2 className="text-2xl lg:text-3xl font-bold font-montserrat mb-3 text-white">Preço de insulfilm no Recreio em 2026</h2>
+                            <p className="text-gray-400 font-light leading-relaxed">
+                                As películas variam de <strong className="text-white">R$ 90/m²</strong> (carbono) a <strong className="text-white">R$ 240/m²</strong> (nano cerâmica); janela a partir de R$ 90 e porta de vidro de ~R$ 176. Veja a tabela completa com exemplos por tipo de vidro e película.
+                            </p>
+                        </div>
+                        <a
+                            href="/blog/preco-insulfilm-residencial-rio-de-janeiro/"
+                            className="btn-primary inline-flex items-center justify-center gap-3 text-sm py-4 px-6 shrink-0 transform transition hover:scale-105"
+                        >
+                            Ver tabela de preços <ArrowRight size={18} />
+                        </a>
                     </div>
                 </div>
             </section>
@@ -335,40 +361,7 @@ export function RecreioPage() {
                     </div>
 
                     <div className="space-y-4">
-                        {[
-                            {
-                                q: "1. Quanto custa instalar insulfilm residencial no Recreio?",
-                                a: "O valor é baseado no tipo de película e na área total dos vidros. No Recreio, atendemos desde projetos compactos até grandes coberturas. Oferecemos orçamento rápido pelo WhatsApp, basta nos enviar as medidas ou agendar uma medição no local."
-                            },
-                            {
-                                q: "2. Qual o melhor tipo de insulfilm para apartamentos no Recreio?",
-                                a: "Para as Glebas A e B, onde a incidência solar é alta, as películas de Nano Cerâmica são as campeãs por barrarem o calor mantendo a transparência. Se a busca for por privacidade, a linha Carbono Premium G5 ou G20 é a mais indicada."
-                            },
-                            {
-                                q: "3. O insulfilm residencial descola com a maresia do Recreio?",
-                                a: "Nossas películas são de poliester de alta densidade com adesivos químicos resistentes. Diferente de materiais de baixa qualidade, nossas películas não descolam nem criam 'oxidação' com a maresia típica do Pontal e arredores."
-                            },
-                            {
-                                q: "4. Quanto tempo dura a película depois de instalada?",
-                                a: "Trabalhamos com materiais de padrão elite que mantém sua eficiência térmica e cor original por 8 a 15 anos. Elas possuem camada anti-risco para facilitar a limpeza do dia a dia."
-                            },
-                            {
-                                q: "5. O serviço tem garantia oficial no Recreio?",
-                                a: "Sim. Oferecemos 2 anos de garantia oficial da LUME Controle Solar cobrindo instalação e material. Sua satisfação total é o nosso compromisso no bairro."
-                            },
-                            {
-                                q: "6. Posso instalar em varandas gourmet de vidro?",
-                                a: "Com certeza. Somos especialistas em fechamento de varandas. A película reduz a temperatura da varanda drasticamente, transformando-a em uma área realmente útil inclusive no verão carioca."
-                            },
-                            {
-                                q: "7. O insulfilm altera muito a luminosidade interna?",
-                                a: "Isso depende de você. Temos filmes de Nano Cerâmica que são quase imperceptíveis ao olho humano, mas que barram o calor brutalmente. Também temos opções mais escuras para quem prefere ambientes mais privativos."
-                            },
-                            {
-                                q: "8. Atendem comércios e academias na região do Recreio?",
-                                a: "Sim. Realizamos aplicações em vitrines de lojas, janelas de escritórios e academias locais, garantindo conforto térmico e privacidade para clientes e colaboradores."
-                            }
-                        ].map((faq, idx) => (
+                        {faqs.map((faq, idx) => (
                             <details key={idx} className="group glass-card border border-white/5 rounded-2xl overflow-hidden cursor-pointer transition-all hover:bg-white/[0.03]">
                                 <summary className="font-bold text-lg p-7 flex justify-between items-center list-none outline-none group-open:text-[#c9a227] transition-colors">
                                     {faq.q}
