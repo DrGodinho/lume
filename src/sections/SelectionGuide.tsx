@@ -3,9 +3,9 @@ import { ScrollReveal } from '../components/ScrollReveal';
 export const LevelDots = ({ level }: { level: number }) => (
   <div className="flex gap-1.5 items-center">
     {[1, 2, 3, 4, 5].map((i) => (
-      <div 
-        key={i} 
-        className={`w-3.5 h-3.5 rounded-full ${i <= level ? 'bg-[#c9a227] shadow-[0_0_8px_rgba(201,162,39,0.4)]' : 'bg-white/10'}`} 
+      <div
+        key={i}
+        className={`w-3.5 h-3.5 rounded-full ${i <= level ? 'bg-[#c9a227] shadow-[0_0_8px_rgba(201,162,39,0.4)]' : 'bg-white/10'}`}
       />
     ))}
   </div>
@@ -83,7 +83,7 @@ const quickAnswers = [
   {
     question: 'Quanto custa insulfilm residencial no Rio de Janeiro?',
     answer:
-      'Na LUME, as linhas principais começam em R$ 90/m² no Carbono, R$ 110/m² na Refletiva, R$ 140/m² na Dupla Camada e R$ 240/m² na Nano Cerâmica. O valor final depende da metragem, altura, tipo de vidro e objetivo do ambiente.',
+      'Na LUME, as linhas principais começam em R$ 80/m² no Carbono, R$ 90/m² na Refletiva, R$ 110/m² na Dupla Camada e R$ 200/m² na Nano Cerâmica. O valor final depende da metragem, altura, tipo de vidro e objetivo do ambiente.',
   },
   {
     question: 'Qual insulfilm reduz mais calor sem escurecer?',
@@ -108,7 +108,7 @@ export function SelectionGuide() {
       {/* Decorative background */}
       <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-[#04080f] to-transparent opacity-50" />
       <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-[#04080f] to-transparent opacity-50" />
-      
+
       <div className="container-lume relative z-10">
         <ScrollReveal animation="slide-up" className="text-center mb-12 sm:mb-16">
           <div className="animate-item flex items-center justify-center gap-4 mb-4">
@@ -133,7 +133,7 @@ export function SelectionGuide() {
           <div className="flex items-center gap-2"><span className="text-[#c9a227]">●</span> Privacidade: opacidade / espelhamento</div>
         </ScrollReveal>
 
-         {/* Table - Desktop */}
+        {/* Table - Desktop */}
         <ScrollReveal animation="slide-up" className="overflow-x-auto mb-6 border border-white/10 rounded-2xl glass-card bg-gradient-to-br from-white/[0.02] to-transparent md:block hidden">
           <table className="w-full text-left min-w-[760px]">
             <thead>
@@ -172,7 +172,7 @@ export function SelectionGuide() {
                   {film.name}
                 </a>
               </div>
-              
+
               <div className="grid grid-cols-3 gap-4 mb-4">
                 <div className="text-center">
                   <div className="text-xs text-[#c9a227] uppercase tracking-wider mb-2">Calor</div>
@@ -187,7 +187,7 @@ export function SelectionGuide() {
                   <LevelDots level={film.priv} />
                 </div>
               </div>
-              
+
               <p className="text-gray-400 text-sm leading-relaxed">{film.desc}</p>
             </div>
           ))}
@@ -257,7 +257,7 @@ export function SelectionGuide() {
                     )}
                   </h3>
                 </div>
-                
+
                 <div className="space-y-5 flex-1">
                   {room.recs.map((rec, rIdx) => (
                     <div key={rIdx} className="pb-5 border-b border-white/10 last:border-0 last:pb-0">
@@ -284,7 +284,7 @@ export function SelectionGuide() {
             <p className="text-[#c9a227] font-medium text-lg mb-6">
               ⚡ Dúvida de qual escolher? Fale com um especialista LUME e receba um projeto gratuito.
             </p>
-            <a 
+            <a
               href="https://wa.me/5521965140612?text=Olá! Gostaria de uma avaliação técnica para saber qual insulfilm é melhor para minha casa."
               target="_blank"
               rel="noopener noreferrer"

@@ -177,7 +177,7 @@ export function SimulatorPage() {
         if (!bestMatch) return;
         const msg = `Olá! O Assistente LUME me recomendou o insulfilm *${bestMatch.name}*. Gostaria de mais informações e um orçamento!`;
         const url = `https://wa.me/5521965140612?text=${msg}`;
-        
+
         const w = window as unknown as { gtagSendEvent?: (url: string) => void };
         if (typeof w.gtagSendEvent === 'function') {
             w.gtagSendEvent(url);

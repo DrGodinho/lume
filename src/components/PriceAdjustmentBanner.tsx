@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ArrowRight, MessageCircle } from 'lucide-react';
+import { Tag, MessageCircle, ArrowRight } from 'lucide-react';
 import { GtagLink } from './GtagLink';
 
-const REAJUST_DATE = new Date('2026-08-31T23:59:59-03:00');
+const PROMO_END = new Date('2026-09-15T23:59:59-03:00');
 
 interface TimeLeft {
   days: number;
@@ -16,14 +16,14 @@ interface TimeLeft {
 const ZERO_TIME: TimeLeft = { days: 0, hours: 0, minutes: 0, seconds: 0 };
 
 const getTimeLeft = (now: number): TimeLeft => {
-  const diff = REAJUST_DATE.getTime() - now;
+  const diff = PROMO_END.getTime() - now;
   if (diff <= 0) return ZERO_TIME;
-  const seconds = Math.floor(diff / 1000);
+  const totalSeconds = Math.floor(diff / 1000);
   return {
-    days: Math.floor(seconds / 86400),
-    hours: Math.floor((seconds % 86400) / 3600),
-    minutes: Math.floor((seconds % 3600) / 60),
-    seconds: seconds % 60,
+    days: Math.floor(totalSeconds / 86400),
+    hours: Math.floor((totalSeconds % 86400) / 3600),
+    minutes: Math.floor((totalSeconds % 3600) / 60),
+    seconds: totalSeconds % 60,
   };
 };
 
@@ -43,7 +43,7 @@ export function PriceAdjustmentBanner() {
   useEffect(() => {
     const tick = () => {
       const now = Date.now();
-      if (now >= REAJUST_DATE.getTime()) {
+      if (now >= PROMO_END.getTime()) {
         setExpired(true);
         return;
       }
@@ -64,22 +64,27 @@ export function PriceAdjustmentBanner() {
 
       <div className="container-lume relative z-10 py-8 sm:py-10">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-7 lg:gap-10">
+
+          {/* Texto principal */}
           <div className="text-center lg:text-left max-w-xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#c9a227]/10 border border-[#c9a227]/30 mb-4">
-              <span className="w-2 h-2 rounded-full bg-[#c9a227] animate-pulse flex-shrink-0" />
+              <Tag className="w-3.5 h-3.5 text-[#c9a227]" />
               <span className="text-[11px] sm:text-xs uppercase tracking-[0.2em] font-semibold text-[#c9a227]">
-                Reajuste de Preços
+                Promoção Especial
               </span>
             </div>
             <h2 className="font-montserrat text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight">
-              Preços reajustados em <span className="text-gradient-gold">31 de agosto</span>
+              <span className="text-gradient-gold">12% de desconto</span> em todas as películas
             </h2>
             <p className="mt-3 text-sm sm:text-base text-gray-400 leading-relaxed">
-              Garanta o valor atual da tabela no seu orçamento antes do novo preço entrar em vigor.
+              Promoção exclusiva válida até{' '}
+              <strong className="text-white">15 de setembro</strong>. Solicite seu orçamento agora e já garanta o desconto.
             </p>
           </div>
 
+          {/* Cronômetro + CTA */}
           <div className="flex flex-col items-center gap-5">
+            {/* Contador regressivo */}
             <div className="flex items-stretch gap-2 sm:gap-3">
               {TIME_UNITS.map(({ key, label }) => (
                 <div
@@ -93,6 +98,7 @@ export function PriceAdjustmentBanner() {
                 </div>
               ))}
             </div>
+
             <GtagLink
               href="https://wa.me/5521965140612"
               target="_blank"
@@ -101,10 +107,11 @@ export function PriceAdjustmentBanner() {
               className="btn-primary flex items-center justify-center gap-2 group w-full sm:w-auto"
             >
               <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span className="whitespace-nowrap">Garantir Preço Atual</span>
+              <span className="whitespace-nowrap">Garantir 12% de Desconto</span>
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </GtagLink>
           </div>
+
         </div>
       </div>
     </section>

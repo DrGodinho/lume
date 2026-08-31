@@ -26,9 +26,9 @@ export const precoInsulfilmResidencialRioDeJaneiro: BlogPost = {
   publishedAt: '2026-06-18T12:00:00.000Z',
   updatedAt: '2026-08-23T12:00:00.000Z',
   seoTitle:
-    'Preço de Insulfilm Residencial no Rio de Janeiro em 2026: a partir de R$ 90/m² (Janela e Porta de Vidro)',
+    'Preço de Insulfilm Residencial no Rio de Janeiro em 2026: a partir de R$ 80/m² (Janela e Porta de Vidro)',
   seoDescription:
-    'Quanto custa insulfilm residencial no Rio de Janeiro em 2026? Varia de R$ 90/m² (carbono) a R$ 240/m² (nano cerâmica): janela a partir de R$ 90 e porta de vidro de ~R$ 176. Veja preços por tipo de película, exemplos de economia e calcule seu orçamento.',
+    'Quanto custa insulfilm residencial no Rio de Janeiro em 2026? Varia de R$ 80/m² (carbono) a R$ 200/m² (nano cerâmica): janela a partir de R$ 80 e porta de vidro de ~R$ 160. Veja preços por tipo de película, exemplos de economia e calcule seu orçamento.',
   featured: true,
   content: [
     // --- HOOK: abre com a dor real do carioca ---
@@ -43,7 +43,7 @@ export const precoInsulfilmResidencialRioDeJaneiro: BlogPost = {
     {
       type: 'callout',
       title: '💡 Resposta rápida para quem está pesquisando preço',
-      text: 'Em 2026, insulfilm residencial no Rio de Janeiro começa em torno de R$ 90 para uma janela pequena com película carbono e pode chegar a R$ 240 ou mais na nano cerâmica para a mesma área. Uma porta de vidro de 200 × 80 cm sai por cerca de R$ 176 na refletiva. Em projetos com várias janelas, o preço médio por peça fica ainda menor — e a economia em energia pode pagar o investimento em poucos meses.',
+      text: 'Em 2026, insulfilm residencial no Rio de Janeiro começa em torno de R$ 80 para uma janela pequena com película carbono e pode chegar a R$ 200 ou mais na nano cerâmica para a mesma área. Uma porta de vidro de 200 × 80 cm sai por cerca de R$ 160 na refletiva. Em projetos com várias janelas, o preço médio por peça fica ainda menor — e a economia em energia pode pagar o investimento em poucos meses.',
     },
 
     // --- BLOCO 0: PREÇO POR M² (keyword) ---
@@ -54,12 +54,12 @@ export const precoInsulfilmResidencialRioDeJaneiro: BlogPost = {
     },
     {
       type: 'paragraph',
-      text: 'Antes de falar de janela e porta, vale trazer o insulfilm à medida que todo mundo busca: o preço por metro quadrado. No Rio de Janeiro em 2026, a referência prática por m² é: película carbono a partir de R$ 90/m², refletiva a partir de R$ 110/m² e nano cerâmica a partir de R$ 240/m². Quanto maior a área protegida de uma vez, melhor o custo médio por m² do projeto.',
+      text: 'Antes de falar de janela e porta, vale trazer o insulfilm à medida que todo mundo busca: o preço por metro quadrado. No Rio de Janeiro em 2026, a referência prática por m² é: película carbono a partir de R$ 80/m², refletiva a partir de R$ 90/m² e nano cerâmica a partir de R$ 200/m². Quanto maior a área protegida de uma vez, melhor o custo médio por m² do projeto.',
     },
     {
       type: 'callout',
       title: '📐 Referência rápida de preço por m² em 2026',
-      text: 'Carbono: a partir de R$ 90/m² · Refletiva: a partir de R$ 110/m² · Nano cerâmica: a partir de R$ 240/m². Esses valores consideram instalação padrão; projetos com várias janelas no mesmo endereço costumam ter preço por m² inferior.',
+      text: 'Carbono: a partir de R$ 80/m² · Refletiva: a partir de R$ 90/m² · Nano cerâmica: a partir de R$ 200/m². Esses valores consideram instalação padrão; projetos com várias janelas no mesmo endereço costumam ter preço por m² inferior.',
     },
 
     // --- BLOCO 1: Exemplos concretos de preço ---
@@ -88,32 +88,32 @@ export const precoInsulfilmResidencialRioDeJaneiro: BlogPost = {
         {
           title: 'Janela com 2 vidros',
           href: '/carbono/',
-          values: ['2 × 100 × 50 cm', '1,00 m²', 'Carbono', 'R$ 90'],
+          values: ['2 × 100 × 50 cm', '1,00 m²', 'Carbono', 'R$ 80'],
         },
         {
           title: 'Janela com 2 vidros',
           href: '/refletiva/',
-          values: ['2 × 100 × 50 cm', '1,00 m²', 'Refletiva', 'R$ 110'],
+          values: ['2 × 100 × 50 cm', '1,00 m²', 'Refletiva', 'R$ 90'],
         },
         {
           title: 'Janela com 2 vidros',
           href: '/nano-ceramica/',
-          values: ['2 × 100 × 50 cm', '1,00 m²', 'Nano cerâmica', 'R$ 240'],
+          values: ['2 × 100 × 50 cm', '1,00 m²', 'Nano cerâmica', 'R$ 200'],
         },
         {
           title: 'Porta de vidro',
           href: '/refletiva/',
-          values: ['200 × 80 cm', '1,60 m²', 'Refletiva', 'R$ 176'],
+          values: ['200 × 80 cm', '1,60 m²', 'Refletiva', 'R$ 144'],
         },
         {
           title: 'Porta de vidro',
           href: '/nano-ceramica/',
-          values: ['200 × 80 cm', '1,60 m²', 'Nano cerâmica', 'R$ 384'],
+          values: ['200 × 80 cm', '1,60 m²', 'Nano cerâmica', 'R$ 320'],
         },
         {
           title: 'Porta de vidro',
           href: '/jateado/',
-          values: ['200 × 80 cm', '1,60 m²', 'Jateada (privacidade)', 'R$ 158'],
+          values: ['200 × 80 cm', '1,60 m²', 'Jateada (privacidade)', 'R$ 128'],
         },
       ],
     },
@@ -126,7 +126,7 @@ export const precoInsulfilmResidencialRioDeJaneiro: BlogPost = {
     },
     {
       type: 'paragraph',
-      text: 'A janela é o ponto de partida da maioria dos projetos — e no Rio, onde apartamentos e casas têm vidros voltados para norte e oeste, proteger a janela é o que mais reduz calor e conta de luz. Uma janela com 2 folhas de 100 × 50 cm (1 m²) sai a partir de R$ 90 na carbono e chega a R$ 240 na nano cerâmica. Em apartamentos com várias janelas iguais, o preço médio por janela cai bastante porque o técnico aproveita a mesma visita.',
+      text: 'A janela é o ponto de partida da maioria dos projetos — e no Rio, onde apartamentos e casas têm vidros voltados para norte e oeste, proteger a janela é o que mais reduz calor e conta de luz. Uma janela com 2 folhas de 100 × 50 cm (1 m²) sai a partir de R$ 80 na carbono e chega a R$ 200 na nano cerâmica. Em apartamentos com várias janelas iguais, o preço médio por janela cai bastante porque o técnico aproveita a mesma visita.',
     },
 
     // --- BLOCO 1C: PREÇO PARA PORTA DE VIDRO (keyword) ---
@@ -137,7 +137,7 @@ export const precoInsulfilmResidencialRioDeJaneiro: BlogPost = {
     },
     {
       type: 'paragraph',
-      text: 'A porta de vidro é a maior entrada de calor da casa e, por isso, uma das peças mais procuradas. Uma porta de vidro de 200 × 80 cm (1,60 m²) fica em torno de R$ 176 na refletiva, R$ 158 na jateada e R$ 384 na nano cerâmica. Na sala, varanda, quarto ou corredor, proteger a porta de vidro com insulfilm transforma a temperatura do ambiente sem obra.',
+      text: 'A porta de vidro é a maior entrada de calor da casa e, por isso, uma das peças mais procuradas. Uma porta de vidro de 200 × 80 cm (1,60 m²) fica em torno de R$ 176 na refletiva, R$ 158 na jateada e R$ 320 na nano cerâmica. Na sala, varanda, quarto ou corredor, proteger a porta de vidro com insulfilm transforma a temperatura do ambiente sem obra.',
     },
 
     // --- BLOCO 2: ARGUMENTO DE ECONOMIA ---
@@ -189,7 +189,7 @@ export const precoInsulfilmResidencialRioDeJaneiro: BlogPost = {
     {
       type: 'callout',
       title: '🔢 Conta simples de retorno do investimento',
-      text: 'Em 2026, uma janela com nano cerâmica custa R$ 240. Se ela reduzir R$ 60 na conta de luz por mês, o investimento se paga em 4 meses. O restante do tempo de vida da película — que pode ser de 10 a 15 anos — é retorno líquido. Uma porta de vidro com refletiva (R$ 176) pode se pagar em menos de 3 meses de economia.',
+      text: 'Em 2026, uma janela com nano cerâmica custa R$ 200. Se ela reduzir R$ 50 na conta de luz por mês, o investimento se paga em 4 meses. O restante do tempo de vida da película — que pode ser de 10 a 15 anos — é retorno líquido. Uma porta de vidro com refletiva (R$ 144) pode se pagar em menos de 3 meses de economia.',
     },
 
     // --- BLOCO 3: Diferença entre as películas ---
@@ -258,7 +258,7 @@ export const precoInsulfilmResidencialRioDeJaneiro: BlogPost = {
           title: 'Tipo de película',
           values: [
             'Maior tecnologia = maior investimento, mas também maior retorno',
-            'Carbono (R$ 90/m²) vs. nano cerâmica (R$ 240/m²) em 1 m²',
+            'Carbono (R$ 80/m²) vs. nano cerâmica (R$ 200/m²) em 1 m²',
           ],
         },
         {
@@ -397,7 +397,7 @@ export const precoInsulfilmResidencialRioDeJaneiro: BlogPost = {
     {
       type: 'callout',
       title: '🧮 Exemplo de cálculo rápido',
-      text: 'Porta de vidro: 2,00 m × 0,80 m = 1,60 m². Com película refletiva a ~R$ 110/m², a estimativa fica em R$ 176. Janela com 2 folhas de 1,00 m × 0,50 m = 1,00 m². Com carbono a ~R$ 90/m², a estimativa fica em R$ 90. Duas janelas + uma porta = ~R$ 266 para proteger três pontos da casa.',
+      text: 'Porta de vidro: 2,00 m × 0,80 m = 1,60 m². Com película refletiva a ~R$ 90/m², a estimativa fica em R$ 176. Janela com 2 folhas de 1,00 m × 0,50 m = 1,00 m². Com carbono a ~R$ 90/m², a estimativa fica em R$ 90. Duas janelas + uma porta = ~R$ 266 para proteger três pontos da casa.',
     },
 
     // --- BLOCO 9: Como pedir orçamento ---
@@ -466,7 +466,7 @@ export const precoInsulfilmResidencialRioDeJaneiro: BlogPost = {
         {
           question: 'Qual é o preço do insulfilm residencial por m² no Rio de Janeiro em 2026?',
           answer:
-            'Em 2026, os valores variam por tipo de película. Como referência prática: carbono parte de ~R$ 90/m², refletiva de ~R$ 110/m² e nano cerâmica de ~R$ 240/m². O preço final depende também de quantidade de vidros, acesso ao local, recortes e se há remoção de película antiga.',
+            'Em 2026, os valores variam por tipo de película. Como referência prática: carbono parte de ~R$ 80/m², refletiva de ~R$ 90/m² e nano cerâmica de ~R$ 200/m². O preço final depende também de quantidade de vidros, acesso ao local, recortes e se há remoção de película antiga.',
         },
         {
           question: 'Uma janela pequena pode custar só R$ 90 em 2026?',
@@ -476,7 +476,7 @@ export const precoInsulfilmResidencialRioDeJaneiro: BlogPost = {
         {
           question: 'Quanto custa colocar insulfilm em uma porta de vidro?',
           answer:
-            'Uma porta de vidro de 200 × 80 cm tem cerca de 1,60 m². Na película refletiva (~R$ 110/m²), o exemplo fica em R$ 176 em 2026. Na nano cerâmica, em torno de R$ 384. Portas com grid (divisões internas), tamanho maior ou acesso difícil alteram o orçamento.',
+            'Uma porta de vidro de 200 × 80 cm tem cerca de 1,60 m². Na película refletiva (~R$ 90/m²), o exemplo fica em R$ 176 em 2026. Na nano cerâmica, em torno de R$ 384. Portas com grid (divisões internas), tamanho maior ou acesso difícil alteram o orçamento.',
         },
         {
           question: 'Vale a pena investir em nano cerâmica sendo mais cara?',
@@ -486,7 +486,7 @@ export const precoInsulfilmResidencialRioDeJaneiro: BlogPost = {
         {
           question: 'O insulfilm residencial realmente reduz a conta de luz?',
           answer:
-            'Sim, de forma significativa em imóveis com sol forte. Ao reduzir a entrada de calor pelos vidros, o insulfilm diminui o trabalho do ar-condicionado para manter a temperatura. A redução varia entre 25% e 40% no uso do aparelho em ambientes protegidos, o que pode representar de R$ 60 a R$ 120 de economia mensal em residências com uso regular de climatização.',
+            'Sim, de forma significativa em imóveis com sol forte. Ao reduzir a entrada de calor pelos vidros, o insulfilm diminui o trabalho do ar-condicionado para manter a temperatura. A redução varia entre 25% e 40% no uso do aparelho em ambientes protegidos, o que pode representar de R$ 50 a R$ 90 de economia mensal em residências com uso regular de climatização.',
         },
         {
           question: 'O insulfilm protege móveis e pisos contra desbotamento?',

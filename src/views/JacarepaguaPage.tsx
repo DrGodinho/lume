@@ -45,7 +45,7 @@ export function JacarepaguaPage({ faqs }: { faqs: { q: string; a: string }[] }) 
                     </h1>
 
                     <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto md:mx-0 mb-10 leading-relaxed font-light">
-                        Proteja seu lar ou comércio no coração da Zona Oeste com películas de controle solar de elite. Atendimento especializado na Freguesia, Taquara, Pechincha e região, com películas a partir de R$ 90/m².
+                        Proteja seu lar ou comércio no coração da Zona Oeste com películas de controle solar de elite. Atendimento especializado na Freguesia, Taquara, Pechincha e região, com películas a partir de R$ 80/m².
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
@@ -334,7 +334,7 @@ export function JacarepaguaPage({ faqs }: { faqs: { q: string; a: string }[] }) 
                         <div className="flex-1">
                             <h2 className="text-2xl lg:text-3xl font-bold font-montserrat mb-3 text-white">Preço de insulfilm em Jacarepaguá em 2026</h2>
                             <p className="text-gray-400 font-light leading-relaxed">
-                                As películas variam de <strong className="text-white">R$ 90/m²</strong> (carbono) a <strong className="text-white">R$ 240/m²</strong> (nano cerâmica); janela a partir de R$ 90 e porta de vidro de ~R$ 176. Veja a tabela completa com exemplos por tipo de vidro e película.
+                                As películas variam de <strong className="text-white">R$ 80/m²</strong> (carbono) a <strong className="text-white">R$ 200/m²</strong> (nano cerâmica); janela a partir de R$ 80 e porta de vidro de ~R$ 160. Veja a tabela completa com exemplos por tipo de vidro e película.
                             </p>
                         </div>
                         <a

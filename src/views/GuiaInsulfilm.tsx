@@ -150,7 +150,7 @@ export function GuiaInsulfilm() {
                         </div>
                         <h2 className="text-3xl font-bold font-montserrat text-white">1. Conforto Térmico e Economia: O Fim do "Forno" em Casa</h2>
                     </div>
-                    
+
                     <div className="text-gray-400 space-y-6 text-lg leading-relaxed mb-8">
                         <p>
                             O principal motivo que leva alguém a buscar insulfilm residencial no Rio de Janeiro é, sem dúvida, o calor. Quando o sol atinge o vidro comum, ele se transforma em energia térmica que fica presa no ambiente — o famoso efeito estufa.
@@ -269,7 +269,7 @@ export function GuiaInsulfilm() {
                                             )}
                                         </h3>
                                     </div>
-                                    
+
                                     <div className="space-y-5 flex-1">
                                         {room.recs.map((rec, rIdx) => (
                                             <div key={rIdx} className="pb-5 border-b border-white/10 last:border-0 last:pb-0">
@@ -303,7 +303,7 @@ export function GuiaInsulfilm() {
                 {/* Tabela Comparativa */}
                 <section>
                     <h2 className="text-3xl font-bold font-montserrat text-white mb-8 text-center md:text-left">Comparativo Técnico das Películas</h2>
-                    
+
                     <div className="overflow-x-auto rounded-2xl glass-card border border-white/10 shadow-2xl">
                         <table className="w-full text-left border-collapse min-w-[800px]">
                             <thead>
@@ -325,7 +325,7 @@ export function GuiaInsulfilm() {
                                     <td className="p-4 md:p-6 text-[#c9a227] font-medium">99,9%</td>
                                     <td className="p-4 md:p-6 font-bold text-white">95% a 99%</td>
                                     <td className="p-4 md:p-6">70% a 80%</td>
-                                    <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 240</td>
+                                    <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 200</td>
                                 </tr>
                                 <tr className="hover:bg-white/[0.02] transition-colors">
                                     <td className="p-4 md:p-6 font-bold text-white">
@@ -335,7 +335,7 @@ export function GuiaInsulfilm() {
                                     <td className="p-4 md:p-6 text-[#c9a227] font-medium">99%</td>
                                     <td className="p-4 md:p-6 font-bold text-white">60% a 70%</td>
                                     <td className="p-4 md:p-6">65% a 75%</td>
-                                    <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 140</td>
+                                    <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 110</td>
                                 </tr>
                                 <tr className="hover:bg-white/[0.02] transition-colors">
                                     <td className="p-4 md:p-6 font-bold text-white">
@@ -345,7 +345,7 @@ export function GuiaInsulfilm() {
                                     <td className="p-4 md:p-6 text-[#c9a227] font-medium">99%</td>
                                     <td className="p-4 md:p-6 font-bold text-white">50% a 60%</td>
                                     <td className="p-4 md:p-6">55% a 65%</td>
-                                    <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 140</td>
+                                    <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 110</td>
                                 </tr>
                                 <tr className="hover:bg-white/[0.02] transition-colors">
                                     <td className="p-4 md:p-6 font-bold text-white">
@@ -385,7 +385,7 @@ export function GuiaInsulfilm() {
                                     <td className="p-4 md:p-6 text-[#c9a227] font-medium">99%</td>
                                     <td className="p-4 md:p-6 font-medium text-gray-500">{'< 10%'}</td>
                                     <td className="p-4 md:p-6">15% a 25%</td>
-                                    <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 99</td>
+                                    <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 80</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -435,7 +435,7 @@ export function GuiaInsulfilm() {
                 {/* 5 e 6: Durabilidade, Cuidados e Remoção */}
                 <section>
                     <h2 className="text-3xl font-bold font-montserrat text-white mb-8">5. Qualidade e Cuidados Diários</h2>
-                    
+
                     <div className="text-gray-400 space-y-6 text-lg leading-relaxed mb-8">
                         <p>
                             Você já viu aqueles carros com o vidro cheio de bolhas e com uma cor roxa estranha? Isso é o resultado de películas tintadas de baixa qualidade. Elas duram poucos meses sob o sol do Rio.
@@ -462,7 +462,7 @@ export function GuiaInsulfilm() {
                 {/* 6. Remoção */}
                 <section>
                     <h2 className="text-3xl font-bold font-montserrat text-white mb-6">6. Remoção: Quando é Hora de Mudar?</h2>
-                    
+
                     <div className="text-gray-400 space-y-6 text-lg leading-relaxed mb-8">
                         <p>
                             A remoção de insulfilm antigo é uma arte ingrata. Se a película for velha e estiver ressecada, ela sairá em pedacinhos minúsculos, deixando uma cola grudenta e fedorenta no vidro.

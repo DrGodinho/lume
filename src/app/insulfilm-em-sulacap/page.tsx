@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 const sulacapFaqs = [
   {
     q: 'Quanto custa instalar insulfilm residencial em Sulacap?',
-    a: 'O valor varia conforme o tipo de película e a quantidade de m² de vidro: películas a partir de R$ 90/m² (carbono) até R$ 240/m² (nano cerâmica). Quanto mais vidros no mesmo endereço, melhor o custo médio por peça. Oferecemos orçamento gratuito e sem compromisso pelo WhatsApp — basta enviar as medidas ou agendar visita de medição.',
+    a: 'O valor varia conforme o tipo de película e a quantidade de m² de vidro: películas a partir de R$ 80/m² (carbono) até R$ 200/m² (nano cerâmica). Quanto mais vidros no mesmo endereço, melhor o custo médio por peça. Oferecemos orçamento gratuito e sem compromisso pelo WhatsApp — basta enviar as medidas ou agendar visita de medição.',
   },
   {
     q: 'Qual o melhor tipo de insulfilm para casas em Sulacap?',

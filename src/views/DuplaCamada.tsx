@@ -27,7 +27,7 @@ export function DuplaCamadaPage() {
                 </div>
 
                 <div className="container-lume relative z-10 page-entrance text-center md:text-left">
-                    <NavigationBreadcrumbs 
+                    <NavigationBreadcrumbs
                         showVisualTrail={false}
                         items={[
                             { label: 'Início', href: '/' },
@@ -73,7 +73,7 @@ export function DuplaCamadaPage() {
                             Se você mora ou possui comércio em <strong>Bangu, Campo Grande, Realengo ou adjacências</strong>, sabe que as temperaturas de verão não são uma mera inconveniência; elas são um dreno financeiro maciço na sua conta de energia por causa dos aparelhos de Ar Condicionado ligados no 16ºC, operando em pico durante o dia todo.
                         </p>
                         <p className="text-gray-400 leading-relaxed text-lg">
-                            O <strong>Insulfilm Dupla Camada</strong> é projetado especificamente para barrar esse ciclo destrutivo. Ao instalar esse material nas suas janelas de vidro ou varandas fechadas, a película rejeita brutalmente a radiação solar térmica *antes* mesmo dela aquecer o ar da sua sala. Quando a temperatura interna é estabilizada pela película, o seu Inverter gela o ambiente com <strong>metade do esforço</strong>. O retorno do investimento dessa película ($120/m²) se paga mês a mês reduzindo sua tarifa de energia elétrica.
+                            O <strong>Insulfilm Dupla Camada</strong> é projetado especificamente para barrar esse ciclo destrutivo. Ao instalar esse material nas suas janelas de vidro ou varandas fechadas, a película rejeita brutalmente a radiação solar térmica *antes* mesmo dela aquecer o ar da sua sala. Quando a temperatura interna é estabilizada pela película, o seu Inverter gela o ambiente com <strong>metade do esforço</strong>. O retorno do investimento dessa película (A partir de R$ 110/m²) se paga mês a mês reduzindo sua tarifa de energia elétrica.
                         </p>
                     </div>
                 </div>
@@ -95,7 +95,7 @@ export function DuplaCamadaPage() {
                     <div className="max-w-4xl mx-auto text-left">
                         <div className="glass-card p-8 md:p-10 rounded-3xl border border-white/5 bg-white/[0.02] relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-[#c9a227]/5 blur-3xl rounded-full pointer-events-none"></div>
-                            
+
                             <h3 className="text-2xl font-bold mb-6 text-white font-montserrat">O que é a Tecnologia de Dupla Camada?</h3>
                             <p className="text-gray-300 leading-relaxed mb-10 text-lg">
                                 Tecnicamente, trata-se de um processo de fabricação onde uma camada de <strong>Sputtering de Alumínio</strong> (altamente refletiva) é fundida a uma camada de <strong>Poliéster Pigmentado ou Carbono</strong> (fumê).
@@ -154,7 +154,7 @@ export function DuplaCamadaPage() {
                     </div>
                     <div className="inline-flex flex-col items-center">
                         <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-2 text-white">Escolha sua Dupla Camada</h2>
-                        <span className="text-[#c9a227] font-semibold tracking-wide bg-[#c9a227]/10 px-4 py-1 rounded-full text-sm">Apenas R$ 140/m² Instalado</span>
+                        <span className="text-[#c9a227] font-semibold tracking-wide bg-[#c9a227]/10 px-4 py-1 rounded-full text-sm">Apenas R$ 110/m² Instalado</span>
                     </div>
                 </div>
 
