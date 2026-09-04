@@ -33,6 +33,7 @@ interface AppConfig {
   agressividadeCorte: number;
   filmTypes: Record<FilmTypeKey, number>;
   selectedFilm: FilmTypeKey;
+  draftExpiration: number;
 }
 
 interface ConfigPanelProps {
@@ -288,6 +289,31 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
                 {config.modoCorConfig === 'ambiente'
                   ? 'Usa uma cor única por ambiente/identificação.'
                   : 'Usa cores baseadas no tamanho de cada peça.'}
+              </HelpText>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between gap-3 mb-2">
+                <FieldLabel>Tempo de Auto-Save (min)</FieldLabel>
+                <span className="text-[10px] text-white font-black bg-[#040811] border border-white/10 rounded-lg px-2 py-1">
+                  {config.draftExpiration} min
+                </span>
+              </div>
+              <input
+                type="range"
+                min={0}
+                max={120}
+                step={5}
+                value={config.draftExpiration}
+                onChange={(e) => onUpdate('draftExpiration', parseInt(e.target.value, 10))}
+                className="w-full accent-[#c9a227]"
+              />
+              <div className="flex justify-between text-[9px] text-gray-600 mt-1 font-bold uppercase">
+                <span>0 (desligado)</span>
+                <span>120 min</span>
+              </div>
+              <HelpText>
+                Rascunhos salvos retomam apenas dentro desse tempo. Após isso, a calculadora abre vazia para novos clientes. Padrão: 15 min.
               </HelpText>
             </div>
 

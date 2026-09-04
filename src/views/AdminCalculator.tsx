@@ -74,6 +74,7 @@ interface AppConfig {
   agressividadeCorte: number;
   filmTypes: Record<FilmTypeKey, number>;
   selectedFilm: FilmTypeKey;
+  draftExpiration: number;
 }
 
 const DEFAULT_FILM_TYPES: Record<FilmTypeKey, number> = {
@@ -98,6 +99,7 @@ const DEFAULT_CONFIG: AppConfig = {
   agressividadeCorte: 35,
   filmTypes: { ...DEFAULT_FILM_TYPES },
   selectedFilm: 'carbono_g20',
+  draftExpiration: 15,
 };
 
 const DEFAULT_ROOM_COLORS: Record<string, string> = {
@@ -390,6 +392,7 @@ export function AdminCalculator() {
   const [agressividadeCorte, setAgressividadeCorte] = useState(cfg.agressividadeCorte);
   const [filmTypes, setFilmTypes] = useState<Record<FilmTypeKey, number>>(normalizeFilmTypes(cfg.filmTypes));
   const [selectedFilm, setSelectedFilm] = useState<FilmTypeKey>(normalizeFilmTypeKey(cfg.selectedFilm));
+  const [draftExpiration, setDraftExpiration] = useState(cfg.draftExpiration);
   const [configRestored, setConfigRestored] = useState(false);
   const [draftRestored, setDraftRestored] = useState(false);
 
@@ -416,6 +419,7 @@ export function AdminCalculator() {
         agressividadeCorte,
         filmTypes,
         selectedFilm,
+        draftExpiration,
     }), [
         rollW,
         price,
@@ -428,6 +432,7 @@ export function AdminCalculator() {
         agressividadeCorte,
         filmTypes,
         selectedFilm,
+        draftExpiration,
     ]);
 
     const [vidrosState, dispatch] = useReducer(historyReducer, {
@@ -675,6 +680,7 @@ export function AdminCalculator() {
         cliente, phone, vidros, desconto, desconto_input: descontoInput,
         roll_w: rollW, price, margin, modo_otimizacao: modoOtimizacao,
         user_name: userName, selected_film: selectedFilm,
+        last_saved: Date.now(),
       });
       setCloudStatus(ok ? 'synced' : 'error');
       if (ok) setTimeout(() => setCloudStatus('idle'), 3000);
@@ -712,6 +718,7 @@ export function AdminCalculator() {
         if (source.agressividadeCorte !== undefined) setAgressividadeCorte(source.agressividadeCorte);
         if (source.filmTypes) setFilmTypes(normalizeFilmTypes(source.filmTypes));
         setSelectedFilm(normalizeFilmTypeKey(source.selectedFilm));
+        if (source.draftExpiration !== undefined) setDraftExpiration(source.draftExpiration);
 
         if (cloud) {
           saveConfig({
@@ -736,6 +743,17 @@ export function AdminCalculator() {
         const restoreDraft = async () => {
           try {
             const scopeKey = await resolveCalculatorScopeKey();
+            // Resolve the configured draft expiration (minutes) directly from config
+            // so it works regardless of the config-restore effect's timing.
+            const cfgSource = loadConfig(scopeKey);
+            let expirationMin = cfgSource.draftExpiration ?? DEFAULT_CONFIG.draftExpiration;
+            try {
+              const cloudCfg = await loadConfigFromCloud();
+              if (cloudCfg && cloudCfg.draftExpiration !== undefined) expirationMin = cloudCfg.draftExpiration;
+            } catch { /* ignore */ }
+            const isFresh = (lastSaved?: number) =>
+              !lastSaved || expirationMin <= 0 || (Date.now() - lastSaved) <= expirationMin * 60 * 1000;
+
             // Local draft (source of roomColors, which aren't synced to cloud)
             const saved = localStorage.getItem(buildCalculatorStorageKey('lume_calculator_draft', scopeKey));
             let localDraft: { roomColors?: Record<string, string> } | null = null;
@@ -749,7 +767,7 @@ export function AdminCalculator() {
             };
             // Try cloud first
             const cloud = await loadDraftFromCloud();
-            if (cloud && Array.isArray(cloud.vidros) && cloud.vidros.length > 0) {
+            if (cloud && Array.isArray(cloud.vidros) && cloud.vidros.length > 0 && isFresh(cloud.last_saved)) {
                 dispatch({ type: 'SET', payload: cloud.vidros as GlassItem[] });
                 if (cloud.cliente) setCliente(cloud.cliente);
                 if (cloud.phone) setPhone(cloud.phone);
@@ -770,7 +788,7 @@ export function AdminCalculator() {
             if (saved) {
                 try {
                     const draft = JSON.parse(saved);
-                    if (draft.vidros && draft.vidros.length > 0) {
+                    if (draft.vidros && draft.vidros.length > 0 && isFresh(draft.lastSaved)) {
                         dispatch({ type: 'SET', payload: draft.vidros });
                         if (draft.cliente) setCliente(draft.cliente);
                         if (draft.phone) setPhone(draft.phone);
@@ -1341,6 +1359,9 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
         case 'selectedFilm':
           setSelectedFilm(value as FilmTypeKey);
           break;
+        case 'draftExpiration':
+          setDraftExpiration(Math.max(0, value as number));
+          break;
       }
     }
     const normalizedValue = key === 'perdasFixas' ? Math.min(100, Math.max(0, value as number)) : value;
@@ -1427,7 +1448,7 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
       <ConfigPanel
         aberto={configAberto}
         setAberto={setConfigAberto}
-        config={{ rollW, price, margin, modoOtimizacao, userName, modoPerdas, perdasFixas, modoCorConfig: usarCoresPorAmbiente ? 'ambiente' : 'tamanho', agressividadeCorte, filmTypes, selectedFilm }}
+        config={{ rollW, price, margin, modoOtimizacao, userName, modoPerdas, perdasFixas, modoCorConfig: usarCoresPorAmbiente ? 'ambiente' : 'tamanho', agressividadeCorte, filmTypes, selectedFilm, draftExpiration }}
         onUpdate={atualizarConfig}
         cloudStatus={cloudStatus}
         onLogout={handleLogout}

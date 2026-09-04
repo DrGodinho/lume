@@ -17,15 +17,71 @@ interface DraftData {
   modo_otimizacao: string;
   user_name: string;
   selected_film: string;
+  last_saved?: number;
+}
+
+const asFiniteNumber = (value: unknown): number | undefined =>
+  typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+
+// Sanitiza o rascunho antes do envio para evitar payloads invalidos que
+// quebrem o upsert (valores NaN/undefined, tipos errados, vidros corrompidos).
+function sanitizeDraft(draft: DraftData): DraftData | null {
+  const vidros = Array.isArray(draft.vidros)
+    ? draft.vidros
+        .map((glass) => {
+          if (typeof glass !== 'object' || glass === null) return null;
+          const cleaned: Record<string, unknown> = {};
+          for (const [key, value] of Object.entries(glass)) {
+            if (value === undefined) continue;
+            if (typeof value === 'number' && !Number.isFinite(value)) continue;
+            cleaned[key] = value;
+          }
+          return cleaned;
+        })
+        .filter((glass): glass is Record<string, unknown> => glass !== null)
+    : [];
+
+  const rollW = asFiniteNumber(draft.roll_w);
+  const price = asFiniteNumber(draft.price);
+  const margin = asFiniteNumber(draft.margin);
+  const desconto = asFiniteNumber(draft.desconto);
+  const lastSaved = asFiniteNumber(draft.last_saved);
+
+  return {
+    cliente: typeof draft.cliente === 'string' ? draft.cliente : '',
+    phone: typeof draft.phone === 'string' ? draft.phone : '',
+    vidros,
+    desconto: desconto ?? 0,
+    desconto_input: typeof draft.desconto_input === 'string' ? draft.desconto_input : '',
+    roll_w: rollW ?? 0,
+    price: price ?? 0,
+    margin: margin ?? 0,
+    modo_otimizacao: typeof draft.modo_otimizacao === 'string' ? draft.modo_otimizacao : '',
+    user_name: typeof draft.user_name === 'string' ? draft.user_name : '',
+    selected_film: typeof draft.selected_film === 'string' ? draft.selected_film : '',
+    ...(lastSaved !== undefined ? { last_saved: lastSaved } : {}),
+  };
 }
 
 export async function saveDraftToCloud(draft: DraftData): Promise<boolean> {
+  let payload: DraftData | null;
+  try {
+    payload = sanitizeDraft(draft);
+  } catch (error) {
+    logger.error('Draft sanitize failed', undefined, { message: String(error) });
+    return false;
+  }
+  if (!payload) {
+    logger.error('Draft invalid, aborting save');
+    return false;
+  }
+
   try {
     const response = await fetch('/api/calculator/draft', {
       method: 'PUT',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(draft),
+      body: JSON.stringify(payload),
     });
     if (!response.ok) {
       logger.error('Draft save failed', undefined, { status: response.status });
@@ -143,6 +199,7 @@ interface ConfigData {
   agressividadeCorte: number;
   filmTypes: Record<string, number>;
   selectedFilm: string;
+  draftExpiration?: number;
 }
 
 const DEFAULT_FILM_TYPES: Record<string, number> = {
@@ -192,6 +249,7 @@ export async function saveConfigToCloud(config: ConfigData): Promise<boolean> {
     agressividade_corte: config.agressividadeCorte,
     film_types: normalizeFilmTypes(config.filmTypes),
     selected_film: normalizeSelectedFilm(config.selectedFilm),
+    draft_expiration: config.draftExpiration,
   };
 
   try {
@@ -240,6 +298,7 @@ export async function loadConfigFromCloud(): Promise<ConfigData | null> {
       agressividadeCorte: data.agressividade_corte ?? 35,
       filmTypes: normalizeFilmTypes(data.film_types),
       selectedFilm: normalizeSelectedFilm(data.selected_film),
+      draftExpiration: data.draft_expiration,
     };
   } catch {
     return null;

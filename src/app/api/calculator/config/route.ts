@@ -10,6 +10,7 @@ const CONFIG_OPTIONAL_COLUMNS = [
   'agressividade_corte',
   'film_types',
   'selected_film',
+  'draft_expiration',
 ] as const;
 
 export async function GET(request: NextRequest) {
