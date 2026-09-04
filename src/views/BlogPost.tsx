@@ -21,6 +21,26 @@ function formatDate(date: string) {
   }).format(new Date(date));
 }
 
+function RichText({ text }: { text: string }) {
+  const parts = text.split(/(\[[^\]]+\]\([^)]+\))/g);
+
+  return (
+    <>
+      {parts.map((part, index) => {
+        const match = /^\[([^\]]+)\]\(([^)]+)\)$/.exec(part);
+        if (match) {
+          return (
+            <a key={index} href={match[2]} className="font-bold text-[#c9a227] hover:underline">
+              {match[1]}
+            </a>
+          );
+        }
+        return <span key={index}>{part}</span>;
+      })}
+    </>
+  );
+}
+
 function TextWithBreaks({ text }: { text: string }) {
   const lines = text.split('\n');
 
@@ -28,7 +48,7 @@ function TextWithBreaks({ text }: { text: string }) {
     <>
       {lines.map((line, index) => (
         <span key={`${line}-${index}`}>
-          {line}
+          <RichText text={line} />
           {index < lines.length - 1 && <br />}
         </span>
       ))}
@@ -60,7 +80,9 @@ function BlogBlock({ block }: { block: BlogContentBlock }) {
         {block.items.map((item) => (
           <li key={item} className="flex gap-3 text-lg leading-8 text-gray-300">
             <span className="mt-3 h-2 w-2 flex-shrink-0 rounded-full bg-[#c9a227]" />
-            <span>{item}</span>
+            <span>
+              <RichText text={item} />
+            </span>
           </li>
         ))}
       </ul>
@@ -79,7 +101,7 @@ function BlogBlock({ block }: { block: BlogContentBlock }) {
   if (block.type === 'quote') {
     return (
       <blockquote className="my-10 border-l-4 border-[#c9a227] bg-[#c9a227]/10 p-6 text-xl font-semibold leading-8 text-white">
-        "{block.text}"
+        "<RichText text={block.text} />"
         {block.cite && <cite className="mt-4 block text-sm not-italic text-[#c9a227]">{block.cite}</cite>}
       </blockquote>
     );
@@ -89,7 +111,9 @@ function BlogBlock({ block }: { block: BlogContentBlock }) {
     return (
       <aside className="my-10 rounded-[1.5rem] border border-[#c9a227]/30 bg-[#c9a227]/10 p-6">
         {block.title && <h3 className="font-montserrat text-xl font-black text-[#c9a227]">{block.title}</h3>}
-        <p className="mt-3 text-lg leading-8 text-gray-200">{block.text}</p>
+        <p className="mt-3 text-lg leading-8 text-gray-200">
+          <RichText text={block.text} />
+        </p>
       </aside>
     );
   }
@@ -135,7 +159,7 @@ function BlogBlock({ block }: { block: BlogContentBlock }) {
           <table className="w-full min-w-[720px] border-collapse text-left">
             <thead>
               <tr className="border-b border-white/10 bg-[#c9a227]/10">
-                <th className="p-4 text-xs font-black uppercase tracking-widest text-[#c9a227]">Item</th>
+                <th className="p-4 text-xs font-black uppercase tracking-widest text-[#c9a227]">{block.firstColumnTitle || 'Item'}</th>
                 {block.columns.map((column) => (
                   <th key={column} className="p-4 text-xs font-black uppercase tracking-widest text-[#c9a227]">
                     {column}
@@ -201,7 +225,9 @@ function BlogBlock({ block }: { block: BlogContentBlock }) {
                 {item.question}
                 <span className="float-right text-[#c9a227] transition-transform group-open:rotate-45">+</span>
               </summary>
-              <p className="mt-4 leading-7 text-gray-400">{item.answer}</p>
+              <p className="mt-4 leading-7 text-gray-400">
+                <RichText text={item.answer} />
+              </p>
             </details>
           ))}
         </div>

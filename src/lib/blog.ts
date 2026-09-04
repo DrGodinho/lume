@@ -25,6 +25,7 @@ export type BlogContentBlock =
       type: 'comparison_table';
       title?: string;
       text?: string;
+      firstColumnTitle?: string;
       columns: string[];
       rows: {
         title: string;
