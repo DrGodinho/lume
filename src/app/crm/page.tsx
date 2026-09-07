@@ -196,6 +196,7 @@ function CrmApp({ activeTab, onSelectTab }: { activeTab: CrmTab; onSelectTab: (t
         sidebarEditingTarget={sidebarEditingTarget}
         onBeginTargetEdit={beginSidebarTargetEdit}
         onCommitTargetEdit={commitTargetGoal}
+        onCancelTargetEdit={closeSidebarTargetEdit}
         targetInput={crm.targetInput}
         onTargetInputChange={crm.setTargetInput}
         targetGoal={crm.targetGoal}

@@ -8,6 +8,8 @@ import { Coverage } from '../sections/Coverage';
 import { SelectionGuide } from '../sections/SelectionGuide';
 import { ContactCTA } from '../sections/ContactCTA';
 import { GoogleReviews } from '../components/GoogleReviews';
+import { HomeFaq } from '../sections/HomeFaq';
+import { homeFaqs } from '../content/homeFaq';
 
 export const metadata: Metadata = {
   title: 'LUME Controle Solar | Insulfilm Residencial e Comercial no Rio de Janeiro',
@@ -28,16 +30,16 @@ export const metadata: Metadata = {
     canonical: 'https://lumecontrolesolar.com.br/',
   },
   openGraph: {
-    title: 'LUME Controle Solar | Insulfilm de Elite no RJ',
+    title: 'LUME Controle Solar | Insulfilm Residencial e Comercial no Rio de Janeiro',
     description: 'Insulfilm residencial de alta performance no Rio, com instalação profissional, garantia de 2 anos e opção de privacidade 24h com jateado.',
     url: 'https://lumecontrolesolar.com.br/',
     siteName: 'LUME Controle Solar',
     images: [
       {
-        url: 'https://lumecontrolesolar.com.br/og-image.jpg',
-        width: 1200,
-        height: 630,
-        alt: 'LUME Controle Solar - Insulfilm de Alta Performance',
+        url: 'https://lumecontrolesolar.com.br/hero-bg.webp',
+        width: 1344,
+        height: 768,
+        alt: 'LUME Controle Solar - Insulfilm de Alta Performance no Rio de Janeiro',
       },
     ],
     locale: 'pt_BR',
@@ -45,16 +47,34 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'LUME Controle Solar | Insulfilm de Elite no RJ',
+    title: 'LUME Controle Solar | Insulfilm Residencial e Comercial no Rio de Janeiro',
     description: 'Insulfilm residencial no RJ para reduzir calor, proteger móveis e ter privacidade 24h com película jateada.',
-    images: ['https://lumecontrolesolar.com.br/og-image.jpg'],
+    images: ['https://lumecontrolesolar.com.br/hero-bg.webp'],
   },
+};
+
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: homeFaqs.map((faq) => ({
+    '@type': 'Question',
+    name: faq.q,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: faq.a,
+    },
+  })),
 };
 
 
 export default function Home() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Hero />
       <PriceAdjustmentBanner />
       <Benefits />
@@ -63,6 +83,7 @@ export default function Home() {
       <About />
       <Coverage />
       <GoogleReviews />
+      <HomeFaq />
       <ContactCTA />
     </>
   );

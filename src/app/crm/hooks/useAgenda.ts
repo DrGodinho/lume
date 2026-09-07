@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { format, isPast, isToday, parseISO, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import type { Lead, LeadStatus, ServiceStatus, ServiceStatusMeta } from '../types';
+import { formatBRL } from '../utils';
 
 export const normalizeLeadStatus = (status: unknown): LeadStatus => {
   if (status === 'Proposta Enviada') return 'Agendado';
@@ -77,8 +78,11 @@ export const SERVICE_STATUS_META: Record<ServiceStatus, ServiceStatusMeta> = {
   },
 };
 
-export const formatCurrencyBRL = (value: number) =>
-  new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+/**
+ * @deprecated Alias — use `formatBRL` de `../utils` (implementação única).
+ * Mantido por 1 release para não quebrar imports existentes.
+ */
+export const formatCurrencyBRL = (value: number) => formatBRL(value);
 
 export const formatDateInputValue = (value?: string | null) => {
   const date = parseAgendaDate(value);

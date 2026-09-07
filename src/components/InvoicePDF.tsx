@@ -1,4 +1,6 @@
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import { formatBRL } from '../lib/money';
+import { groupByAmbiente } from '../lib/grouping';
 
 const styles = StyleSheet.create({
   page: {
@@ -168,12 +170,7 @@ interface InvoicePDFProps {
 export const InvoicePDF = ({ cliente, userName, resumo, totalAreaM2, areaV, finalPrice, descontoInput }: InvoicePDFProps) => {
   
   // Group items by label
-  const groupedResumo = resumo.reduce((acc, item) => {
-    const groupName = item.label || 'Sem Ambiente';
-    if (!acc[groupName]) acc[groupName] = [];
-    acc[groupName].push(item);
-    return acc;
-  }, {} as Record<string, typeof resumo>);
+  const groupedResumo = groupByAmbiente(resumo);
 
   return (
   <Document>
@@ -248,7 +245,7 @@ export const InvoicePDF = ({ cliente, userName, resumo, totalAreaM2, areaV, fina
         </View>
         <View style={{textAlign: 'right'}}>
             <Text style={styles.totalValue}>
-                {finalPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                {formatBRL(finalPrice)}
             </Text>
             <View style={{marginTop: 6}}>
                 <Text style={{fontSize: 10, color: '#000000', fontWeight: 'bold'}}>lumecontrolesolar.com.br</Text>

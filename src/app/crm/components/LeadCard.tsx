@@ -1,6 +1,6 @@
 'use client';
 
-import { format } from 'date-fns';
+import { format, isPast, isToday } from 'date-fns';
 import { AlertTriangle, CheckCircle2, RefreshCw, Star } from 'lucide-react';
 import { memo, type CSSProperties } from 'react';
 import type { Lead, LeadSyncStatus } from '../types';
@@ -8,9 +8,9 @@ import type { Lead, LeadSyncStatus } from '../types';
 interface LeadCardProps {
   lead: Lead;
   collapsed: boolean;
-  daysInStatus: (lead: Lead) => number;
   formatCurrency: (value: number) => string;
   getLeadServiceDate: (lead: Lead) => Date | null;
+  getLeadFollowUpDate: (lead: Lead) => Date | null;
   syncStatus?: LeadSyncStatus;
   onToggleCollapse: (leadId: string) => void;
   onOpenDetail: (lead: Lead) => void;
@@ -32,9 +32,9 @@ interface LeadCardProps {
 export const LeadCard = memo(function LeadCard({
   lead,
   collapsed,
-  daysInStatus,
   formatCurrency,
   getLeadServiceDate,
+  getLeadFollowUpDate,
   syncStatus = 'ok',
   onToggleCollapse,
   onOpenDetail,
@@ -53,6 +53,15 @@ export const LeadCard = memo(function LeadCard({
   disableMoveRight,
 }: LeadCardProps) {
   const serviceDate = getLeadServiceDate(lead);
+  const followUpDate = getLeadFollowUpDate(lead);
+  const followUpOverdue = !!followUpDate && isPast(followUpDate) && !isToday(followUpDate);
+  const nextAction = serviceDate
+    ? { label: `Serviço ${format(serviceDate, 'dd/MM')}`, className: 'font-semibold text-sky-300/80' }
+    : followUpDate
+      ? followUpOverdue
+        ? { label: `Em atraso — retorno ${format(followUpDate, 'dd/MM')}`, className: 'font-semibold text-red-300' }
+        : { label: `Retorno ${format(followUpDate, 'dd/MM')}`, className: 'font-semibold text-[#c9a227]/80' }
+      : { label: 'Sem retorno agendado', className: 'text-white/35' };
   const syncMeta = {
     ok: {
       label: 'Salvo no Supabase',
@@ -82,7 +91,7 @@ export const LeadCard = memo(function LeadCard({
       {...(isSortable ? sortableAttributes : {})}
       {...(isSortable ? sortableListeners : {})}
       onDoubleClick={() => onOpenEdit(lead)}
-      title={isSortable ? 'Segure e arraste para mudar de status, duplo clique para editar' : 'Duplo clique para editar este lead'}
+      title={isSortable ? 'Arraste para trocar de etapa, duplo clique para editar' : 'Duplo clique para editar este lead'}
       className={`group relative rounded-2xl border bg-[#04080f]/90 p-3 shadow-md transition md:p-2.5 ${
         isInteractive ? 'cursor-grab touch-pan-y select-none active:cursor-grabbing' : 'cursor-pointer'
       } ${
@@ -140,13 +149,21 @@ export const LeadCard = memo(function LeadCard({
         >
           <Star className={`h-3 w-3 ${isPinned ? 'fill-current' : ''}`} strokeWidth={isPinned ? 0 : 2} />
         </button>
-        <span
-          className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${syncMeta.className}`}
-          title={syncMeta.label}
-          aria-label={syncMeta.label}
-        >
-          <SyncStatusIcon className={`h-3 w-3 ${syncStatus === 'pending' ? 'animate-spin' : ''}`} />
-        </span>
+        {syncStatus === 'ok' ? (
+          <span
+            className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400/70"
+            title={syncMeta.label}
+            aria-label={syncMeta.label}
+          />
+        ) : (
+          <span
+            className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${syncMeta.className}`}
+            title={syncMeta.label}
+            aria-label={syncMeta.label}
+          >
+            <SyncStatusIcon className={`h-3 w-3 ${syncStatus === 'pending' ? 'animate-spin' : ''}`} />
+          </span>
+        )}
       </div>
 
       {collapsed ? (
@@ -156,35 +173,23 @@ export const LeadCard = memo(function LeadCard({
         </div>
       ) : (
         <>
-          <p className="mt-1 text-[11px] text-white/40">{lead.phone}</p>
-          <p className="mt-0.5 flex items-center gap-1 text-[11px] text-white/40">
+          <p className={`mt-1.5 flex items-center gap-1 text-[11px] ${nextAction.className}`}>
             <svg className="h-2.5 w-2.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            {lead.sqm.toFixed(2)} m²
+            {nextAction.label}
           </p>
-          <p className="mt-0.5 flex items-center gap-1 text-[11px] font-semibold text-[#c9a227]/70">
+          <p className="mt-0.5 flex items-center gap-1 text-[11px] text-white/40">
             <svg className="h-2.5 w-2.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               <circle cx="12" cy="12" r="1.5" />
             </svg>
             {lead.neighborhood}
           </p>
-          {serviceDate && (
-            <p className="mt-0.5 flex items-center gap-1 text-[11px] font-semibold text-sky-300/80">
-              <svg className="h-2.5 w-2.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              Serviço {format(serviceDate, 'dd/MM')}
-            </p>
-          )}
 
           <div className="mt-2 flex items-center justify-between border-t border-white/5 pt-1.5">
             <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] font-semibold text-white/60">{lead.filmType}</span>
-            <span className="flex items-center gap-2">
-              <span className="font-mono text-[10px] text-white/30">{daysInStatus(lead)}d</span>
-              <span className="text-xs font-black text-[#c9a227]">R$ {formatCurrency(lead.value)}</span>
-            </span>
+            <span className="text-xs font-black text-[#c9a227]">R$ {formatCurrency(lead.value)}</span>
           </div>
 
           <div className="mt-2 flex items-center justify-between gap-1.5 border-t border-white/5 pt-1.5 opacity-100 transition duration-300 md:opacity-0 md:group-hover:opacity-100">
@@ -202,36 +207,20 @@ export const LeadCard = memo(function LeadCard({
               &larr;
             </button>
 
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onOpenEdit(lead);
-                }}
-                onDoubleClick={(event) => event.stopPropagation()}
-                className="text-white/40 hover:text-white"
-                title="Editar"
-              >
-                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                </svg>
-              </button>
-              <button
-                type="button"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onDelete(lead.id);
-                }}
-                onDoubleClick={(event) => event.stopPropagation()}
-                className="text-white/30 hover:text-red-400"
-                title="Excluir"
-              >
-                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                onDelete(lead.id);
+              }}
+              onDoubleClick={(event) => event.stopPropagation()}
+              className="text-white/30 hover:text-red-400"
+              title="Excluir"
+            >
+              <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
 
             <button
               type="button"

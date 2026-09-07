@@ -1,50 +1,23 @@
 import React from 'react';
-import { Cloud, CloudOff, Loader2, LogOut, Settings, X } from 'lucide-react';
-
-type FilmTypeKey = 'carbono_g5' | 'carbono_g20' | 'refletiva' | 'dupla_camada' | 'nano_ceramica' | 'nano_ceramica_g20' | 'jateado';
-type OptimizationMode = 'densidade' | 'facilidade' | 'facilidade_v2';
-type LossMode = 'dinamico' | 'fixo';
-type ColorMode = 'ambiente' | 'tamanho';
-type CloudStatus = 'idle' | 'syncing' | 'synced' | 'error';
-
-const FILM_TYPE_LABELS: Record<FilmTypeKey, string> = {
-  carbono_g5: 'Carbono G5',
-  carbono_g20: 'Carbono G20',
-  refletiva: 'Refletiva',
-  dupla_camada: 'Dupla Camada',
-  nano_ceramica: 'Nano Cerâmica 75',
-  nano_ceramica_g20: 'Nano Cerâmica G20',
-  jateado: 'Jateado',
-};
-
-const FILM_TYPE_KEYS = Object.keys(FILM_TYPE_LABELS) as FilmTypeKey[];
-const inputClass = 'w-full bg-[#040811] border border-white/10 rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-[#c9a227]/50 transition-colors';
-const centeredInputClass = `${inputClass} text-center`;
-
-interface AppConfig {
-  rollW: number;
-  price: number;
-  margin: number;
-  modoOtimizacao: OptimizationMode;
-  userName: string;
-  modoPerdas: LossMode;
-  perdasFixas: number;
-  modoCorConfig: ColorMode;
-  agressividadeCorte: number;
-  filmTypes: Record<FilmTypeKey, number>;
-  selectedFilm: FilmTypeKey;
-  draftExpiration: number;
-}
+import { LogOut, Settings, X } from 'lucide-react';
+import {
+  AppConfig,
+  FILM_TYPE_KEYS,
+  FILM_TYPE_LABELS,
+  FilmTypeKey,
+} from '../lib/films';
 
 interface ConfigPanelProps {
   aberto: boolean;
   setAberto: (v: boolean) => void;
   config: AppConfig;
   onUpdate: <K extends keyof AppConfig>(key: K, value: AppConfig[K]) => void;
-  cloudStatus: CloudStatus;
   onLogout?: () => void | Promise<void>;
   loggingOut?: boolean;
 }
+
+const inputClass = 'w-full bg-[#040811] border border-white/10 rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-[#c9a227]/50 transition-colors';
+const centeredInputClass = `${inputClass} text-center`;
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -111,22 +84,19 @@ function SegmentGroup<T extends string>({
   );
 }
 
-function CloudIndicator({ status }: { status: CloudStatus }) {
-  const title =
-    status === 'synced'
-      ? 'Sincronizado'
-      : status === 'syncing'
-        ? 'Sincronizando...'
-        : status === 'error'
-          ? 'Erro de sincronização'
-          : 'Auto-save';
-
+function FieldShortcut({ current, onAdjust, adjustLabel }: { current: string; onAdjust: () => void; adjustLabel: string }) {
   return (
-    <div className="flex items-center gap-1" title={title}>
-      {status === 'syncing' && <Loader2 size={12} className="text-[#c9a227] animate-spin" />}
-      {status === 'synced' && <Cloud size={12} className="text-green-400" />}
-      {status === 'error' && <CloudOff size={12} className="text-red-400" />}
-      {status === 'idle' && <Cloud size={12} className="text-gray-600" />}
+    <div className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-[#040811] px-4 py-3">
+      <div>
+        <p className="text-[9px] uppercase text-gray-500 font-bold">Atual</p>
+        <p className="text-sm font-bold text-white">{current}</p>
+      </div>
+      <button
+        onClick={onAdjust}
+        className="shrink-0 rounded-lg border border-[#c9a227]/40 bg-[#c9a227]/10 px-3 py-2 text-[10px] font-black uppercase tracking-wider text-[#c9a227] transition-colors hover:bg-[#c9a227]/20"
+      >
+        {adjustLabel}
+      </button>
     </div>
   );
 }
@@ -136,10 +106,19 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
   setAberto,
   config,
   onUpdate,
-  cloudStatus,
   onLogout,
   loggingOut = false,
 }) => {
+  // A4: Algoritmo e Cor moram no painel principal — aqui é só atalho que foca o campo.
+  const goToField = (targetId: string) => {
+    setAberto(false);
+    window.setTimeout(() => {
+      document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 350);
+  };
+  const algoritmoLabel =
+    config.modoOtimizacao === 'densidade' ? 'Densidade' : config.modoOtimizacao === 'facilidade' ? 'Corte Fácil v1' : 'Corte Fácil v2';
+  const corLabel = config.modoCorConfig === 'ambiente' ? 'Por ambiente' : 'Por tamanho';
   return (
     <>
       <div className={`fixed inset-y-0 left-0 z-50 w-80 bg-[#070f1f] border-r border-white/10 shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col ${aberto ? 'translate-x-0' : '-translate-x-full'}`}>
@@ -150,7 +129,6 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            <CloudIndicator status={cloudStatus} />
             <button onClick={() => setAberto(false)} className="p-1.5 hover:bg-white/10 rounded-lg transition-colors">
               <X size={18} />
             </button>
@@ -225,16 +203,11 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
             </div>
 
             <div>
-              <FieldLabel>Algoritmo Padrão</FieldLabel>
-              <SegmentGroup
-                value={config.modoOtimizacao}
-                onChange={(value) => onUpdate('modoOtimizacao', value)}
-                options={[
-                  { label: 'Densidade', value: 'densidade' },
-                  { label: 'Fácil v1', value: 'facilidade' },
-                  { label: 'Fácil v2', value: 'facilidade_v2' },
-                ]}
-              />
+              <FieldLabel>Algoritmo</FieldLabel>
+              <FieldShortcut current={algoritmoLabel} onAdjust={() => goToField('calc-algoritmo')} adjustLabel="Ajustar" />
+              <HelpText>
+                O ajuste mora no painel principal, junto ao mapa de corte.
+              </HelpText>
             </div>
 
             <div className="rounded-2xl border border-[#c9a227]/20 bg-[#c9a227]/[0.04] p-4">
@@ -277,18 +250,9 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
 
             <div>
               <FieldLabel>Modo de Cor</FieldLabel>
-              <SegmentGroup
-                value={config.modoCorConfig}
-                onChange={(value) => onUpdate('modoCorConfig', value)}
-                options={[
-                  { label: 'Ambiente', value: 'ambiente' },
-                  { label: 'Tamanho', value: 'tamanho' },
-                ]}
-              />
+              <FieldShortcut current={corLabel} onAdjust={() => goToField('calc-cor-esquema')} adjustLabel="Ajustar" />
               <HelpText>
-                {config.modoCorConfig === 'ambiente'
-                  ? 'Usa uma cor única por ambiente/identificação.'
-                  : 'Usa cores baseadas no tamanho de cada peça.'}
+                O ajuste mora no painel principal, junto às medidas. Usa uma cor única por ambiente ou cores por tamanho de cada peça.
               </HelpText>
             </div>
 

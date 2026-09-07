@@ -78,7 +78,7 @@ export function PriceAdjustmentBanner() {
             </h2>
             <p className="mt-3 text-sm sm:text-base text-gray-400 leading-relaxed">
               Promoção exclusiva válida até{' '}
-              <strong className="text-white">15 de setembro</strong>. Solicite seu orçamento agora e já garanta o desconto.
+              <strong className="text-white">15 de setembro de 2026</strong>. Solicite seu orçamento agora e já garanta o desconto.
             </p>
           </div>
 

@@ -65,7 +65,13 @@ const DEFAULT_CRM_UI_PREFERENCES: CrmUiPreferences = {
 };
 
 const VALID_VIEW_MODES = new Set<CrmUiPreferences['viewMode']>(['kanban', 'table']);
-const VALID_AGENDA_VIEWS = new Set<AgendaView>(['hoje', 'semana', 'mes', 'servicos', 'sem_acao', 'dormentes']);
+const VALID_AGENDA_VIEWS = new Set<AgendaView>(['hoje', 'semana', 'mes', 'servicos', 'parados', 'ciclo_5anos']);
+
+/** Migração B4: valores antigos 'sem_acao'/'dormentes' (URL ou localStorage) viram 'parados'. */
+const migrateAgendaView = (value: unknown): AgendaView | undefined => {
+  if (value === 'sem_acao' || value === 'dormentes') return 'parados';
+  return VALID_AGENDA_VIEWS.has(value as AgendaView) ? (value as AgendaView) : undefined;
+};
 const VALID_SORT_DIRECTIONS = new Set<CrmUiPreferences['sortDir']>(['asc', 'desc']);
 const VALID_SORT_KEYS = new Set<LeadSortKey>(['', 'name', 'neighborhood', 'filmType', 'sqm', 'value', 'status', 'dataServico', 'serviceStatus']);
 
@@ -106,9 +112,7 @@ const parseCrmUiPreferencesFromSearchParams = (searchParams: URLSearchParams): P
   viewMode: VALID_VIEW_MODES.has(searchParams.get('view') as CrmUiPreferences['viewMode'])
     ? searchParams.get('view') as CrmUiPreferences['viewMode']
     : undefined,
-  agendaInitialView: VALID_AGENDA_VIEWS.has(searchParams.get('agenda') as AgendaView)
-    ? searchParams.get('agenda') as AgendaView
-    : undefined,
+  agendaInitialView: migrateAgendaView(searchParams.get('agenda')),
   sortKey: VALID_SORT_KEYS.has(searchParams.get('sort') as LeadSortKey)
     ? searchParams.get('sort') as LeadSortKey
     : undefined,
@@ -131,7 +135,7 @@ const mergeCrmUiPreferences = (base: CrmUiPreferences, overrides: Partial<CrmUiP
     filterNeighborhood: filterNeighborhoodOverride ?? base.filterNeighborhood,
     filterStatus: filterStatusOverride ?? base.filterStatus,
     viewMode: VALID_VIEW_MODES.has(overrides.viewMode as CrmUiPreferences['viewMode']) ? overrides.viewMode as CrmUiPreferences['viewMode'] : base.viewMode,
-    agendaInitialView: VALID_AGENDA_VIEWS.has(overrides.agendaInitialView as AgendaView) ? overrides.agendaInitialView as AgendaView : base.agendaInitialView,
+    agendaInitialView: migrateAgendaView(overrides.agendaInitialView) ?? base.agendaInitialView,
     sortKey: VALID_SORT_KEYS.has(overrides.sortKey as LeadSortKey) ? overrides.sortKey as LeadSortKey : base.sortKey,
     sortDir: VALID_SORT_DIRECTIONS.has(overrides.sortDir as CrmUiPreferences['sortDir']) ? overrides.sortDir as CrmUiPreferences['sortDir'] : base.sortDir,
     metricsPeriod: isMetricsPeriod(overrides.metricsPeriod) ? overrides.metricsPeriod : base.metricsPeriod,

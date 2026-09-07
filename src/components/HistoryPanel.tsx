@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { History, X, Clock, ChevronRight, Trash2, ChevronDown } from 'lucide-react';
-import type { OrcamentoSalvo } from '../views/AdminCalculator';
+import type { OrcamentoSalvo } from '../lib/films';
 
 
 interface HistoryPanelProps {
@@ -58,7 +58,12 @@ export const HistoryPanel: React.FC<HistoryPanelProps> = ({
                             {visiveis.map(orc => (
                                 <div key={orc.id} className="bg-[#04080f] border border-white/5 rounded-xl p-3 hover:border-[#c9a227]/30 transition-colors">
                                     <div className="flex items-start justify-between mb-1">
-                                        <p className="font-bold text-sm text-white leading-tight truncate max-w-[160px]">{orc.cliente}</p>
+                                        <div className="leading-tight min-w-0 max-w-[160px]">
+                                            <p className="font-bold text-sm text-white truncate">{orc.cliente}</p>
+                                            {orc.neighborhood && (
+                                                <p className="text-[11px] text-gray-500 truncate">{orc.neighborhood}</p>
+                                            )}
+                                        </div>
                                         <span className="text-[10px] text-gray-500 shrink-0 ml-2">{orc.data}</span>
                                     </div>
                                     <p className="text-green-400 font-bold text-base">{formatBRL(orc.valor)}</p>

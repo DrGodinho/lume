@@ -1,27 +1,20 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
-  addDays,
   addMonths,
-  differenceInDays,
-  eachDayOfInterval,
-  endOfMonth,
-  endOfWeek,
   format,
-  isPast,
   isSameDay,
-  isSameMonth,
-  isToday,
-  isWithinInterval,
   startOfMonth,
-  startOfWeek,
   subMonths,
 } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { CalendarPlus } from 'lucide-react';
-import { WhatsAppTemplateMenu, type WhatsAppTemplateType } from './WhatsAppTemplateMenu';
-import { buildGoogleCalendarUrl } from '../utils/googleCalendar';
+import { AgendaLeadCard } from './AgendaLeadCard';
+import { AgendaFilters } from './AgendaFilters';
+import { AgendaWeekStrip } from './AgendaWeekStrip';
+import { AgendaMonthCalendar } from './AgendaMonthCalendar';
+import { useAgendaLists } from '../hooks/useAgendaLists';
+import type { WhatsAppTemplateType } from './WhatsAppTemplateMenu';
 import type { AgendaView, Lead, LeadCardKind, ServiceStatus, ServiceStatusMeta } from '../types';
 
 interface AgendaSectionProps {
@@ -43,314 +36,6 @@ interface AgendaSectionProps {
   getWhatsAppHref: (lead: Lead, template?: WhatsAppTemplateType) => string;
   formatCurrencyBRL: (value: number) => string;
   serviceStatusMeta: Record<ServiceStatus, ServiceStatusMeta>;
-}
-
-interface LeadCardAgendaProps {
-  lead: Lead;
-  kind?: LeadCardKind;
-  onAgendar: (leadId: string, data: string) => Promise<void>;
-  onMarcarFeito: (leadId: string) => Promise<void>;
-  onSetDormant: (leadId: string, dormant: boolean) => Promise<void>;
-  onUpdateServiceStatus: (leadId: string, serviceStatus: ServiceStatus) => Promise<void>;
-  onAbrirLead: (lead: Lead) => void;
-  onRestoreFromArchive?: (lead: Lead) => Promise<void>;
-  getLeadFollowUpDate: (lead: Lead) => Date | null;
-  getLeadServiceDate: (lead: Lead) => Date | null;
-  getLeadActivityDate: (lead: Lead) => Date | null;
-  getLeadServiceStatus: (lead: Lead) => ServiceStatus;
-  getLeadStatusClasses: (status: Lead['status']) => string;
-  getLeadPhoneHref: (phone?: string | null) => string;
-  getWhatsAppHref: (lead: Lead, template?: WhatsAppTemplateType) => string;
-  serviceStatusMeta: Record<ServiceStatus, ServiceStatusMeta>;
-}
-
-function LeadCardAgenda({
-  lead,
-  kind = 'followup',
-  onAgendar,
-  onMarcarFeito,
-  onSetDormant,
-  onUpdateServiceStatus,
-  onAbrirLead,
-  onRestoreFromArchive,
-  getLeadFollowUpDate,
-  getLeadServiceDate,
-  getLeadActivityDate,
-  getLeadServiceStatus,
-  getLeadStatusClasses,
-  getLeadPhoneHref,
-  getWhatsAppHref,
-  serviceStatusMeta,
-}: LeadCardAgendaProps) {
-  const [agendando, setAgendando] = useState(false);
-  const [novaData, setNovaData] = useState('');
-  const [salvando, setSalvando] = useState(false);
-
-  const followUpDate = getLeadFollowUpDate(lead);
-  const serviceDate = getLeadServiceDate(lead);
-  const activityDate = getLeadActivityDate(lead);
-  const inactivityDays = activityDate ? differenceInDays(new Date(), activityDate) : null;
-  const atrasado = !!followUpDate && isPast(followUpDate) && !isToday(followUpDate);
-  const hasFollowUp = !!followUpDate;
-  const isServiceCard = kind === 'service';
-  const isIdleCard = kind === 'idle';
-  const isDormantCard = kind === 'dormant';
-  const serviceStatus = getLeadServiceStatus(lead);
-  const serviceMeta = serviceStatusMeta[serviceStatus];
-
-  const isFiveYearsCompleted = serviceDate ? differenceInDays(new Date(), serviceDate) >= 1826 : false;
-
-  const cardLabel = isFiveYearsCompleted && lead.archived
-    ? 'Ciclo 5 Anos'
-    : isServiceCard
-      ? 'Serviço'
-      : isDormantCard
-        ? 'Dormente'
-        : isIdleCard
-          ? 'Sem próxima ação'
-          : 'Follow-up';
-
-  const cardClasses = atrasado
-    ? 'border-red-500/20 bg-red-500/[0.06] hover:border-red-500/35'
-    : isFiveYearsCompleted && lead.archived
-      ? 'border-[#c9a227]/40 bg-[#c9a227]/[0.08] hover:border-[#c9a227]/60 shadow-[inset_0_0_12px_rgba(201,162,39,0.06)]'
-      : isServiceCard
-        ? 'border-sky-500/15 bg-sky-500/[0.05] hover:border-sky-500/30'
-        : isDormantCard
-          ? 'border-slate-500/20 bg-slate-500/[0.05] hover:border-slate-500/30'
-        : isIdleCard
-          ? 'border-white/10 bg-white/[0.025] hover:border-[#c9a227]/20'
-          : 'border-white/5 bg-[#04080f]/90 hover:border-[#c9a227]/20';
-
-  const salvarAgendamento = async () => {
-    if (!novaData) return;
-    setSalvando(true);
-    try {
-      await onAgendar(lead.id, novaData);
-      setAgendando(false);
-      setNovaData('');
-    } finally {
-      setSalvando(false);
-    }
-  };
-
-  return (
-    <article className={`group rounded-3xl border p-5 shadow-lg transition duration-300 ${cardClasses}`}>
-      <div className="flex items-start justify-between gap-3">
-        <button onClick={() => onAbrirLead(lead)} className="min-w-0 text-left">
-          <span
-            className={`mb-2 inline-flex rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] ${
-              isFiveYearsCompleted && lead.archived
-                ? 'border-[#c9a227]/40 bg-[#c9a227]/20 text-[#f5d77a]'
-                : isServiceCard
-                  ? 'border-sky-500/20 bg-sky-500/10 text-sky-300'
-                  : isDormantCard
-                    ? 'border-slate-500/20 bg-slate-500/10 text-slate-300'
-                  : isIdleCard
-                    ? 'border-white/10 bg-white/[0.03] text-white/45'
-                    : 'border-[#c9a227]/20 bg-[#c9a227]/10 text-[#f5d77a]'
-            }`}
-          >
-            {cardLabel}
-          </span>
-          <p className="truncate text-sm font-bold text-white transition group-hover:text-[#f5d77a]">{lead.name}</p>
-          <p className="mt-1 text-[11px] text-white/40">
-            {lead.neighborhood} · {lead.filmType}
-          </p>
-        </button>
-
-        <div className="flex shrink-0 flex-col items-end gap-2">
-          <span className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${getLeadStatusClasses(lead.status)}`}>
-            {lead.status}
-          </span>
-          {isServiceCard && (
-            <span className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${serviceMeta.badge}`}>
-              {serviceMeta.label}
-            </span>
-          )}
-        </div>
-      </div>
-
-      <div className="mt-4 flex flex-wrap gap-2 text-[11px]">
-        {atrasado && (
-          <span className="rounded-full border border-red-500/20 bg-red-500/10 px-2.5 py-1 text-red-300">
-            Atrasado
-          </span>
-        )}
-        {!hasFollowUp && inactivityDays !== null && inactivityDays >= 3 && (
-          <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-white/50">
-            Parado ha {inactivityDays}d
-          </span>
-        )}
-        {lead.dormant && (
-          <span className="rounded-full border border-slate-500/20 bg-slate-500/10 px-2.5 py-1 text-slate-300">
-            Dormente
-          </span>
-        )}
-        {hasFollowUp && followUpDate && (
-          <span className="rounded-full border border-[#c9a227]/20 bg-[#c9a227]/10 px-2.5 py-1 text-[#f2d98a]">
-            {atrasado ? `Atrasado ha ${differenceInDays(new Date(), followUpDate)}d` : `Retorno ${format(followUpDate, "d 'de' MMM", { locale: ptBR })}`}
-          </span>
-        )}
-        {serviceDate && (
-          <span className="rounded-full border border-sky-500/20 bg-sky-500/10 px-2.5 py-1 text-sky-300">
-            Servico {format(serviceDate, "d 'de' MMM", { locale: ptBR })}
-          </span>
-        )}
-      </div>
-
-      <div className={`mt-4 grid gap-3 text-xs text-white/55 ${isServiceCard ? 'grid-cols-2 xl:grid-cols-3' : 'grid-cols-2'}`}>
-        <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-3">
-          <p className="text-[10px] uppercase tracking-[0.25em] text-white/35 group-hover:text-white/50">Telefone</p>
-          {getLeadPhoneHref(lead.phone) ? (
-            <a href={getLeadPhoneHref(lead.phone)} className="mt-1 inline-flex font-medium text-white transition hover:text-[#f5d77a]">
-              {lead.phone}
-            </a>
-          ) : (
-            <p className="mt-1 font-medium text-white">Sem telefone</p>
-          )}
-        </div>
-        <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-3">
-          <p className="text-[10px] uppercase tracking-[0.25em] text-white/35 group-hover:text-white/50">Bairro</p>
-          <p className="mt-1 font-medium text-white">{lead.neighborhood || 'Sem bairro'}</p>
-        </div>
-        <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-3">
-          <p className="text-[10px] uppercase tracking-[0.25em] text-white/35 group-hover:text-white/50">Valor</p>
-          <p className="mt-1 font-semibold text-[#f5d77a]">
-            R$ {lead.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-          </p>
-        </div>
-        {isServiceCard && (
-          <>
-            <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-3">
-              <p className="text-[10px] uppercase tracking-[0.25em] text-white/35 group-hover:text-white/50">Endereco</p>
-              <p className="mt-1 line-clamp-2 font-medium text-white">{lead.address || 'Sem endereco'}</p>
-            </div>
-            <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-3">
-              <p className="text-[10px] uppercase tracking-[0.25em] text-white/35 group-hover:text-white/50">Pelicula</p>
-              <p className="mt-1 font-medium text-white">{lead.filmType}</p>
-            </div>
-            <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-3">
-              <p className="text-[10px] uppercase tracking-[0.25em] text-white/35 group-hover:text-white/50">Metragem</p>
-              <p className="mt-1 font-medium text-white">{lead.sqm.toFixed(2)} m²</p>
-            </div>
-          </>
-        )}
-      </div>
-
-      {agendando ? (
-        <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-          <input
-            type="date"
-            value={novaData}
-            min={format(new Date(), 'yyyy-MM-dd')}
-            onChange={(e) => setNovaData(e.target.value)}
-            className="min-w-0 flex-1 rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white outline-none focus:border-[#c9a227]/40"
-          />
-          <button
-            onClick={salvarAgendamento}
-            disabled={!novaData || salvando}
-            className="rounded-2xl bg-[#c9a227] px-4 py-2 text-xs font-bold uppercase tracking-wider text-[#04080f] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {salvando ? 'Salvando...' : 'Salvar'}
-          </button>
-          <button
-            onClick={() => {
-              setAgendando(false);
-              setNovaData('');
-            }}
-            className="rounded-2xl border border-white/10 px-4 py-2 text-xs font-semibold text-white/60 transition hover:bg-white/[0.03] hover:text-white"
-          >
-            Cancelar
-          </button>
-        </div>
-      ) : (
-        <div className="mt-4 flex flex-wrap gap-2">
-          <button
-            onClick={() => setAgendando(true)}
-            className="rounded-2xl border border-white/10 px-4 py-2 text-xs font-semibold text-white/70 transition hover:border-[#c9a227]/40 hover:text-[#f5d77a]"
-          >
-            {hasFollowUp ? 'Reagendar retorno' : 'Agendar retorno'}
-          </button>
-          {lead.archived && onRestoreFromArchive && (
-            <button
-              onClick={() => onRestoreFromArchive(lead)}
-              className="rounded-2xl border border-[#c9a227]/30 bg-[#c9a227]/10 px-4 py-2 text-xs font-bold text-[#f5d77a] transition hover:bg-[#c9a227]/25"
-            >
-              Reativar
-            </button>
-          )}
-          {!isServiceCard && !lead.archived && (
-            <button
-              onClick={() => onSetDormant(lead.id, !lead.dormant)}
-              className="rounded-2xl border border-slate-500/20 px-4 py-2 text-xs font-semibold text-slate-300 transition hover:bg-slate-500/10"
-            >
-              {lead.dormant ? 'Reativar lead' : 'Marcar dormente'}
-            </button>
-          )}
-          {hasFollowUp && (
-            <button
-              onClick={() => onMarcarFeito(lead.id)}
-              className="rounded-2xl border border-emerald-500/20 px-4 py-2 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-500/10"
-            >
-              Feito
-            </button>
-          )}
-          {getWhatsAppHref(lead) && (
-            <a
-              href={getWhatsAppHref(lead)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-2xl border border-white/10 px-4 py-2 text-xs font-semibold text-white/70 transition hover:border-emerald-500/40 hover:text-emerald-300"
-            >
-              WhatsApp
-            </a>
-          )}
-          <WhatsAppTemplateMenu getHref={(template) => getWhatsAppHref(lead, template)} />
-          {serviceDate && (
-            <a
-              href={buildGoogleCalendarUrl(lead, serviceDate)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-2xl border border-sky-500/20 bg-sky-500/10 px-4 py-2 text-xs font-semibold text-sky-300 transition hover:bg-sky-500/15"
-              title="Adicionar este serviço ao Google Calendar"
-            >
-              <CalendarPlus className="h-3.5 w-3.5" />
-              Google Calendar
-            </a>
-          )}
-          <button
-            onClick={() => onAbrirLead(lead)}
-            className="rounded-2xl border border-white/10 px-4 py-2 text-xs font-semibold text-white/70 transition hover:border-white/20 hover:text-white"
-          >
-            Abrir
-          </button>
-        </div>
-      )}
-
-      {isServiceCard && (
-        <div className="mt-4 rounded-2xl border border-white/5 bg-white/[0.02] p-3">
-          <p className="text-[10px] uppercase tracking-[0.25em] text-white/35">Status do servico</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {(Object.keys(serviceStatusMeta) as ServiceStatus[]).map((statusOption) => (
-              <button
-                key={statusOption}
-                type="button"
-                onClick={() => onUpdateServiceStatus(lead.id, statusOption)}
-                className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold transition ${
-                  statusOption === serviceStatus
-                    ? serviceStatusMeta[statusOption].button
-                    : 'border-white/10 bg-white/[0.02] text-white/55 hover:border-white/20 hover:text-white'
-                }`}
-              >
-                {serviceStatusMeta[statusOption].label}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-    </article>
-  );
 }
 
 export function AgendaSection({
@@ -380,240 +65,42 @@ export function AgendaSection({
   useEffect(() => {
     setAgendaView(initialView);
   }, [initialView]);
-
-  const hoje = useMemo(() => new Date(), []);
-  const inicioSemana = startOfWeek(hoje, { weekStartsOn: 1 });
-  const diasSemana = Array.from({ length: 7 }, (_, index) => addDays(inicioSemana, index));
-  const inicioGradeMes = startOfWeek(startOfMonth(mesVisivel), { weekStartsOn: 1 });
-  const fimGradeMes = endOfWeek(endOfMonth(mesVisivel), { weekStartsOn: 1 });
-  const diasMes = eachDayOfInterval({ start: inicioGradeMes, end: fimGradeMes });
-  const leadsAtivos = useMemo(() => leads.filter((lead) => !isClosedLead(lead.status)), [isClosedLead, leads]);
-  const leadsComRetorno = useMemo(() => leadsAtivos.filter((lead) => !!lead.proximoContato), [leadsAtivos]);
-  const leadsComServico = useMemo(() => leadsAtivos.filter((lead) => !!lead.dataServico), [leadsAtivos]);
-
-  const leadsCincoAnos = useMemo(() => {
-    return leads.filter((lead) => {
-      if (!lead.archived && lead.status !== 'Fechado') return false;
-      const serviceDate = getLeadServiceDate(lead);
-      if (!serviceDate) return false;
-      return differenceInDays(new Date(), serviceDate) >= 1826;
-    });
-  }, [getLeadServiceDate, leads]);
-
-  const contactarHoje = useMemo(() => {
-    return leadsAtivos.filter((lead) => {
-      const followUpDate = getLeadFollowUpDate(lead);
-      if (!followUpDate) return false;
-      if (diaSelecionado) {
-        if (isToday(diaSelecionado)) {
-          return isSameDay(followUpDate, diaSelecionado) || isPast(followUpDate);
-        }
-        return isSameDay(followUpDate, diaSelecionado);
-      }
-      return isToday(followUpDate) || isPast(followUpDate);
-    });
-  }, [diaSelecionado, getLeadFollowUpDate, leadsAtivos]);
-
-  const proximos7Dias = useMemo(() => {
-    return leadsAtivos.filter((lead) => {
-      const followUpDate = getLeadFollowUpDate(lead);
-      if (!followUpDate) return false;
-
-      const withinNextWeek = isWithinInterval(followUpDate, {
-        start: addDays(hoje, 1),
-        end: addDays(hoje, 7),
-      });
-
-      if (!withinNextWeek) return false;
-      if (!diaSelecionado) return true;
-      return isSameDay(followUpDate, diaSelecionado);
-    });
-  }, [diaSelecionado, getLeadFollowUpDate, leadsAtivos, hoje]);
-
-  const parados = useMemo(() => {
-    return leadsAtivos.filter((lead) => {
-      if (lead.dormant) return false;
-      if (lead.proximoContato || lead.dataServico) return false;
-      const activityDate = getLeadActivityDate(lead);
-      if (!activityDate) return false;
-      return differenceInDays(hoje, activityDate) >= 3;
-    });
-  }, [getLeadActivityDate, hoje, leadsAtivos]);
-
-  const dormentes = useMemo(() => {
-    return leadsAtivos
-      .filter((lead) => lead.dormant)
-      .sort((a, b) => {
-        const aDate = getLeadActivityDate(a)?.getTime() || 0;
-        const bDate = getLeadActivityDate(b)?.getTime() || 0;
-        return bDate - aDate;
-      });
-  }, [getLeadActivityDate, leadsAtivos]);
-
-  const emDiaCount = useMemo(() => {
-    return leadsAtivos.filter((lead) => {
-      if (lead.proximoContato) return false;
-      const activityDate = getLeadActivityDate(lead);
-      if (!activityDate) return true;
-      return differenceInDays(hoje, activityDate) < 3;
-    }).length;
-  }, [getLeadActivityDate, hoje, leadsAtivos]);
-
-  const servicosAgendados = useMemo(() => {
-    return leadsComServico
-      .filter((lead) => {
-        const serviceDate = getLeadServiceDate(lead);
-        if (!serviceDate) return false;
-        return diaSelecionado ? isSameDay(serviceDate, diaSelecionado) : true;
-      })
-      .sort((a, b) => {
-        const aDate = getLeadServiceDate(a)?.getTime() || 0;
-        const bDate = getLeadServiceDate(b)?.getTime() || 0;
-        return aDate - bDate;
-      });
-  }, [diaSelecionado, getLeadServiceDate, leadsComServico]);
-
-  const servicosHoje = useMemo(() => {
-    return leadsComServico.filter((lead) => {
-      const serviceDate = getLeadServiceDate(lead);
-      return serviceDate ? isSameDay(serviceDate, diaSelecionado || hoje) : false;
-    });
-  }, [diaSelecionado, getLeadServiceDate, hoje, leadsComServico]);
-
-  const serviceStatusCounts = useMemo(() => {
-    return servicosAgendados.reduce<Record<ServiceStatus, number>>((acc, lead) => {
-      const status = getLeadServiceStatus(lead);
-      acc[status] += 1;
-      return acc;
-    }, {
-      Marcado: 0,
-      Confirmado: 0,
-      'Em Execucao': 0,
-      Concluido: 0,
-      Reagendar: 0,
-    });
-  }, [getLeadServiceStatus, servicosAgendados]);
-
-  const serviceRouteGroups = useMemo(() => {
-    const grouped = servicosAgendados.reduce<Record<string, Lead[]>>((acc, lead) => {
-      const key = lead.neighborhood || 'Sem bairro';
-      if (!acc[key]) acc[key] = [];
-      acc[key].push(lead);
-      return acc;
-    }, {});
-
-    return Object.entries(grouped)
-      .map(([neighborhood, items]) => ({
-        neighborhood,
-        items: items.sort((a, b) => {
-          const aDate = getLeadServiceDate(a)?.getTime() || 0;
-          const bDate = getLeadServiceDate(b)?.getTime() || 0;
-          return aDate - bDate;
-        }),
-        totalValue: items.reduce((sum, lead) => sum + lead.value, 0),
-      }))
-      .sort((a, b) => b.items.length - a.items.length || b.totalValue - a.totalValue);
-  }, [getLeadServiceDate, servicosAgendados]);
-
-  const monthlyFollowUps = useMemo(() => {
-    return leadsAtivos
-      .filter((lead) => {
-        const followUpDate = getLeadFollowUpDate(lead);
-        if (!followUpDate || !isSameMonth(followUpDate, mesVisivel)) return false;
-        return diaSelecionado ? isSameDay(followUpDate, diaSelecionado) : true;
-      })
-      .sort((a, b) => {
-        const aDate = getLeadFollowUpDate(a)?.getTime() || 0;
-        const bDate = getLeadFollowUpDate(b)?.getTime() || 0;
-        return aDate - bDate;
-      });
-  }, [diaSelecionado, getLeadFollowUpDate, leadsAtivos, mesVisivel]);
-
-  const monthlyServices = useMemo(() => {
-    return leadsComServico
-      .filter((lead) => {
-        const serviceDate = getLeadServiceDate(lead);
-        if (!serviceDate || !isSameMonth(serviceDate, mesVisivel)) return false;
-        return diaSelecionado ? isSameDay(serviceDate, diaSelecionado) : true;
-      })
-      .sort((a, b) => {
-        const aDate = getLeadServiceDate(a)?.getTime() || 0;
-        const bDate = getLeadServiceDate(b)?.getTime() || 0;
-        return aDate - bDate;
-      });
-  }, [diaSelecionado, getLeadServiceDate, leadsComServico, mesVisivel]);
-
-  const activeMonthLeadCount = useMemo(() => {
-    const uniqueIds = new Set(
-      leadsAtivos
-        .filter((lead) => {
-          const followUpDate = getLeadFollowUpDate(lead);
-          const serviceDate = getLeadServiceDate(lead);
-          return (followUpDate && isSameMonth(followUpDate, mesVisivel)) || (serviceDate && isSameMonth(serviceDate, mesVisivel));
-        })
-        .map((lead) => lead.id),
-    );
-    return uniqueIds.size;
-  }, [getLeadFollowUpDate, getLeadServiceDate, leadsAtivos, mesVisivel]);
-
-  const followUpCountByDay = (day: Date) =>
-    leadsComRetorno.filter((lead) => {
-      const followUpDate = getLeadFollowUpDate(lead);
-      return followUpDate ? isSameDay(followUpDate, day) : false;
-    }).length;
-
-  const serviceCountByDay = (day: Date) =>
-    leadsComServico.filter((lead) => {
-      const serviceDate = getLeadServiceDate(lead);
-      return serviceDate ? isSameDay(serviceDate, day) : false;
-    }).length;
-
-  const agendaCountByDay = (day: Date) => followUpCountByDay(day) + serviceCountByDay(day);
-
-  const monthFollowUpCountByDay = (day: Date) =>
-    leadsComRetorno.filter((lead) => {
-      const followUpDate = getLeadFollowUpDate(lead);
-      return followUpDate ? isSameDay(followUpDate, day) : false;
-    }).length;
-
-  const monthServiceCountByDay = (day: Date) =>
-    leadsComServico.filter((lead) => {
-      const serviceDate = getLeadServiceDate(lead);
-      return serviceDate ? isSameDay(serviceDate, day) : false;
-    }).length;
-
-  const monthValueByDay = (day: Date) =>
-    leadsComServico.reduce((sum, lead) => {
-      const serviceDate = getLeadServiceDate(lead);
-      return serviceDate && isSameDay(serviceDate, day) ? sum + lead.value : sum;
-    }, 0);
-
-  const weeklyActionDays = diasSemana.map((day) => {
-    const followUps = followUpCountByDay(day);
-    const services = serviceCountByDay(day);
-    const dayServices = leadsComServico.filter((lead) => {
-      const serviceDate = getLeadServiceDate(lead);
-      return serviceDate ? isSameDay(serviceDate, day) : false;
-    });
-    return {
-      day,
-      followUps,
-      services,
-      total: followUps + services,
-      forecastValue: dayServices.reduce((sum, lead) => sum + lead.value, 0),
-    };
+  const {
+    hoje,
+    leadsCincoAnos,
+    contactarHoje,
+    proximos7Dias,
+    parados,
+    dormentes,
+    emDiaCount,
+    servicosAgendados,
+    servicosHoje,
+    serviceStatusCounts,
+    serviceRouteGroups,
+    monthlyFollowUps,
+    monthlyServices,
+    activeMonthLeadCount,
+    weeklyActionDays,
+    monthActionDays,
+    selectedDayLabel,
+    sectionsEmpty,
+  } = useAgendaLists({
+    leads,
+    diaSelecionado,
+    mesVisivel,
+    isClosedLead,
+    getLeadFollowUpDate,
+    getLeadServiceDate,
+    getLeadActivityDate,
+    getLeadServiceStatus,
   });
-
-  const selectedDayLabel = diaSelecionado ? format(diaSelecionado, "EEEE, d 'de' MMMM", { locale: ptBR }) : '';
-  const sectionsEmpty = contactarHoje.length === 0 && proximos7Dias.length === 0 && parados.length === 0 && servicosAgendados.length === 0 && leadsCincoAnos.length === 0;
 
   const activeAgendaEmpty =
     (agendaView === 'hoje' && contactarHoje.length === 0 && servicosHoje.length === 0) ||
     (agendaView === 'semana' && proximos7Dias.length === 0) ||
     (agendaView === 'mes' && monthlyFollowUps.length === 0 && monthlyServices.length === 0) ||
     (agendaView === 'servicos' && servicosAgendados.length === 0) ||
-    (agendaView === 'sem_acao' && parados.length === 0) ||
-    (agendaView === 'dormentes' && dormentes.length === 0) ||
+    (agendaView === 'parados' && parados.length === 0 && dormentes.length === 0) ||
     (agendaView === 'ciclo_5anos' && leadsCincoAnos.length === 0);
 
   const highlightDay = (day: Date) => {
@@ -639,96 +126,17 @@ export function AgendaSection({
     setDiaSelecionado(null);
   };
 
-  const monthActionDays = diasMes.map((day) => {
-    const followUps = monthFollowUpCountByDay(day);
-    const services = monthServiceCountByDay(day);
-    const total = followUps + services;
-
-    return {
-      day,
-      followUps,
-      services,
-      total,
-      forecastValue: monthValueByDay(day),
-    };
-  });
-
-  const summaryCards: Array<{
-    view: AgendaView;
-    label: string;
-    count: number;
-    description: string;
-    activeClass: string;
-    idleClass: string;
-    labelClass: string;
-  }> = [
-    {
-      view: 'hoje',
-      label: 'Contatar hoje',
-      count: contactarHoje.length,
-      description: 'Atrasados e contatos do dia.',
-      activeClass: 'border-red-400/45 bg-red-500/[0.12]',
-      idleClass: 'border-red-500/20 bg-red-500/[0.055] hover:border-red-400/35 hover:bg-red-500/[0.08]',
-      labelClass: 'text-red-300/80',
-    },
-    {
-      view: 'semana',
-      label: 'Proximos 7 dias',
-      count: proximos7Dias.length,
-      description: 'Retornos agendados para a semana.',
-      activeClass: 'border-[#c9a227]/50 bg-[#c9a227]/15',
-      idleClass: 'border-[#c9a227]/20 bg-[#c9a227]/5 hover:border-[#c9a227]/35 hover:bg-[#c9a227]/10',
-      labelClass: 'text-[#f5d77a]',
-    },
-    {
-      view: 'servicos',
-      label: 'Servicos',
-      count: servicosAgendados.length,
-      description: 'Datas de servico marcadas.',
-      activeClass: 'border-sky-400/45 bg-sky-500/[0.11]',
-      idleClass: 'border-sky-500/15 bg-sky-500/[0.045] hover:border-sky-400/30 hover:bg-sky-500/[0.07]',
-      labelClass: 'text-sky-300/85',
-    },
-    {
-      view: 'mes',
-      label: 'Mes',
-      count: activeMonthLeadCount,
-      description: 'Retornos e servicos do mes.',
-      activeClass: 'border-emerald-400/45 bg-emerald-500/[0.11]',
-      idleClass: 'border-emerald-500/15 bg-emerald-500/[0.045] hover:border-emerald-400/30 hover:bg-emerald-500/[0.07]',
-      labelClass: 'text-emerald-300/85',
-    },
-    {
-      view: 'sem_acao',
-      label: 'Parados',
-      count: parados.length,
-      description: 'Sem agenda e sem contato recente.',
-      activeClass: 'border-white/25 bg-white/[0.07]',
-      idleClass: 'border-white/10 bg-white/[0.025] hover:border-white/20 hover:bg-white/[0.045]',
-      labelClass: 'text-white/38',
-    },
-    {
-      view: 'dormentes',
-      label: 'Dormentes',
-      count: dormentes.length,
-      description: 'Leads pausados fora da rotina.',
-      activeClass: 'border-slate-400/35 bg-slate-500/[0.10]',
-      idleClass: 'border-slate-500/15 bg-slate-500/[0.04] hover:border-slate-400/25 hover:bg-slate-500/[0.065]',
-      labelClass: 'text-slate-300/80',
-    },
-    {
-      view: 'ciclo_5anos',
-      label: 'Ciclo de 5 Anos',
-      count: leadsCincoAnos.length,
-      description: 'Instalacoes com 5 anos concluidos.',
-      activeClass: 'border-[#c9a227]/50 bg-[#c9a227]/15',
-      idleClass: 'border-[#c9a227]/20 bg-[#c9a227]/5 hover:border-[#c9a227]/35 hover:bg-[#c9a227]/10',
-      labelClass: 'text-[#f5d77a]',
-    },
-  ];
+  const filterCounts = {
+    hoje: contactarHoje.length,
+    semana: proximos7Dias.length,
+    parados: parados.length + dormentes.length,
+    servicos: servicosAgendados.length,
+    mes: activeMonthLeadCount,
+    ciclo5Anos: leadsCincoAnos.length,
+  };
 
   const renderLeadCard = (lead: Lead, kind: LeadCardKind) => (
-    <LeadCardAgenda
+    <AgendaLeadCard
       key={`${kind}-${lead.id}`}
       lead={lead}
       kind={kind}
@@ -818,235 +226,36 @@ export function AgendaSection({
         </div>
       </section>
 
-      <section className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7">
-        {summaryCards.map((card) => {
-          const selected = agendaView === card.view;
-
-          return (
-            <button
-              key={card.view}
-              type="button"
-              onClick={() => openAgendaView(card.view)}
-              aria-pressed={selected}
-              className={`group flex min-h-[86px] w-full items-center justify-between gap-3 rounded-2xl border px-3 py-2.5 text-left shadow-md shadow-black/10 transition duration-200 hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f5d77a]/60 ${
-                selected ? card.activeClass : card.idleClass
-              }`}
-            >
-              <div className="min-w-0">
-                <p className={`truncate text-[9px] font-black uppercase tracking-[0.22em] ${card.labelClass}`}>{card.label}</p>
-                <p className="mt-1.5 line-clamp-2 text-[11px] font-semibold leading-snug text-white/45 group-hover:text-white/55">
-                  {card.description}
-                </p>
-              </div>
-              <span className="shrink-0 text-2xl font-black leading-none text-white sm:text-3xl">{card.count}</span>
-            </button>
-          );
-        })}
-      </section>
+      <AgendaFilters activeView={agendaView} counts={filterCounts} onSelect={openAgendaView} />
 
       {agendaView !== 'mes' && (
-        <section>
-          <div className="rounded-[2rem] border border-white/5 bg-[#07111d]/75 p-5 shadow-2xl shadow-black/20 backdrop-blur-md sm:p-6">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.35em] text-white/35">Acoes da semana</p>
-              <h3 className="mt-1 text-lg font-black text-white sm:text-xl">Capacidade diaria</h3>
-            </div>
-            {diaSelecionado && (
-              <button
-                onClick={() => setDiaSelecionado(null)}
-                className="w-fit rounded-full border border-white/10 bg-white/[0.02] px-3 py-1 text-xs font-semibold text-white/60 transition hover:border-white/20 hover:bg-white/[0.05] hover:text-white"
-              >
-                Limpar filtro
-              </button>
-            )}
-          </div>
-
-          <div className="mt-4 space-y-2 sm:hidden">
-            {weeklyActionDays.map(({ day, followUps, services, total, forecastValue }) => {
-              const selected = diaSelecionado ? isSameDay(day, diaSelecionado) : false;
-
-              return (
-                <button
-                  key={day.toISOString()}
-                  type="button"
-                  onClick={() => highlightDay(day)}
-                  className={`flex w-full items-center justify-between gap-3 rounded-2xl border px-4 py-2.5 text-left transition ${
-                    selected
-                      ? 'border-[#c9a227]/50 bg-[#c9a227]/10 text-white'
-                      : 'border-white/5 bg-white/[0.02] text-white/70'
-                  } ${isToday(day) ? 'ring-1 ring-[#f5d77a]/30' : ''}`}
-                >
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/35">{format(day, 'EEE', { locale: ptBR })}</p>
-                    <p className={`mt-1 text-base font-black ${isToday(day) ? 'text-[#f5d77a]' : 'text-white'}`}>
-                      {format(day, "d 'de' MMM", { locale: ptBR })}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-black text-white">{total} acoes</p>
-                    <p className="mt-0.5 text-[11px] text-white/45">{services} servicos · {followUps} retornos</p>
-                    <p className="mt-0.5 text-[11px] font-semibold text-[#f5d77a]">{formatCurrencyBRL(forecastValue)}</p>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="mt-4 hidden grid-cols-7 gap-2 sm:grid">
-            {diasSemana.map((day) => {
-              const selected = diaSelecionado ? isSameDay(day, diaSelecionado) : false;
-              const dayCount = agendaCountByDay(day);
-              const followUps = followUpCountByDay(day);
-              const services = serviceCountByDay(day);
-              const forecastValue = weeklyActionDays.find((item) => isSameDay(item.day, day))?.forecastValue || 0;
-
-              return (
-                <button
-                  key={day.toISOString()}
-                  type="button"
-                  onClick={() => highlightDay(day)}
-                  className={`group rounded-2xl border p-2.5 text-left transition duration-300 ${
-                    selected
-                      ? 'border-[#c9a227]/50 bg-[linear-gradient(180deg,rgba(201,162,39,0.16),rgba(201,162,39,0.06))] shadow-[0_0_0_1px_rgba(201,162,39,0.18)]'
-                      : 'border-white/5 bg-white/[0.02] hover:border-white/10 hover:bg-white/[0.03]'
-                  } ${isToday(day) ? 'ring-1 ring-[#f5d77a]/35' : ''}`}
-                >
-                  <p className="text-[10px] uppercase tracking-[0.25em] text-white/35 group-hover:text-white/50">{format(day, 'EEE', { locale: ptBR })}</p>
-                  <p className={`mt-1.5 text-base font-black ${isToday(day) ? 'text-[#f5d77a]' : 'text-white'}`}>{format(day, 'd')}</p>
-                  <p className="mt-0.5 text-[10px] text-white/45">{dayCount} itens</p>
-                  <p className="mt-0.5 truncate text-[10px] font-semibold text-[#f5d77a]">{formatCurrencyBRL(forecastValue)}</p>
-                  <div className="mt-1.5 flex gap-1">
-                    <span className="h-1.5 flex-1 rounded-full bg-[#c9a227]/40" style={{ opacity: followUps > 0 ? 1 : 0.18 }} />
-                    <span className="h-1.5 flex-1 rounded-full bg-sky-400/50" style={{ opacity: services > 0 ? 1 : 0.18 }} />
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-
-          </div>
-        </section>
+        <AgendaWeekStrip
+          days={weeklyActionDays}
+          diaSelecionado={diaSelecionado}
+          onHighlightDay={highlightDay}
+          onClearFilter={() => setDiaSelecionado(null)}
+          formatMoney={formatCurrencyBRL}
+        />
       )}
 
       {agendaView === 'mes' && (
-        <section>
-          <div className="rounded-[2rem] border border-white/5 bg-[#07111d]/75 p-5 shadow-2xl shadow-black/20 backdrop-blur-md sm:p-6">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.35em] text-white/35">Calendario mensal</p>
-                <h3 className="mt-1 text-lg font-black text-white sm:text-xl">{format(mesVisivel, "MMMM 'de' yyyy", { locale: ptBR })}</h3>
-                <p className="mt-2 text-sm text-white/55">Azul marca retornos comerciais. Verde destaca servicos agendados. Clique no dia para filtrar os cards.</p>
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/65">
-                  <span className="h-2.5 w-2.5 rounded-full bg-sky-400" />
-                  Retornos
-                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
-                  Servicos
-                </div>
-                {diaSelecionado && (
-                  <button
-                    onClick={() => setDiaSelecionado(null)}
-                    className="rounded-full border border-white/10 bg-white/[0.02] px-3 py-2 text-xs font-semibold text-white/60 transition hover:border-white/20 hover:bg-white/[0.05] hover:text-white"
-                  >
-                    Limpar dia
-                  </button>
-                )}
-                <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.02] p-1">
-                  <button
-                    type="button"
-                    onClick={goToPreviousMonth}
-                    className="rounded-full px-3 py-2 text-sm font-bold text-white/70 transition hover:bg-white/[0.05] hover:text-white"
-                    aria-label="Mes anterior"
-                  >
-                    ←
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMesVisivel(startOfMonth(new Date()));
-                      setDiaSelecionado(null);
-                    }}
-                    className="rounded-full px-3 py-2 text-xs font-bold uppercase tracking-[0.18em] text-[#f5d77a] transition hover:bg-[#c9a227]/10"
-                  >
-                    Hoje
-                  </button>
-                  <button
-                    type="button"
-                    onClick={goToNextMonth}
-                    className="rounded-full px-3 py-2 text-sm font-bold text-white/70 transition hover:bg-white/[0.05] hover:text-white"
-                    aria-label="Proximo mes"
-                  >
-                    →
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-5 grid grid-cols-7 gap-2 text-center">
-              {['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom'].map((label) => (
-                <div key={label} className="px-2 py-1 text-[10px] font-bold uppercase tracking-[0.28em] text-white/30">
-                  {label}
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-2 grid grid-cols-7 gap-2">
-              {monthActionDays.map(({ day, followUps, services, total, forecastValue }) => {
-                const selected = diaSelecionado ? isSameDay(day, diaSelecionado) : false;
-                const inCurrentMonth = isSameMonth(day, mesVisivel);
-                const hasItems = total > 0;
-
-                return (
-                  <button
-                    key={day.toISOString()}
-                    type="button"
-                    onClick={() => highlightDay(day)}
-                    className={`min-h-[92px] rounded-2xl border p-2.5 text-left transition duration-300 ${
-                      selected
-                        ? 'border-[#c9a227]/50 bg-[linear-gradient(180deg,rgba(201,162,39,0.18),rgba(201,162,39,0.06))] shadow-[0_0_0_1px_rgba(201,162,39,0.18)]'
-                        : hasItems
-                          ? 'border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.05]'
-                          : 'border-white/5 bg-white/[0.015] hover:border-white/10'
-                    } ${isToday(day) ? 'ring-1 ring-[#f5d77a]/35' : ''} ${inCurrentMonth ? 'text-white' : 'text-white/28'}`}
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <p className={`text-sm font-black ${isToday(day) && inCurrentMonth ? 'text-[#f5d77a]' : ''}`}>{format(day, 'd')}</p>
-                      {total > 0 && (
-                        <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] font-semibold text-white/70">
-                          {total}
-                        </span>
-                      )}
-                    </div>
-                    <div className="mt-3 space-y-2">
-                      <div className="flex gap-1.5">
-                        <span className="h-2.5 flex-1 rounded-full bg-sky-400/85" style={{ opacity: followUps > 0 ? 1 : 0.14 }} />
-                        <span className="h-2.5 flex-1 rounded-full bg-emerald-400/85" style={{ opacity: services > 0 ? 1 : 0.14 }} />
-                      </div>
-                      <div className="space-y-1 text-[10px]">
-                        <p className="text-sky-200/80">{followUps} retornos</p>
-                        <p className="text-emerald-200/80">{services} servicos</p>
-                        <p className="truncate font-semibold text-[#f5d77a]/85">{forecastValue > 0 ? formatCurrencyBRL(forecastValue) : 'Sem valor'}</p>
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="mt-4 rounded-2xl border border-white/5 bg-white/[0.03] px-4 py-3 text-sm text-white/60">
-              {diaSelecionado ? (
-                <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
-                  <p>Exibindo <span className="font-semibold text-white">{selectedDayLabel}</span> dentro de {format(mesVisivel, "MMMM 'de' yyyy", { locale: ptBR })}.</p>
-                  <p className="text-white/40">{monthlyFollowUps.length} retornos e {monthlyServices.length} servicos neste filtro.</p>
-                </div>
-              ) : (
-                <p>Sem dia selecionado, os cards abaixo mostram todo o volume do mes.</p>
-              )}
-            </div>
-          </div>
-        </section>
+        <AgendaMonthCalendar
+          days={monthActionDays}
+          mesVisivel={mesVisivel}
+          diaSelecionado={diaSelecionado}
+          onHighlightDay={highlightDay}
+          onClearDay={() => setDiaSelecionado(null)}
+          onPrevMonth={goToPreviousMonth}
+          onNextMonth={goToNextMonth}
+          onGoToday={() => {
+            setMesVisivel(startOfMonth(new Date()));
+            setDiaSelecionado(null);
+          }}
+          filteredFollowUps={monthlyFollowUps.length}
+          filteredServices={monthlyServices.length}
+          selectedDayLabel={selectedDayLabel}
+          formatMoney={formatCurrencyBRL}
+        />
       )}
 
       {agendaView === 'servicos' && servicosAgendados.length > 0 && (
@@ -1097,8 +306,18 @@ export function AgendaSection({
       {agendaView === 'mes' && monthlyFollowUps.length > 0 && renderAgendaSection(diaSelecionado ? 'Retornos do dia' : 'Retornos do mes', monthlyFollowUps.length, 'gold', monthlyFollowUps, 'followup', diaSelecionado ? 'Nenhum retorno neste dia.' : 'Nenhum retorno neste mes.')}
       {agendaView === 'mes' && monthlyServices.length > 0 && renderAgendaSection(diaSelecionado ? 'Servicos do dia' : 'Servicos do mes', monthlyServices.length, 'sky', monthlyServices, 'service', diaSelecionado ? 'Nenhum servico neste dia.' : 'Nenhum servico neste mes.')}
       {agendaView === 'ciclo_5anos' && leadsCincoAnos.length > 0 && renderAgendaSection('Ciclo de 5 Anos', leadsCincoAnos.length, 'gold', leadsCincoAnos, 'followup', 'Nenhum lead no ciclo de 5 anos.')}
-      {agendaView === 'sem_acao' && parados.length > 0 && renderAgendaSection('Sem atividade ha 3+ dias', parados.length, 'muted', parados, 'idle', 'Nenhum lead parado.')}
-      {agendaView === 'dormentes' && dormentes.length > 0 && renderAgendaSection('Leads dormentes', dormentes.length, 'muted', dormentes, 'dormant', 'Nenhum lead dormente.')}
+      {agendaView === 'parados' && (parados.length > 0 || dormentes.length > 0) && (
+        <section className="space-y-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-bold uppercase tracking-[0.25em] text-white/55">Parados</span>
+            <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-xs font-semibold text-white/55">{parados.length + dormentes.length}</span>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {parados.map((lead) => renderLeadCard(lead, 'idle'))}
+            {dormentes.map((lead) => renderLeadCard(lead, 'dormant'))}
+          </div>
+        </section>
+      )}
 
       {!sectionsEmpty && activeAgendaEmpty && (
         <div className="rounded-[2rem] border border-white/5 bg-white/[0.02] px-6 py-10 text-center shadow-lg shadow-black/10">

@@ -15,10 +15,10 @@ interface CrmHeaderProps {
 
 const TAB_TITLES: Record<CrmTab, string> = {
   dashboard: 'Painel Geral',
-  leads: 'Gestão de Leads',
+  leads: 'Leads',
   trash: 'Lixeira de Leads',
   archive: 'Arquivo de Leads',
-  historico: 'Histórico Supabase',
+  historico: 'Orçamentos',
   extratos: 'Extratos Mensais',
   agenda: 'Agenda & Follow-up',
   settings: 'Configuracoes do CRM',
@@ -49,8 +49,8 @@ export function CrmHeader({ activeTab, crmSync, lastCloudCheckAt, isVerifyingClo
   const syncStatusLabel = syncTone === 'error'
     ? 'Erro'
     : syncTone === 'warning'
-      ? 'Sincronizando'
-      : 'Sincronizado';
+      ? 'Atualizando'
+      : 'Atualizado';
   const lastSyncRelative = formatRelativeSync(lastCloudCheckAt, now);
   const lastCloudCheckLabel = lastCloudCheckAt
     ? format(new Date(lastCloudCheckAt), 'HH:mm')
@@ -116,46 +116,9 @@ export function CrmHeader({ activeTab, crmSync, lastCloudCheckAt, isVerifyingClo
           onClick={onVerifyCloud}
           disabled={isVerifyingCloud}
           className={`inline-flex h-6 items-center justify-center self-start rounded-md border px-2 text-[9px] font-black uppercase tracking-[0.12em] transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 sm:self-auto ${syncClasses.button}`}
-          title="Buscar um snapshot novo do Supabase e comparar com o que está na tela"
+          title="Buscar os dados mais recentes do Supabase e comparar com o que está na tela"
         >
-          Sincronizar
-        </button>
-      </div>
-
-      <div className="hidden">
-        <span className="text-xs text-white/40">Status da Sessão:</span>
-        <span
-          title={[
-            crmSync.message,
-            crmSync.details,
-            lastCloudCheckAt ? `Ultima conferencia: ${format(new Date(lastCloudCheckAt), 'HH:mm:ss')}` : '',
-          ].filter(Boolean).join(' - ')}
-          className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${
-            crmSync.status === 'error'
-              ? 'border-red-500/25 bg-red-500/10 text-red-300'
-              : crmSync.status === 'warning'
-                ? 'border-[#c9a227]/25 bg-[#c9a227]/10 text-[#f5d77a]'
-                : 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400'
-          }`}
-        >
-          <span className={`h-1.5 w-1.5 rounded-full ${
-            crmSync.status === 'error'
-              ? 'bg-red-400'
-              : crmSync.status === 'warning'
-                ? 'animate-pulse bg-[#f5d77a]'
-                : 'bg-emerald-400'
-          }`}
-          />
-          {crmSync.status === 'error' ? 'Erro' : crmSync.status === 'warning' ? (crmSync.message.includes('Salvando') || crmSync.message.includes('Excluindo') ? 'Salvando' : 'Sincronizando') : 'Salvo'}
-        </span>
-        <button
-          type="button"
-          onClick={onVerifyCloud}
-          disabled={isVerifyingCloud}
-          className="rounded-full border border-white/10 px-3 py-1 text-xs font-semibold text-white/70 transition hover:border-[#c9a227]/30 hover:text-[#f5d77a] disabled:cursor-not-allowed disabled:opacity-50"
-          title="Buscar um snapshot novo do Supabase e comparar com o que esta na tela"
-        >
-          {isVerifyingCloud ? 'Conferindo...' : 'Verificar'}
+          {isVerifyingCloud ? 'Atualizando...' : 'Atualizar agora'}
         </button>
       </div>
     </header>

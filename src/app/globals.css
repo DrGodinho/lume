@@ -280,6 +280,26 @@
   }
 }
 
+/* C5 (CALCULADORA_MELHORIAS_V2): entrada dos cards da calculadora — substitui o
+   gsap.fromTo('.admin-entrance') do AdminCalculator (opacity 0/scale .95 → 1/1,
+   0.6s power3.out). CSS anima também os cards montados depois; o
+   prefers-reduced-motion global abaixo já zera a animação para quem prefere. */
+@keyframes admin-entrance-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.admin-entrance {
+  animation: admin-entrance-in 0.6s cubic-bezier(0.215, 0.61, 0.355, 1) both;
+}
+
 @keyframes soft-ping {
   0% {
     transform: scale(1);

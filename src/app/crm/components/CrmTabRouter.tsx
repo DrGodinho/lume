@@ -36,10 +36,7 @@ const MetricsPanel = dynamic(() => import('./MetricsPanel').then((m) => m.Metric
 const PlaybookSettings = dynamic(() => import('./PlaybookSettings').then((m) => m.PlaybookSettings), {
   loading: () => <TabSkeleton />,
 });
-const TrashLeadsView = dynamic(() => import('./TrashLeadsView').then((m) => m.TrashLeadsView), {
-  loading: () => <TabSkeleton />,
-});
-const ArchiveLeadsView = dynamic(() => import('./ArchiveLeadsView').then((m) => m.ArchiveLeadsView), {
+const ArchivedLeadsView = dynamic(() => import('./ArchivedLeadsView').then((m) => m.ArchivedLeadsView), {
   loading: () => <TabSkeleton />,
 });
 const ExtratosMensaisSupabase = dynamic(() => import('../ExtratosMensaisSupabase').then((m) => m.ExtratosMensaisSupabase), {
@@ -95,14 +92,8 @@ export function CrmTabRouter({ activeTab, onSelectTab, metrics, crmSettings, sea
           visibleMonthlySeries={crm.visibleMonthlySeries}
           onToggleMonthlySeries={crm.toggleMonthlySeries}
           formatDashboardCurrency={metrics.formatDashboardCurrency}
-          formatCurrency={formatLeadCurrency}
-          getLeadStatusClasses={getLeadStatusClasses}
           onOpenLead={crm.setLeadDetail}
           onOpenCreateModal={() => crm.openCreateModal()}
-          onOpenAgendaNoAction={() => {
-            crm.setAgendaInitialView('sem_acao');
-            onSelectTab('agenda');
-          }}
           onOpenAgendaToday={() => {
             crm.setAgendaInitialView('hoje');
             onSelectTab('agenda');
@@ -122,7 +113,7 @@ export function CrmTabRouter({ activeTab, onSelectTab, metrics, crmSettings, sea
 
   if (activeTab === 'leads') {
     return (
-      <TabErrorBoundary fallbackTitle="Controle de Leads">
+      <TabErrorBoundary fallbackTitle="Leads">
         <KanbanBoard
           leads={crm.leads}
           filteredLeads={crm.filteredLeads}
@@ -157,6 +148,7 @@ export function CrmTabRouter({ activeTab, onSelectTab, metrics, crmSettings, sea
           daysInStatus={crm.daysInStatus}
           formatCurrency={formatLeadCurrency}
           getLeadServiceDate={getLeadServiceDate}
+          getLeadFollowUpDate={getLeadFollowUpDate}
           getLeadStatusClasses={getLeadStatusClasses}
           searchInputRef={searchInputRef}
           leadSyncState={crm.leadSyncState}
@@ -168,7 +160,8 @@ export function CrmTabRouter({ activeTab, onSelectTab, metrics, crmSettings, sea
   if (activeTab === 'trash') {
     return (
       <TabErrorBoundary fallbackTitle="Lixeira de Leads">
-        <TrashLeadsView
+        <ArchivedLeadsView
+          mode="trash"
           leads={crm.trashedLeads}
           loading={crm.loadingTrashLeads}
           onRefresh={crm.loadTrashLeads}
@@ -181,7 +174,8 @@ export function CrmTabRouter({ activeTab, onSelectTab, metrics, crmSettings, sea
   if (activeTab === 'archive') {
     return (
       <TabErrorBoundary fallbackTitle="Arquivo de Leads">
-        <ArchiveLeadsView
+        <ArchivedLeadsView
+          mode="archive"
           leads={crm.archivedLeads}
           loading={crm.loadingArchivedLeads}
           onRefresh={crm.loadArchivedLeads}
@@ -193,7 +187,7 @@ export function CrmTabRouter({ activeTab, onSelectTab, metrics, crmSettings, sea
 
   if (activeTab === 'historico') {
     return (
-      <TabErrorBoundary fallbackTitle="Histórico Supabase">
+      <TabErrorBoundary fallbackTitle="Orçamentos">
         <HistoricoSupabase
           setActiveTab={onSelectTab}
           openCreateModal={crm.openCreateModal}

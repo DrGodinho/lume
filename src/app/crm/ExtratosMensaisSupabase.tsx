@@ -1,6 +1,6 @@
 'use client';
 
-import { fetchWithTimeout } from '@/lib/fetchWithTimeout';
+import { fetchWithTimeout, isAbortError } from '@/lib/fetchWithTimeout';
 import { useEffect, useMemo, useState } from 'react';
 import type { ComponentType } from 'react';
 import { getCrmApiErrorMessage, getCrmApiHeaders } from './utils';
@@ -381,7 +381,7 @@ export function ExtratosMensaisSupabase() {
         if (!cancelled) {
           setRegistros([]);
           setErrorMessage(
-            error instanceof Error && error.name === 'AbortError'
+            isAbortError(error)
               ? 'A consulta demorou muito (timeout). Tente novamente.'
               : 'Erro inesperado ao carregar o extrato. Tente novamente.',
           );

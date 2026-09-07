@@ -10,9 +10,9 @@ interface SortableLeadCardProps {
   lead: Lead;
   stage: Lead['status'];
   collapsed: boolean;
-  daysInStatus: (lead: Lead) => number;
   formatCurrency: (value: number) => string;
   getLeadServiceDate: (lead: Lead) => Date | null;
+  getLeadFollowUpDate: (lead: Lead) => Date | null;
   syncStatus?: LeadSyncStatus;
   onToggleCollapse: (leadId: string) => void;
   onOpenDetail: (lead: Lead) => void;
@@ -29,9 +29,9 @@ export const SortableLeadCard = memo(function SortableLeadCard({
   lead,
   stage,
   collapsed,
-  daysInStatus,
   formatCurrency,
   getLeadServiceDate,
+  getLeadFollowUpDate,
   syncStatus,
   onToggleCollapse,
   onOpenDetail,
@@ -52,9 +52,9 @@ export const SortableLeadCard = memo(function SortableLeadCard({
     <LeadCard
       lead={lead}
       collapsed={collapsed}
-      daysInStatus={daysInStatus}
       formatCurrency={formatCurrency}
       getLeadServiceDate={getLeadServiceDate}
+      getLeadFollowUpDate={getLeadFollowUpDate}
       syncStatus={syncStatus}
       onToggleCollapse={onToggleCollapse}
       onOpenDetail={onOpenDetail}

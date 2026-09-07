@@ -107,6 +107,29 @@ export default async function Page({ params }: BlogPostPageProps) {
             },
           })),
         })),
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Início',
+            item: new URL('/', getBlogUrl(post.slug)).toString(),
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: 'Blog',
+            item: getBlogUrl(),
+          },
+          {
+            '@type': 'ListItem',
+            position: 3,
+            name: post.title,
+            item: getBlogUrl(post.slug),
+          },
+        ],
+      },
     ],
   };
 

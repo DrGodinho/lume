@@ -70,6 +70,7 @@ export async function PUT(request: NextRequest) {
 
   if (typeof raw.cliente === 'string') row.cliente = raw.cliente;
   if (typeof raw.phone === 'string') row.phone = raw.phone;
+  if (typeof raw.neighborhood === 'string') row.neighborhood = raw.neighborhood;
   if (Array.isArray(raw.vidros)) row.vidros = raw.vidros;
 
   const asNumber = (value: unknown) => (typeof value === 'number' && Number.isFinite(value) ? value : undefined);
@@ -99,7 +100,7 @@ export async function PUT(request: NextRequest) {
   // Colunas opcionais que podem nao existir no banco (schema antigo).
   // Se o PostgREST reclamar de uma coluna inexistente, remove-a e tenta de novo
   // em vez de devolver 500.
-  const OPTIONAL_COLUMNS = ['last_saved'] as const;
+  const OPTIONAL_COLUMNS = ['last_saved', 'neighborhood'] as const;
   let currentRow = row;
   for (let attempt = 0; attempt <= OPTIONAL_COLUMNS.length; attempt++) {
     const { error } = await supabaseAdmin

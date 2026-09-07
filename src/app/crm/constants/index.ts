@@ -2,9 +2,10 @@ export {
   LEAD_STAGES,
   LEAD_STAGE_LABELS,
   LEAD_STAGE_DOT_COLORS,
+  LEAD_STAGE_STYLES,
   isLeadStatus,
 } from './stages';
-export type { LeadStatus } from './stages';
+export type { LeadStatus, LeadStageStyle } from './stages';
 
 export {
   CRM_COLLAPSED_CARDS_STORAGE_KEY,

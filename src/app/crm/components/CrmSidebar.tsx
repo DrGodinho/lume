@@ -2,6 +2,7 @@
 
 import { Archive, BarChart3, Calculator, CalendarClock, Database, LogOut, Plus, ReceiptText, Settings, Trash2, UsersRound, type LucideIcon } from 'lucide-react';
 import type { CrmTab } from '../types';
+import { TargetGoalCard } from './TargetGoalCard';
 
 type NavTone = 'gold' | 'red' | 'slate';
 
@@ -36,14 +37,14 @@ const CRM_NAV_SECTIONS: Array<{ label: string; items: CrmNavItem[] }> = [
     label: 'Operação',
     items: [
       { id: 'dashboard', label: 'Painel Geral', description: 'Métricas e meta', icon: BarChart3, tone: 'gold' },
-      { id: 'leads', label: 'Controle de Leads', description: 'Funil comercial', icon: UsersRound, tone: 'gold' },
+      { id: 'leads', label: 'Leads', description: 'Funil comercial', icon: UsersRound, tone: 'gold' },
       { id: 'agenda', label: 'Agenda & Follow-up', description: 'Retornos e serviços', icon: CalendarClock, tone: 'red' },
     ],
   },
   {
     label: 'Dados',
     items: [
-      { id: 'historico', label: 'Histórico Supabase', description: 'Orçamentos salvos', icon: Database, tone: 'slate' },
+      { id: 'historico', label: 'Orçamentos', description: 'Da calculadora', icon: Database, tone: 'slate' },
       { id: 'extratos', label: 'Extratos Mensais', description: 'Fechamentos por mês', icon: ReceiptText, tone: 'slate' },
       { id: 'settings', label: 'Configuracoes', description: 'Playbooks e automacoes', icon: Settings, tone: 'slate' },
       { id: 'archive', label: 'Arquivo', description: 'Leads fechados antigos', icon: Archive, tone: 'gold' },
@@ -59,6 +60,7 @@ interface CrmSidebarProps {
   sidebarEditingTarget: boolean;
   onBeginTargetEdit: () => void;
   onCommitTargetEdit: () => void;
+  onCancelTargetEdit?: () => void;
   targetInput: string;
   onTargetInputChange: (value: string) => void;
   targetGoal: number | null;
@@ -75,6 +77,7 @@ export function CrmSidebar({
   sidebarEditingTarget,
   onBeginTargetEdit,
   onCommitTargetEdit,
+  onCancelTargetEdit,
   targetInput,
   onTargetInputChange,
   targetGoal,
@@ -113,51 +116,17 @@ export function CrmSidebar({
       </div>
 
       <div className="mt-5 hidden lg:block">
-        {sidebarEditingTarget ? (
-          <div className="rounded-xl border border-[#c9a227]/30 bg-[#03060b] p-3 shadow-[inset_0_0_0_1px_rgba(201,162,39,0.06)]">
-            <div className="flex justify-between text-xs font-semibold">
-              <span className="text-white/60">Faturamento Mensal</span>
-              <span className="text-[#c9a227]">{targetPercent ?? '--'}{targetPercent !== null ? '%' : ''}</span>
-            </div>
-            <input
-              type="number"
-              value={targetInput}
-              min={1}
-              onChange={(event) => onTargetInputChange(event.target.value)}
-              onBlur={onCommitTargetEdit}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter') {
-                  event.currentTarget.blur();
-                }
-              }}
-              className="mt-3 w-full rounded-lg border border-[#c9a227]/35 bg-[#04080f] px-2.5 py-2 text-right text-sm font-bold text-white outline-none transition focus:border-[#f5d77a]/70"
-              aria-label="Meta mensal do CRM"
-              autoFocus
-            />
-            <p className="mt-2 text-right text-[10px] text-white/40">Enter salva a meta</p>
-          </div>
-        ) : (
-          <button
-            type="button"
-            onClick={onBeginTargetEdit}
-            className="w-full rounded-xl border border-white/10 bg-[#03060b] p-3 text-left transition hover:border-[#c9a227]/35 hover:bg-[#07111d]"
-            title="Alterar meta mensal"
-          >
-            <div className="flex justify-between text-xs font-semibold">
-              <span className="text-white/60">Faturamento Mensal</span>
-              <span className="text-[#c9a227]">{targetPercent ?? '--'}{targetPercent !== null ? '%' : ''}</span>
-            </div>
-            <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-white/5 p-0.5">
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-[#c9a227] to-[#d4ad30] shadow-inner transition-all duration-1000"
-                style={{ width: `${targetPercent ?? 0}%` }}
-              />
-            </div>
-            <p className="mt-2 text-right text-[10px] text-white/40">
-              {targetGoal !== null ? `Meta: R$ ${targetGoal.toLocaleString('pt-BR')}` : 'Sem meta definida'}
-            </p>
-          </button>
-        )}
+        <TargetGoalCard
+          variant="compact"
+          targetGoal={targetGoal}
+          targetPercent={targetPercent}
+          editing={sidebarEditingTarget}
+          targetInput={targetInput}
+          onInputChange={onTargetInputChange}
+          onBeginEdit={onBeginTargetEdit}
+          onCommitEdit={onCommitTargetEdit}
+          onCancelEdit={onCancelTargetEdit ?? onCommitTargetEdit}
+        />
       </div>
 
       <nav className="mt-3 flex flex-1 gap-2 overflow-x-auto pb-1 lg:mt-6 lg:flex-none lg:flex-col lg:gap-4 lg:overflow-visible lg:pb-0">

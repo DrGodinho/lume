@@ -3,7 +3,8 @@
 import { useMemo } from 'react';
 import { addDays, differenceInDays, eachDayOfInterval, endOfMonth, format, isPast, isSameDay, isToday, startOfMonth, startOfWeek, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { formatCurrencyBRL, getLeadActivityDate, getLeadFollowUpDate, getLeadServiceDate, getLeadServiceStatus, isClosedLead, parseAgendaDate } from './useAgenda';
+import { getLeadActivityDate, getLeadFollowUpDate, getLeadServiceDate, getLeadServiceStatus, isClosedLead, parseAgendaDate } from './useAgenda';
+import { formatBRL } from '../utils';
 import { buildMetricsPeriodRange, type MetricsPeriod } from '../utils/metricsPeriod';
 import type { MonthlySnapshot } from './useMonthlySnapshots';
 import type { DashboardStats, Lead, MonthlyEvolutionData } from '../types';
@@ -295,6 +296,8 @@ export const useMetrics = (
     monthDifferencePercent,
     monthTrendIsPositive,
     targetPercent,
-    formatDashboardCurrency: formatCurrencyBRL,
+    // @deprecated Alias — implementação única é `formatBRL` (`../utils`).
+    // Mantido por 1 release (usado em MetricsPanel/MonthlyChart via CrmTabRouter).
+    formatDashboardCurrency: formatBRL,
   };
 };

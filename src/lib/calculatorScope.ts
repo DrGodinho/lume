@@ -17,24 +17,17 @@ export function buildCalculatorStorageKey(baseKey: string, scopeKey: string) {
   return `${baseKey}__${normalizeCalculatorScopeKey(scopeKey)}`;
 }
 
-async function readCalculatorScopeKeyOnce() {
-  if (!supabase) {
-    return { scopeKey: DEFAULT_CALCULATOR_SCOPE, hasSession: false };
-  }
+// C3: cache do scope — antes cada save/restore fazia getSession + getUser
+// (2 idas à rede por chamada). Agora resolve 1x e reutiliza; o reset é
+// chamado no logout para a próxima conta resolver do zero.
+let cachedScopeKey: string | null = null;
+let inFlightScopeKey: Promise<string> | null = null;
 
-  const { data, error } = await supabase.auth.getSession();
-  if (error) {
-    return { scopeKey: DEFAULT_CALCULATOR_SCOPE, hasSession: false };
-  }
-
-  let user = data.session?.user ?? null;
-  if (!user) {
-    const { data: userData, error: userError } = await supabase.auth.getUser();
-    if (!userError) {
-      user = userData.user ?? null;
-    }
-  }
-
+function scopeKeyFromUser(user: {
+  email?: string | null;
+  user_metadata?: Record<string, unknown>;
+  app_metadata?: Record<string, unknown>;
+} | null): { scopeKey: string; hasSession: boolean } {
   if (!user) {
     return { scopeKey: DEFAULT_CALCULATOR_SCOPE, hasSession: false };
   }
@@ -57,12 +50,37 @@ async function readCalculatorScopeKeyOnce() {
   return { scopeKey: DEFAULT_CALCULATOR_SCOPE, hasSession: true };
 }
 
+async function readCalculatorScopeKeyOnce() {
+  if (!supabase) {
+    return { scopeKey: DEFAULT_CALCULATOR_SCOPE, hasSession: false };
+  }
+
+  // C3: getUser único (validado no servidor) — o getSession local + o
+  // fallback getUser duplicavam a ida à rede por save/restore.
+  const { data, error } = await supabase.auth.getUser();
+  if (error || !data.user) {
+    return { scopeKey: DEFAULT_CALCULATOR_SCOPE, hasSession: false };
+  }
+
+  return scopeKeyFromUser(data.user);
+}
+
 export async function resolveCalculatorScopeKey() {
-  const { scopeKey } = await readCalculatorScopeKeyOnce();
-  return scopeKey;
+  if (cachedScopeKey) return cachedScopeKey;
+  if (!inFlightScopeKey) {
+    inFlightScopeKey = readCalculatorScopeKeyOnce().then(({ scopeKey }) => {
+      cachedScopeKey = scopeKey;
+      inFlightScopeKey = null;
+      return scopeKey;
+    }).catch(() => {
+      inFlightScopeKey = null;
+      return DEFAULT_CALCULATOR_SCOPE;
+    });
+  }
+  return inFlightScopeKey;
 }
 
 export function resetCalculatorScopeCache() {
-  return undefined;
+  cachedScopeKey = null;
+  inFlightScopeKey = null;
 }
-

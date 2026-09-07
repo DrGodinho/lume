@@ -1,12 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useMemo, useReducer, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import {
-    Plus, Trash2, Smartphone, Save, FolderOpen, Scissors,
-    Calculator, Camera, Layers, RotateCcw, AlignRight, AlignLeft, X,
-    History, Undo2, Redo2, FileText, Settings, Cloud, CloudOff, Loader2, Copy, ClipboardPaste, User
+    Trash2, Scissors,
+    Calculator, RotateCcw, AlignRight, AlignLeft, X,
+    History, Undo2, Redo2, Settings, Copy, ClipboardPaste, User
 } from 'lucide-react';
-import gsap from 'gsap';
 import { InvoicePNG } from '../components/InvoicePNG';
 import { createScopedLogger } from '../lib/logger';
 
@@ -17,37 +16,32 @@ import { InputPanel } from '../components/calculator/InputPanel';
 import { CutMap } from '../components/calculator/CutMap';
 import { ResumeList } from '../components/calculator/ResumeList';
 import { ColarModal } from '../components/calculator/ColarModal';
+import { ResultPanel } from '../components/calculator/ResultPanel';
+import { ConfirmDialog } from '../components/calculator/ConfirmDialog';
+import { Toast, type ToastData } from '../components/calculator/Toast';
+import { ImportModal } from '../components/calculator/ImportModal';
 import { CutModeToolbar } from '../components/calculator/CutModeToolbar';
-import { buildCalculatorStorageKey, resolveCalculatorScopeKey } from '../lib/calculatorScope';
+import { buildCalculatorStorageKey, resetCalculatorScopeCache, resolveCalculatorScopeKey } from '../lib/calculatorScope';
 import {
-    saveDraftToCloud, loadDraftFromCloud,
-    saveHistoryItemToCloud, loadHistoryFromCloud, deleteHistoryItemFromCloud,
+    saveHistoryItemToCloud,
     saveConfigToCloud, loadConfigFromCloud,
 } from '../lib/cloudSync';
-import { roundCurrency, roundMeasure } from '../lib/numberPrecision';
+import { roundMeasure } from '../lib/numberPrecision';
+import {
+  calcCompensacaoPerda,
+  calcEficiencia,
+  calcFinalPrice,
+  calcMetrosComprar,
+  calcSubtotalBruto,
+  calcTotalAreaM2,
+  calcValorPraticoM2,
+} from '../lib/pricing';
+import { formatBRL, formatNumber2 } from '../lib/money';
+import { groupByAmbiente } from '../lib/grouping';
 import { supabase } from '../lib/supabase';
 
 // ─── CONFIGURAÇÕES PADRÃO ─────────────────────────────────────────────────────
-
-export type FilmTypeKey = 'carbono_g5' | 'carbono_g20' | 'refletiva' | 'dupla_camada' | 'nano_ceramica' | 'nano_ceramica_g20' | 'jateado';
-type OptimizationMode = 'densidade' | 'facilidade' | 'facilidade_v2';
-type LossMode = 'dinamico' | 'fixo';
-type ColorMode = 'ambiente' | 'tamanho';
-
-const OPTIMIZATION_MODES: OptimizationMode[] = ['densidade', 'facilidade', 'facilidade_v2'];
-const LOSS_MODES: LossMode[] = ['dinamico', 'fixo'];
-const COLOR_MODES: ColorMode[] = ['ambiente', 'tamanho'];
-export const FILM_TYPE_KEYS: FilmTypeKey[] = ['carbono_g5', 'carbono_g20', 'refletiva', 'dupla_camada', 'nano_ceramica', 'nano_ceramica_g20', 'jateado'];
-
-export const FILM_TYPE_LABELS: Record<FilmTypeKey, string> = {
-  carbono_g5: 'Carbono G5',
-  carbono_g20: 'Carbono G20',
-  refletiva: 'Refletiva',
-  dupla_camada: 'Dupla Camada',
-  nano_ceramica: 'Nano Cerâmica 75',
-  nano_ceramica_g20: 'Nano Cerâmica G20',
-  jateado: 'Jateado',
-};
+// C1: domínio em lib/films.ts; load/save em lib/calculatorConfig.ts.
 
 const getCrmLeadHeaders = async () => {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
@@ -62,237 +56,34 @@ const getCrmLeadHeaders = async () => {
   return headers;
 };
 
-interface AppConfig {
-  rollW: number;
-  price: number;
-  margin: number;
-  modoOtimizacao: OptimizationMode;
-  userName: string;
-  modoPerdas: LossMode;
-  perdasFixas: number;
-  modoCorConfig: ColorMode;
-  agressividadeCorte: number;
-  filmTypes: Record<FilmTypeKey, number>;
-  selectedFilm: FilmTypeKey;
-  draftExpiration: number;
-}
-
-const DEFAULT_FILM_TYPES: Record<FilmTypeKey, number> = {
-  carbono_g5: 80,
-  carbono_g20: 80,
-  refletiva: 95,
-  dupla_camada: 120,
-  nano_ceramica: 220,
-  nano_ceramica_g20: 180,
-  jateado: 90,
-};
-
-const DEFAULT_CONFIG: AppConfig = {
-  rollW: 152,
-  price: 80,
-  margin: 3,
-  modoOtimizacao: 'facilidade_v2',
-  userName: 'MP Godinho',
-  modoPerdas: 'dinamico',
-  perdasFixas: 20,
-  modoCorConfig: 'tamanho',
-  agressividadeCorte: 35,
-  filmTypes: { ...DEFAULT_FILM_TYPES },
-  selectedFilm: 'carbono_g20',
-  draftExpiration: 15,
-};
-
-const DEFAULT_ROOM_COLORS: Record<string, string> = {
-  sala: '#60a5fa',
-  cozinha: '#facc15',
-  quarto: '#c084fc',
-  banheiro: '#34d399',
-  varanda: '#fb923c',
-  area: '#f87171',
-  escritorio: '#38bdf8',
-  garagem: '#a78bfa',
-  lavanderia: '#2dd4bf',
-  hall: '#fbbf24',
-  suite: '#e879f9',
-  closet: '#fb7185',
-  corredor: '#a3e635',
-  terraco: '#f59e0b',
-  jardim: '#4ade80',
-  lavabo: '#22c55e',
-  sacada: '#f97316',
-  homeoffice: '#0ea5e9',
-  sala_jantar: '#d97706',
-  sala_tv: '#3b82f6',
-  area_gourmet: '#f59e0b',
-  area_servico: '#14b8a6',
-};
-export const ROOM_COLOR_SWATCHES = [
-  '#60a5fa', '#facc15', '#c084fc', '#34d399', '#fb923c',
-  '#f87171', '#38bdf8', '#a78bfa', '#2dd4bf', '#fbbf24',
-  '#e879f9', '#fb7185', '#a3e635', '#f59e0b', '#4ade80',
-];
-
-const normalizeRoomKey = (label: string) =>
-  label.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase().replace(/\s+/g, ' ');
-
-const createGlassId = () =>
-  typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
-    ? crypto.randomUUID()
-    : Math.random().toString(36).slice(2, 11);
-
-const isOptimizationMode = (value: unknown): value is OptimizationMode =>
-  OPTIMIZATION_MODES.includes(value as OptimizationMode);
-
-const isLossMode = (value: unknown): value is LossMode =>
-  LOSS_MODES.includes(value as LossMode);
-
-const isColorMode = (value: unknown): value is ColorMode =>
-  COLOR_MODES.includes(value as ColorMode);
-
-const isFilmTypeKey = (value: unknown): value is FilmTypeKey =>
-  FILM_TYPE_KEYS.includes(value as FilmTypeKey);
-
-const normalizeFilmTypeKey = (value: unknown): FilmTypeKey => {
-  if (value === 'carbono') return 'carbono_g20';
-  return isFilmTypeKey(value) ? value : DEFAULT_CONFIG.selectedFilm;
-};
-
-const normalizeFilmTypes = (value: unknown): Record<FilmTypeKey, number> => {
-  const next = { ...DEFAULT_FILM_TYPES };
-  if (!value || typeof value !== 'object') return next;
-
-  const source = value as Record<string, unknown>;
-  const legacyCarbono = Number(source.carbono);
-  if (Number.isFinite(legacyCarbono)) {
-    next.carbono_g5 = legacyCarbono;
-    next.carbono_g20 = legacyCarbono;
-  }
-
-  FILM_TYPE_KEYS.forEach((key) => {
-    const price = Number(source[key]);
-    if (Number.isFinite(price)) next[key] = price;
-  });
-
-  return next;
-};
-
-const getSizeColor = (h?: number, w?: number) => {
-  if (typeof h !== 'number' || typeof w !== 'number') return '#94a3b8';
-  const area = h * w;
-  const hue = (area * 137.508) % 360;
-  const saturation = 60 + (Math.round(area) % 20);
-  const lightness = 68 + (Math.round(area * 7) % 12);
-  return `hsl(${hue.toFixed(1)}, ${saturation}%, ${lightness}%)`;
-};
-
-const ROOM_ALIAS_RULES: Array<{ test: RegExp; key: string }> = [
-  { test: /\bsala\b.*\b(jantar|tv|estar)?\b/, key: 'sala' },
-  { test: /\bcozinha\b/, key: 'cozinha' },
-  { test: /\bquarto\b|\bdormitorio\b|\bsu[ií]te\b/, key: 'quarto' },
-  { test: /\bbanheiro\b|\blavabo\b|\btoalete\b/, key: 'banheiro' },
-  { test: /\bvaranda\b|\bsacada\b/, key: 'varanda' },
-  { test: /\barea\s+gourmet\b/, key: 'area_gourmet' },
-  { test: /\barea\s+de\s+servico\b|\blavanderia\b/, key: 'lavanderia' },
-  { test: /\bescritorio\b|\bhome\s*office\b/, key: 'escritorio' },
-  { test: /\bgaragem\b/, key: 'garagem' },
-  { test: /\bhall\b/, key: 'hall' },
-  { test: /\bcloset\b/, key: 'closet' },
-  { test: /\bcorredor\b/, key: 'corredor' },
-  { test: /\bterraco\b/, key: 'terraco' },
-  { test: /\bjardim\b/, key: 'jardim' },
-];
-
-const ROOM_SWATCHES = [
-  '#60a5fa', '#eab308', '#c084fc', '#34d399', '#fb923c',
-  '#f87171', '#38bdf8', '#a78bfa', '#2dd4bf', '#fbbf24',
-  '#e879f9', '#fb7185', '#a3e635', '#f59e0b', '#4ade80',
-];
-
-const resolveRoomKey = (label: string) => {
-  const normalized = normalizeRoomKey(label);
-  if (!normalized) return '';
-  return normalized.replace(/\s+/g, '_');
-};
-
-const stableRoomColor = (label: string) => {
-  const key = resolveRoomKey(label);
-  if (!key) return '#94a3b8';
-  if (DEFAULT_ROOM_COLORS[key]) return DEFAULT_ROOM_COLORS[key];
-  let hash = ROOM_ALIAS_RULES.length;
-  for (let i = 0; i < key.length; i++) {
-    hash = ((hash << 5) - hash) + key.charCodeAt(i);
-    hash |= 0;
-  }
-  return ROOM_SWATCHES[Math.abs(hash) % ROOM_SWATCHES.length];
-};
-
-function loadConfig(scopeKey?: string): AppConfig {
-    try {
-        const saved = localStorage.getItem(scopeKey ? buildCalculatorStorageKey('lume_config', scopeKey) : 'lume_config');
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          return {
-            ...DEFAULT_CONFIG,
-            ...parsed,
-            filmTypes: normalizeFilmTypes(parsed.filmTypes),
-            selectedFilm: normalizeFilmTypeKey(parsed.selectedFilm),
-          };
-        }
-    } catch {
-        return DEFAULT_CONFIG;
-    }
-    return DEFAULT_CONFIG;
-}
-
-function saveConfig(cfg: AppConfig, scopeKey?: string) {
-    localStorage.setItem(scopeKey ? buildCalculatorStorageKey('lume_config', scopeKey) : 'lume_config', JSON.stringify(cfg));
-}
+import {
+  AppConfig,
+  ColorMode,
+  DEFAULT_CONFIG,
+  FILM_TYPE_LABELS,
+  FilmTypeKey,
+  GlassItem,
+  LossMode,
+  OptimizationMode,
+  OrcamentoSalvo,
+  createGlassId,
+  getSizeColor,
+  isColorMode,
+  isLossMode,
+  isOptimizationMode,
+  normalizeFilmTypeKey,
+  normalizeFilmTypes,
+  resolveRoomKey,
+  stableRoomColor,
+} from '../lib/films';
+import { loadConfig, saveConfig } from '../lib/calculatorConfig';
+import { useCalculatorState } from '../hooks/useCalculatorState';
+import { usePackingWorker } from '../hooks/usePackingWorker';
+import { useDraftSync } from '../hooks/useDraftSync';
+import { useCalculatorHistory } from '../hooks/useCalculatorHistory';
 
 // ─── TIPOS ────────────────────────────────────────────────────────────────────
 
-export interface GlassItem {
-    id: string;
-    h: number;
-    w: number;
-    oh: number;
-    ow: number;
-    label?: string;
-    cor: string;
-    forceRotate?: boolean;
-    alignRight?: boolean;
-    sortOrder: number;
-}
-
-export interface Block {
-    id: string;
-    w: number;
-    h: number;
-    rw: number;
-    rh: number;
-    cor: string;
-    label?: string;
-    fit?: { x: number; y: number };
-    rotated?: boolean;
-    h_visual?: number;
-    forceRotate?: boolean;
-    alignRight?: boolean;
-    sortOrder?: number;
-}
-
-export interface OrcamentoSalvo {
-    id: string;
-    cliente: string;
-    phone?: string;
-    data: string;
-    valor: number;
-    qtd: number;
-    vidros: GlassItem[];
-  config: { rollW: number; price: number; margin: number };
-  desconto: number;
-  modoOtimizacao: 'densidade' | 'facilidade' | 'facilidade_v2';
-  selectedFilm?: string;
-  leadId?: string | null;
-}
 
 type ImportedGlass = Partial<GlassItem> & {
   h?: number;
@@ -320,148 +111,53 @@ interface SavedProjectPayload {
 }
 
 // ─── UNDO/REDO REDUCER ────────────────────────────────────────────────────────
-
-interface HistoryState {
-    past: GlassItem[][];
-    present: GlassItem[];
-    future: GlassItem[][];
-}
-
-type HistoryAction =
-    | { type: 'SET'; payload: GlassItem[] }
-    | { type: 'SET_FN'; payload: (prev: GlassItem[]) => GlassItem[] }
-    | { type: 'UNDO' }
-    | { type: 'REDO' };
-
-function historyReducer(state: HistoryState, action: HistoryAction): HistoryState {
-    switch (action.type) {
-        case 'SET':
-            return {
-                past: [...state.past.slice(-30), state.present],
-                present: action.payload,
-                future: []
-            };
-        case 'SET_FN':
-            return {
-                past: [...state.past.slice(-30), state.present],
-                present: action.payload(state.present),
-                future: []
-            };
-        case 'UNDO': {
-            if (state.past.length === 0) return state;
-            const previous = state.past[state.past.length - 1];
-            return {
-                past: state.past.slice(0, -1),
-                present: previous,
-                future: [state.present, ...state.future]
-            };
-        }
-        case 'REDO': {
-            if (state.future.length === 0) return state;
-            const next = state.future[0];
-            return {
-                past: [...state.past, state.present],
-                present: next,
-                future: state.future.slice(1)
-            };
-        }
-        default:
-            return state;
-    }
-}
+// C1: movido para useCalculatorState (com os states da sessão).
 
 // ─── COMPONENTE PRINCIPAL ─────────────────────────────────────────────────────
 
 export function AdminCalculator() {
-  const [cliente, setCliente] = useState('');
+  const cfg = useMemo(() => loadConfig(), []);
+  // C1: estado de sessão extraído (os ~32 useState + historyReducer).
+  const {
+    cliente, setCliente,
+    phone, setPhone,
+    neighborhood, setNeighborhood,
+    rollW, setRollW,
+    margin, setMargin,
+    price, setPrice,
+    userName, setUserName,
+    desconto, setDesconto,
+    descontoInput, setDescontoInput,
+    modoOtimizacao, setModoOtimizacao,
+    configAberto, setConfigAberto,
+    compensarPerdas, setCompensarPerdas,
+    modoPerdas, setModoPerdas,
+    perdasFixas, setPerdasFixas,
+    agressividadeCorte, setAgressividadeCorte,
+    filmTypes, setFilmTypes,
+    selectedFilm, setSelectedFilm,
+    draftExpiration, setDraftExpiration,
+    configRestored, setConfigRestored,
+    heightIn, setHeightIn,
+    widthIn, setWidthIn,
+    qtyIn, setQtyIn,
+    labelIn, setLabelIn,
+    usarCoresPorAmbiente, setUsarCoresPorAmbiente,
+    roomColors, setRoomColors,
+    selectedIds, setSelectedIds,
+    cloudStatus, setCloudStatus,
+    authRefreshKey, setAuthRefreshKey,
+    isLoggingOut, setIsLoggingOut,
+    vidros, setVidros, canUndo, canRedo, undo, redo,
+    currentConfig,
+  } = useCalculatorState(cfg);
+
   const [isCutMode, setIsCutMode] = useState(false);
   const [vidrosBackup, setVidrosBackup] = useState<GlassItem[]>([]);
-  const [phone, setPhone] = useState('');
-  const [neighborhood, setNeighborhood] = useState('');
-  const cfg = useMemo(() => loadConfig(), []);
-  const [rollW, setRollW] = useState(cfg.rollW);
-  const [margin, setMargin] = useState(cfg.margin);
-  const [price, setPrice] = useState(cfg.price);
-  const [userName, setUserName] = useState(cfg.userName);
-  const [desconto, setDesconto] = useState(0);
-  const [modoOtimizacao, setModoOtimizacao] = useState<OptimizationMode>(cfg.modoOtimizacao);
-  const [configAberto, setConfigAberto] = useState(false);
-  const [compensarPerdas, setCompensarPerdas] = useState(false);
-  const [modoPerdas, setModoPerdas] = useState<LossMode>(cfg.modoPerdas);
-  const [perdasFixas, setPerdasFixas] = useState(cfg.perdasFixas);
-  const [agressividadeCorte, setAgressividadeCorte] = useState(cfg.agressividadeCorte);
-  const [filmTypes, setFilmTypes] = useState<Record<FilmTypeKey, number>>(normalizeFilmTypes(cfg.filmTypes));
-  const [selectedFilm, setSelectedFilm] = useState<FilmTypeKey>(normalizeFilmTypeKey(cfg.selectedFilm));
-  const [draftExpiration, setDraftExpiration] = useState(cfg.draftExpiration);
-  const [configRestored, setConfigRestored] = useState(false);
-  const [draftRestored, setDraftRestored] = useState(false);
 
   useEffect(() => {
     setPrice(filmTypes[selectedFilm] || 0);
-  }, [selectedFilm, filmTypes]);
-
-  const [heightIn, setHeightIn] = useState('');
-    const [widthIn, setWidthIn] = useState('');
-    const [qtyIn, setQtyIn] = useState('1');
-    const [labelIn, setLabelIn] = useState('');
-    const [usarCoresPorAmbiente, setUsarCoresPorAmbiente] = useState(cfg.modoCorConfig === 'ambiente');
-    const [roomColors, setRoomColors] = useState<Record<string, string>>(DEFAULT_ROOM_COLORS);
-
-    const currentConfig = useMemo<AppConfig>(() => ({
-        rollW,
-        price,
-        margin,
-        modoOtimizacao,
-        userName,
-        modoPerdas,
-        perdasFixas,
-        modoCorConfig: usarCoresPorAmbiente ? 'ambiente' : 'tamanho',
-        agressividadeCorte,
-        filmTypes,
-        selectedFilm,
-        draftExpiration,
-    }), [
-        rollW,
-        price,
-        margin,
-        modoOtimizacao,
-        userName,
-        modoPerdas,
-        perdasFixas,
-        usarCoresPorAmbiente,
-        agressividadeCorte,
-        filmTypes,
-        selectedFilm,
-        draftExpiration,
-    ]);
-
-    const [vidrosState, dispatch] = useReducer(historyReducer, {
-        past: [],
-        present: [],
-        future: []
-    });
-    const vidros = vidrosState.present;
-    const canUndo = vidrosState.past.length > 0;
-    const canRedo = vidrosState.future.length > 0;
-
-    const setVidros = useCallback((updater: GlassItem[] | ((prev: GlassItem[]) => GlassItem[])) => {
-        if (typeof updater === 'function') {
-            dispatch({ type: 'SET_FN', payload: updater });
-        } else {
-            dispatch({ type: 'SET', payload: updater });
-        }
-    }, []);
-
-    const [blocosCalculados, setBlocosCalculados] = useState<Block[]>([]);
-    const [maxY, setMaxY] = useState(0);
-    const [areaV, setAreaV] = useState(0);
-    const [isCalculating, setIsCalculating] = useState(false);
-
-    const [selectedIds, setSelectedIds] = useState<string[]>([]);
-    const [cloudStatus, setCloudStatus] = useState<'idle' | 'syncing' | 'synced' | 'error'>('idle');
-    const [authRefreshKey, setAuthRefreshKey] = useState(0);
-    const [isLoggingOut, setIsLoggingOut] = useState(false);
-    const cloudTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  }, [selectedFilm, filmTypes, setPrice]);
 
 
 
@@ -479,12 +175,29 @@ export function AdminCalculator() {
         return () => window.removeEventListener('resize', updateWidth);
     }, []);
 
-    const prevVidrosLengthRef = useRef(0);
-
-    const [historicoAberto, setHistoricoAberto] = useState(false);
-    const [historico, setHistorico] = useState<OrcamentoSalvo[]>([]);
     const [currentLeadId, setCurrentLeadId] = useState<string | null>(null);
-    const [showSaveToast, setShowSaveToast] = useState(false);
+    // B1: toast único do DS (sucesso/erro) — substitui `alert`.
+    const [toast, setToast] = useState<ToastData | null>(null);
+    const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const showToast = useCallback((msg: string, tone: ToastData['tone']) => {
+        if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+        setToast({ msg, tone });
+        toastTimerRef.current = setTimeout(() => setToast(null), 3000);
+    }, []);
+    // B1: confirmação destrutiva do DS — substitui `window.confirm`.
+    const [confirmDialog, setConfirmDialog] = useState<{
+        title: string;
+        message: string;
+        confirmLabel: string;
+        onConfirm: () => void;
+    } | null>(null);
+    // B1: importação Zap via modal — substitui `prompt`.
+    const [importAberto, setImportAberto] = useState(false);
+    const [importCode, setImportCode] = useState('');
+    const [importError, setImportError] = useState<string | null>(null);
+    // B1: validação inline — substitui `alert` silencioso/evasivo.
+    const [addError, setAddError] = useState<string | null>(null);
+    const [renameError, setRenameError] = useState<string | null>(null);
 
     // Estados para edição de nomes de ambientes
     const [editingAmbiente, setEditingAmbiente] = useState<string | null>(null);
@@ -517,36 +230,20 @@ export function AdminCalculator() {
 
     const invoiceRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const workerRef = useRef<Worker | null>(null);
     const heightRef = useRef<HTMLInputElement>(null);
     const widthRef = useRef<HTMLInputElement>(null);
     const qtyRef = useRef<HTMLInputElement>(null);
 
-    useEffect(() => {
-        const load = async () => {
-            const scopeKey = await resolveCalculatorScopeKey();
-            const cloudHistory = await loadHistoryFromCloud();
-            if (cloudHistory.length > 0) {
-                setHistorico(cloudHistory as OrcamentoSalvo[]);
-                localStorage.setItem(buildCalculatorStorageKey('lume_historico', scopeKey), JSON.stringify(cloudHistory));
-                return;
-            }
-            try {
-                const saved = localStorage.getItem(buildCalculatorStorageKey('lume_historico', scopeKey));
-                if (saved) setHistorico(JSON.parse(saved));
-            } catch {
-                setHistorico([]);
-            }
-        };
-        load();
-    }, [authRefreshKey]);
+    // C1: histórico extraído (load nuvem→local + schema) — ver useCalculatorHistory.
+    const {
+        historico, setHistorico,
+        historicoAberto, setHistoricoAberto,
+        salvarNoHistorico: salvarNoHistoricoHook,
+        carregarDoHistorico: carregarDoHistoricoHook,
+        deletarDoHistorico,
+    } = useCalculatorHistory({ authRefreshKey, notify: showToast });
 
-    useEffect(() => {
-        gsap.fromTo('.admin-entrance',
-            { opacity: 0, scale: 0.95 },
-            { opacity: 1, scale: 1, duration: 0.6, stagger: 0.05, ease: 'power3.out' }
-        );
-    }, []);
+    // C5: entrada animada via CSS (.admin-entrance em globals.css) — sem gsap.
 
     // ─── COMANDOS DE TECLADO ──────────────────────────────────────────────────
     useEffect(() => {
@@ -555,57 +252,25 @@ export function AdminCalculator() {
             if (tag === 'INPUT' || tag === 'TEXTAREA') return;
             if (e.ctrlKey && e.key === 'z' && !e.shiftKey) {
                 e.preventDefault();
-                if (canUndo) dispatch({ type: 'UNDO' });
+                if (canUndo) undo();
             }
             if ((e.ctrlKey && e.key === 'y') || (e.ctrlKey && e.shiftKey && e.key === 'z')) {
                 e.preventDefault();
-                if (canRedo) dispatch({ type: 'REDO' });
+                if (canRedo) redo();
             }
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [canUndo, canRedo]);
+    }, [canUndo, canRedo, undo, redo]);
 
-    useEffect(() => {
-        workerRef.current = new Worker(new URL('../workers/packer.worker.ts', import.meta.url));
-        workerRef.current.onmessage = (e) => {
-            const { blocos, maxY, areaV } = e.data;
-            setBlocosCalculados(blocos);
-            setMaxY(maxY);
-            setAreaV(areaV);
-            setIsCalculating(false);
-        };
-        return () => {
-            workerRef.current?.terminate();
-        };
-    }, []);
-
-    useEffect(() => {
-        if (isCutMode) {
-            // Em modo de corte, apenas ocultamos os blocos apagados sem recalcular posições.
-            setBlocosCalculados(prev => prev.filter(b => vidros.some(v => v.id === b.id)));
-            if (vidros.length === 0) {
-                setSelectedIds([]);
-            }
-            prevVidrosLengthRef.current = vidros.length;
-            return;
-        }
-
-        if (vidros.length > 0) {
-            setIsCalculating(true);
-            workerRef.current?.postMessage({ vidros, rollW, margin, modoOtimizacao, agressividadeCorte });
-            if (vidros.length !== prevVidrosLengthRef.current) {
-                setDesconto(0);
-            }
-        } else {
-            setBlocosCalculados([]);
-            setMaxY(0);
-            setAreaV(0);
-            setDesconto(0);
-            setSelectedIds([]);
-        }
-        prevVidrosLengthRef.current = vidros.length;
-    }, [vidros, rollW, margin, modoOtimizacao, agressividadeCorte, isCutMode]);
+    // C1: worker de otimização extraído (com timeout/erro) — ver usePackingWorker.
+    const { blocosCalculados, maxY, areaV, isCalculating, setIsCalculating } = usePackingWorker({
+        vidros, rollW, margin, modoOtimizacao, agressividadeCorte, isCutMode,
+        onEmptyVidros: () => { setDesconto(0); setSelectedIds([]); },
+        onCutModeEmpty: () => { setSelectedIds([]); },
+        onVidrosCountChange: () => { setDesconto(0); },
+        onError: (msg) => showToast(msg, 'error'),
+    });
 
     const currentAuthUserRef = useRef<string | null>(null);
 
@@ -625,18 +290,10 @@ export function AdminCalculator() {
         return () => {
             subscription.unsubscribe();
         };
-    }, []);
+    }, [setAuthRefreshKey]);
 
     // ─── FORMATAÇÃO ────────────────────────────────────────────────────────────
-
-    const formatBRL = (num: number) =>
-        num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
-    const [descontoInput, setDescontoInput] = useState('0');
-
-    useEffect(() => {
-        if (desconto === 0) setDescontoInput('0');
-    }, [desconto]);
+    // (formatBRL/formatNumber2 canônicos em lib/money.ts)
 
     const handleDescontoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const valor = e.target.value.replace(/\D/g, '');
@@ -646,47 +303,27 @@ export function AdminCalculator() {
 
     const displayDesconto = useMemo(() => {
         const num = parseInt(descontoInput, 10) / 100 || 0;
-        return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        return formatNumber2(num);
     }, [descontoInput]);
 
 // ─── AUTO-SAVE DRAFT ──────────────────────────────────────────────────
-  // ─── AUTO-SAVE (local imediato + nuvem debounced 5s) ───────────────────────
-  useEffect(() => {
-    if (!draftRestored || isCutMode) return;
-    const draft = {
-      cliente,
-      phone,
-      neighborhood,
-      vidros,
-      desconto,
-      descontoInput,
-      rollW,
-      price,
-      margin,
-      modoOtimizacao,
-      userName,
-      selectedFilm,
-      roomColors,
-      lastSaved: Date.now()
-    };
-    resolveCalculatorScopeKey().then((scopeKey) => {
-      localStorage.setItem(buildCalculatorStorageKey('lume_calculator_draft', scopeKey), JSON.stringify(draft));
-    }).catch(() => null);
-
-    if (cloudTimerRef.current) clearTimeout(cloudTimerRef.current);
-    cloudTimerRef.current = setTimeout(async () => {
-      setCloudStatus('syncing');
-      const ok = await saveDraftToCloud({
-        cliente, phone, vidros, desconto, desconto_input: descontoInput,
-        roll_w: rollW, price, margin, modo_otimizacao: modoOtimizacao,
-        user_name: userName, selected_film: selectedFilm,
-        last_saved: Date.now(),
-      });
-      setCloudStatus(ok ? 'synced' : 'error');
-      if (ok) setTimeout(() => setCloudStatus('idle'), 3000);
-    }, 5000);
-    return () => { if (cloudTimerRef.current) clearTimeout(cloudTimerRef.current); };
-  }, [draftRestored, isCutMode, cliente, phone, neighborhood, vidros, desconto, descontoInput, rollW, price, margin, modoOtimizacao, userName, selectedFilm, roomColors]);
+  // C1: rascunho extraído (autosave local+nuvem + restore) — ver useDraftSync.
+  useDraftSync(
+    {
+      cliente, phone, neighborhood, vidros, desconto, descontoInput,
+      rollW, price, margin, modoOtimizacao, userName, selectedFilm,
+      roomColors, isCutMode,
+    },
+    {
+      setVidros,
+      setCliente, setPhone, setNeighborhood,
+      setDesconto, setDescontoInput,
+      setRollW, setPrice, setMargin,
+      setModoOtimizacao, setUserName, setSelectedFilm,
+      setRoomColors, setCloudStatus,
+    },
+    authRefreshKey,
+  );
 
 // ─── CLOUD CONFIG AUTO-SAVE (debounced 2s) ────────────────────────────────
   const configCloudTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -736,83 +373,9 @@ export function AdminCalculator() {
       }
     };
     restoreConfig();
-  }, [authRefreshKey]);
+  }, [authRefreshKey, setRollW, setPrice, setMargin, setModoOtimizacao, setUserName, setModoPerdas, setPerdasFixas, setUsarCoresPorAmbiente, setAgressividadeCorte, setFilmTypes, setSelectedFilm, setDraftExpiration, setConfigRestored]);
 
-  // RESTORE DRAFT ON MOUNT (cloud-first, localStorage fallback)
-    useEffect(() => {
-        const restoreDraft = async () => {
-          try {
-            const scopeKey = await resolveCalculatorScopeKey();
-            // Resolve the configured draft expiration (minutes) directly from config
-            // so it works regardless of the config-restore effect's timing.
-            const cfgSource = loadConfig(scopeKey);
-            let expirationMin = cfgSource.draftExpiration ?? DEFAULT_CONFIG.draftExpiration;
-            try {
-              const cloudCfg = await loadConfigFromCloud();
-              if (cloudCfg && cloudCfg.draftExpiration !== undefined) expirationMin = cloudCfg.draftExpiration;
-            } catch { /* ignore */ }
-            const isFresh = (lastSaved?: number) =>
-              !lastSaved || expirationMin <= 0 || (Date.now() - lastSaved) <= expirationMin * 60 * 1000;
-
-            // Local draft (source of roomColors, which aren't synced to cloud)
-            const saved = localStorage.getItem(buildCalculatorStorageKey('lume_calculator_draft', scopeKey));
-            let localDraft: { roomColors?: Record<string, string> } | null = null;
-            if (saved) {
-                try { localDraft = JSON.parse(saved); } catch { localDraft = null; }
-            }
-            const applyLocalRoomColors = () => {
-                if (localDraft?.roomColors && typeof localDraft.roomColors === 'object') {
-                    setRoomColors(localDraft.roomColors);
-                }
-            };
-            // Try cloud first
-            const cloud = await loadDraftFromCloud();
-            if (cloud && Array.isArray(cloud.vidros) && cloud.vidros.length > 0 && isFresh(cloud.last_saved)) {
-                dispatch({ type: 'SET', payload: cloud.vidros as GlassItem[] });
-                if (cloud.cliente) setCliente(cloud.cliente);
-                if (cloud.phone) setPhone(cloud.phone);
-                if (cloud.desconto !== undefined) setDesconto(cloud.desconto);
-                if (cloud.desconto_input !== undefined) setDescontoInput(cloud.desconto_input);
-                if (cloud.roll_w) setRollW(cloud.roll_w);
-                if (cloud.price) setPrice(cloud.price);
-                if (cloud.margin !== undefined) setMargin(cloud.margin);
-                if (isOptimizationMode(cloud.modo_otimizacao)) setModoOtimizacao(cloud.modo_otimizacao);
-                if (cloud.user_name) setUserName(cloud.user_name);
-                setSelectedFilm(normalizeFilmTypeKey(cloud.selected_film));
-                applyLocalRoomColors();
-                setCloudStatus('synced');
-                setTimeout(() => setCloudStatus('idle'), 3000);
-                return;
-            }
-            // Fallback to localStorage
-            if (saved) {
-                try {
-                    const draft = JSON.parse(saved);
-                    if (draft.vidros && draft.vidros.length > 0 && isFresh(draft.lastSaved)) {
-                        dispatch({ type: 'SET', payload: draft.vidros });
-                        if (draft.cliente) setCliente(draft.cliente);
-                        if (draft.phone) setPhone(draft.phone);
-                        if (draft.neighborhood) setNeighborhood(draft.neighborhood);
-                        if (draft.desconto !== undefined) setDesconto(draft.desconto);
-                        if (draft.descontoInput !== undefined) setDescontoInput(draft.descontoInput);
-                        if (draft.rollW) setRollW(draft.rollW);
-                        if (draft.price) setPrice(draft.price);
-                        if (draft.margin !== undefined) setMargin(draft.margin);
-                        if (isOptimizationMode(draft.modoOtimizacao)) setModoOtimizacao(draft.modoOtimizacao);
-                        if (draft.userName) setUserName(draft.userName);
-                        setSelectedFilm(normalizeFilmTypeKey(draft.selectedFilm));
-                        applyLocalRoomColors();
-                    }
-                } catch (e) {
-                    logger.error('Erro ao carregar rascunho local', e);
-                }
-            }
-          } finally {
-            setDraftRestored(true);
-          }
-        };
-        restoreDraft();
-    }, [authRefreshKey]); 
+  // C1: restore do rascunho movido para useDraftSync (nuvem primeiro, local como fallback).
 
     // ─── ENTER NOS INPUTS ──────────────────────────────────────────────────────
 
@@ -846,13 +409,16 @@ export function AdminCalculator() {
     } else {
       setSelectedIds(prev => [...new Set([...prev, ...ids])]);
     }
-  }, [vidros, selectedIds]);
+  }, [vidros, selectedIds, setSelectedIds]);
 
     const adicionar = () => {
         const h = parseFloat(heightIn.replace(',', '.'));
         const w = parseFloat(widthIn.replace(',', '.'));
         const q = parseInt(qtyIn) || 1;
-        if (!h || !w || h <= 0 || w <= 0 || q <= 0) return;
+        if (!h || !w || h <= 0 || w <= 0 || q <= 0) {
+            setAddError('Informe altura e largura válidas (maiores que zero).');
+            return;
+        }
         const label = labelIn.trim();
         const roomColor = getColorForItem(label, h, w);
         const novos: GlassItem[] = [];
@@ -868,9 +434,16 @@ export function AdminCalculator() {
             });
         }
         setVidros([...vidros, ...novos]);
+        setAddError(null);
         setHeightIn(''); setWidthIn(''); setQtyIn('1');
         heightRef.current?.focus();
     };
+
+    // B1: some com o erro inline assim que o usuário corrige os campos.
+    useEffect(() => {
+        if (addError) setAddError(null);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [heightIn, widthIn, qtyIn]);
 
     const removerTudoTipo = (h: number, w: number, label?: string) => {
         setVidros(current => current.filter(v => !(v.oh === h && v.ow === w && (v.label || '') === (label || ''))));
@@ -878,25 +451,31 @@ export function AdminCalculator() {
 
     const limparTudo = () => {
         if (vidros.length === 0) return;
-        if (window.confirm('Tem certeza que deseja remover TODAS as peças?')) {
-            setVidros([]);
-            try { localStorage.removeItem(CLIPBOARD_KEY); } catch { /* ignore */ }
-            setItensCopiados(null);
-            setDesconto(0);
-            setDescontoInput('0');
-            setCliente('');
-            setPhone('');
-            setNeighborhood('');
-            setRollW(DEFAULT_CONFIG.rollW);
-            setPrice(DEFAULT_CONFIG.price);
-            setMargin(DEFAULT_CONFIG.margin);
-            setSelectedIds([]);
-        }
+        setConfirmDialog({
+            title: 'Limpar tudo?',
+            message: 'Remove TODAS as peças, o cliente e as configurações da sessão. Essa ação não pode ser desfeita.',
+            confirmLabel: 'Remover tudo',
+            onConfirm: () => {
+                setVidros([]);
+                try { localStorage.removeItem(CLIPBOARD_KEY); } catch { /* ignore */ }
+                setItensCopiados(null);
+                setDesconto(0);
+                setDescontoInput('0');
+                setCliente('');
+                setPhone('');
+                setNeighborhood('');
+                setRollW(DEFAULT_CONFIG.rollW);
+                setPrice(DEFAULT_CONFIG.price);
+                setMargin(DEFAULT_CONFIG.margin);
+                setSelectedIds([]);
+                setConfirmDialog(null);
+            },
+        });
     };
 
     const toggleSelection = useCallback((id: string) => {
         setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
-    }, []);
+    }, [setSelectedIds]);
 
     const toggleAmbienteSelection = (ambiente: string) => {
         const targetLabel = ambiente === 'Sem Ambiente' ? '' : ambiente;
@@ -920,6 +499,7 @@ export function AdminCalculator() {
         if (!editingAmbiente || !editNome.trim()) {
             setEditingAmbiente(null);
             setEditNome('');
+            setRenameError(null);
             return;
         }
         const novoNome = editNome.trim();
@@ -927,22 +507,37 @@ export function AdminCalculator() {
         if (novoNome === labelAntigo || (editingAmbiente === 'Sem Ambiente' && novoNome === '')) {
             setEditingAmbiente(null);
             setEditNome('');
+            setRenameError(null);
             return;
         }
         // Verifica se já existe ambiente com esse nome
         const jaExiste = vidros.some(v => (v.label || '') === novoNome && (v.label || '') !== labelAntigo);
         if (jaExiste) {
-            alert('Já existe um ambiente com este nome!');
+            setRenameError('Já existe um ambiente com este nome.');
             return;
         }
         setVidros(prev => prev.map(v => (v.label || '') === labelAntigo ? { ...v, label: novoNome || undefined } : v));
         setEditingAmbiente(null);
         setEditNome('');
+        setRenameError(null);
     };
 
     const iniciarRenomeacao = (label: string) => {
         setEditingAmbiente(label || 'Sem Ambiente');
         setEditNome(label);
+        setRenameError(null);
+    };
+
+    const handleEditNomeChange = (v: string) => {
+        setEditNome(v);
+        if (renameError) setRenameError(null);
+    };
+
+    // B4: cancela a renomeação sem setter cru no filho.
+    const handleCancelarRenomeacao = () => {
+        setEditingAmbiente(null);
+        setEditNome('');
+        setRenameError(null);
     };
 
     const handleDeleteSelected = () => {
@@ -1002,37 +597,29 @@ export function AdminCalculator() {
     // ─── HISTÓRICO ─────────────────────────────────────────────────────────────
 
     const totalAreaM2 = useMemo(() => {
-        const area = vidros.reduce((acc, v) => acc + (v.ow * v.oh), 0);
-        return area / 10000;
+        return calcTotalAreaM2(vidros);
     }, [vidros]);
 
     const subtotalBruto = useMemo(() => {
-        return totalAreaM2 * price;
+        return calcSubtotalBruto(totalAreaM2, price);
     }, [totalAreaM2, price]);
 
     const eficiencia = useMemo(() => {
-        return maxY > 0 ? Math.round((areaV / (maxY * rollW)) * 100) : 0;
+        return calcEficiencia(maxY, areaV, rollW);
     }, [maxY, areaV, rollW]);
 
     const compensacaoPerda = useMemo(() => {
-        if (!compensarPerdas) return 0;
-        if (modoPerdas === 'fixo') {
-            return subtotalBruto * (perdasFixas / 100);
-        }
-        // dinâmico
-        if (eficiencia >= 100 || eficiencia <= 0) return 0;
-        return subtotalBruto * ((100 - eficiencia) / 100);
+        return calcCompensacaoPerda({ compensarPerdas, modoPerdas, perdasFixas, eficiencia, subtotalBruto });
     }, [compensarPerdas, modoPerdas, perdasFixas, eficiencia, subtotalBruto]);
 
-    const finalPrice = roundCurrency(subtotalBruto + compensacaoPerda - desconto);
+    const finalPrice = calcFinalPrice(subtotalBruto, compensacaoPerda, desconto);
 
+    // C1: persistência no hook (com schema); aqui só o snapshot da sessão.
     const salvarNoHistorico = useCallback(() => {
-        if (vidros.length === 0) return;
-        const novo: OrcamentoSalvo = {
-            id: Date.now().toString(),
+        salvarNoHistoricoHook({
             cliente: cliente || 'Sem nome',
             phone,
-            data: new Date().toLocaleDateString('pt-BR'),
+            neighborhood,
             valor: finalPrice,
             qtd: vidros.length,
             vidros: [...vidros],
@@ -1041,20 +628,12 @@ export function AdminCalculator() {
             modoOtimizacao,
             selectedFilm,
             leadId: currentLeadId ?? undefined,
-        };
-        const atualizado = [novo, ...historico].slice(0, 100);
-        setHistorico(atualizado);
-        resolveCalculatorScopeKey().then((scopeKey) => {
-            localStorage.setItem(buildCalculatorStorageKey('lume_historico', scopeKey), JSON.stringify(atualizado));
-        }).catch(() => null);
-        saveHistoryItemToCloud(novo);
-        setShowSaveToast(true);
-        setTimeout(() => setShowSaveToast(false), 3000);
-    }, [vidros, cliente, phone, finalPrice, rollW, price, margin, historico, desconto, modoOtimizacao, selectedFilm, currentLeadId]);
+        });
+    }, [vidros, cliente, phone, neighborhood, finalPrice, rollW, price, margin, desconto, modoOtimizacao, selectedFilm, currentLeadId, salvarNoHistoricoHook]);
 
     const criarLead = useCallback(async () => {
       if (!cliente && !phone) {
-        alert('Preencha o nome ou telefone do cliente.');
+        showToast('Preencha o nome ou telefone do cliente.', 'error');
         return;
       }
       const totalM2 = roundMeasure(vidros.reduce((acc, v) => acc + (v.oh * v.ow), 0) / 10000);
@@ -1096,6 +675,7 @@ export function AdminCalculator() {
               id: orcId,
               cliente: clienteNome,
               phone,
+              neighborhood,
               data: new Date().toLocaleDateString('pt-BR'),
               valor: finalPrice,
               qtd: vidros.length,
@@ -1110,6 +690,7 @@ export function AdminCalculator() {
               id: orcId,
               cliente: clienteNome,
               phone,
+              neighborhood,
               data: new Date().toLocaleDateString('pt-BR'),
               valor: finalPrice,
               qtd: vidros.length,
@@ -1128,54 +709,55 @@ export function AdminCalculator() {
           }
         }
 
-        setShowSaveToast(true);
-        setTimeout(() => setShowSaveToast(false), 3000);
+        showToast('Lead criado com sucesso!', 'success');
       } else {
         const err = await res.json();
         const details = [err.error, err.details, err.hint].filter(Boolean).join(' - ');
-        alert('Erro ao criar lead: ' + (details || 'desconhecido'));
+        showToast('Erro ao criar lead: ' + (details || 'desconhecido'), 'error');
       }
-    }, [cliente, phone, neighborhood, vidros, selectedFilm, finalPrice, rollW, price, margin, desconto, modoOtimizacao, historico]);
+    }, [cliente, phone, neighborhood, vidros, selectedFilm, finalPrice, rollW, price, margin, desconto, modoOtimizacao, historico, setHistorico, showToast]);
 
+// C1: abrir passa pelo schema do hook; aqui só a aplicação na sessão.
 const carregarDoHistorico = (orc: OrcamentoSalvo) => {
-    setCliente(orc.cliente);
-    setPhone(orc.phone || '');
-    setRollW(orc.config.rollW);
-        setPrice(orc.config.price);
-        setMargin(orc.config.margin);
-        if (orc.desconto !== undefined) {
-            setDesconto(orc.desconto);
-            setDescontoInput((orc.desconto * 100).toString());
+    carregarDoHistoricoHook(orc, (valid) => {
+    setCliente(valid.cliente);
+    setPhone(valid.phone || '');
+    setNeighborhood(valid.neighborhood || '');
+    setRollW(valid.config.rollW);
+        setPrice(valid.config.price);
+        setMargin(valid.config.margin);
+        if (valid.desconto !== undefined) {
+            setDesconto(valid.desconto);
+            setDescontoInput((valid.desconto * 100).toString());
         }
-  if (orc.modoOtimizacao) setModoOtimizacao(orc.modoOtimizacao);
-    setSelectedFilm(normalizeFilmTypeKey(orc.selectedFilm));
-    if (orc.leadId) setCurrentLeadId(orc.leadId);
-    dispatch({ type: 'SET', payload: orc.vidros });
-        setHistoricoAberto(false);
-    };
-
-    const deletarDoHistorico = (id: string) => {
-        const atualizado = historico.filter(o => o.id !== id);
-        setHistorico(atualizado);
-        resolveCalculatorScopeKey().then((scopeKey) => {
-            localStorage.setItem(buildCalculatorStorageKey('lume_historico', scopeKey), JSON.stringify(atualizado));
-            deleteHistoryItemFromCloud(id);
-        }).catch(() => null);
+  if (isOptimizationMode(valid.modoOtimizacao)) setModoOtimizacao(valid.modoOtimizacao);
+    setSelectedFilm(normalizeFilmTypeKey(valid.selectedFilm));
+    if (valid.leadId) setCurrentLeadId(valid.leadId);
+    setVidros(valid.vidros);
+    });
     };
 
     // ─── IMPORTAR / SALVAR / ABRIR ─────────────────────────────────────────────
 
     const importarZap = () => {
-        const code = prompt("Cole o CÓDIGO DE IMPORTAÇÃO:");
+        setImportCode('');
+        setImportError(null);
+        setImportAberto(true);
+    };
+
+    const confirmarImportacaoZap = () => {
+        const code = importCode.trim();
         if (!code) return;
         try {
             const d = JSON.parse(atob(code)) as ImportedZapPayload;
             if (!Array.isArray(d.v)) throw new Error('Payload sem vidros');
             setCliente(`${d.n} (${d.b}) - ${d.f}`);
             if (d.p) setPhone(d.p);
-            dispatch({ type: 'SET', payload: d.v.map((v) => ({ ...v, id: createGlassId(), oh: v.oh ?? v.h ?? 0, ow: v.ow ?? v.w ?? 0, forceRotate: undefined, alignRight: false })) as GlassItem[] });
+            setVidros(d.v.map((v) => ({ ...v, id: createGlassId(), oh: v.oh ?? v.h ?? 0, ow: v.ow ?? v.w ?? 0, forceRotate: undefined, alignRight: false })) as GlassItem[]);
+            setImportAberto(false);
+            showToast(`${d.v.length} peça(s) importada(s)!`, 'success');
         } catch {
-            alert("Erro ao importar.");
+            setImportError('Código inválido. Confira e tente de novo.');
         }
     };
 
@@ -1205,10 +787,10 @@ const carregarDoHistorico = (orc: OrcamentoSalvo) => {
                 setRollW(parseFloat(String(d.config?.rolo ?? '')) || 152);
                 setPrice(parseFloat(String(d.config?.preco ?? '')) || 80);
                 setSelectedFilm(normalizeFilmTypeKey(d.config?.selectedFilm));
-                dispatch({ type: 'SET', payload: (d.vidros || []).map((v) => ({ ...v, oh: v.oh ?? v.h ?? 0, ow: v.ow ?? v.w ?? 0 })) as GlassItem[] });
+                setVidros((d.vidros || []).map((v) => ({ ...v, oh: v.oh ?? v.h ?? 0, ow: v.ow ?? v.w ?? 0 })) as GlassItem[]);
                 setDesconto(0);
             } catch {
-                alert("Arquivo inválido");
+                showToast('Arquivo inválido.', 'error');
             }
         };
         reader.readAsText(file);
@@ -1367,7 +949,7 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
     const normalizedValue = key === 'perdasFixas' ? Math.min(100, Math.max(0, value as number)) : value;
     const updated = { ...currentConfig, [key]: normalizedValue };
     resolveCalculatorScopeKey().then((scopeKey) => saveConfig(updated, scopeKey)).catch(() => saveConfig(updated));
-  }, [currentConfig, getColorForItem, setVidros]);
+  }, [currentConfig, getColorForItem, setVidros, setUsarCoresPorAmbiente, setRollW, setPrice, setMargin, setModoOtimizacao, setUserName, setModoPerdas, setPerdasFixas, setAgressividadeCorte, setFilmTypes, setSelectedFilm, setDraftExpiration]);
 
   const handleLogout = useCallback(async () => {
     if (isLoggingOut) return;
@@ -1389,8 +971,11 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
       logger.warn('Falha ao limpar cookies da sessao', { error });
     }
 
+    // C3: limpa o scope em cache para a próxima conta resolver do zero.
+    resetCalculatorScopeCache();
+
     window.location.href = '/login';
-  }, [isLoggingOut]);
+  }, [isLoggingOut, setIsLoggingOut, setConfigAberto]);
 
     // ─── MEMOS ─────────────────────────────────────────────────────────────────
 
@@ -1403,7 +988,7 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
         if (selectedIds.length === 0) return 0;
         const area = vidros.filter(v => selectedIds.includes(v.id)).reduce((acc, v) => acc + (v.ow * v.oh), 0);
         return area / 10000;
-    }, [vidros, selectedIds]);
+  }, [vidros, selectedIds]);
 
     const resumo = useMemo(() => {
         const map = new Map<string, { h: number, w: number, q: number, label: string }>();
@@ -1416,14 +1001,7 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
         return Array.from(map.values()).sort((a, b) => a.label.localeCompare(b.label));
     }, [vidros]);
 
-    const groupedResumo = useMemo(() => {
-        return resumo.reduce((acc, item) => {
-            const groupName = item.label || 'Sem Ambiente';
-            if (!acc[groupName]) acc[groupName] = [];
-            acc[groupName].push(item);
-            return acc;
-        }, {} as Record<string, typeof resumo>);
-    }, [resumo]);
+    const groupedResumo = useMemo(() => groupByAmbiente(resumo), [resumo]);
 
     const currentRoomLabel = labelIn.trim();
     const currentRoomKey = resolveRoomKey(currentRoomLabel);
@@ -1436,8 +1014,31 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
         setVidros(prev => prev.map(v => (v.label || '') === trimmed ? { ...v, cor: color } : v));
     };
 
-    const m = maxY / 100;
-    const valorPraticoM2 = areaV > 0 ? finalPrice / (areaV / 10000) : 0;
+    // C2: callbacks de intenção (filhos não recebem setter cru).
+    const handleToggleCorEsquema = () => {
+        const next = !usarCoresPorAmbiente;
+        setUsarCoresPorAmbiente(next);
+        setVidros(prev => prev.map(v => ({
+            ...v,
+            cor: getColorForItem(v.label, v.oh, v.ow, next)
+        })));
+    };
+    const handleSelectRoomColor = (swatch: string) => {
+        if (!currentRoomLabel) return;
+        setRoomColors(prev => ({ ...prev, [currentRoomKey]: swatch }));
+    };
+    const handleEnterCutMode = () => {
+        setVidrosBackup(vidros);
+        setIsCutMode(true);
+    };
+    const handleExitCutMode = () => {
+        setVidros(vidrosBackup);
+        setIsCutMode(false);
+        setVidrosBackup([]);
+    };
+
+    const m = calcMetrosComprar(maxY);
+    const valorPraticoM2 = calcValorPraticoM2(finalPrice, areaV);
 
     // ─── RENDER ────────────────────────────────────────────────────────────────
 
@@ -1450,7 +1051,6 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
         setAberto={setConfigAberto}
         config={{ rollW, price, margin, modoOtimizacao, userName, modoPerdas, perdasFixas, modoCorConfig: usarCoresPorAmbiente ? 'ambiente' : 'tamanho', agressividadeCorte, filmTypes, selectedFilm, draftExpiration }}
         onUpdate={atualizarConfig}
-        cloudStatus={cloudStatus}
         onLogout={handleLogout}
         loggingOut={isLoggingOut}
       />
@@ -1538,14 +1138,7 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
                             <h1 className="text-xl sm:text-2xl font-bold font-montserrat">LUME <span className="font-light text-gray-400">Calculator</span></h1>
                         </div>
                         <div className="flex items-center gap-1.5 ml-2" title={isCutMode ? 'Sincronização pausada (Modo de Corte)' : cloudStatus === 'synced' ? 'Sincronizado com a nuvem' : cloudStatus === 'syncing' ? 'Sincronizando...' : cloudStatus === 'error' ? 'Erro de sincronização' : 'Nuvem'}>
-                            {isCutMode ? <Scissors size={14} className="text-red-400" /> : (
-                                <>
-                                    {cloudStatus === 'syncing' && <Loader2 size={14} className="text-[#c9a227] animate-spin" />}
-                                    {cloudStatus === 'synced' && <Cloud size={14} className="text-green-400" />}
-                                    {cloudStatus === 'error' && <CloudOff size={14} className="text-red-400" />}
-                                    {cloudStatus === 'idle' && <Cloud size={14} className="text-gray-600" />}
-                                </>
-                            )}
+                            <span className={`h-2 w-2 rounded-full ${isCutMode || cloudStatus === 'error' ? 'bg-red-400' : cloudStatus === 'syncing' ? 'bg-[#f5d77a] animate-pulse' : cloudStatus === 'synced' ? 'bg-emerald-400' : 'bg-gray-600'}`} />
                         </div>
                     </div>
                     <div className="flex items-center gap-1.5 flex-nowrap justify-end xl:justify-end overflow-x-auto pb-1 scrollbar-hide">
@@ -1571,22 +1164,25 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
                         >
                             <Trash2 size={14} /> <span className="hidden sm:inline">Limpar</span>
                         </button>
-                        <button
-                            onClick={() => dispatch({ type: 'UNDO' })}
-                            disabled={!canUndo}
-                            title="Desfazer (Ctrl+Z)"
-                            className={`flex items-center gap-1 px-2.5 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all border shrink-0 ${canUndo ? 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:text-white' : 'border-white/5 text-white/20 cursor-not-allowed'}`}
-                        >
-                            <Undo2 size={14} /> <span className="hidden sm:inline">Desfazer</span>
-                        </button>
-                        <button
-                            onClick={() => dispatch({ type: 'REDO' })}
-                            disabled={!canRedo}
-                            title="Refazer (Ctrl+Y)"
-                            className={`flex items-center gap-1 px-2.5 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all border shrink-0 ${canRedo ? 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:text-white' : 'border-white/5 text-white/20 cursor-not-allowed'}`}
-                        >
-                            <Redo2 size={14} /> <span className="hidden sm:inline">Refazer</span>
-                        </button>
+                        <div className="flex items-center rounded-xl border border-white/10 bg-white/5 p-0.5 shrink-0">
+                            <button
+                                onClick={() => undo()}
+                                disabled={!canUndo}
+                                title="Desfazer (Ctrl+Z)"
+                                className={`flex items-center gap-1 px-2.5 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${canUndo ? 'text-gray-300 hover:bg-white/10 hover:text-white' : 'text-white/20 cursor-not-allowed'}`}
+                            >
+                                <Undo2 size={14} /> <span className="hidden sm:inline">Desfazer</span>
+                            </button>
+                            <div className="w-px self-stretch bg-white/10" />
+                            <button
+                                onClick={() => redo()}
+                                disabled={!canRedo}
+                                title="Refazer (Ctrl+Y)"
+                                className={`flex items-center gap-1 px-2.5 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${canRedo ? 'text-gray-300 hover:bg-white/10 hover:text-white' : 'text-white/20 cursor-not-allowed'}`}
+                            >
+                                <Redo2 size={14} /> <span className="hidden sm:inline">Refazer</span>
+                            </button>
+                        </div>
                         <button
                             onClick={() => setHistoricoAberto(true)}
                             className="flex items-center gap-1 px-2.5 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider bg-[#c9a227]/10 border border-[#c9a227]/30 text-[#c9a227] hover:bg-[#c9a227]/20 transition-all shrink-0"
@@ -1602,68 +1198,62 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
                 {/* COLUNA ESQUERDA */}
                 <div className="col-span-1 xl:col-span-4 space-y-6">
                     <InputPanel
-                        vidros={vidros}
-                        cliente={cliente}
-                        setCliente={setCliente}
-                        phone={phone}
-                        setPhone={setPhone}
-                        neighborhood={neighborhood}
-                        setNeighborhood={setNeighborhood}
-                        importarZap={importarZap}
-                        salvarProjeto={salvarProjeto}
-                        fileInputRef={fileInputRef}
-                        abrirProjeto={abrirProjeto}
-                        rollW={rollW}
-                        setRollW={setRollW}
-                        selectedFilm={selectedFilm}
-                        setSelectedFilm={setSelectedFilm}
-                        margin={margin}
-                        setMargin={setMargin}
-                        price={price}
-                        labelIn={labelIn}
-                        setLabelIn={setLabelIn}
-                        usarCoresPorAmbiente={usarCoresPorAmbiente}
-                        setUsarCoresPorAmbiente={setUsarCoresPorAmbiente}
-                        setVidros={setVidros}
-                        getColorForItem={getColorForItem}
-                        currentRoomColor={currentRoomColor}
-                        currentRoomKey={currentRoomKey}
-                        currentRoomLabel={currentRoomLabel}
-                        roomColors={roomColors}
-                        setRoomColors={setRoomColors}
-                        aplicarCorNoAmbiente={aplicarCorNoAmbiente}
-                        hasCurrentRoomPieces={hasCurrentRoomPieces}
-                        heightRef={heightRef}
-                        widthRef={widthRef}
-                        qtyRef={qtyRef}
-                        onHeightKeyDown={handleKeyDownHeight}
-                        onWidthKeyDown={handleKeyDownWidth}
-                        onQtyKeyDown={handleKeyDownQty}
-                        heightIn={heightIn}
-                        setHeightIn={setHeightIn}
-                        widthIn={widthIn}
-                        setWidthIn={setWidthIn}
-                        qtyIn={qtyIn}
-                        setQtyIn={setQtyIn}
-                        adicionar={adicionar}
-                        limparTudo={limparTudo}
+                        clienteProps={{
+                            cliente, phone, neighborhood,
+                            onClienteChange: setCliente,
+                            onPhoneChange: setPhone,
+                            onNeighborhoodChange: setNeighborhood,
+                            onImportarZap: importarZap,
+                            onSalvarProjeto: salvarProjeto,
+                            fileInputRef,
+                            onAbrirProjeto: abrirProjeto,
+                        }}
+                        roloProps={{
+                            rollW, selectedFilm, margin, price,
+                            onRollWChange: setRollW,
+                            onSelectedFilmChange: setSelectedFilm,
+                            onMarginChange: setMargin,
+                        }}
+                        corProps={{
+                            usarCoresPorAmbiente,
+                            currentRoomColor,
+                            currentRoomLabel,
+                            hasCurrentRoomPieces,
+                            onToggleCorEsquema: handleToggleCorEsquema,
+                            onSelectRoomColor: handleSelectRoomColor,
+                            onAplicarCorNoAmbiente: aplicarCorNoAmbiente,
+                        }}
+                        medidaProps={{
+                            labelIn, heightIn, widthIn, qtyIn,
+                            onLabelInChange: setLabelIn,
+                            onHeightChange: setHeightIn,
+                            onWidthChange: setWidthIn,
+                            onQtyChange: setQtyIn,
+                            heightRef, widthRef, qtyRef,
+                            onHeightKeyDown: handleKeyDownHeight,
+                            onWidthKeyDown: handleKeyDownWidth,
+                            onQtyKeyDown: handleKeyDownQty,
+                            onAdicionar: adicionar,
+                            addError,
+                        }}
                     />
 
                     {resumo.length > 0 && (
                         <ResumeList
-                            resumo={resumo}
-                            vidros={vidros}
-                            selectedIds={selectedIds}
-                            editingAmbiente={editingAmbiente}
-                            editNome={editNome}
-                            setEditNome={setEditNome}
-                            setEditingAmbiente={setEditingAmbiente}
-                            editInputRef={editInputRef}
-                            confirmarRenomeacao={confirmarRenomeacao}
-                            iniciarRenomeacao={iniciarRenomeacao}
-                            toggleAmbienteSelection={toggleAmbienteSelection}
-                            removerTudoTipo={removerTudoTipo}
-                            getColorForItem={getColorForItem}
+                            listaProps={{
+                                resumo, vidros, selectedIds, getColorForItem,
+                                onRemoverTudoTipo: removerTudoTipo,
+                            }}
+                            renameProps={{
+                                editingAmbiente, editNome, renameError, editInputRef,
+                                onEditNomeChange: handleEditNomeChange,
+                                onConfirmarRenomeacao: confirmarRenomeacao,
+                                onCancelarRenomeacao: handleCancelarRenomeacao,
+                                onIniciarRenomeacao: iniciarRenomeacao,
+                            }}
+                            selectionProps={{
+                                onToggleAmbienteSelection: toggleAmbienteSelection,
+                            }}
                         />
                     )}
                 </div>
@@ -1677,92 +1267,29 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
                         </div>
                     ) : (
                         <>
-                            <div className="admin-entrance bg-gradient-to-br from-[#111e33] to-[#04080f] border-2 border-[#c9a227]/40 rounded-2xl p-5 shadow-2xl relative overflow-hidden">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/5 blur-3xl rounded-full" />
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
-                                    <div>
-                                        <div className="flex flex-col">
-                                            <p className="text-[10px] uppercase text-blue-300 font-bold mb-1">Total Cliente</p>
-                                            <div className="flex items-baseline gap-2 my-1">
-                                                <h2 className="text-3xl font-bold text-green-400">{formatBRL(finalPrice)}</h2>
-                                                <span className="text-xl font-bold text-gray-400">({totalAreaM2.toFixed(2)} m²)</span>
-                                            </div>
-                                        </div>
-                                        <div className="flex gap-2">
-                                            <span className="text-[9px] bg-blue-900/40 text-blue-300 px-2 py-1 rounded-lg border border-blue-500/20 font-medium whitespace-nowrap">Vlr Efetivo: {formatBRL(valorPraticoM2)}/m²</span>
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <div className="bg-[#c9a227]/10 p-3 rounded-xl border border-[#c9a227]/30 text-center">
-                                            <p className="text-[9px] uppercase text-[#c9a227] font-bold mb-1">Comprar</p>
-                                            <p className="text-xl font-bold">{m.toFixed(2)}<span className="text-[10px] ml-1 opacity-50">m</span></p>
-                                        </div>
-                                        <div className="bg-white/5 p-3 rounded-xl border border-white/10 text-center">
-                                            <p className="text-[9px] uppercase text-gray-500 font-bold mb-1">Eficiência</p>
-                                            <p className={`text-xl font-bold ${eficiencia > 80 ? 'text-green-400' : 'text-yellow-400'}`}>{eficiencia}%</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-4 pt-4 border-t border-white/5">
-                                    <div className="flex items-center justify-center sm:justify-start gap-3 w-full sm:w-auto">
-                                        <p className="text-[10px] uppercase text-red-300 font-bold">Desconto R$:</p>
-                                        <div className="relative">
-                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-red-400 font-bold">R$</span>
-                                            <input
-                                                type="text"
-                                                inputMode="numeric"
-                                                value={displayDesconto}
-                                                onChange={handleDescontoChange}
-                                                onFocus={(e) => e.target.select()}
-                                                onClick={(e) => e.currentTarget.select()}
-                                                onKeyDown={(e) => {
-                                                    if (!/[0-9]/.test(e.key) &&
-                                                        e.key !== 'Backspace' &&
-                                                        e.key !== 'Tab' &&
-                                                        e.key !== 'Enter' &&
-                                                        e.key !== 'Delete' &&
-                                                        e.key !== 'ArrowLeft' &&
-                                                        e.key !== 'ArrowRight' &&
-                                                        !(e.ctrlKey || e.metaKey)) {
-                                                        e.preventDefault();
-                                                    }
-                                                }}
-                                                className="w-28 bg-[#040811] text-red-400 border border-red-500/30 rounded-lg pl-8 pr-2 py-1.5 text-sm text-right font-bold outline-none"
-                                            />
-                                        </div>
-                                        <button
-                                            onClick={() => setCompensarPerdas(!compensarPerdas)}
-                                            className={`p-2 rounded-lg border transition-all flex items-center gap-1.5 h-[34px] ${compensarPerdas ? 'bg-green-500/20 border-green-500/50 text-green-400' : 'bg-white/5 border-white/10 text-gray-500 hover:text-white'}`}
-                                            title={modoPerdas === 'fixo' ? `Perdas fixas: ${perdasFixas}%` : 'Compensar perdas (dinâmico, baseado na eficiência)'}
-                                        >
-                                            <Scissors size={14} />
-                                            <span className="text-[9px] font-bold uppercase whitespace-nowrap">
-                                                Perdas
-                                            </span>
-                                        </button>
-                                    </div>
-                                    <div className="flex gap-2 w-full sm:w-auto">
-                                        <button onClick={salvarNoHistorico} className="flex-1 flex items-center justify-center gap-2 bg-[#c9a227]/10 border border-[#c9a227]/30 text-[#c9a227] px-3 py-2.5 rounded-xl font-bold uppercase text-[9px] hover:bg-[#c9a227]/20 transition-all">
-                                            <History size={13} /> Salvar
-                                        </button>
-                                        <button onClick={gerarImagem} className="flex-1 flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-white px-3 py-2.5 rounded-xl font-bold uppercase text-[9px] transition-transform active:scale-95">
-                                            <Camera size={14} /> PNG
-                                        </button>
-                                        <button onClick={gerarPDF} className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-[#c9a227] to-[#e5c158] text-black px-3 py-2.5 rounded-xl font-bold uppercase text-[9px] transition-transform active:scale-95">
-                                            <FileText size={14} /> PDF
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                            <ResultPanel
+                                finalPrice={finalPrice}
+                                totalAreaM2={totalAreaM2}
+                                valorPraticoM2={valorPraticoM2}
+                                metrosComprar={m}
+                                eficiencia={eficiencia}
+                                displayDesconto={displayDesconto}
+                                onDescontoChange={handleDescontoChange}
+                                compensarPerdas={compensarPerdas}
+                                onTogglePerdas={() => setCompensarPerdas(!compensarPerdas)}
+                                modoPerdas={modoPerdas}
+                                perdasFixas={perdasFixas}
+                                onSalvar={salvarNoHistorico}
+                                onGerarImagem={gerarImagem}
+                                onGerarPDF={gerarPDF}
+                                formatBRL={formatBRL}
+                            />
 
                             <CutModeToolbar
                                 isCutMode={isCutMode}
-                                vidros={vidros}
-                                vidrosBackup={vidrosBackup}
-                                setVidros={setVidros}
-                                setIsCutMode={setIsCutMode}
-                                setVidrosBackup={setVidrosBackup}
-                                criarLead={criarLead}
+                                onEnterCutMode={handleEnterCutMode}
+                                onExitCutMode={handleExitCutMode}
+                                onCriarLead={criarLead}
                             />
 
                               {isCutMode && (
@@ -1771,7 +1298,7 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
                                   </div>
                               )}
 
-                            <div className="flex items-center gap-2 mb-4 w-full">
+                            <div id="calc-algoritmo" className="flex items-center gap-2 mb-4 w-full scroll-mt-24">
                                 <div className="flex bg-[#04080f] border border-white/10 p-1.5 rounded-xl shadow-2xl flex-1 max-w-sm ml-auto">
                                     <button onClick={() => setModoOtimizacao('densidade')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${modoOtimizacao === 'densidade' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}>Corte Densidade</button>
                                     <button onClick={() => setModoOtimizacao('facilidade')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${modoOtimizacao === 'facilidade' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}>Corte Fácil v1</button>
@@ -1816,11 +1343,28 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
                 2026 - lume controle solar - todos os direitos reservados
             </div>
 
-            {showSaveToast && (
-                <div className="fixed top-20 left-1/2 transform -translate-x-1/2 bg-green-500 text-black font-black text-xs uppercase px-6 py-3 rounded-full shadow-[0_0_40px_rgba(34,197,94,0.4)] z-[100] animate-bounce">
-                    Orçamento salvo no histórico!
-                </div>
-            )}
+            <Toast toast={toast} />
+
+            {/* B1: confirmação destrutiva do DS (ex-`confirm` do Limpar) */}
+            <ConfirmDialog
+                show={confirmDialog !== null}
+                title={confirmDialog?.title ?? ''}
+                message={confirmDialog?.message ?? ''}
+                confirmLabel={confirmDialog?.confirmLabel ?? 'Confirmar'}
+                danger
+                onConfirm={() => confirmDialog?.onConfirm()}
+                onCancel={() => setConfirmDialog(null)}
+            />
+
+            {/* B1: importação Zap via modal (ex-`prompt`) */}
+            <ImportModal
+                show={importAberto}
+                code={importCode}
+                setCode={(v) => { setImportCode(v); if (importError) setImportError(null); }}
+                error={importError}
+                onClose={() => setImportAberto(false)}
+                onImport={confirmarImportacaoZap}
+            />
 
             {/* MODAL: COLAR EM... */}
             <ColarModal

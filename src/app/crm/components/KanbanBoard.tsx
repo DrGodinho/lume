@@ -2,13 +2,14 @@
 
 import { DndContext, DragOverlay, KeyboardSensor, MouseSensor, TouchSensor, useDroppable, useSensor, useSensors, type DragEndEvent, type DragStartEvent } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { format } from 'date-fns';
 import { X } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
-import { LEAD_STAGES } from '../constants';
+import { LEAD_STAGES, LEAD_STAGE_STYLES } from '../constants';
 import type { LeadStatus } from '../constants/stages';
 import { resolveKanbanDrop, type KanbanDragData } from '../utils/kanbanDnd';
 import { LeadCard } from './LeadCard';
+import { LeadListItem } from './LeadListItem';
+import { LeadTable, LeadTableEmpty } from './LeadTable';
 import { MultiSelectDropdown } from './MultiSelectDropdown';
 import { SortableLeadCard } from './SortableLeadCard';
 import type { Lead, LeadSortKey, LeadSyncStatus } from '../types';
@@ -47,6 +48,7 @@ interface KanbanBoardProps {
   daysInStatus: (lead: Lead) => number;
   formatCurrency: (value: number) => string;
   getLeadServiceDate: (lead: Lead) => Date | null;
+  getLeadFollowUpDate: (lead: Lead) => Date | null;
   getLeadStatusClasses: (status: Lead['status']) => string;
   leadSyncState: Record<string, LeadSyncStatus>;
   searchInputRef?: React.RefObject<HTMLInputElement | null>;
@@ -88,6 +90,7 @@ export function KanbanBoard({
   daysInStatus,
   formatCurrency,
   getLeadServiceDate,
+  getLeadFollowUpDate,
   getLeadStatusClasses,
   leadSyncState,
   searchInputRef,
@@ -182,7 +185,7 @@ export function KanbanBoard({
                 className="flex-1 rounded-xl px-3 py-2 text-xs font-semibold text-white/60 transition hover:text-white sm:flex-none sm:py-1.5"
                 title="Colapsar todos os cards"
               >
-                Collapse all
+                Recolher
               </button>
               <button
                 type="button"
@@ -190,7 +193,7 @@ export function KanbanBoard({
                 className="flex-1 rounded-xl px-3 py-2 text-xs font-semibold text-white/60 transition hover:text-white sm:flex-none sm:py-1.5"
                 title="Expandir todos os cards"
               >
-                Expand all
+                Expandir
               </button>
             </div>
           )}
@@ -245,9 +248,9 @@ export function KanbanBoard({
           onDelete={onDelete}
           onTogglePin={onTogglePin}
           onReorderLead={onReorderLead}
-          daysInStatus={daysInStatus}
           formatCurrency={formatCurrency}
           getLeadServiceDate={getLeadServiceDate}
+          getLeadFollowUpDate={getLeadFollowUpDate}
         />
       )}
 
@@ -255,36 +258,15 @@ export function KanbanBoard({
         <div className="rounded-2xl border border-white/5 bg-[#07111d]/50 p-4 shadow-lg backdrop-blur-md sm:rounded-3xl sm:p-6 md:overflow-x-auto">
           <div className="space-y-3 md:hidden">
             {visibleTableLeads.map((lead) => (
-              <article key={lead.id} className="rounded-2xl border border-white/5 bg-[#04080f]/85 p-4">
-                <button type="button" onClick={() => onOpenDetail(lead)} className="w-full text-left">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <h3 className="truncate text-sm font-bold text-white">{lead.name}</h3>
-                      <p className="mt-1 text-xs text-white/40">{lead.phone || 'Sem telefone'}</p>
-                    </div>
-                    <span className="shrink-0 text-sm font-black text-[#c9a227]">R$ {formatCurrency(lead.value)}</span>
-                  </div>
-                </button>
-
-                <div className="mt-3 flex flex-wrap gap-2 text-[11px]">
-                  <span className="rounded-full border border-white/5 bg-white/[0.03] px-2.5 py-1 text-white/60">{lead.neighborhood}</span>
-                  <span className="rounded-full border border-white/5 bg-white/[0.03] px-2.5 py-1 text-white/60">{lead.filmType}</span>
-                  {getLeadServiceDate(lead) && (
-                    <span className="rounded-full border border-sky-500/20 bg-sky-500/10 px-2.5 py-1 font-semibold text-sky-300">
-                      Serviço {format(getLeadServiceDate(lead)!, 'dd/MM')}
-                    </span>
-                  )}
-                  <span className={`rounded-full border px-2.5 py-1 font-bold uppercase tracking-wider ${getLeadStatusClasses(lead.status)}`}>{lead.status}</span>
-                </div>
-
-                <div className="mt-4 flex items-center justify-between border-t border-white/5 pt-3">
-                  <span className="text-xs text-white/40">{lead.sqm.toFixed(2)}m² · {daysInStatus(lead)}d no status</span>
-                  <div className="flex gap-3">
-                    <button type="button" onClick={() => onOpenEdit(lead)} className="text-xs font-semibold text-white/60 hover:text-white">Editar</button>
-                    <button type="button" onClick={() => onDelete(lead.id)} className="text-xs font-semibold text-red-300/70 hover:text-red-300">Excluir</button>
-                  </div>
-                </div>
-              </article>
+              <LeadListItem
+                key={lead.id}
+                lead={lead}
+                getLeadServiceDate={getLeadServiceDate}
+                daysInStatus={daysInStatus}
+                onOpenDetail={onOpenDetail}
+                onOpenEdit={onOpenEdit}
+                onDelete={onDelete}
+              />
             ))}
             {hiddenTableCount > 0 && (
               <button
@@ -292,150 +274,41 @@ export function KanbanBoard({
                 onClick={loadMoreTable}
                 className="w-full rounded-2xl border border-white/5 bg-white/[0.02] py-2.5 text-sm font-semibold text-white/50 transition hover:border-[#c9a227]/30 hover:text-[#f5d77a]"
               >
-                Mostrar mais {hiddenTableCount} lead{hiddenTableCount === 1 ? '' : 's'}
+                Ver mais {hiddenTableCount} lead{hiddenTableCount === 1 ? '' : 's'}
               </button>
             )}
             {filteredLeads.length === 0 && (
-              <div className="rounded-2xl border border-dashed border-white/10 p-6 text-center">
-                <p className="text-sm font-semibold text-white/30">
-                  {leads.length === 0 ? 'Nenhum lead cadastrado ainda.' : 'Nenhum lead encontrado com estes filtros.'}
-                </p>
-                {leads.length === 0 && (
-                  <button
-                    type="button"
-                    onClick={onOpenCreateModal}
-                    className="mt-3 rounded-2xl border border-[#c9a227]/20 bg-[#c9a227]/10 px-4 py-2 text-xs font-bold uppercase tracking-wider text-[#f5d77a] transition hover:bg-[#c9a227]/15"
-                  >
-                    Criar primeiro lead
-                  </button>
-                )}
-              </div>
+              <LeadTableEmpty
+                message={leads.length === 0 ? 'Nenhum lead cadastrado ainda.' : 'Nenhum lead encontrado com estes filtros.'}
+                actionLabel={leads.length === 0 ? 'Criar primeiro lead' : undefined}
+                onAction={leads.length === 0 ? onOpenCreateModal : undefined}
+              />
             )}
           </div>
 
-          <table className="hidden w-full border-collapse text-left text-sm text-white/80 md:table">
-            <thead>
-              <tr className="border-b border-white/5 text-xs uppercase tracking-widest text-white/40">
-                <th className="cursor-pointer select-none pb-3 font-semibold hover:text-white" onClick={() => onToggleSort('name')}>
-                  Cliente {sortKey === 'name' && <span className="ml-1 text-[#c9a227]">{sortDir === 'asc' ? '↑' : '↓'}</span>}
-                </th>
-                <th className="cursor-pointer select-none pb-3 font-semibold hover:text-white" onClick={() => onToggleSort('neighborhood')}>
-                  Bairro {sortKey === 'neighborhood' && <span className="ml-1 text-[#c9a227]">{sortDir === 'asc' ? '↑' : '↓'}</span>}
-                </th>
-                <th className="cursor-pointer select-none pb-3 font-semibold hover:text-white" onClick={() => onToggleSort('filmType')}>
-                  Película {sortKey === 'filmType' && <span className="ml-1 text-[#c9a227]">{sortDir === 'asc' ? '↑' : '↓'}</span>}
-                </th>
-                <th className="cursor-pointer select-none pb-3 text-center font-semibold hover:text-white" onClick={() => onToggleSort('sqm')}>
-                  Área (m²) {sortKey === 'sqm' && <span className="ml-1 text-[#c9a227]">{sortDir === 'asc' ? '↑' : '↓'}</span>}
-                </th>
-                <th className="cursor-pointer select-none pb-3 text-right font-semibold hover:text-white" onClick={() => onToggleSort('value')}>
-                  Valor {sortKey === 'value' && <span className="ml-1 text-[#c9a227]">{sortDir === 'asc' ? '↑' : '↓'}</span>}
-                </th>
-                <th className="cursor-pointer select-none pb-3 text-center font-semibold hover:text-white" onClick={() => onToggleSort('status')}>
-                  Status {sortKey === 'status' && <span className="ml-1 text-[#c9a227]">{sortDir === 'asc' ? '↑' : '↓'}</span>}
-                </th>
-                <th className="cursor-pointer select-none pb-3 text-center font-semibold hover:text-white" onClick={() => onToggleSort('dataServico')}>
-                  Serviço {sortKey === 'dataServico' && <span className="ml-1 text-[#c9a227]">{sortDir === 'asc' ? '↑' : '↓'}</span>}
-                </th>
-                <th className="pb-3 text-center font-semibold">Dias</th>
-                <th className="pb-3 text-right font-semibold">Ações</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/5">
-              {visibleTableLeads.map((lead) => (
-                <tr
-                  key={lead.id}
-                  className="group cursor-pointer hover:bg-white/[0.01]"
-                  onClick={() => onTableRowClick(lead)}
-                  onDoubleClick={() => onTableRowDoubleClick(lead)}
-                  title="Clique para ver detalhes. Duplo clique para editar."
-                >
-                  <td className="py-3.5 font-semibold text-white">
-                    <div className="flex flex-col">
-                      <span className="border-b border-dotted border-white/20 transition hover:border-[#c9a227]/60">{lead.name}</span>
-                      <span className="text-xs font-normal text-white/40">{lead.phone}</span>
-                    </div>
-                  </td>
-                  <td className="py-3.5 text-white/70">{lead.neighborhood}</td>
-                  <td className="py-3.5">
-                    <span className="inline-flex rounded-lg border border-white/5 bg-white/[0.02] px-2.5 py-0.5 text-xs text-white/70">
-                      {lead.filmType}
-                    </span>
-                  </td>
-                  <td className="py-3.5 text-center font-mono">{lead.sqm.toFixed(2)}m²</td>
-                  <td className="py-3.5 text-right font-bold text-[#c9a227]">R$ {formatCurrency(lead.value)}</td>
-                  <td className="py-3.5 text-center">
-                    <span className={`inline-flex rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${getLeadStatusClasses(lead.status)}`}>
-                      {lead.status}
-                    </span>
-                  </td>
-                  <td className="py-3.5 text-center text-xs font-semibold text-sky-300">
-                    {getLeadServiceDate(lead) ? format(getLeadServiceDate(lead)!, 'dd/MM/yyyy') : '—'}
-                  </td>
-                  <td className="py-3.5 text-center font-mono text-xs text-white/40">{daysInStatus(lead)}d</td>
-                  <td className="py-3.5 text-right">
-                    <div className="flex justify-end gap-3 opacity-60 transition duration-300 group-hover:opacity-100">
-                      <button
-                        type="button"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          onOpenEdit(lead);
-                        }}
-                        onDoubleClick={(event) => event.stopPropagation()}
-                        className="text-white/40 hover:text-white"
-                        title="Editar"
-                      >
-                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                        </svg>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          onDelete(lead.id);
-                        }}
-                        onDoubleClick={(event) => event.stopPropagation()}
-                        className="text-white/30 hover:text-red-400"
-                        title="Excluir"
-                      >
-                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {filteredLeads.length === 0 && (
-                <tr>
-                  <td colSpan={9} className="py-10">
-                    <div className="flex flex-col items-center gap-3 text-center">
-                      <p className="font-semibold text-white/30">
-                        {leads.length === 0 ? 'Nenhum lead cadastrado ainda.' : 'Nenhum lead encontrado com estes filtros.'}
-                      </p>
-                      {leads.length === 0 && (
-                        <button
-                          type="button"
-                          onClick={onOpenCreateModal}
-                          className="rounded-2xl border border-[#c9a227]/20 bg-[#c9a227]/10 px-4 py-2 text-xs font-bold uppercase tracking-wider text-[#f5d77a] transition hover:bg-[#c9a227]/15"
-                        >
-                          Criar primeiro lead
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+          <LeadTable
+            leads={visibleTableLeads}
+            emptyMessage={leads.length === 0 ? 'Nenhum lead cadastrado ainda.' : 'Nenhum lead encontrado com estes filtros.'}
+            emptyActionLabel={leads.length === 0 ? 'Criar primeiro lead' : undefined}
+            onEmptyAction={leads.length === 0 ? onOpenCreateModal : undefined}
+            onOpenEdit={onOpenEdit}
+            onRowClick={onTableRowClick}
+            onRowDoubleClick={onTableRowDoubleClick}
+            onDelete={onDelete}
+            sortKey={sortKey}
+            sortDir={sortDir}
+            onToggleSort={onToggleSort}
+            daysInStatus={daysInStatus}
+            getLeadServiceDate={getLeadServiceDate}
+            tableClassName="hidden w-full border-collapse text-left text-sm text-white/80 md:table"
+          />
           {hiddenTableCount > 0 && (
             <button
               type="button"
               onClick={loadMoreTable}
               className="mt-4 w-full rounded-2xl border border-white/5 bg-white/[0.02] py-2.5 text-sm font-semibold text-white/50 transition hover:border-[#c9a227]/30 hover:text-[#f5d77a]"
             >
-              Mostrar mais {hiddenTableCount} lead{hiddenTableCount === 1 ? '' : 's'}
+              Ver mais {hiddenTableCount} lead{hiddenTableCount === 1 ? '' : 's'}
             </button>
           )}
         </div>
@@ -465,9 +338,9 @@ interface KanbanDnDProps {
   onOpenEdit: (lead: Lead) => void;
   onDelete: (leadId: string) => void;
   onTogglePin: (leadId: string) => void;
-  daysInStatus: (lead: Lead) => number;
   formatCurrency: (value: number) => string;
   getLeadServiceDate: (lead: Lead) => Date | null;
+  getLeadFollowUpDate: (lead: Lead) => Date | null;
 }
 
 function KanbanDnD({
@@ -481,38 +354,10 @@ function KanbanDnD({
   onDelete,
   onTogglePin,
   onReorderLead,
-  daysInStatus,
   formatCurrency,
   getLeadServiceDate,
+  getLeadFollowUpDate,
 }: KanbanDnDProps) {
-  const stageStyles: Record<string, { border: string; headerBg: string; badge: string }> = {
-    Novo: {
-      border: 'border-blue-500/20 hover:border-blue-500/40',
-      headerBg: 'bg-blue-500/10 text-blue-400',
-      badge: 'bg-blue-500/20 text-blue-300',
-    },
-    'Em Contato': {
-      border: 'border-amber-500/20 hover:border-amber-500/40',
-      headerBg: 'bg-amber-500/10 text-amber-400',
-      badge: 'bg-amber-500/20 text-amber-300',
-    },
-    Agendado: {
-      border: 'border-purple-500/20 hover:border-purple-500/40',
-      headerBg: 'bg-purple-500/10 text-purple-400',
-      badge: 'bg-purple-500/20 text-purple-300',
-    },
-    Fechado: {
-      border: 'border-emerald-500/20 hover:border-emerald-500/40',
-      headerBg: 'bg-emerald-500/10 text-emerald-400',
-      badge: 'bg-emerald-500/20 text-emerald-300',
-    },
-    Perdido: {
-      border: 'border-red-500/20 hover:border-red-500/40',
-      headerBg: 'bg-red-500/10 text-red-400',
-      badge: 'bg-red-500/20 text-red-300',
-    },
-  };
-
   const [activeLeadId, setActiveLeadId] = useState<string | null>(null);
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
@@ -594,7 +439,7 @@ function KanbanDnD({
       <div className="grid gap-3 pb-4 md:grid-cols-5 md:gap-4">
         {LEAD_STAGES.map((stage) => {
           const stageLeads = leads.filter((lead) => lead.status === stage);
-          const style = stageStyles[stage] || KANBAN_DND_FALLBACK_STYLE;
+          const style = LEAD_STAGE_STYLES[stage] || KANBAN_DND_FALLBACK_STYLE;
           return (
             <KanbanColumn
               key={stage}
@@ -609,9 +454,9 @@ function KanbanDnD({
               onOpenEdit={onOpenEdit}
               onDelete={onDelete}
               onTogglePin={onTogglePin}
-              daysInStatus={daysInStatus}
               formatCurrency={formatCurrency}
               getLeadServiceDate={getLeadServiceDate}
+              getLeadFollowUpDate={getLeadFollowUpDate}
             />
           );
         })}
@@ -622,9 +467,9 @@ function KanbanDnD({
           <LeadCard
             lead={activeLead}
             collapsed={collapsedCards.has(activeLead.id)}
-            daysInStatus={daysInStatus}
             formatCurrency={formatCurrency}
             getLeadServiceDate={getLeadServiceDate}
+            getLeadFollowUpDate={getLeadFollowUpDate}
             syncStatus={leadSyncState[activeLead.id] || 'ok'}
             onToggleCollapse={onToggleCollapse}
             onOpenDetail={onOpenDetail}
@@ -655,9 +500,9 @@ interface KanbanColumnProps {
   onOpenEdit: (lead: Lead) => void;
   onDelete: (leadId: string) => void;
   onTogglePin: (leadId: string) => void;
-  daysInStatus: (lead: Lead) => number;
   formatCurrency: (value: number) => string;
   getLeadServiceDate: (lead: Lead) => Date | null;
+  getLeadFollowUpDate: (lead: Lead) => Date | null;
 }
 
 function KanbanColumn({
@@ -672,9 +517,9 @@ function KanbanColumn({
   onOpenEdit,
   onDelete,
   onTogglePin,
-  daysInStatus,
   formatCurrency,
   getLeadServiceDate,
+  getLeadFollowUpDate,
 }: KanbanColumnProps) {
   const { setNodeRef, isOver } = useDroppable({ id: `column-${stage}`, data: { type: 'column', stage } });
   const stageIndex = LEAD_STAGES.indexOf(stage);
@@ -720,9 +565,9 @@ function KanbanColumn({
               lead={lead}
               stage={stage}
               collapsed={collapsedCards.has(lead.id)}
-              daysInStatus={daysInStatus}
               formatCurrency={formatCurrency}
               getLeadServiceDate={getLeadServiceDate}
+              getLeadFollowUpDate={getLeadFollowUpDate}
               syncStatus={leadSyncState[lead.id] || 'ok'}
               onToggleCollapse={onToggleCollapse}
               onOpenDetail={onOpenDetail}
@@ -742,7 +587,7 @@ function KanbanColumn({
               onClick={loadMoreStage}
               className="w-full rounded-2xl border border-white/5 bg-white/[0.02] py-2 text-xs font-semibold text-white/50 transition hover:border-[#c9a227]/30 hover:text-[#f5d77a]"
             >
-              Mostrar mais {hiddenStageCount} lead{hiddenStageCount === 1 ? '' : 's'}
+                Ver mais {hiddenStageCount} lead{hiddenStageCount === 1 ? '' : 's'}
             </button>
           )}
 

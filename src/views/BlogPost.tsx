@@ -56,14 +56,29 @@ function TextWithBreaks({ text }: { text: string }) {
   );
 }
 
+function slugifyHeading(text: string) {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 function BlogBlock({ block }: { block: BlogContentBlock }) {
   if (block.type === 'heading') {
     const className =
       block.level === 3
         ? 'mt-12 font-montserrat text-2xl font-black text-white'
-        : 'mt-14 font-montserrat text-3xl font-black text-white md:text-4xl';
+        : 'mt-14 scroll-mt-28 font-montserrat text-3xl font-black text-white md:text-4xl';
 
-    return block.level === 3 ? <h3 className={className}>{block.text}</h3> : <h2 className={className}>{block.text}</h2>;
+    return block.level === 3 ? (
+      <h3 className={className}>{block.text}</h3>
+    ) : (
+      <h2 id={slugifyHeading(block.text)} className={className}>
+        {block.text}
+      </h2>
+    );
   }
 
   if (block.type === 'paragraph') {
@@ -92,7 +107,7 @@ function BlogBlock({ block }: { block: BlogContentBlock }) {
   if (block.type === 'image') {
     return (
       <figure className="my-10 overflow-hidden rounded-[1.7rem] border border-white/10 bg-white/[0.03]">
-        <img src={block.url} alt={block.alt} className="w-full object-cover" loading="lazy" />
+        <img src={block.url} alt={block.alt} className="aspect-[16/9] w-full object-cover" loading="lazy" />
         {block.caption && <figcaption className="p-4 text-sm text-gray-500">{block.caption}</figcaption>}
       </figure>
     );
@@ -241,6 +256,10 @@ function BlogBlock({ block }: { block: BlogContentBlock }) {
 export function BlogPost({ post, relatedPosts }: BlogPostProps) {
   const readingTime = getReadingTime(post.content);
   const postUrl = getBlogUrl(post.slug);
+  const waHref = `https://wa.me/5521965140612?text=${encodeURIComponent(`Olá! Li o artigo ${postUrl} e quero um orçamento.`)}`;
+  const headings = post.content.flatMap((block) =>
+    block.type === 'heading' && block.level !== 3 ? [block.text] : [],
+  );
 
   return (
     <article className="min-h-screen bg-[#04080f] text-white">
@@ -282,6 +301,26 @@ export function BlogPost({ post, relatedPosts }: BlogPostProps) {
 
       <main className="container-lume grid gap-10 px-4 pb-24 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="min-w-0 rounded-[2rem] border border-white/10 bg-white/[0.025] p-6 md:p-10">
+          {headings.length >= 3 && (
+            <nav
+              aria-label="Neste artigo"
+              className="mb-10 rounded-[1.5rem] border border-[#c9a227]/25 bg-[#c9a227]/[0.06] p-5"
+            >
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-[#c9a227]">Neste artigo</p>
+              <ul className="mt-3 space-y-2">
+                {headings.map((heading) => (
+                  <li key={heading}>
+                    <a
+                      href={`#${slugifyHeading(heading)}`}
+                      className="text-sm font-bold leading-6 text-gray-200 hover:text-[#c9a227] hover:underline"
+                    >
+                      {heading}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          )}
           {post.content.map((block, index) => (
             <BlogBlock key={`${block.type}-${index}`} block={block} />
           ))}
@@ -338,6 +377,17 @@ export function BlogPost({ post, relatedPosts }: BlogPostProps) {
           </div>
         </aside>
       </main>
+      <div className="lg:hidden fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-[#04080f]/95 px-4 pt-3 backdrop-blur pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        <a
+          href={waHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn-primary flex w-full items-center justify-center gap-2"
+        >
+          <MessageCircle className="h-4 w-4" />
+          Pedir orçamento no WhatsApp
+        </a>
+      </div>
     </article>
   );
 }

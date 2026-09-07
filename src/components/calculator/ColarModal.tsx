@@ -1,14 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { ClipboardPaste, X, Layers, Plus } from 'lucide-react';
+import type { ResumoItem } from '../../lib/grouping';
+import { groupByAmbiente } from '../../lib/grouping';
 
-export interface ResumoItem {
-    h: number;
-    w: number;
-    q: number;
-    label: string;
-}
+export type { ResumoItem };
 
 interface ColarModalProps {
     show: boolean;
@@ -20,6 +17,19 @@ interface ColarModalProps {
 
 export function ColarModal({ show, onClose, resumo, colarItens, labelIn }: ColarModalProps) {
     if (!show) return null;
+    return <ColarModalBody onClose={onClose} resumo={resumo} colarItens={colarItens} initialNome={labelIn} />;
+}
+
+function ColarModalBody({ onClose, resumo, colarItens, initialNome }: {
+    onClose: () => void;
+    resumo: ResumoItem[];
+    colarItens: (labelDestino: string) => void;
+    initialNome: string;
+}) {
+    // Estado inicial por montagem: o body só monta quando o modal abre,
+    // então o input já nasce com o ambiente atual sem precisar de efeito.
+    const [novoNome, setNovoNome] = useState(initialNome);
+    const trimmed = novoNome.trim();
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
@@ -34,14 +44,7 @@ export function ColarModal({ show, onClose, resumo, colarItens, labelIn }: Colar
                     </button>
                 </div>
                 <div className="space-y-2">
-                    {Object.entries(
-                        resumo.reduce((acc, item) => {
-                            const lbl = item.label || 'Sem Ambiente';
-                            if (!acc[lbl]) acc[lbl] = [];
-                            acc[lbl].push(item);
-                            return acc;
-                        }, {} as globalThis.Record<string, ResumoItem[]>)
-                    ).map(([ambiente]) => (
+                    {Object.entries(groupByAmbiente(resumo)).map(([ambiente]) => (
                         <button
                             key={ambiente}
                             onClick={() => colarItens(ambiente === 'Sem Ambiente' ? '' : ambiente)}
@@ -52,19 +55,24 @@ export function ColarModal({ show, onClose, resumo, colarItens, labelIn }: Colar
                             <span className="text-[10px] text-gray-400 ml-auto">existente</span>
                         </button>
                     ))}
-                    <div className="pt-2 border-t border-white/10 mt-2">
-                        <button
-                            onClick={() => {
-                                const novoLabel = labelIn.trim();
-                                if (novoLabel) {
-                                    colarItens(novoLabel);
-                                }
+                    <div className="pt-2 border-t border-white/10 mt-2 space-y-2">
+                        <input
+                            type="text"
+                            value={novoNome}
+                            onChange={(e) => setNovoNome(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') { e.preventDefault(); if (trimmed) colarItens(trimmed); }
                             }}
-                            disabled={!labelIn.trim()}
+                            placeholder="Nome do novo ambiente..."
+                            className="w-full bg-[#040811] border border-white/10 rounded-xl p-3 text-sm outline-none focus:border-[#c9a227]/50 placeholder:text-gray-600"
+                        />
+                        <button
+                            onClick={() => { if (trimmed) colarItens(trimmed); }}
+                            disabled={!trimmed}
                             className="w-full text-left p-3 rounded-xl bg-[#c9a227]/10 hover:bg-[#c9a227]/20 border border-[#c9a227]/30 text-[#c9a227] transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
                         >
                             <Plus size={14} />
-                            <span className="text-sm font-bold">Novo: {labelIn || 'Digite o nome acima'}</span>
+                            <span className="text-sm font-bold">Novo: {trimmed || 'digite o nome acima'}</span>
                         </button>
                     </div>
                 </div>

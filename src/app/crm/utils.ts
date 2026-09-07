@@ -140,6 +140,11 @@ export const areLeadCollectionsEquivalent = (left: Lead[], right: Lead[]) => {
   ));
 };
 
+/** Formatação canônica de moeda do CRM (com símbolo, ex.: "R$ 1.234,56"). */
+export const formatBRL = (value: number) =>
+  new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+
+/** Apenas o número (sem "R$" — quem chama adiciona o prefixo). Mantido para os cards que já prefixam "R$ ". */
 export const formatLeadCurrency = (value: number) => value.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
 
 const normalizePhoneDigits = (value: string) => value.replace(/\D/g, '');

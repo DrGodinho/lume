@@ -112,11 +112,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'ID do orcamento e obrigatorio' }, { status: 400 });
   }
 
-  const { error } = await supabaseAdmin.from('calculator_history').upsert({
+  const baseRow = {
     id,
     owner_key: ownerKey,
     cliente: body.cliente,
     phone: body.phone ?? null,
+    neighborhood: body.neighborhood ?? null,
     data: body.data,
     valor: body.valor,
     qtd: body.qtd,
@@ -126,7 +127,16 @@ export async function POST(request: NextRequest) {
     modo_otimizacao: body.modoOtimizacao,
     selected_film: body.selectedFilm ?? null,
     lead_id: body.leadId ?? null,
-  });
+  };
+
+  // `neighborhood` pode nao existir no banco (schema antigo): se o PostgREST
+  // reclamar da coluna, tenta de novo sem ela em vez de devolver 500.
+  let { error } = await supabaseAdmin.from('calculator_history').upsert(baseRow);
+  if (error && error.message?.includes('neighborhood')) {
+    const { neighborhood: _dropped, ...rowWithoutNeighborhood } = baseRow;
+    void _dropped;
+    ({ error } = await supabaseAdmin.from('calculator_history').upsert(rowWithoutNeighborhood));
+  }
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

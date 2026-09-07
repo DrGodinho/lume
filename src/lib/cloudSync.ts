@@ -8,6 +8,7 @@ type CloudConfig = object;
 interface DraftData {
   cliente: string;
   phone: string;
+  neighborhood: string;
   vidros: CloudGlass[];
   desconto: number;
   desconto_input: string;
@@ -50,6 +51,7 @@ function sanitizeDraft(draft: DraftData): DraftData | null {
   return {
     cliente: typeof draft.cliente === 'string' ? draft.cliente : '',
     phone: typeof draft.phone === 'string' ? draft.phone : '',
+    neighborhood: typeof draft.neighborhood === 'string' ? draft.neighborhood : '',
     vidros,
     desconto: desconto ?? 0,
     desconto_input: typeof draft.desconto_input === 'string' ? draft.desconto_input : '',
@@ -112,6 +114,7 @@ interface HistoryItem {
   id: string;
   cliente: string;
   phone?: string;
+  neighborhood?: string;
   data: string;
   valor: number;
   qtd: number;
@@ -155,6 +158,7 @@ export async function loadHistoryFromCloud(): Promise<HistoryItem[]> {
       id: String(row.id),
       cliente: String(row.cliente ?? ''),
       phone: row.phone ? String(row.phone) : undefined,
+      neighborhood: row.neighborhood ? String(row.neighborhood) : undefined,
       data: String(row.data ?? ''),
       valor: Number(row.valor) || 0,
       qtd: Number(row.qtd) || 0,

@@ -1,8 +1,20 @@
 'use client';
 
 import { ContactCTA } from '../sections/ContactCTA';
-import { ArrowRight, Zap, Target, Shield } from 'lucide-react';
+import { ArrowRight, MessageCircle, Zap, Target, Shield } from 'lucide-react';
 import { HeroEntrance } from '../components/HeroEntrance';
+import { guiaFaqGroups } from '../content/guiaInsulfilmFaq';
+
+const guiaToc = [
+    { id: 'o-que-e-insulfilm', label: 'O que é Insulfilm?' },
+    { id: 'conforto-termico', label: '1. Conforto Térmico e Economia' },
+    { id: 'protecao-uv', label: '2. Proteção UV' },
+    { id: 'privacidade-seguranca', label: '3. Privacidade e Segurança' },
+    { id: 'guia-selecao', label: '4. Guia de Seleção' },
+    { id: 'comparativo-tecnico', label: 'Comparativo Técnico das Películas' },
+    { id: 'qualidade-cuidados', label: '5. Qualidade e Cuidados Diários' },
+    { id: 'remocao', label: '6. Remoção: Quando é Hora de Mudar?' },
+];
 
 // Reusable Accordion Component for FAQs
 const FAQAccordion = ({ items }: { items: { q: string, a: string }[] }) => (
@@ -97,15 +109,11 @@ export function GuiaInsulfilm() {
                     </div>
 
                     <h1 className="text-4xl md:text-5xl lg:text-6xl font-black font-montserrat mb-6 leading-tight">
-                        <span className="word opacity-0 inline-block">Absolutamente</span>{' '}
-                        <span className="word opacity-0 inline-block">tudo</span>{' '}
-                        <span className="word opacity-0 inline-block">o</span>{' '}
-                        <span className="word opacity-0 inline-block">que</span>{' '}
-                        <span className="word opacity-0 inline-block">você</span>{' '}
-                        <span className="word opacity-0 inline-block">precisa</span>{' '}
-                        <span className="word opacity-0 inline-block">saber</span>{' '}
-                        <span className="word opacity-0 inline-block">sobre</span>{' '}
+                        <span className="word opacity-0 inline-block">Guia</span>{' '}
+                        <span className="word opacity-0 inline-block">de</span>{' '}
                         <span className="word opacity-0 inline-block text-gradient-gold">insulfilm</span>{' '}
+                        <span className="word opacity-0 inline-block">residencial:</span>{' '}
+                        <span className="word opacity-0 inline-block">tudo</span>{' '}
                         <span className="word opacity-0 inline-block">antes</span>{' '}
                         <span className="word opacity-0 inline-block">de</span>{' '}
                         <span className="word opacity-0 inline-block">comprar</span>
@@ -124,8 +132,22 @@ export function GuiaInsulfilm() {
             {/* Main Content */}
             <main className="container-lume max-w-4xl mx-auto py-16 px-4 space-y-20 page-entrance">
 
+                {/* Índice do guia */}
+                <nav aria-label="Neste guia" className="rounded-2xl border border-[#c9a227]/25 bg-[#c9a227]/[0.06] p-5 md:p-6">
+                    <p className="text-xs font-black uppercase tracking-[0.2em] text-[#c9a227]">Neste guia</p>
+                    <ul className="mt-3 grid gap-2 md:grid-cols-2">
+                        {guiaToc.map((item) => (
+                            <li key={item.id}>
+                                <a href={`#${item.id}`} className="text-sm font-bold leading-6 text-gray-200 hover:text-[#c9a227] hover:underline">
+                                    {item.label}
+                                </a>
+                            </li>
+                        ))}
+                    </ul>
+                </nav>
+
                 {/* Definição Técnica */}
-                <section className="prose prose-lg prose-invert max-w-none text-gray-300">
+                <section id="o-que-e-insulfilm" className="prose prose-lg prose-invert max-w-none text-gray-300 scroll-mt-24">
                     <h2 className="text-3xl font-bold font-montserrat text-white mb-6">O que é Insulfilm?</h2>
                     <p className="text-xl leading-relaxed text-gray-400">
                         Tecnicamente conhecido como <strong>Película de Controle Solar</strong>, o insulfilm é um laminado composto por múltiplas camadas de poliéster (PET) de alta resistência ótica. Diferente de um adesivo comum, ele é um dispositivo de engenharia de materiais que utiliza nanotecnologia, pigmentos inorgânicos e metais (em linhas específicas) para filtrar seletivamente o espectro solar. Sua estrutura conta com uma camada de adesivo sensível à pressão, camadas de filtragem de radiação Ultravioleta (UV) e Infravermelha (IR), e um revestimento externo chamado <strong>Hard Coat</strong>, que protege o material contra riscos e abrasão mecânica durante a limpeza.
@@ -143,7 +165,7 @@ export function GuiaInsulfilm() {
                 </section>
 
                 {/* 1. Conforto Térmico */}
-                <section>
+                <section id="conforto-termico" className="scroll-mt-24">
                     <div className="flex items-center gap-4 mb-6">
                         <div className="w-12 h-12 rounded-xl bg-[#c9a227]/10 flex items-center justify-center text-[#c9a227]">
                             <Zap size={24} />
@@ -157,7 +179,7 @@ export function GuiaInsulfilm() {
                         </p>
                         <h3 className="text-xl font-bold text-white mt-8 mb-4">Economia Real no Bolso</h3>
                         <p>
-                            As películas de alta performance atuam como um escudo inteligente. Ao reduzir a entrada de calor, o seu ar-condicionado não precisa trabalhar no limite o tempo todo para manter a temperatura agradável. Estudos indicam que a instalação de películas premium pode gerar uma <strong>economia de até 30% no consumo de energia elétrica</strong> do ar-condicionado. Em regiões quentes como a Zona Oeste, esse investimento se paga em poucos meses.
+                            As películas de alta performance atuam como um escudo inteligente. Ao reduzir a entrada de calor, o seu ar-condicionado não precisa trabalhar no limite o tempo todo para manter a temperatura agradável. Estudos indicam que a instalação de películas premium pode gerar uma <strong>economia de 25% a 40% no consumo de energia elétrica</strong> do ar-condicionado. Em regiões quentes como a Zona Oeste, esse investimento se paga em poucos meses.
                         </p>
                         <h3 className="text-xl font-bold text-white mt-8 mb-4">Alta Tecnologia: Nanocerâmica e Películas Claras</h3>
                         <p>
@@ -165,16 +187,11 @@ export function GuiaInsulfilm() {
                         </p>
                     </div>
 
-                    <FAQAccordion items={[
-                        { q: "No inverno, minha casa vai ficar gelada?", a: "Você tocou num ponto físico real! Como o filme barra o calor do sol, no inverno ele também vai reduzir o ganho térmico solar. A boa notícia é que películas de alto padrão também possuem propriedades de isolamento que ajudam a reter o calor gerado dentro de casa, impedindo que ele escape pelo vidro frio." },
-                        { q: "Realmente economiza energia elétrica?", a: "Sim, e é um investimento que se paga. Quando o sol bate no vidro sem proteção, ele transforma o ambiente em uma estufa. O ar-condicionado precisa trabalhar no talo para vencer essa carga térmica. Ao bloquear até 80% desse calor na janela, o ambiente resfria mais rápido e o motor do ar-condicionado trabalha menos, reduzindo o consumo de energia." },
-                        { q: "O filme vai deixar minha casa escura?", a: "De jeito nenhum, a menos que você queira! Antigamente, para barrar o calor, era preciso escurecer o vidro. Hoje a física evoluiu. O sol emite luz visível (que ilumina) e infravermelho (que gera calor). Películas de alta tecnologia, como as de Nano Cerâmica, conseguem filtrar seletivamente a radiação infravermelha, retendo o calor enquanto deixam a luz natural passar quase que totalmente." },
-                        { q: "As minhas plantas vão morrer por falta de luz?", a: "Não. Para fazer a fotossíntese, as plantas utilizam principalmente a luz visível (espectros azul e vermelho). As películas de qualidade bloqueiam os raios UV (que causam queimaduras nas folhas) e o infravermelho (calor excessivo que desidrata a planta). A luz que as plantas precisam para \"se alimentar\" continua passando perfeitamente." }
-                    ]} />
+                    <FAQAccordion items={guiaFaqGroups[0]} />
                 </section>
 
                 {/* 2. Proteção UV */}
-                <section>
+                <section id="protecao-uv" className="scroll-mt-24">
                     <div className="flex items-center gap-4 mb-6">
                         <div className="w-12 h-12 rounded-xl bg-[#c9a227]/10 flex items-center justify-center text-[#c9a227]">
                             <Shield size={24} />
@@ -200,12 +217,7 @@ export function GuiaInsulfilm() {
                         </p>
                     </div>
 
-                    <FAQAccordion items={[
-                        { q: "O filme protege mesmo contra o desbotamento de móveis e pisos?", a: "Protege muito, mas a proteção não é 100% vitalícia, e qualquer profissional honesto vai te dizer isso. O desbotamento é causado por três fatores principais: Raios UV (40%), Calor (25%) e Luz Visível (25%). O filme bloqueia 99% do UV e a maior parte do calor, o que significa que ele retarda o desbotamento em muitas vezes. Mas como a luz visível ainda passa (afinal, você quer claridade), o processo continua ocorrendo, só que em passos de tartaruga!" },
-                        { q: "Mesmo em dias nublados o UV é perigoso?", a: "Sim, com certeza. Diferente da luz visível, que é barrada pelas nuvens, a radiação ultravioleta possui um comprimento de onda que atravessa facilmente a camada de nuvens e o vidro comum sem qualquer dificuldade. Na verdade, em dias nublados, podemos ser enganados pela sensação de frescor, mas a carga de UV que incide sobre sua pele e seus móveis continua sendo perigosamente alta." },
-                        { q: "A película perde o filtro UV com o tempo?", a: "Depende da qualidade da fabricação. Películas tingidas de baixo custo (aquelas que ficam roxas) possuem inibidores de UV instáveis que são destruídos rapidamente pela própria radiação solar. Já as películas de alto padrão LUME possuem estabilizadores de UV integrados na massa do poliéster durante a fabricação, garantindo 99% de bloqueio UV eficaz por muitos anos." },
-                        { q: "Por que o jateado também protege contra o UV?", a: "É um mito comum achar que o bloqueio UV depende da cor ou da transparência. Na realidade, o filtro UV é um componente químico incolor e invisível que é adicionado às camadas internas do poliéster. O efeito 'jateado' é apenas visual (uma distorção da luz), mas o material base da película LUME já contém a tecnologia de absorção ultravioleta máxima para proteger seu patrimônio." }
-                    ]} />
+                    <FAQAccordion items={guiaFaqGroups[1]} />
                 </section>
 
                 {/* Middle CTA */}
@@ -218,7 +230,7 @@ export function GuiaInsulfilm() {
                 </div>
 
                 {/* 3. Privacidade e Segurança */}
-                <section>
+                <section id="privacidade-seguranca" className="scroll-mt-24">
                     <div className="flex items-center gap-4 mb-6">
                         <div className="w-12 h-12 rounded-xl bg-[#c9a227]/10 flex items-center justify-center text-[#c9a227]">
                             <Target size={24} />
@@ -235,15 +247,11 @@ export function GuiaInsulfilm() {
                         </p>
                     </div>
 
-                    <FAQAccordion items={[
-                        { q: "À noite, quem está fora conseguirá ver dentro de casa?", a: "Sim, e é importante ser honesto sobre isso. O efeito de privacidade (seja fumê ou espelhado) baseia-se na física da reflexão da luz: o lado que estiver mais iluminado reflete e não vê através do vidro. Durante o dia, o sol faz esse papel e ninguém te vê. À noite, se você acender a luz interna, o interior da casa fica mais claro que o exterior, e o efeito se inverte. Para a noite, o uso de cortinas ou persianas continua sendo necessário." },
-                        { q: "Qual a diferença da G5 para a G20?", a: "É uma questão de luminosidade e privacidade. A letra 'G' vem de 'Grade' (grau de transparência). Uma película G5 permite que apenas 5% da luz visível atravesse o vidro, sendo a escolha ideal para quem busca privacidade total em quartos ou salas que recebem muito brilho. Já a G20 permite a passagem de 20% da luz, sendo considerada uma película de transparência média. Ela equilibra bem a visão externa clara durante o dia com uma redução moderada do calor e um nível de privacidade satisfatório." },
-                        { q: "O filme de segurança deixa o vidro inquebrável?", a: "Não, he não impede que o vidro quebre. A função da película de segurança (antivandalismo) é a retenção. Se alguém der uma marretada ou uma pedra bater no vidro, ele vai quebrar, mas os estilhaços ficarão colados na película. Isso evita que cacos firam pessoas e cria uma barreira física resistente que atrasa a invasão de criminosos." }
-                    ]} />
+                    <FAQAccordion items={guiaFaqGroups[2]} />
                 </section>
 
                 {/* 4. Guia de Seleção */}
-                <section>
+                <section id="guia-selecao" className="scroll-mt-24">
                     <h2 className="text-3xl font-bold font-montserrat text-white mb-4">4. Guia de Seleção: Escolha a Película Ideal</h2>
                     <p className="text-gray-400 text-lg mb-10">Escolher a película certa depende da sua prioridade. Identifique seu cenário abaixo:</p>
 
@@ -290,18 +298,11 @@ export function GuiaInsulfilm() {
                         ))}
                     </div>
 
-                    <FAQAccordion items={[
-                        { q: "Moro em condomínio e não posso usar película refletiva, o que fazer?", a: "Essa é uma situação muito comum. Prédios com fachadas padronizadas proíbem o efeito espelhado ou o escurecimento excessivo. Nesses casos, a solução ideal é a Linha Nano Cerâmica. Como ela é tecnologicamente projetada para ser quase invisível por fora, ela não altera a estética do edifício, permitindo que você desfrute de um conforto térmico superior sem infringir as regras do condomínio." },
-                        { q: "Qual a diferença entre Carbono e Tintada?", a: "A diferença é brutal em termos de durabilidade. Películas tintadas são o que chamamos de 'adesivos de balcão': a cor é apenas um pigmento na superfície que desbota e fica roxo sob o sol do Rio em poucos meses. O filme de Carbono, por outro lado, possui a pigmentação fundida na própria massa do poliéster. Isso garante que a película nunca perca a cor original, mantendo o visual grafite profundo por toda a vida útil do produto." },
-                        { q: "O filme atrapalha o sinal de Wi-Fi e celular?", a: "As películas antigas ou espelhadas baratas usavam metais em sua composição, o que criava uma barreira (Gaiola de Faraday) e atenuava sinais eletromagnéticos. Já as películas modernas de Nano Carbono ou Nano Cerâmica são feitas de materiais não condutivos. Elas são totalmente inertes e não causam nenhuma interferência no seu Wi-Fi, sinal de celular ou GPS." },
-                        { q: "Posso aplicar em vidros duplos (insulados) ou apenas nos simples?", a: "Pode ser aplicado, mas exige cuidado redobrado. Em vidros duplos (termoacústicos), o calor pode ficar aprisionado na câmara de ar entre os vidros. Por isso, nunca devemos usar películas muito escuras ou altamente absorventes na face interna de um vidro duplo. É necessário usar películas específicas de alta reflexão ou de baixa absorção térmica." },
-                        { q: "Qual a diferença entre o filme fumê e o nano cerâmico?", a: "O filme fumê tradicional bloqueia o calor 'no peito', barrando o excesso de luz (escurecendo o ambiente). Já o filme de Nano Cerâmica usa nanotecnologia para absorver e rejeitar a radiação infravermelha (calor) sem precisar bloquear a luz. Em resumo: o fumê escurece e protege um pouco; a nano cerâmica protege muito e pode ser completamente transparente." },
-                        { q: "Meu vidro já é verde (fábrica). Posso colocar película por cima?", a: "Claro que pode! Vidros coloridos de fábrica (como o verde ou bronze) já oferecem uma pequena redução de calor porque absorvem parte da radiação. Quando aplicamos o filme por cima, o efeito térmico se soma. Esteticamente, a cor original do vidro vai se fundir com a tonalidade da película escolhida. Só é preciso cuidado na escolha para não precisar gerar uma absorção térmica excessiva que cause estresse no vidro." }
-                    ]} />
+                    <FAQAccordion items={guiaFaqGroups[3]} />
                 </section>
 
                 {/* Tabela Comparativa */}
-                <section>
+                <section id="comparativo-tecnico" className="scroll-mt-24">
                     <h2 className="text-3xl font-bold font-montserrat text-white mb-8 text-center md:text-left">Comparativo Técnico das Películas</h2>
 
                     <div className="overflow-x-auto rounded-2xl glass-card border border-white/10 shadow-2xl">
@@ -355,7 +356,7 @@ export function GuiaInsulfilm() {
                                     <td className="p-4 md:p-6 text-[#c9a227] font-medium">99%</td>
                                     <td className="p-4 md:p-6 font-bold text-white">45% a 55%</td>
                                     <td className="p-4 md:p-6">50% a 60%</td>
-                                    <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 90</td>
+                                    <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 80</td>
                                 </tr>
                                 <tr className="hover:bg-white/[0.02] transition-colors">
                                     <td className="p-4 md:p-6 font-bold text-white">
@@ -365,7 +366,7 @@ export function GuiaInsulfilm() {
                                     <td className="p-4 md:p-6 text-[#c9a227] font-medium">99%</td>
                                     <td className="p-4 md:p-6 font-bold text-white">40% a 50%</td>
                                     <td className="p-4 md:p-6">45% a 55%</td>
-                                    <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 90</td>
+                                    <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 80</td>
                                 </tr>
                                 <tr className="hover:bg-white/[0.02] transition-colors">
                                     <td className="p-4 md:p-6 font-bold text-white">
@@ -375,7 +376,7 @@ export function GuiaInsulfilm() {
                                     <td className="p-4 md:p-6 text-[#c9a227] font-medium">99%</td>
                                     <td className="p-4 md:p-6 font-bold text-white">70% a 85%</td>
                                     <td className="p-4 md:p-6">65% a 78%</td>
-                                    <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 110</td>
+                                    <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 90</td>
                                 </tr>
                                 <tr className="hover:bg-white/[0.02] transition-colors">
                                     <td className="p-4 md:p-6 font-bold text-white">
@@ -433,7 +434,7 @@ export function GuiaInsulfilm() {
                 </section>
 
                 {/* 5 e 6: Durabilidade, Cuidados e Remoção */}
-                <section>
+                <section id="qualidade-cuidados" className="scroll-mt-24">
                     <h2 className="text-3xl font-bold font-montserrat text-white mb-8">5. Qualidade e Cuidados Diários</h2>
 
                     <div className="text-gray-400 space-y-6 text-lg leading-relaxed mb-8">
@@ -450,17 +451,11 @@ export function GuiaInsulfilm() {
                         </ul>
                     </div>
 
-                    <FAQAccordion items={[
-                        { q: "O filme é resistente a arranhões? E se meu gato arranhar?", a: "Películas profissionais possuem uma camada de proteção contra riscos chamada Hard Coat, feita exatamente para resistir à limpeza do dia a dia. Mas vamos ser realistas: as garras de um gato ou cachorro empolgado aplicando força pontual podem, sim, rasgar o poliéster. Se o arranhão for profundo e incomodar visualmente, infelizmente não há 'retoque'; será necessário trocar a película daquela peça de vidro específica." },
-                        { q: "Vai ficar bolha ou marcado nas bordas?", a: "Não fica com bolhas de ar ou borrões se o instalador for bom! Geralmente é má aplicação combinada ao uso de adesivos de baixa qualidade que fervem e reagem com o calor do sol gerando gases. Sobre as bordas, a física e a técnica exigem um corte com uma folga milimétrica (cerca de 1 a 2 mm) em relação à borracha ou esquadria. Isso é necessário para que a água usada na aplicação seja totalmente drenada e para que a dilatação térmica do vidro não faça a película levantar nas pontas com o tempo. De longe, essa bordinha é imperceptível." },
-                        { q: "O cloro da piscina perto da janela estraga o filme?", a: "O vapor de cloro é um agente químico corrosivo que pode afetar negativamente as películas metalizadas (espelhadas comuns) com o passar dos anos, causando oxidação. No entanto, para áreas de lazer, piscinas ou academias, recomendamos as películas de Nano Carbono ou Nano Cerâmica. Como esses materiais não possuem metais em sua composição, eles são quimicamente inertes ao cloro, garantindo uma vida útil muito maior mesmo em ambientes com alta umidade e agentes químicos." },
-                        { q: "Posso aplicar no box do banheiro? O vapor não estraga o filme?", a: "Pode, e fica ótimo para dar privacidade ou um efeito jateado! O segredo aqui é o lado da aplicação. O ideal é aplicar a película pelo lado de fora do box, onde não há contato direto com a água corrente e produtos químicos de banho. O vapor do banheiro em si não descola o filme depois que a cola passa pelo período de cura, mas a água constante batendo na borda poderia reduzir a vida útil do material." },
-                        { q: "Como é feita a instalação? Suja muito a casa?", a: "O processo envolve o uso de água e detergente neutro para posicionar e ativar a cola da película. É um trabalho muito limpo em comparação com obras civis. Um instalador profissional protege o chão e os móveis próximos com lonas ou toalhas, faz a raspagem e limpeza profunda do vidro e recolhe todo o descarte. A casa fica exatamente como estava, só que muito mais fresca." }
-                    ]} />
+                    <FAQAccordion items={guiaFaqGroups[4]} />
                 </section>
 
                 {/* 6. Remoção */}
-                <section>
+                <section id="remocao" className="scroll-mt-24">
                     <h2 className="text-3xl font-bold font-montserrat text-white mb-6">6. Remoção: Quando é Hora de Mudar?</h2>
 
                     <div className="text-gray-400 space-y-6 text-lg leading-relaxed mb-8">
@@ -482,16 +477,24 @@ export function GuiaInsulfilm() {
                         </div>
                     </div>
 
-                    <FAQAccordion items={[
-                        { q: "A remoção estraga o vidro?", a: "Se feita por um profissional qualificado usando as ferramentas corretas, o vidro volta a ser exatamente o que era antes, sem um único arranhão. O segredo está no uso de vaporetos industriais para amolecer a cola e solventes cítricos específicos que dissolvem o adesivo residual sem a necessidade de força bruta ou estiletes inadequados. Se você tentar remover em casa 'no seco', o risco de riscar o vidro ou deixar manchas permanentes de cola é altíssimo." },
-                        { q: "Quanto tempo leva para remover?", a: "Depende inteiramente do 'estado de saúde' da película antiga. Um filme que ficou exposto ao sol direto por 10 anos e começou a ressecar (craquelar) pode levar o triplo do tempo para ser removido em comparação a uma instalação nova. Em média, a remoção pode levar de 30 minutos a 1 hora por peça de vidro, dependendo da dificuldade de extração da cola. É um processo que exige paciência e técnica para preservar a integridade do seu vidro." },
-                        { q: "Posso trocar o insulfilm de apenas um vidro em uma janela com várias folhas?", a: "Sim, é perfeitamente possível trocar a película de apenas uma folha de vidro. No entanto, é importante considerar que o insulfilm novo terá um brilho e uma integridade de cor ligeiramente diferentes do filme antigo que já sofreu exposição solar. Por isso, para garantir um visual 100% uniforme e harmonioso em toda a janela, nossa recomendação técnica é sempre realizar a troca de todos os vidros daquela mesma esquadria simultaneamente." }
-                    ]} />
+                    <FAQAccordion items={guiaFaqGroups[5]} />
                 </section>
 
             </main>
 
             <ContactCTA />
+
+            <div className="lg:hidden fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-[#04080f]/95 px-4 pt-3 backdrop-blur pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+                <a
+                    href="https://wa.me/5521965140612?text=Olá! Estava lendo o Guia de Insulfilm e gostaria de um orçamento."
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-primary flex w-full items-center justify-center gap-2"
+                >
+                    <MessageCircle className="h-4 w-4" />
+                    Pedir orçamento no WhatsApp
+                </a>
+            </div>
         </div>
     );
 }

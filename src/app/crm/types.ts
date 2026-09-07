@@ -7,7 +7,7 @@ export type { LeadStatus } from './constants/stages';
 
 export type ServiceStatus = 'Marcado' | 'Confirmado' | 'Em Execucao' | 'Concluido' | 'Reagendar';
 
-export type AgendaView = 'hoje' | 'semana' | 'mes' | 'servicos' | 'sem_acao' | 'dormentes' | 'ciclo_5anos';
+export type AgendaView = 'hoje' | 'semana' | 'mes' | 'servicos' | 'parados' | 'ciclo_5anos';
 
 export type LeadCardKind = 'followup' | 'service' | 'idle' | 'dormant';
 

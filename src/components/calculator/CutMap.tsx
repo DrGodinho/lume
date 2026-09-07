@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useRef } from 'react';
-import type { Block } from '../../views/AdminCalculator';
+import { formatNumber2 } from '../../lib/money';
+import type { Block } from '../../lib/films';
 
 const MemoBlock = React.memo(({
     b,
@@ -114,7 +115,6 @@ interface CutMapProps {
 }
 
 export function CutMap({
-    isCutMode,
     rollW,
     maxY,
     scale,
@@ -128,41 +128,41 @@ export function CutMap({
 }: CutMapProps) {
     return (
         <div className="admin-entrance bg-[#111827] border-2 border-[#c9a227]/25 rounded-xl overflow-hidden shadow-2xl relative min-h-[500px]">
-            <div className="absolute top-0 left-0 w-full bg-[#1f2937] text-gray-400 text-[10px] uppercase font-bold flex justify-between px-3 py-1.5 z-10 border-b border-gray-700">
+            <div className="absolute top-0 left-0 w-full bg-[#1f2937] text-gray-200 text-[10px] uppercase font-bold flex justify-between px-3 py-1.5 z-10 border-b border-gray-700">
                 <span className="flex items-center gap-2">
                     0cm
                 </span>
                 <span className="flex items-center gap-2">
                     {isCalculating && <span className="w-2 h-2 rounded-full bg-[#c9a227] animate-pulse inline-block" title="Calculando..." />}
-                    Rolo: {rollW}cm
+                    Rolo: {rollW}cm · réguas em cm
                 </span>
             </div>
             <div className="w-full h-full overflow-y-auto p-2 pt-8 pr-10 sm:pr-14 pb-12 overflow-x-hidden">
                 <div className="relative pl-7 sm:pl-8 pt-8 w-full max-w-full">
-                    {/* Régua Superior (Rolo Width) */}
-                    <div className="absolute top-0 left-8 right-0 h-8 border-b border-white/20">
+                    {/* Régua Superior (cm) */}
+                    <div className="absolute top-0 left-8 right-0 h-8 border-b border-white/40">
                         {Array.from({ length: Math.floor(rollW / 10) + 1 }).map((_, i) => {
                             const val = i * 10;
                             const isMajor = val % 50 === 0 || val === rollW || val === 0;
                             if (val > rollW) return null;
                             return (
                                 <div key={val} className="absolute bottom-0 flex flex-col items-center -translate-x-1/2" style={{ left: `${(val / rollW) * 100}%` }}>
-                                    {isMajor && <span className="text-[10px] text-gray-400 font-black mb-0.5">{val}</span>}
-                                    <div className={`w-px bg-white/30 ${isMajor ? 'h-2.5' : 'h-1.5'}`} />
+                                    {isMajor && <span className="text-[10px] text-gray-200 font-black mb-0.5">{val}</span>}
+                                    <div className={`w-px bg-white/50 ${isMajor ? 'h-3' : 'h-2'}`} />
                                 </div>
                             );
                         })}
                     </div>
 
-                    {/* Régua Lateral (Altura Linear) */}
-                    <div className="absolute top-8 left-0 w-8 border-r border-white/20" style={{ height: `${(maxY / rollW) * containerWidth + 40}px` }}>
+                    {/* Régua Lateral (cm) */}
+                    <div className="absolute top-8 left-0 w-8 border-r border-white/40" style={{ height: `${(maxY / rollW) * containerWidth + 40}px` }}>
                         {Array.from({ length: Math.floor(maxY / 10) + 1 }).map((_, i) => {
                             const val = i * 10;
                             const isMajor = val % 50 === 0 || val === 0;
                             return (
                                 <div key={val} className="absolute right-0 flex items-center translate-y-1/2" style={{ top: val * scale }}>
-                                    {isMajor && <span className="text-[10px] text-gray-400 font-black mr-1.5">{val / 100}</span>}
-                                    <div className={`h-px bg-white/30 ${isMajor ? 'w-2.5' : 'w-1.5'}`} />
+                                    {isMajor && <span className="text-[10px] text-gray-200 font-black mr-1.5">{val}</span>}
+                                    <div className={`h-px bg-white/50 ${isMajor ? 'w-3' : 'w-2'}`} />
                                 </div>
                             );
                         })}
@@ -177,7 +177,7 @@ export function CutMap({
                             <div className="bg-white/95 backdrop-blur-md rounded-full shadow-lg border border-white/20 flex items-center pr-1 pl-3 py-1 gap-2">
                                 <span className="text-[10px] font-black tracking-widest text-black/50 uppercase">Compr.</span>
                                 <span className="bg-black text-white px-2 py-0.5 rounded-full text-xs font-black">
-                                    {(maxY / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} m
+                                    {formatNumber2(maxY / 100)} m
                                 </span>
                             </div>
                         </div>
@@ -191,7 +191,7 @@ export function CutMap({
                             userSelect: 'none',
                         }}
                     >
-                        <div className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: `${10 * scale}px ${10 * scale}px` }} />
+                        <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: `${10 * scale}px ${10 * scale}px` }} />
                         {blocosCalculados.map((b, idx) => (
                             b.fit && (
                                 <MemoBlock

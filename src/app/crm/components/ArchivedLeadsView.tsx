@@ -1,0 +1,191 @@
+'use client';
+
+import { differenceInDays, format, parseISO } from 'date-fns';
+import { Archive } from 'lucide-react';
+import type { Lead } from '../types';
+
+export type ArchivedLeadsMode = 'archive' | 'trash';
+
+interface ArchivedLeadsViewProps {
+  mode: ArchivedLeadsMode;
+  leads: Lead[];
+  loading: boolean;
+  onRefresh: () => Promise<void>;
+  onRestore: (lead: Lead) => Promise<void>;
+}
+
+const parseAgendaDate = (value?: string | null) => {
+  if (!value) return null;
+  const parsed = parseISO(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+};
+
+const MODE_META = {
+  archive: {
+    eyebrow: 'LUME ELITE',
+    title: 'Arquivo de Leads',
+    description: 'Leads fechados antigos salvos para acompanhamento comercial.',
+    emptyMessage: 'Nenhum lead arquivado no momento.',
+    actionLabel: 'Reativar Lead',
+    showIcon: true,
+    actionClasses: 'border-[#c9a227]/20 bg-[#c9a227]/10 text-[#f5d77a] hover:bg-[#c9a227]/20',
+  },
+  trash: {
+    eyebrow: 'Recuperação em 30 dias',
+    title: 'Lixeira de Leads',
+    description: 'Leads excluídos ficam disponíveis para restauração por até 30 dias.',
+    emptyMessage: 'Nenhum lead na lixeira no período de recuperação.',
+    actionLabel: 'Restaurar',
+    showIcon: false,
+    actionClasses: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/15',
+  },
+} as const;
+
+/** Visão única para Arquivo (`mode="archive"`) e Lixeira (`mode="trash"`).
+ * Estrutura, skeleton e layout são compartilhados; só textos, selos e ação mudam. */
+export function ArchivedLeadsView({
+  mode,
+  leads,
+  loading,
+  onRefresh,
+  onRestore,
+}: ArchivedLeadsViewProps) {
+  const meta = MODE_META[mode];
+
+  if (loading) {
+    return (
+      <div className="space-y-3" aria-hidden="true">
+        {Array.from({ length: 5 }).map((_, index) => (
+          <div
+            key={index}
+            className="flex flex-col gap-4 rounded-2xl border border-white/5 bg-[#04080f]/80 p-4 sm:flex-row sm:items-center sm:justify-between"
+          >
+            <div className="min-w-0 flex-1 space-y-2">
+              <div className="skeleton-shimmer h-4 w-40 rounded" />
+              <div className="skeleton-shimmer h-3 w-56 rounded" />
+              <div className="flex flex-wrap gap-2">
+                <div className="skeleton-shimmer h-5 w-32 rounded-full" />
+                <div className="skeleton-shimmer h-5 w-24 rounded-full" />
+              </div>
+            </div>
+            <div className="skeleton-shimmer h-9 w-28 rounded-2xl" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col gap-3 rounded-3xl border border-white/5 bg-[#07111d]/50 p-6 shadow-lg backdrop-blur-md sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-start gap-3">
+          {meta.showIcon && (
+            <div className="rounded-2xl bg-[#c9a227]/10 p-3 text-[#f5d77a] shrink-0">
+              <Archive className="h-6 w-6" />
+            </div>
+          )}
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#f5d77a]/75">{meta.eyebrow}</p>
+            <h3 className="mt-1 text-lg font-black text-white">{meta.title}</h3>
+            <p className="mt-2 text-sm text-white/45">{meta.description}</p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => void onRefresh()}
+          className="rounded-2xl border border-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white/70 transition hover:border-[#c9a227]/40 hover:text-[#f5d77a]"
+        >
+          Atualizar
+        </button>
+      </div>
+
+      <div className="rounded-3xl border border-white/5 bg-[#07111d]/50 p-6 shadow-lg backdrop-blur-md">
+        {leads.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-white/10 p-8 text-center text-white/35">
+            {meta.emptyMessage}
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {leads.map((lead) => (
+              <ArchivedLeadRow key={lead.id} mode={mode} lead={lead} actionLabel={meta.actionLabel} actionClasses={meta.actionClasses} onRestore={onRestore} />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ArchivedLeadRow({
+  mode,
+  lead,
+  actionLabel,
+  actionClasses,
+  onRestore,
+}: {
+  mode: ArchivedLeadsMode;
+  lead: Lead;
+  actionLabel: string;
+  actionClasses: string;
+  onRestore: (lead: Lead) => Promise<void>;
+}) {
+  if (mode === 'trash') {
+    const deletedAt = parseAgendaDate(lead.deletedAt || null);
+    const daysRemaining = deletedAt ? Math.max(0, 30 - differenceInDays(new Date(), deletedAt)) : 0;
+
+    return (
+      <article className="flex flex-col gap-4 rounded-2xl border border-white/5 bg-[#04080f]/80 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <p className="truncate text-sm font-bold text-white">{lead.name}</p>
+          <p className="mt-1 text-xs text-white/40">{lead.phone || 'Sem telefone'} · {lead.neighborhood || 'Sem bairro'}</p>
+          <div className="mt-2 flex flex-wrap gap-2 text-[11px]">
+            <span className="rounded-full border border-red-500/20 bg-red-500/10 px-2.5 py-1 text-red-300">
+              Excluído {deletedAt ? format(deletedAt, 'dd/MM/yyyy HH:mm') : 'recentemente'}
+            </span>
+            <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-white/50">
+              {daysRemaining} dia{daysRemaining === 1 ? '' : 's'} para recuperar
+            </span>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => void onRestore(lead)}
+          className={`rounded-2xl border px-4 py-2 text-xs font-bold uppercase tracking-wider transition ${actionClasses}`}
+        >
+          {actionLabel}
+        </button>
+      </article>
+    );
+  }
+
+  const serviceDate = parseAgendaDate(lead.dataServico || null);
+  const formattedDate = serviceDate ? format(serviceDate, 'dd/MM/yyyy') : 'Sem data';
+
+  return (
+    <article className="flex flex-col gap-4 rounded-2xl border border-white/5 bg-[#04080f]/80 p-4 sm:flex-row sm:items-center sm:justify-between hover:border-[#c9a227]/20 transition duration-350">
+      <div className="min-w-0">
+        <p className="truncate text-sm font-bold text-white hover:text-[#f5d77a] transition">{lead.name}</p>
+        <p className="mt-1 text-xs text-white/40">
+          {lead.phone || 'Sem telefone'} · {lead.neighborhood || 'Sem bairro'} · {lead.filmType}
+        </p>
+        <div className="mt-2 flex flex-wrap gap-2 text-[11px]">
+          <span className="rounded-full border border-[#c9a227]/20 bg-[#c9a227]/10 px-2.5 py-1 text-[#f5d77a]">
+            Serviço executado em {formattedDate}
+          </span>
+          <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-emerald-300">
+            R$ {lead.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </span>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => void onRestore(lead)}
+        className={`rounded-2xl border px-4 py-2 text-xs font-bold uppercase tracking-wider transition ${actionClasses}`}
+      >
+        {actionLabel}
+      </button>
+    </article>
+  );
+}
