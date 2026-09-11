@@ -81,8 +81,14 @@ export default async function Page({ params }: BlogPostPageProps) {
         datePublished: post.publishedAt,
         dateModified: post.updatedAt,
         author: {
-          '@type': 'Organization',
+          '@type': 'Person',
           name: post.authorName,
+          jobTitle: 'Especialista em Películas de Controle Solar',
+          worksFor: {
+            '@type': 'Organization',
+            name: 'LUME Controle Solar',
+            url: 'https://lumecontrolesolar.com.br',
+          },
         },
         publisher: {
           '@type': 'Organization',

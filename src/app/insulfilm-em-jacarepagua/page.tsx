@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { JacarepaguaPage } from '../../views/JacarepaguaPage';
 import { businessAddressSchema, businessInfo } from '@/lib/businessInfo';
+import { buildBreadcrumbSchema } from '@/lib/schema/breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Insulfilm em Jacarepaguá RJ | Preço, Instalação e Garantia - LUME',
@@ -85,6 +86,11 @@ const jacarepaguaFaqs = [
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
+    buildBreadcrumbSchema([
+      { name: 'Início', url: 'https://lumecontrolesolar.com.br/' },
+      { name: 'Onde Atendemos', url: 'https://lumecontrolesolar.com.br/#onde-atendemos' },
+      { name: 'Jacarepaguá', url: 'https://lumecontrolesolar.com.br/insulfilm-em-jacarepagua/' },
+    ]),
     {
       '@type': 'LocalBusiness',
       '@id': 'https://lumecontrolesolar.com.br/insulfilm-em-jacarepagua/#localbusiness',

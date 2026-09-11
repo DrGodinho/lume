@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { CampoGrandePage } from '../../views/CampoGrandePage';
 import { businessAddressSchema, businessInfo } from '@/lib/businessInfo';
+import { buildBreadcrumbSchema } from '@/lib/schema/breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Insulfilm em Campo Grande RJ | Preço, Instalação e Garantia - LUME',
@@ -83,6 +84,11 @@ const campoGrandeFaqs = [
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
+    buildBreadcrumbSchema([
+      { name: 'Início', url: 'https://lumecontrolesolar.com.br/' },
+      { name: 'Onde Atendemos', url: 'https://lumecontrolesolar.com.br/#onde-atendemos' },
+      { name: 'Campo Grande', url: 'https://lumecontrolesolar.com.br/insulfilm-em-campo-grande/' },
+    ]),
     {
       '@type': 'LocalBusiness',
       '@id': 'https://lumecontrolesolar.com.br/insulfilm-em-campo-grande/#localbusiness',

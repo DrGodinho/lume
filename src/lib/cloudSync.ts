@@ -84,6 +84,7 @@ export async function saveDraftToCloud(draft: DraftData): Promise<boolean> {
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
+      keepalive: true,
     });
     if (!response.ok) {
       logger.error('Draft save failed', undefined, { status: response.status });
@@ -124,6 +125,9 @@ interface HistoryItem {
   modoOtimizacao: string;
   selectedFilm?: string;
   leadId?: string | null;
+  compensarPerdas?: boolean;
+  modoPerdas?: string;
+  perdasFixas?: number;
 }
 
 export async function saveHistoryItemToCloud(item: HistoryItem): Promise<boolean> {
@@ -133,6 +137,7 @@ export async function saveHistoryItemToCloud(item: HistoryItem): Promise<boolean
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(item),
+      keepalive: true,
     });
     if (!response.ok) {
       logger.error('History save failed', undefined, { status: response.status });
@@ -154,21 +159,27 @@ export async function loadHistoryFromCloud(): Promise<HistoryItem[]> {
     if (!response.ok) return [];
     const result = await response.json();
     const rows = (result?.items as Array<Record<string, unknown>>) ?? [];
-    return rows.map((row) => ({
-      id: String(row.id),
-      cliente: String(row.cliente ?? ''),
-      phone: row.phone ? String(row.phone) : undefined,
-      neighborhood: row.neighborhood ? String(row.neighborhood) : undefined,
-      data: String(row.data ?? ''),
-      valor: Number(row.valor) || 0,
-      qtd: Number(row.qtd) || 0,
-      vidros: (row.vidros as CloudGlass[]) ?? [],
-      config: (row.config as CloudConfig) ?? {},
-      desconto: Number(row.desconto) || 0,
-      modoOtimizacao: String(row.modo_otimizacao ?? ''),
-      selectedFilm: row.selected_film ? String(row.selected_film) : undefined,
-      leadId: row.lead_id ? String(row.lead_id) : null,
-    }));
+    return rows.map((row) => {
+      const cfg = (row.config as Record<string, unknown>) ?? {};
+      return {
+        id: String(row.id),
+        cliente: String(row.cliente ?? ''),
+        phone: row.phone ? String(row.phone) : undefined,
+        neighborhood: row.neighborhood ? String(row.neighborhood) : undefined,
+        data: String(row.data ?? ''),
+        valor: Number(row.valor) || 0,
+        qtd: Number(row.qtd) || 0,
+        vidros: (row.vidros as CloudGlass[]) ?? [],
+        config: cfg,
+        desconto: Number(row.desconto) || 0,
+        modoOtimizacao: String(row.modo_otimizacao ?? ''),
+        selectedFilm: row.selected_film ? String(row.selected_film) : undefined,
+        leadId: row.lead_id ? String(row.lead_id) : null,
+        compensarPerdas: typeof cfg.compensarPerdas === 'boolean' ? cfg.compensarPerdas : (typeof row.compensar_perdas === 'boolean' ? row.compensar_perdas : undefined),
+        modoPerdas: typeof cfg.modoPerdas === 'string' ? cfg.modoPerdas : undefined,
+        perdasFixas: typeof cfg.perdasFixas === 'number' ? cfg.perdasFixas : undefined,
+      };
+    });
   } catch {
     return [];
   }

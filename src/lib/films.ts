@@ -56,12 +56,12 @@ export const DEFAULT_CONFIG: AppConfig = {
   userName: 'MP Godinho',
   modoPerdas: 'dinamico',
   perdasFixas: 20,
-  modoCorConfig: 'tamanho',
+  modoCorConfig: 'ambiente',
   agressividadeCorte: 35,
   filmTypes: { ...DEFAULT_FILM_TYPES },
   selectedFilm: 'carbono_g20',
   draftExpiration: 15,
-};
+  };
 
 export const DEFAULT_ROOM_COLORS: Record<string, string> = {
   sala: '#60a5fa',
@@ -154,10 +154,14 @@ export const getSizeColor = (h?: number, w?: number) => {
 };
 
 const ROOM_ALIAS_RULES: Array<{ test: RegExp; key: string }> = [
-  { test: /\bsala\b.*\b(jantar|tv|estar)?\b/, key: 'sala' },
+  { test: /\bsala\b.*\b(jantar)?\b/, key: 'sala_jantar' },
+  { test: /\bsala\b.*\b(tv)?\b/, key: 'sala_tv' },
+  { test: /\bsala\b/, key: 'sala' },
   { test: /\bcozinha\b/, key: 'cozinha' },
-  { test: /\bquarto\b|\bdormitorio\b|\bsu[ií]te\b/, key: 'quarto' },
-  { test: /\bbanheiro\b|\blavabo\b|\btoalete\b/, key: 'banheiro' },
+  { test: /\bquarto\b|\bdormitorio\b/, key: 'quarto' },
+  { test: /\bsu[ií]te\b/, key: 'suite' },
+  { test: /\bbanheiro\b|\btoalete\b/, key: 'banheiro' },
+  { test: /\blavabo\b/, key: 'lavabo' },
   { test: /\bvaranda\b|\bsacada\b/, key: 'varanda' },
   { test: /\barea\s+gourmet\b/, key: 'area_gourmet' },
   { test: /\barea\s+de\s+servico\b|\blavanderia\b/, key: 'lavanderia' },
@@ -173,16 +177,21 @@ const ROOM_ALIAS_RULES: Array<{ test: RegExp; key: string }> = [
 export const resolveRoomKey = (label: string) => {
   const normalized = normalizeRoomKey(label);
   if (!normalized) return '';
-  return normalized.replace(/\s+/g, '_');
+  const directKey = normalized.replace(/\s+/g, '_');
+  if (DEFAULT_ROOM_COLORS[directKey]) return directKey;
+  const matched = ROOM_ALIAS_RULES.find((r) => r.test.test(normalized));
+  if (matched && DEFAULT_ROOM_COLORS[matched.key]) return matched.key;
+  return directKey;
 };
 
 export const stableRoomColor = (label: string) => {
+  const normalized = normalizeRoomKey(label);
+  if (!normalized) return '#94a3b8';
   const key = resolveRoomKey(label);
-  if (!key) return '#94a3b8';
   if (DEFAULT_ROOM_COLORS[key]) return DEFAULT_ROOM_COLORS[key];
-  let hash = ROOM_ALIAS_RULES.length;
-  for (let i = 0; i < key.length; i++) {
-    hash = ((hash << 5) - hash) + key.charCodeAt(i);
+  let hash = 0;
+  for (let i = 0; i < normalized.length; i++) {
+    hash = ((hash << 5) - hash) + normalized.charCodeAt(i);
     hash |= 0;
   }
   return ROOM_SWATCHES[Math.abs(hash) % ROOM_SWATCHES.length];
@@ -226,9 +235,19 @@ export interface OrcamentoSalvo {
   valor: number;
   qtd: number;
   vidros: GlassItem[];
-  config: { rollW: number; price: number; margin: number };
+  config: {
+    rollW: number;
+    price: number;
+    margin: number;
+    compensarPerdas?: boolean;
+    modoPerdas?: LossMode;
+    perdasFixas?: number;
+  };
   desconto: number;
   modoOtimizacao: OptimizationMode;
   selectedFilm?: string;
   leadId?: string | null;
+  compensarPerdas?: boolean;
+  modoPerdas?: LossMode;
+  perdasFixas?: number;
 }

@@ -1,15 +1,16 @@
 import type { Metadata } from 'next';
 import { DuplaCamadaPage } from '../../views/DuplaCamada';
 import { businessAddressSchema, businessInfo } from '@/lib/businessInfo';
+import { buildBreadcrumbSchema } from '@/lib/schema/breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Película Dupla Camada G5 | Máxima Rejeição de Calor - LUME',
   description: 'Película Dupla Camada com camada refletiva externa e fumê interna. Máxima rejeição de calor sem reflexo interno noturno. Orçamento grátis via WhatsApp.',
-  alternates: { canonical: 'https://lumecontrolesolar.com.br/dupla-camada' },
+  alternates: { canonical: 'https://lumecontrolesolar.com.br/dupla-camada/' },
   openGraph: {
     title: 'Película Dupla Camada G5 | Máxima Rejeição de Calor - LUME',
     description: 'Camada refletiva + fumê interna: o melhor dos dois mundos. Máxima rejeição de calor sem reflexo interno à noite. Instalação no Rio de Janeiro.',
-    url: 'https://lumecontrolesolar.com.br/dupla-camada',
+    url: 'https://lumecontrolesolar.com.br/dupla-camada/',
     type: 'website',
     siteName: 'LUME Controle Solar',
     images: [{ url: 'https://lumecontrolesolar.com.br/product-smoke.webp', width: 1200, height: 630, alt: 'Película Dupla Camada G5 LUME' }],
@@ -24,46 +25,55 @@ export const metadata: Metadata = {
 
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'Product',
-  name: 'Película Dupla Camada G5/G20 LUME',
-  image: 'https://lumecontrolesolar.com.br/product-smoke.webp',
-  description: 'Película dupla camada profissional com tecnologia de deposição a vácuo. Camada refletiva externa para máxima rejeição de calor e camada fumê interna para eliminar o reflexo noturno.',
-  brand: {
-    '@type': 'Brand',
-    name: 'LUME Controle Solar',
-  },
-  offers: {
-    '@type': 'Offer',
-    url: 'https://lumecontrolesolar.com.br/dupla-camada',
-    priceCurrency: 'BRL',
-    price: '120.00',
-    priceSpecification: {
-      '@type': 'UnitPriceSpecification',
-      price: '120.00',
-      priceCurrency: 'BRL',
-      unitText: 'm²',
+  '@graph': [
+    buildBreadcrumbSchema([
+      { name: 'Início', url: 'https://lumecontrolesolar.com.br/' },
+      { name: 'Produtos', url: 'https://lumecontrolesolar.com.br/#produtos' },
+      { name: 'Dupla Camada', url: 'https://lumecontrolesolar.com.br/dupla-camada/' },
+    ]),
+    {
+      '@type': 'Product',
+      name: 'Película Dupla Camada G5/G20 LUME',
+      image: 'https://lumecontrolesolar.com.br/product-smoke.webp',
+      description: 'Película dupla camada profissional com tecnologia de deposição a vácuo. Camada refletiva externa para máxima rejeição de calor e camada fumê interna para eliminar o reflexo noturno.',
+      brand: {
+        '@type': 'Brand',
+        name: 'LUME Controle Solar',
+      },
+      offers: {
+        '@type': 'Offer',
+        url: 'https://lumecontrolesolar.com.br/dupla-camada/',
+        priceCurrency: 'BRL',
+        price: '120.00',
+        priceSpecification: {
+          '@type': 'UnitPriceSpecification',
+          price: '120.00',
+          priceCurrency: 'BRL',
+          unitText: 'm²',
+        },
+        availability: 'https://schema.org/InStock',
+        hasMerchantReturnPolicy: {
+          '@type': 'MerchantReturnPolicy',
+          returnPolicyCategory: 'https://schema.org/MerchantReturnNotPermitted',
+          merchantReturnDays: 0,
+          applicableCountry: 'BR',
+        },
+        seller: {
+          '@type': 'LocalBusiness',
+          name: 'LUME Controle Solar',
+          image: 'https://lumecontrolesolar.com.br/logo-lume.png',
+          telephone: businessInfo.phoneE164,
+          address: businessAddressSchema,
+        },
+      },
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: '5.0',
+        reviewCount: '22',
+        bestRating: '5',
+      },
     },
-    availability: 'https://schema.org/InStock',
-    hasMerchantReturnPolicy: {
-      '@type': 'MerchantReturnPolicy',
-      returnPolicyCategory: 'https://schema.org/MerchantReturnNotPermitted',
-      merchantReturnDays: 0,
-      applicableCountry: 'BR',
-    },
-    seller: {
-      '@type': 'LocalBusiness',
-      name: 'LUME Controle Solar',
-      image: 'https://lumecontrolesolar.com.br/logo-lume.png',
-      telephone: businessInfo.phoneE164,
-      address: businessAddressSchema,
-    },
-  },
-  aggregateRating: {
-    '@type': 'AggregateRating',
-    ratingValue: '5.0',
-    reviewCount: '22',
-    bestRating: '5',
-  },
+  ],
 };
 
 export default function Page() {

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { InsulfilmSala } from '../../views/InsulfilmSala';
 import { businessAddressSchema, businessInfo } from '@/lib/businessInfo';
+import { buildBreadcrumbSchema } from '@/lib/schema/breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Insulfilm para Sala | Conforto e Proteção - LUME',
@@ -17,11 +18,11 @@ export const metadata: Metadata = {
     'insulfilm sala de estar',
     'pelicula para tv sala'
   ],
-  alternates: { canonical: 'https://lumecontrolesolar.com.br/insulfilm-na-sala' },
+  alternates: { canonical: 'https://lumecontrolesolar.com.br/insulfilm-na-sala/' },
   openGraph: {
     title: 'Insulfilm para Sala | Conforto Térmico e Visual',
     description: 'Assista TV sem reflexo, reduza o calor e valorize seu imóvel com a película certa para sua sala de estar. Orçamento grátis.',
-    url: 'https://lumecontrolesolar.com.br/insulfilm-na-sala',
+    url: 'https://lumecontrolesolar.com.br/insulfilm-na-sala/',
     type: 'website',
     siteName: 'LUME Controle Solar',
     images: [{ url: 'https://lumecontrolesolar.com.br/og-image.jpg', width: 1200, height: 630, alt: 'Insulfilm para Sala - LUME' }],
@@ -36,11 +37,18 @@ export const metadata: Metadata = {
 
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'Service',
-  name: 'Instalação de Insulfilm para Salas de Estar',
-  alternateName: 'Película de Controle Solar para Sala',
-  description: 'Instalação profissional de películas de alta performance em salas de estar residenciais. Ideal para reduzir reflexo na TV, diminuir o consumo de ar-condicionado, proteger móveis do sol e valorizar o imóvel. Películas Nano Cerâmica, Reflexiva e Carbono G20 disponíveis.',
-  url: 'https://lumecontrolesolar.com.br/insulfilm-na-sala',
+  '@graph': [
+    buildBreadcrumbSchema([
+      { name: 'Início', url: 'https://lumecontrolesolar.com.br/' },
+      { name: 'Soluções por Ambiente', url: 'https://lumecontrolesolar.com.br/#produtos' },
+      { name: 'Insulfilm na Sala', url: 'https://lumecontrolesolar.com.br/insulfilm-na-sala/' },
+    ]),
+    {
+      '@type': 'Service',
+      name: 'Instalação de Insulfilm para Salas de Estar',
+      alternateName: 'Película de Controle Solar para Sala',
+      description: 'Instalação profissional de películas de alta performance em salas de estar residenciais. Ideal para reduzir reflexo na TV, diminuir o consumo de ar-condicionado, proteger móveis do sol e valorizar o imóvel. Películas Nano Cerâmica, Reflexiva e Carbono G20 disponíveis.',
+      url: 'https://lumecontrolesolar.com.br/insulfilm-na-sala/',
   image: 'https://lumecontrolesolar.com.br/og-image.jpg',
   provider: {
     '@type': 'LocalBusiness',
@@ -68,6 +76,8 @@ const jsonLd = {
     { '@type': 'PropertyValue', name: 'Proteção UV', value: 'Até 99%' },
     { '@type': 'PropertyValue', name: 'Tipos Recomendados', value: 'Nano Cerâmica, Reflexiva e Carbono G20' },
   ]
+    },
+  ],
 };
 
 export default function Page() {

@@ -18,7 +18,7 @@ export const comoProtegerMoveisDanosSol: BlogPost = {
   ],
   coverImageUrl: '/blog/como-proteger-moveis-danos-sol.png',
   coverImageAlt: 'Sala residencial moderna de alto padrão com grandes janelas de vidro protegidas por insulfilm de controle solar',
-  authorName: 'LUME Controle Solar',
+  authorName: 'Marcos Paulo Godinho',
   publishedAt: '2026-06-11T12:00:00.000Z',
   updatedAt: '2026-06-11T12:00:00.000Z',
   seoTitle: 'Como Proteger Móveis do Sol com Película Solar',
@@ -245,6 +245,36 @@ export const comoProtegerMoveisDanosSol: BlogPost = {
     {
       type: 'paragraph',
       text: 'Se você chegou até aqui, já sabe que o vidro comum não é suficiente para proteger o que você construiu. O próximo passo não poderia ser mais fácil.',
+    },
+    {
+      type: 'callout',
+      title: 'Sinal de alerta: desbotamento unilateral',
+      text: 'Se apenas um lado do sofá, da cortina, do piso ou de um móvel de madeira está mais claro que o restante, o ambiente já sofre com excesso de incidência solar direta. Nesses casos, a película de controle solar no vidro é a proteção definitiva para interromper a degradação sem fechar a luminosidade natural.',
+    },
+    {
+      type: 'heading',
+      level: 2,
+      text: 'Perguntas frequentes sobre proteção de móveis com insulfilm',
+    },
+    {
+      type: 'faq',
+      items: [
+        {
+          question: 'O insulfilm realmente evita o desbotamento de móveis e pisos?',
+          answer:
+            'Sim. Películas de alta performance bloqueiam até 99% dos raios UV e reduzem significativamente o calor infravermelho, eliminando as duas principais causas de desbotamento, ressecamento e envelhecimento precoce de materiais.',
+        },
+        {
+          question: 'Cortina ou persiana sozinha não protege os móveis?',
+          answer:
+            'Apenas parcialmente. Cortinas só protegem quando estão totalmente fechadas (bloqueando a claridade e a vista). Além disso, o próprio tecido da cortina resseca e desbota com a radiação. O insulfilm atua direto no vidro, mantendo a proteção 24h por dia mesmo com as cortinas abertas.',
+        },
+        {
+          question: 'A película precisa ser muito escura para proteger contra os raios UV?',
+          answer:
+            'Não! A tecnologia Nano Cerâmica oferece bloqueio de 99% dos raios UV e até 97% do calor infravermelho mantendo alta transparência (70% de transmissão de luz), preservando a luz natural e a vista externa sem escurecer o cômodo.',
+        },
+      ],
     },
     {
       type: 'cta',

@@ -106,6 +106,7 @@ interface SavedProjectPayload {
     rolo?: number | string;
     preco?: number | string;
     selectedFilm?: string;
+    compensarPerdas?: boolean;
   };
   vidros?: ImportedGlass[];
 }
@@ -623,13 +624,16 @@ export function AdminCalculator() {
             valor: finalPrice,
             qtd: vidros.length,
             vidros: [...vidros],
-            config: { rollW, price, margin },
+            config: { rollW, price, margin, compensarPerdas, modoPerdas, perdasFixas },
             desconto,
             modoOtimizacao,
             selectedFilm,
             leadId: currentLeadId ?? undefined,
+            compensarPerdas,
+            modoPerdas,
+            perdasFixas,
         });
-    }, [vidros, cliente, phone, neighborhood, finalPrice, rollW, price, margin, desconto, modoOtimizacao, selectedFilm, currentLeadId, salvarNoHistoricoHook]);
+    }, [vidros, cliente, phone, neighborhood, finalPrice, rollW, price, margin, desconto, modoOtimizacao, selectedFilm, currentLeadId, compensarPerdas, modoPerdas, perdasFixas, salvarNoHistoricoHook]);
 
     const criarLead = useCallback(async () => {
       if (!cliente && !phone) {
@@ -734,6 +738,20 @@ const carregarDoHistorico = (orc: OrcamentoSalvo) => {
     setSelectedFilm(normalizeFilmTypeKey(valid.selectedFilm));
     if (valid.leadId) setCurrentLeadId(valid.leadId);
     setVidros(valid.vidros);
+
+    const cfgObj = valid.config as { compensarPerdas?: boolean; modoPerdas?: LossMode; perdasFixas?: number };
+    const savedCompensar = valid.compensarPerdas !== undefined ? valid.compensarPerdas : cfgObj?.compensarPerdas;
+    if (savedCompensar !== undefined) {
+        setCompensarPerdas(Boolean(savedCompensar));
+    }
+    const savedModoPerdas = valid.modoPerdas || cfgObj?.modoPerdas;
+    if (savedModoPerdas && isLossMode(savedModoPerdas)) {
+        setModoPerdas(savedModoPerdas);
+    }
+    const savedPerdasFixas = valid.perdasFixas !== undefined ? valid.perdasFixas : cfgObj?.perdasFixas;
+    if (savedPerdasFixas !== undefined) {
+        setPerdasFixas(savedPerdasFixas);
+    }
     });
     };
 
@@ -763,7 +781,7 @@ const carregarDoHistorico = (orc: OrcamentoSalvo) => {
 
     const salvarProjeto = () => {
         const dados = {
-            config: { cliente, phone, neighborhood, rolo: rollW, preco: price, selectedFilm },
+            config: { cliente, phone, neighborhood, rolo: rollW, preco: price, selectedFilm, compensarPerdas },
             vidros: [...vidros],
         };
         const blob = new Blob([JSON.stringify(dados)], { type: 'application/json' });
@@ -788,6 +806,9 @@ const carregarDoHistorico = (orc: OrcamentoSalvo) => {
                 setPrice(parseFloat(String(d.config?.preco ?? '')) || 80);
                 setSelectedFilm(normalizeFilmTypeKey(d.config?.selectedFilm));
                 setVidros((d.vidros || []).map((v) => ({ ...v, oh: v.oh ?? v.h ?? 0, ow: v.ow ?? v.w ?? 0 })) as GlassItem[]);
+                if (d.config?.compensarPerdas !== undefined) {
+                    setCompensarPerdas(Boolean(d.config.compensarPerdas));
+                }
                 setDesconto(0);
             } catch {
                 showToast('Arquivo inválido.', 'error');
@@ -1302,7 +1323,7 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
                                 <div className="flex bg-[#04080f] border border-white/10 p-1.5 rounded-xl shadow-2xl flex-1 max-w-sm ml-auto">
                                     <button onClick={() => setModoOtimizacao('densidade')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${modoOtimizacao === 'densidade' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}>Corte Densidade</button>
                                     <button onClick={() => setModoOtimizacao('facilidade')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${modoOtimizacao === 'facilidade' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}>Corte Fácil v1</button>
-                                    <button onClick={() => setModoOtimizacao('facilidade_v2')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${modoOtimizacao === 'facilidade_v2' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}>Corte Fácil v2</button>
+                                    <button onClick={() => setModoOtimizacao('facilidade_v2')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${modoOtimizacao === 'facilidade_v2' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}>Corte Fácil Pro</button>
                                 </div>
                             </div>
 
@@ -1311,6 +1332,7 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
                                 rollW={rollW}
                                 maxY={maxY}
                                 scale={scale}
+                                margin={margin}
                                 isCalculating={isCalculating}
                                 containerWidth={containerWidth}
                                 blocosCalculados={blocosCalculados}

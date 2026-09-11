@@ -21,13 +21,16 @@ const valido = {
 
 describe('parseOrcamentoSalvo', () => {
   it('aceita item válido completo', () => {
-    expect(parseOrcamentoSalvo(valido)?.cliente).toBe('Maria');
+    const parsed = parseOrcamentoSalvo(valido);
+    expect(parsed?.cliente).toBe('Maria');
+    expect(parsed?.neighborhood).toBe('Barra da Tijuca');
   });
 
   it('aceita item mínimo (opcionais ausentes)', () => {
     const { phone, neighborhood, selectedFilm, leadId, ...minimo } = valido;
     void phone; void neighborhood; void selectedFilm; void leadId;
     expect(parseOrcamentoSalvo(minimo)?.id).toBe('1');
+    expect(parseOrcamentoSalvo(minimo)?.neighborhood).toBeUndefined();
   });
 
   it('rejeita sem id, sem cliente ou sem vidros', () => {

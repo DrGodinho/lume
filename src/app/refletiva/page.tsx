@@ -1,15 +1,16 @@
 import type { Metadata } from 'next';
 import { RefletivaPage } from '../../views/Refletiva';
 import { businessAddressSchema, businessInfo } from '@/lib/businessInfo';
+import { buildBreadcrumbSchema } from '@/lib/schema/breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Película Refletiva Espelhada | Privacidade Total - LUME',
   description: 'Película refletiva espelhada com rejeição brutal de calor e privacidade total durante o dia. Efeito espelhado elegante. Orçamento grátis via WhatsApp.',
-  alternates: { canonical: 'https://lumecontrolesolar.com.br/refletiva' },
+  alternates: { canonical: 'https://lumecontrolesolar.com.br/refletiva/' },
   openGraph: {
     title: 'Película Refletiva Espelhada | Privacidade Total - LUME',
     description: 'Rejeição de até 78% do calor e privacidade absoluta durante o dia. O clássico que derrota o calor carioca com efeito espelhado elegante.',
-    url: 'https://lumecontrolesolar.com.br/refletiva',
+    url: 'https://lumecontrolesolar.com.br/refletiva/',
     type: 'website',
     siteName: 'LUME Controle Solar',
     images: [{ url: 'https://lumecontrolesolar.com.br/product-refletiva.webp', width: 1200, height: 630, alt: 'Película Refletiva Espelhada LUME' }],
@@ -25,6 +26,11 @@ export const metadata: Metadata = {
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
+    buildBreadcrumbSchema([
+      { name: 'Início', url: 'https://lumecontrolesolar.com.br/' },
+      { name: 'Produtos', url: 'https://lumecontrolesolar.com.br/#produtos' },
+      { name: 'Refletiva', url: 'https://lumecontrolesolar.com.br/refletiva/' },
+    ]),
     {
       '@type': 'Product',
   name: 'Película Refletiva Espelhada LUME',

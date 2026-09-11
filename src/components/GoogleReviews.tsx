@@ -1,4 +1,4 @@
-import { Star, Quote } from 'lucide-react';
+import { Star, Quote, ExternalLink } from 'lucide-react';
 import { businessInfo } from '@/lib/businessInfo';
 
 const reviews = [
@@ -87,12 +87,18 @@ export function GoogleReviews() {
         {/* Call to action for more reviews */}
         <div className="text-center mt-12">
           <a
-            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(businessInfo.address.mapsQuery)}`}
+            href={businessInfo.googleMapsUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 text-[#c9a227] hover:text-white transition-colors text-sm font-medium border border-[#c9a227]/30 hover:border-[#c9a227] rounded-full px-6 py-2 bg-[#c9a227]/5"
+            className="inline-flex items-center justify-center gap-2 text-[#c9a227] hover:text-white transition-all text-sm font-semibold border border-[#c9a227]/40 hover:border-[#c9a227] rounded-full px-7 py-3 bg-[#c9a227]/10 hover:bg-[#c9a227]/20 shadow-lg shadow-[#c9a227]/5"
           >
-            Ver mais avaliações no Google
+            <div className="flex gap-0.5">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-3.5 h-3.5 fill-[#c9a227] text-[#c9a227]" />
+              ))}
+            </div>
+            <span>Ver perfil e avaliações no Google Maps</span>
+            <ExternalLink className="w-3.5 h-3.5 ml-0.5" />
           </a>
         </div>
       </div>

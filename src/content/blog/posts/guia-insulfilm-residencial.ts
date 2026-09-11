@@ -10,7 +10,7 @@ export const guiaInsulfilmResidencial: BlogPost = {
   tags: ['guia de insulfilm', 'insulfilm residencial', 'película de controle solar', 'proteção UV', 'privacidade'],
   coverImageUrl: 'https://lumecontrolesolar.com.br/hero-bg.webp',
   coverImageAlt: 'Guia de insulfilm residencial da LUME Controle Solar',
-  authorName: 'LUME Controle Solar',
+  authorName: 'Marcos Paulo Godinho',
   publishedAt: '2026-06-09T12:00:00.000Z',
   updatedAt: '2026-06-09T12:00:00.000Z',
   seoTitle: 'Guia de Insulfilm Residencial | LUME Controle Solar',

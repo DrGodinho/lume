@@ -67,8 +67,8 @@ export function CarbonoPage() {
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden px-4">
                 <div className="absolute inset-0 z-0">
-                    <Image src="/carbono-hero.webp" alt="Ambiente privativo com Insulfilm Carbono Premium LUME - Rio de Janeiro" fill sizes="(max-width: 768px) 100vw, 100vw" priority className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-black/60" />
+                    <Image src="/carbono-hero.webp" alt="Demonstração real do Insulfilm Carbono escurecendo janela durante o dia - Rio de Janeiro" fill sizes="(max-width: 768px) 100vw, 100vw" priority className="w-full h-full object-cover object-center" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/30" />
                 </div>
 
                 <div className="container-lume relative z-10 page-entrance text-center md:text-left">

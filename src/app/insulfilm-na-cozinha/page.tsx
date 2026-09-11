@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { InsulfilmCozinha } from '../../views/InsulfilmCozinha';
 import { businessAddressSchema, businessInfo } from '@/lib/businessInfo';
+import { buildBreadcrumbSchema } from '@/lib/schema/breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Insulfilm para Cozinha | Conforto e Proteção UV - LUME',
@@ -14,11 +15,11 @@ export const metadata: Metadata = {
     'insulfilm jateado cozinha',
     'lume controle solar'
   ],
-  alternates: { canonical: 'https://lumecontrolesolar.com.br/insulfilm-na-cozinha' },
+  alternates: { canonical: 'https://lumecontrolesolar.com.br/insulfilm-na-cozinha/' },
   openGraph: {
     title: 'Insulfilm para Cozinha | Conforto e Proteção Térmica',
     description: 'Transforme o ambiente da sua cozinha. Películas avançadas que reduzem o calor e protegem móveis sem escurecer o ambiente. Orçamento grátis.',
-    url: 'https://lumecontrolesolar.com.br/insulfilm-na-cozinha',
+    url: 'https://lumecontrolesolar.com.br/insulfilm-na-cozinha/',
     type: 'website',
     siteName: 'LUME Controle Solar',
     images: [{ url: 'https://lumecontrolesolar.com.br/og-image.jpg', width: 1200, height: 630, alt: 'Insulfilm para Cozinha - LUME' }],
@@ -33,37 +34,46 @@ export const metadata: Metadata = {
 
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'Service',
-  name: 'Instalação de Insulfilm para Cozinhas',
-  alternateName: 'Película de Controle Solar para Cozinha',
-  description: 'Instalação profissional de películas de alta performance em cozinhas residenciais. Ideal para reduzir calor, proteger eletrodomésticos e móveis planejados dos raios UV sem perder a iluminação natural. Instalação rápida e higiênica.',
-  url: 'https://lumecontrolesolar.com.br/insulfilm-na-cozinha',
-  image: 'https://lumecontrolesolar.com.br/og-image.jpg',
-  provider: {
-    '@type': 'LocalBusiness',
-    name: 'LUME Controle Solar',
-    url: 'https://lumecontrolesolar.com.br',
-    telephone: businessInfo.phoneE164,
-    address: businessAddressSchema,
-  },
-  areaServed: {
-    '@type': 'City',
-    name: 'Rio de Janeiro',
-  },
-  offers: {
-    '@type': 'Offer',
-    priceCurrency: 'BRL',
-    availability: 'https://schema.org/InStock',
-    seller: {
-      '@type': 'LocalBusiness',
-      name: 'LUME Controle Solar',
+  '@graph': [
+    buildBreadcrumbSchema([
+      { name: 'Início', url: 'https://lumecontrolesolar.com.br/' },
+      { name: 'Soluções por Ambiente', url: 'https://lumecontrolesolar.com.br/#produtos' },
+      { name: 'Insulfilm na Cozinha', url: 'https://lumecontrolesolar.com.br/insulfilm-na-cozinha/' },
+    ]),
+    {
+      '@type': 'Service',
+      name: 'Instalação de Insulfilm para Cozinhas',
+      alternateName: 'Película de Controle Solar para Cozinha',
+      description: 'Instalação profissional de películas de alta performance em cozinhas residenciais. Ideal para reduzir calor, proteger eletrodomésticos e móveis planejados dos raios UV sem perder a iluminação natural. Instalação rápida e higiênica.',
+      url: 'https://lumecontrolesolar.com.br/insulfilm-na-cozinha/',
+      image: 'https://lumecontrolesolar.com.br/og-image.jpg',
+      provider: {
+        '@type': 'LocalBusiness',
+        name: 'LUME Controle Solar',
+        url: 'https://lumecontrolesolar.com.br',
+        telephone: businessInfo.phoneE164,
+        address: businessAddressSchema,
+      },
+      areaServed: {
+        '@type': 'City',
+        name: 'Rio de Janeiro',
+      },
+      offers: {
+        '@type': 'Offer',
+        priceCurrency: 'BRL',
+        availability: 'https://schema.org/InStock',
+        seller: {
+          '@type': 'LocalBusiness',
+          name: 'LUME Controle Solar',
+        },
+      },
+      additionalProperty: [
+        { '@type': 'PropertyValue', name: 'Proteção UV', value: 'Até 99%' },
+        { '@type': 'PropertyValue', name: 'Rejeição de Calor', value: 'Alta Performance Térmica' },
+        { '@type': 'PropertyValue', name: 'Tipos Recomendados', value: 'Nano Cerâmica e Jateada' },
+      ],
     },
-  },
-  additionalProperty: [
-    { '@type': 'PropertyValue', name: 'Proteção UV', value: 'Até 99%' },
-    { '@type': 'PropertyValue', name: 'Rejeição de Calor', value: 'Alta Performance Térmica' },
-    { '@type': 'PropertyValue', name: 'Tipos Recomendados', value: 'Nano Cerâmica e Jateada' },
-  ]
+  ],
 };
 
 export default function Page() {

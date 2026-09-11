@@ -1,6 +1,6 @@
  'use client';
 
-import { ArrowRight, CalendarDays, Clock, MessageCircle, Tag } from 'lucide-react';
+import { ArrowRight, CalendarDays, Clock, MessageCircle, Tag, User, ShieldCheck } from 'lucide-react';
 import { getBlogUrl, getReadingTime, type BlogContentBlock, type BlogPost as BlogPostType } from '@/lib/blog';
 
 type BlogPostProps = {
@@ -292,6 +292,10 @@ export function BlogPost({ post, relatedPosts }: BlogPostProps) {
               {formatDate(post.publishedAt)}
             </span>
             <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2">
+              <User className="h-4 w-4 text-[#c9a227]" />
+              {post.authorName}
+            </span>
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2">
               <Clock className="h-4 w-4" />
               {readingTime} min de leitura
             </span>
@@ -324,6 +328,43 @@ export function BlogPost({ post, relatedPosts }: BlogPostProps) {
           {post.content.map((block, index) => (
             <BlogBlock key={`${block.type}-${index}`} block={block} />
           ))}
+
+          {/* E-E-A-T Author Box (Monograma elegante MPG sem foto) */}
+          <div className="mt-14 rounded-2xl border border-[#c9a227]/30 bg-gradient-to-br from-[#0c1829] via-[#081220] to-[#04080f] p-6 sm:p-8 shadow-xl">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+              <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-2xl border-2 border-[#c9a227]/50 bg-gradient-to-br from-[#1a3a5c] to-[#0a1828] text-xl font-bold font-montserrat tracking-wider text-[#c9a227] shadow-lg shadow-[#c9a227]/10">
+                MPG
+              </div>
+              <div className="flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h3 className="font-montserrat text-xl font-bold text-white">
+                    {post.authorName}
+                  </h3>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-[#c9a227]/15 px-2.5 py-0.5 text-xs font-semibold text-[#c9a227] border border-[#c9a227]/30">
+                    <ShieldCheck className="h-3 w-3" />
+                    Especialista Técnico
+                  </span>
+                </div>
+                <p className="mt-1 text-sm font-medium text-[#c9a227]/90">
+                  Especialista em Películas de Controle Solar e Fundador da LUME
+                </p>
+                <p className="mt-3 text-sm leading-relaxed text-gray-300">
+                  Com anos de experiência prática em soluções arquitetônicas de vidro no Rio de Janeiro, orienta clientes residenciais e comerciais a alcançarem a máxima redução térmica, proteção contra raios UV e privacidade personalizada.
+                </p>
+                <div className="mt-4 flex flex-wrap items-center gap-3">
+                  <a
+                    href={waHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-xs font-semibold text-[#c9a227] hover:text-white transition-colors"
+                  >
+                    <MessageCircle className="h-3.5 w-3.5" />
+                    Tirar dúvidas diretamente com o especialista
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <aside>

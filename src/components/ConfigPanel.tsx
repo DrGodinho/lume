@@ -117,7 +117,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
     }, 350);
   };
   const algoritmoLabel =
-    config.modoOtimizacao === 'densidade' ? 'Densidade' : config.modoOtimizacao === 'facilidade' ? 'Corte Fácil v1' : 'Corte Fácil v2';
+    config.modoOtimizacao === 'densidade' ? 'Densidade' : config.modoOtimizacao === 'facilidade' ? 'Corte Fácil v1' : 'Corte Fácil Pro';
   const corLabel = config.modoCorConfig === 'ambiente' ? 'Por ambiente' : 'Por tamanho';
   return (
     <>
@@ -252,7 +252,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
               <FieldLabel>Modo de Cor</FieldLabel>
               <FieldShortcut current={corLabel} onAdjust={() => goToField('calc-cor-esquema')} adjustLabel="Ajustar" />
               <HelpText>
-                O ajuste mora no painel principal, junto às medidas. Usa uma cor única por ambiente ou cores por tamanho de cada peça.
+                O ajuste mora no painel principal, junto às medidas. Alterna entre cor única por ambiente ou cores por tamanho de cada peça.
               </HelpText>
             </div>
 
@@ -281,30 +281,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
               </HelpText>
             </div>
 
-            <div>
-              <div className="flex items-center justify-between gap-3 mb-2">
-                <FieldLabel>Agressividade do Corte Fácil v2</FieldLabel>
-                <span className="text-[10px] text-white font-black bg-[#040811] border border-white/10 rounded-lg px-2 py-1">
-                  {config.agressividadeCorte}%
-                </span>
-              </div>
-              <input
-                type="range"
-                min={0}
-                max={100}
-                step={5}
-                value={config.agressividadeCorte}
-                onChange={(e) => onUpdate('agressividadeCorte', parseInt(e.target.value, 10))}
-                className="w-full accent-[#c9a227]"
-              />
-              <div className="flex justify-between text-[9px] text-gray-600 mt-1 font-bold uppercase">
-                <span>Mais linhas de corte</span>
-                <span>Mais econômico</span>
-              </div>
-              <HelpText>
-                Valores menores aproximam bordas em linhas horizontais. Valores maiores apertam mais as peças para economizar rolo.
-              </HelpText>
-            </div>
+
             {onLogout && (
               <div className="pt-2 border-t border-white/10">
                 <button

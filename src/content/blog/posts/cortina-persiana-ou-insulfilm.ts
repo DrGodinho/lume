@@ -18,10 +18,10 @@ export const cortinaPersianaOuInsulfilm: BlogPost = {
     'conforto térmico',
     'película para janela',
   ],
-  coverImageUrl: '/cortinavsnano.png',
+  coverImageUrl: '/cortinavsnano.webp',
   coverImageAlt:
     'Comparação visual entre cortina tradicional e insulfilm nano cerâmica em ambiente residencial com entrada de luz natural',
-  authorName: 'LUME Controle Solar',
+  authorName: 'Marcos Paulo Godinho',
   publishedAt: '2026-07-08T12:00:00.000Z',
   updatedAt: '2026-07-08T12:00:00.000Z',
   seoTitle: 'Cortina, Persiana ou Insulfilm: Qual Vale Mais para Calor e Privacidade?',
@@ -114,7 +114,7 @@ export const cortinaPersianaOuInsulfilm: BlogPost = {
     },
     {
       type: 'image',
-      url: '/cortinavsg5.png',
+      url: '/cortinavsg5.webp',
       alt: 'Comparação visual entre cortina e película G5 mostrando diferença de escurecimento e controle de luz no ambiente',
       caption:
         'Comparativo visual útil para quem pensa apenas em escurecer o ambiente. A cortina resolve luz e privacidade, mas o G5 ainda atua no vidro antes que o calor se espalhe pela sala.',
@@ -179,7 +179,7 @@ export const cortinaPersianaOuInsulfilm: BlogPost = {
     },
     {
       type: 'image',
-      url: '/cortinavsnano.png',
+      url: '/cortinavsnano.webp',
       alt: 'Comparação visual entre cortina e insulfilm nano cerâmica com foco em conforto térmico sem perder luz natural',
       caption:
         'A comparação entre cortina e nano cerâmica deixa clara uma diferença importante: quando o objetivo é conforto térmico com luminosidade, a película tende a preservar melhor a sensação de ambiente aberto.',

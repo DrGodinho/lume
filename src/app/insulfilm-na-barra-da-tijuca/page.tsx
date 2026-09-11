@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { BarraPage } from '../../views/BarraPage';
 import { businessAddressSchema, businessInfo } from '@/lib/businessInfo';
+import { buildBreadcrumbSchema } from '@/lib/schema/breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Insulfilm na Barra da Tijuca RJ | Preço, Instalação e Garantia - LUME',
@@ -85,6 +86,11 @@ const barraFaqs = [
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
+    buildBreadcrumbSchema([
+      { name: 'Início', url: 'https://lumecontrolesolar.com.br/' },
+      { name: 'Onde Atendemos', url: 'https://lumecontrolesolar.com.br/#onde-atendemos' },
+      { name: 'Barra da Tijuca', url: 'https://lumecontrolesolar.com.br/insulfilm-na-barra-da-tijuca/' },
+    ]),
     {
       '@type': 'LocalBusiness',
       '@id': 'https://lumecontrolesolar.com.br/insulfilm-na-barra-da-tijuca/#localbusiness',

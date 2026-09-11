@@ -23,7 +23,7 @@ export const elNino2026CasasMaisQuentesArCondicionado: BlogPost = {
   coverImageUrl: '/hero-bg.webp',
   coverImageAlt:
     'Sala residencial com grande janela de vidro em dia de calor intenso durante o El Niño 2026',
-  authorName: 'LUME Controle Solar',
+  authorName: 'Marcos Paulo Godinho',
   publishedAt: '2026-09-04T12:00:00.000Z',
   updatedAt: '2026-09-04T12:00:00.000Z',
   seoTitle:
@@ -137,7 +137,7 @@ export const elNino2026CasasMaisQuentesArCondicionado: BlogPost = {
     },
     {
       type: 'image',
-      url: '/cortinavsnano.png',
+      url: '/cortinavsnano.webp',
       alt: 'Comparação entre cortina tradicional e insulfilm nano cerâmica em sala com muita entrada de sol',
       caption:
         'Cortina escurece o ambiente depois que o calor já entrou. O insulfilm atua no vidro, antes da radiação virar calor interno.',

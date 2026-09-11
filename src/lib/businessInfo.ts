@@ -18,6 +18,7 @@ export const businessInfo = {
     instagram: 'https://www.instagram.com/lumecontrolesolar',
     facebook: 'https://www.facebook.com/lumecontrolesolar',
   },
+  googleMapsUrl: 'https://maps.app.goo.gl/HQ6qCNNRxRGT6rgZ7',
 } as const;
 
 export const businessAddressSchema = {
@@ -32,4 +33,5 @@ export const businessAddressSchema = {
 export const businessSameAs = [
   businessInfo.socialProfiles.instagram,
   businessInfo.socialProfiles.facebook,
+  businessInfo.googleMapsUrl,
 ] as const;

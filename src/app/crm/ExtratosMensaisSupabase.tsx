@@ -419,7 +419,11 @@ export function ExtratosMensaisSupabase() {
   );
 
   const numJobs = registros.length;
-  const ticketMedio = numJobs > 0 ? faturamentoTotal / numJobs : 0;
+  const servicosComValor = useMemo(
+    () => registros.filter((row) => Number(row.valor || 0) > 0),
+    [registros]
+  );
+  const ticketMedio = servicosComValor.length > 0 ? faturamentoTotal / servicosComValor.length : 0;
 
   const m2Total = useMemo(
     () => registros.reduce((sum, row) => sum + getAreaTotal(row), 0),
@@ -458,13 +462,15 @@ export function ExtratosMensaisSupabase() {
   }, [registros]);
 
   const rankingPeliculas = useMemo<FilmRankingItem[]>(() => {
-    const porPelicula: Record<string, { valor: number; jobs: number; area: number }> = {};
+    const porPelicula: Record<string, { valor: number; jobs: number; jobsComValor: number; area: number }> = {};
 
     registros.forEach((record) => {
       const nome = getFilmLabel(record);
-      if (!porPelicula[nome]) porPelicula[nome] = { valor: 0, jobs: 0, area: 0 };
-      porPelicula[nome].valor += Number(record.valor || 0);
+      if (!porPelicula[nome]) porPelicula[nome] = { valor: 0, jobs: 0, jobsComValor: 0, area: 0 };
+      const val = Number(record.valor || 0);
+      porPelicula[nome].valor += val;
       porPelicula[nome].jobs += 1;
+      if (val > 0) porPelicula[nome].jobsComValor += 1;
       porPelicula[nome].area += getAreaTotal(record);
     });
 
@@ -474,7 +480,7 @@ export function ExtratosMensaisSupabase() {
         valor: dados.valor,
         jobs: dados.jobs,
         area: dados.area,
-        ticket: dados.jobs > 0 ? dados.valor / dados.jobs : 0,
+        ticket: dados.jobsComValor > 0 ? dados.valor / dados.jobsComValor : 0,
         share: faturamentoTotal > 0 ? (dados.valor / faturamentoTotal) * 100 : 0,
       }))
       .sort((a, b) => b.valor - a.valor);
@@ -536,7 +542,10 @@ export function ExtratosMensaisSupabase() {
       {
         label: 'Ticket médio',
         value: formatBRL(ticketMedio),
-        subtext: 'receita média por serviço',
+        subtext:
+          servicosComValor.length > 0 && servicosComValor.length < numJobs
+            ? `média de ${servicosComValor.length} serviço${servicosComValor.length !== 1 ? 's' : ''} com valor`
+            : 'receita média por serviço',
         icon: TrendingUp,
         tone: 'emerald',
       },
@@ -548,7 +557,7 @@ export function ExtratosMensaisSupabase() {
         tone: 'sky',
       },
     ];
-  }, [faturamentoTotal, maiorOrcamento, m2Total, numJobs, servicosAgendados, servicosFeitos, ticketMedio]);
+  }, [faturamentoTotal, maiorOrcamento, m2Total, numJobs, servicosAgendados, servicosFeitos, servicosComValor.length, ticketMedio]);
 
   async function exportarPDF() {
     const elemento = document.getElementById('extrato-conteudo');

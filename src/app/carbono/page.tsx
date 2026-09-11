@@ -1,15 +1,16 @@
 import type { Metadata } from 'next';
 import { CarbonoPage } from '../../views/Carbono';
 import { businessAddressSchema, businessInfo } from '@/lib/businessInfo';
+import { buildBreadcrumbSchema } from '@/lib/schema/breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Película de Carbono Premium | Privacidade e Controle Solar',
   description: 'Película de Carbono Premium com visual grafite sofisticado, rejeição térmica de até 80% e estabilidade de cor garantida. Orçamento grátis via WhatsApp.',
-  alternates: { canonical: 'https://lumecontrolesolar.com.br/carbono' },
+  alternates: { canonical: 'https://lumecontrolesolar.com.br/carbono/' },
   openGraph: {
     title: 'Película de Carbono Premium | Privacidade e Redução de Calor - LUME',
     description: 'Visual grafite sofisticado com rejeição térmica de até 80%. A película que une estética e performance no Rio de Janeiro.',
-    url: 'https://lumecontrolesolar.com.br/carbono',
+    url: 'https://lumecontrolesolar.com.br/carbono/',
     type: 'website',
     siteName: 'LUME Controle Solar',
     images: [{ url: 'https://lumecontrolesolar.com.br/carbono-hero.webp', width: 1200, height: 630, alt: 'Película de Carbono Premium LUME' }],
@@ -24,7 +25,14 @@ export const metadata: Metadata = {
 
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'Product',
+  '@graph': [
+    buildBreadcrumbSchema([
+      { name: 'Início', url: 'https://lumecontrolesolar.com.br/' },
+      { name: 'Produtos', url: 'https://lumecontrolesolar.com.br/#produtos' },
+      { name: 'Carbono', url: 'https://lumecontrolesolar.com.br/carbono/' },
+    ]),
+    {
+      '@type': 'Product',
   name: 'Película de Carbono Premium LUME',
   image: 'https://lumecontrolesolar.com.br/carbono-hero.webp',
   description: 'Película de carbono profissional com visual grafite sofisticado, rejeição térmica de até 80% e bloqueio de 99% dos raios UV. Garantia de 2 anos.',
@@ -64,6 +72,8 @@ const jsonLd = {
     reviewCount: '22',
     bestRating: '5',
   },
+    },
+  ],
 };
 
 export default function Page() {

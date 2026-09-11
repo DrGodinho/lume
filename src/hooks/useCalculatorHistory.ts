@@ -34,11 +34,17 @@ const OrcamentoSalvoSchema = z.object({
     rollW: z.number(),
     price: z.number(),
     margin: z.number(),
+    compensarPerdas: z.boolean().optional(),
+    modoPerdas: z.string().optional(),
+    perdasFixas: z.number().optional(),
   }).catchall(z.unknown()),
   desconto: z.number(),
   modoOtimizacao: z.string(),
   selectedFilm: z.string().optional(),
   leadId: z.string().nullable().optional(),
+  compensarPerdas: z.boolean().optional(),
+  modoPerdas: z.string().optional(),
+  perdasFixas: z.number().optional(),
 }).catchall(z.unknown());
 
 /** Valida um item de histórico (nuvem/localStorage/abrir). Retorna null se inválido. */

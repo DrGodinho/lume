@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { SulacapPage } from '../../views/SulacapPage';
 import { businessAddressSchema, businessInfo } from '@/lib/businessInfo';
+import { buildBreadcrumbSchema } from '@/lib/schema/breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Insulfilm em Sulacap RJ | Preço, Instalação e Garantia - LUME',
@@ -83,6 +84,11 @@ const sulacapFaqs = [
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
+    buildBreadcrumbSchema([
+      { name: 'Início', url: 'https://lumecontrolesolar.com.br/' },
+      { name: 'Onde Atendemos', url: 'https://lumecontrolesolar.com.br/#onde-atendemos' },
+      { name: 'Sulacap', url: 'https://lumecontrolesolar.com.br/insulfilm-em-sulacap/' },
+    ]),
     {
       '@type': 'LocalBusiness',
       '@id': 'https://lumecontrolesolar.com.br/insulfilm-em-sulacap/#localbusiness',

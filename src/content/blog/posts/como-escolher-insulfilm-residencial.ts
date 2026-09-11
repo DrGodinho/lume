@@ -17,7 +17,7 @@ export const comoEscolherInsulfilmResidencial: BlogPost = {
   ],
   coverImageUrl: '/blog/como-escolher-insulfilm-residencial.svg',
   coverImageAlt: 'Mapa visual para escolher insulfilm residencial considerando calor, privacidade, claridade e proteção UV',
-  authorName: 'LUME Controle Solar',
+  authorName: 'Marcos Paulo Godinho',
   publishedAt: '2026-06-08T12:00:00.000Z',
   updatedAt: '2026-06-15T12:00:00.000Z',
   seoTitle: 'Como Escolher Insulfilm Residencial | Guia Premium LUME',

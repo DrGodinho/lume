@@ -1,14 +1,15 @@
 import type { Metadata } from 'next';
 import { SimulatorWrapper } from './SimulatorWrapper';
+import { buildBreadcrumbSchema } from '@/lib/schema/breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Simulador de Películas | Descubra a Película Ideal - LUME',
   description: 'Simulador inteligente de películas residenciais. Responda algumas perguntas e descubra qual insulfilm é o ideal para sua casa em poucos segundos.',
-  alternates: { canonical: 'https://lumecontrolesolar.com.br/simulador' },
+  alternates: { canonical: 'https://lumecontrolesolar.com.br/simulador/' },
   openGraph: {
     title: 'Simulador de Películas | Descubra a Película Ideal - LUME',
     description: 'Responda 3 perguntas e descubra qual insulfilm é o ideal para sua casa. Simulador inteligente e gratuito da LUME Controle Solar.',
-    url: 'https://lumecontrolesolar.com.br/simulador',
+    url: 'https://lumecontrolesolar.com.br/simulador/',
     type: 'website',
     siteName: 'LUME Controle Solar',
     images: [{ url: 'https://lumecontrolesolar.com.br/novo-logo-lume.png', width: 1200, height: 630, alt: 'Simulador de Películas LUME Controle Solar' }],
@@ -21,6 +22,24 @@ export const metadata: Metadata = {
   },
 };
 
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    buildBreadcrumbSchema([
+      { name: 'Início', url: 'https://lumecontrolesolar.com.br/' },
+      { name: 'Simulador de Películas', url: 'https://lumecontrolesolar.com.br/simulador/' },
+    ]),
+  ],
+};
+
 export default function Page() {
-  return <SimulatorWrapper />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <SimulatorWrapper />
+    </>
+  );
 }

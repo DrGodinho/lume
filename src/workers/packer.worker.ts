@@ -53,51 +53,26 @@ interface FreeRect {
   h: number;
 }
 
-interface BeamState {
+interface ProColumn {
+  x: number;
+  width: number;
+  currentHeight: number;
   blocks: PackedBlock[];
-  freeRects: FreeRect[];
-  maxY: number;
-  areaV: number;
-  usedArea: number;
-  rotations: number;
-  horizontalLines: number[];
 }
 
-interface PlacementCandidate {
-  block: PackedBlock;
-  footprint: FreeRect;
-  rect: FreeRect;
-  score: number;
+interface ProShelf {
+  y: number;
+  height: number;
+  width: number;
+  columns: ProColumn[];
 }
 
-interface EaseBias {
-  heightWeight: number;
-  wasteWeight: number;
-  localWasteWeight: number;
-  fragmentationWeight: number;
-  xLineWeight: number;
-  yLineWeight: number;
-  raggedWeight: number;
-  alignmentWeight: number;
-  verticalGapWeight: number;
-  horizontalSnapTolerance: number;
-  lineMergeTolerance: number;
-  horizontalSnapWeight: number;
-  lineCreationWeight: number;
-  nearMissPenalty: number;
-  rotationWeight: number;
-  shelfStartBonus: number;
-  edgeBonus: number;
-  maxSnapShift: number;
-  maxLineCandidates: number;
-  maxRectCandidates: number;
-  maxXCandidates: number;
-}
-
-interface EasyV2SearchProfile {
-  beamWidth: number;
-  candidateLimit: number;
-  orderStrategyLimit: number;
+interface ProStrategyConfig {
+  name: string;
+  mode: 'greedy' | 'composer';
+  sortFn?: (a: PackItem, b: PackItem) => number;
+  preferUpright?: boolean;
+  preferWidthFit?: boolean;
 }
 
 const STRIP_HEIGHT = 1_000_000;
@@ -236,371 +211,474 @@ const splitFreeRects = (freeRects: FreeRect[], placed: FreeRect) => {
   return pruneFreeRects(nextRects);
 };
 
-const alignmentPenalty = (x: number, w: number, rollW: number, blocks: PackedBlock[]) => {
-  const anchors = new Set<number>([0, rollW - w]);
-  blocks.forEach((block) => {
-    if (block.fit) {
-      anchors.add(block.fit.x);
-      anchors.add(block.fit.x + block.w - w);
-    }
-  });
+const getProOrientations = (item: PackItem, rollW: number): PackedBlock[] => {
+  const forced = item.forceRotate === true;
+  const normal = toRawBlock(item, false);
+  const rotated = toRawBlock(item, true);
 
-  let best = Infinity;
-  anchors.forEach((anchor) => {
-    if (anchor >= -EPS && anchor + w <= rollW + EPS) {
-      best = Math.min(best, Math.abs(anchor - x));
-    }
-  });
-
-  return Number.isFinite(best) ? best : 0;
-};
-
-const uniqueRoundedCount = (values: number[]) => new Set(values.map((value) => Math.round(value))).size;
-
-const getEaseBias = (agressividadeCorte: number): EaseBias => {
-  const compactness = clamp(agressividadeCorte, 0, 100) / 100;
-  const linePriority = 1 - compactness;
-
-  return {
-    heightWeight: 2_600 + compactness * 6_400,
-    wasteWeight: 2.5 + compactness * 12,
-    localWasteWeight: 0.7 + compactness * 1.4,
-    fragmentationWeight: 120 + linePriority * 220,
-    xLineWeight: 20 + linePriority * 75,
-    yLineWeight: 12_000 + linePriority * 58_000,
-    raggedWeight: 100 + linePriority * 220,
-    alignmentWeight: 8 + linePriority * 30,
-    verticalGapWeight: 85 + compactness * 260,
-    horizontalSnapTolerance: 3 + linePriority * 10,
-    lineMergeTolerance: 1.5 + linePriority * 2.5,
-    horizontalSnapWeight: 10_000 + linePriority * 70_000,
-    lineCreationWeight: 5_000 + linePriority * 42_000,
-    nearMissPenalty: 8_000 + linePriority * 34_000,
-    rotationWeight: 6 + linePriority * 520,
-    shelfStartBonus: -3_000 - linePriority * 9_000,
-    edgeBonus: -300 - linePriority * 700,
-    maxSnapShift: 8 + linePriority * 58,
-    maxLineCandidates: compactness > 0.75 ? 3 : compactness > 0.4 ? 4 : 6,
-    maxRectCandidates: compactness > 0.75 ? 10 : compactness > 0.4 ? 12 : 16,
-    maxXCandidates: compactness > 0.75 ? 2 : compactness > 0.4 ? 3 : 4,
-  };
-};
-
-const getEasyV2SearchProfile = (itemCount: number, agressividadeCorte: number): EasyV2SearchProfile => {
-  const compactness = clamp(agressividadeCorte, 0, 100) / 100;
-  const linePriority = 1 - compactness;
-  const baseBeam = itemCount > 120 ? 5 : itemCount > 80 ? 6 : itemCount > 45 ? 8 : 10;
-  const baseCandidateLimit = itemCount > 120 ? 6 : itemCount > 80 ? 7 : itemCount > 45 ? 8 : 10;
-  const searchBudget = itemCount > 120 ? 2 : itemCount > 80 ? 2 : itemCount > 45 ? 3 : 5;
-  const compactTrim = compactness > 0.8 ? 1 : 0;
-
-  return {
-    beamWidth: Math.round(baseBeam + linePriority * searchBudget - compactTrim),
-    candidateLimit: Math.round(baseCandidateLimit + linePriority * (searchBudget + 1) - compactTrim),
-    orderStrategyLimit: itemCount > 80
-      ? (linePriority > 0.55 ? 4 : 3)
-      : linePriority > 0.55 ? 6 : 4,
-  };
-};
-
-const stateScore = (state: BeamState, rollW: number, agressividadeCorte: number) => {
-  const bias = getEaseBias(agressividadeCorte);
-  const waste = Math.max(0, state.maxY * rollW - state.usedArea);
-  const xs = state.blocks.map((block) => block.fit?.x ?? 0);
-  const raggedBlocks = state.blocks.filter((block) => {
-    const x = block.fit?.x ?? 0;
-    return x > EPS && x + block.w < rollW - EPS;
-  }).length;
-
-  return (
-    state.maxY * bias.heightWeight +
-    waste * bias.wasteWeight +
-    state.freeRects.length * bias.fragmentationWeight +
-    uniqueRoundedCount(xs) * bias.xLineWeight +
-    Math.max(0, state.horizontalLines.length - 1) * bias.yLineWeight +
-    raggedBlocks * bias.raggedWeight +
-    state.rotations * bias.rotationWeight
-  );
-};
-
-const nearestLineDistance = (line: number, lines: number[]) => {
-  if (lines.length === 0) return Infinity;
-  return Math.min(...lines.map((existing) => Math.abs(existing - line)));
-};
-
-const mergeHorizontalLines = (lines: number[], nextLine: number, tolerance: number) => {
-  const closeLine = lines.find((line) => Math.abs(line - nextLine) <= tolerance);
-  const merged = closeLine === undefined ? [...lines, nextLine] : lines;
-  return [...new Set(merged.map((line) => Math.round(line * 1000) / 1000))].sort((a, b) => a - b);
-};
-
-const addCandidateValue = (values: Set<number>, value: number, min: number, max: number) => {
-  if (value < min - EPS || value > max + EPS) return;
-  values.add(Math.round(clamp(value, min, max) * 1000) / 1000);
-};
-
-const getCandidateXs = (state: BeamState, rect: FreeRect, block: PackedBlock, rollW: number, margin: number, bias: EaseBias) => {
-  const minX = rect.x;
-  const maxX = rect.x + rect.w - block.w;
-  const values = new Set<number>();
-
-  addCandidateValue(values, minX, minX, maxX);
-  addCandidateValue(values, maxX, minX, maxX);
-  addCandidateValue(values, maxX - margin, minX, maxX);
-
-  if (!block.alignRight) {
-    addCandidateValue(values, 0, minX, maxX);
-    addCandidateValue(values, rollW - block.w, minX, maxX);
-    state.blocks.forEach((placed) => {
-      if (!placed.fit) return;
-      addCandidateValue(values, placed.fit.x, minX, maxX);
-      addCandidateValue(values, placed.fit.x + placed.w - block.w, minX, maxX);
-    });
+  if (forced) {
+    return rotated.w <= rollW + EPS ? [rotated] : [];
   }
 
-  return [...values]
-    .sort((a, b) => {
-      const aEdge = Math.min(Math.abs(a - minX), Math.abs(a - maxX));
-      const bEdge = Math.min(Math.abs(b - minX), Math.abs(b - maxX));
-      return aEdge - bEdge || a - b;
-    })
-    .slice(0, block.alignRight ? 2 : bias.maxXCandidates)
-    .sort((a, b) => a - b);
+  const list: PackedBlock[] = [];
+  if (normal.w <= rollW + EPS) list.push(normal);
+  if (Math.abs(normal.w - rotated.w) > EPS || Math.abs(normal.h - rotated.h) > EPS) {
+    if (rotated.w <= rollW + EPS) list.push(rotated);
+  }
+  return list;
 };
 
-const getCandidateYs = (state: BeamState, rect: FreeRect, block: PackedBlock, margin: number, bias: EaseBias) => {
-  const minY = rect.y;
-  const maxY = rect.y + rect.h - block.h;
-  const values = new Set<number>();
+const alignProShelves = (shelves: ProShelf[], rollW: number) => {
+  shelves.forEach((shelf) => {
+    const remainingWidth = rollW - shelf.width;
+    if (remainingWidth <= EPS) return;
 
-  addCandidateValue(values, minY, minY, maxY);
-  addCandidateValue(values, maxY - margin, minY, maxY);
-  addCandidateValue(values, state.maxY, minY, maxY);
+    let currentRight = rollW;
+    for (let i = shelf.columns.length - 1; i >= 0; i--) {
+      const column = shelf.columns[i];
+      if (!column.blocks.some((b) => b.alignRight === true)) break;
 
-  state.horizontalLines.forEach((line) => {
-    const topOnLine = line;
-    const bottomOnLine = line - block.h;
-
-    if (Math.abs(topOnLine - minY) <= bias.maxSnapShift) {
-      addCandidateValue(values, topOnLine, minY, maxY);
-    }
-    if (Math.abs(bottomOnLine - minY) <= bias.maxSnapShift) {
-      addCandidateValue(values, bottomOnLine, minY, maxY);
-    }
-  });
-
-  return [...values]
-    .sort((a, b) => Math.abs(a - minY) - Math.abs(b - minY) || a - b)
-    .slice(0, bias.maxLineCandidates)
-    .sort((a, b) => a - b);
-};
-
-const placementScore = (state: BeamState, block: PackedBlock, footprint: FreeRect, rect: FreeRect, x: number, y: number, rollW: number, bias: EaseBias) => {
-  const newMaxY = Math.max(state.maxY, y + block.h);
-  const localWaste = (rect.w - footprint.w) * 4 + Math.min(rect.h - footprint.h, 500);
-  const align = alignmentPenalty(x, block.w, rollW, state.blocks);
-  const verticalGap = Math.max(0, y - rect.y);
-  const bottomLine = y + block.h;
-  const bottomDistance = nearestLineDistance(bottomLine, state.horizontalLines);
-  const topDistance = nearestLineDistance(y, state.horizontalLines);
-  const snapsBottom = bottomDistance <= bias.horizontalSnapTolerance;
-  const startsOnLine = y < EPS || topDistance <= bias.horizontalSnapTolerance;
-  const createsTopLine = y > EPS && topDistance > bias.lineMergeTolerance;
-  const createsNearMissLine = !snapsBottom && bottomDistance <= bias.horizontalSnapTolerance * 2;
-  const horizontalLineScore =
-    (snapsBottom ? -bias.horizontalSnapWeight : bias.lineCreationWeight) +
-    (createsTopLine ? bias.lineCreationWeight * 0.75 : 0) +
-    (createsNearMissLine ? bias.nearMissPenalty : 0) +
-    (startsOnLine ? bias.shelfStartBonus : 0);
-  const edgeBonus = x < EPS || Math.abs(x + block.w - rollW) < EPS ? bias.edgeBonus : 0;
-
-  return (
-    newMaxY * bias.heightWeight +
-    y * 35 +
-    localWaste * bias.localWasteWeight +
-    align * bias.alignmentWeight +
-    verticalGap * bias.verticalGapWeight +
-    horizontalLineScore +
-    (block.rotated ? bias.rotationWeight * 0.15 : 0) +
-    edgeBonus
-  );
-};
-
-const getCandidateRects = (rects: FreeRect[], orientation: PackedBlock, bias: EaseBias) =>
-  rects
-    .filter((rect) => orientation.w <= rect.w + EPS && orientation.h <= rect.h + EPS)
-    .sort((a, b) => a.y - b.y || a.x - b.x || (a.w * a.h) - (b.w * b.h))
-    .slice(0, bias.maxRectCandidates);
-
-const buildCandidates = (state: BeamState, item: PackItem, rollW: number, margin: number, limit: number, bias: EaseBias) => {
-  const candidates: PlacementCandidate[] = [];
-  const orientations = getRawOrientations(item);
-
-  orientations.forEach((orientation) => {
-    getCandidateRects(state.freeRects, orientation, bias).forEach((rect) => {
-      const xs = getCandidateXs(state, rect, orientation, rollW, margin, bias);
-      const ys = getCandidateYs(state, rect, orientation, margin, bias);
-
-      xs.forEach((x) => {
-        ys.forEach((y) => {
-          const block = { ...orientation, fit: { x, y } };
-          const footprint = getPlacementFootprint(block, x, y, rollW, margin);
-          if (!fitsInside(rect, footprint)) return;
-
-          candidates.push({
-            block,
-            footprint,
-            rect,
-            score: placementScore(state, block, footprint, rect, x, y, rollW, bias),
-          });
-        });
+      const nextX = currentRight - column.width;
+      const shift = nextX - column.x;
+      column.x = nextX;
+      column.blocks.forEach((b) => {
+        if (b.fit) b.fit.x += shift;
       });
-    });
+      currentRight = nextX - 3;
+    }
   });
-
-  return candidates
-    .sort((a, b) => a.score - b.score)
-    .slice(0, limit);
 };
 
-const buildFallbackCandidate = (state: BeamState, item: PackItem, rollW: number, margin: number, bias: EaseBias): PlacementCandidate => {
-  const orientations = getRawOrientations(item);
-  const block = orientations.find((orientation) => orientation.w <= rollW + EPS) ?? orientations[0];
-  const x = block.alignRight && block.w <= rollW ? rollW - block.w : 0;
-  const y = state.maxY;
-  const placedBlock = { ...block, fit: { x, y } };
-  const footprint = getPlacementFootprint(placedBlock, x, y, rollW, margin);
-  const rect = { x: 0, y, w: rollW, h: STRIP_HEIGHT - y };
+const packShelfStrategy = (
+  items: PackItem[],
+  rollW: number,
+  margin: number,
+  strategyConfig: ProStrategyConfig,
+  agressividade: number
+) => {
+  const { sortFn, preferUpright = false, preferWidthFit = false, mode = 'greedy' } = strategyConfig;
+  let pool = [...items];
+  if (sortFn) {
+    pool.sort(sortFn);
+  }
+
+  const shelves: ProShelf[] = [];
+  let currentY = 0;
+  const minStackH = agressividade <= 20 ? 30 : 18;
+
+  while (pool.length > 0) {
+    let shelfHeight = 0;
+    let shelfWidth = 0;
+    let shelfColumns: ProColumn[] = [];
+
+    if (mode === 'composer' && pool.length > 1) {
+      const candidateLimit = Math.min(pool.length, 5);
+      let bestPlan: { height: number; width: number; columns: ProColumn[]; remainingPool: PackItem[] } | null = null;
+      let bestMetric = -Infinity;
+
+      // Build candidate heights to test:
+      // 1. Single orientations of initial items
+      // 2. Composite stacked heights where two items share the same width
+      interface ShelfCandidate {
+        cIdx: number;
+        orient: PackedBlock;
+        testH: number;
+      }
+
+      const candidateList: ShelfCandidate[] = [];
+      const seenCandidates = new Set<string>();
+
+      for (let c = 0; c < candidateLimit; c++) {
+        const candItem = pool[c];
+        for (const orient of getProOrientations(candItem, rollW)) {
+          const keySingle = `${c}_${orient.w}_${orient.h}_${orient.h}`;
+          if (!seenCandidates.has(keySingle)) {
+            seenCandidates.add(keySingle);
+            candidateList.push({ cIdx: c, orient, testH: orient.h });
+          }
+
+          // Check if stacking with another item of identical or near-identical width can form a composite shelf height
+          for (let c2 = c + 1; c2 < Math.min(pool.length, c + 6); c2++) {
+            for (const o2 of getProOrientations(pool[c2], rollW)) {
+              if (Math.abs(orient.w - o2.w) <= 1) {
+                const comboH = orient.h + margin + o2.h;
+                if (comboH <= rollW * 1.5) {
+                  const keyCombo = `${c}_${orient.w}_${orient.h}_${comboH}`;
+                  if (!seenCandidates.has(keyCombo)) {
+                    seenCandidates.add(keyCombo);
+                    candidateList.push({ cIdx: c, orient, testH: comboH });
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      for (const { cIdx, orient, testH } of candidateList) {
+        const testPool = [...pool];
+        testPool.splice(cIdx, 1);
+        const cols: ProColumn[] = [];
+        let wTotal = 0;
+
+        const addCol = (block: PackedBlock) => {
+          const colX = wTotal > 0 ? wTotal + margin : 0;
+          const col: ProColumn = {
+            x: colX,
+            width: block.w,
+            blocks: [{ ...block, fit: { x: colX, y: currentY } }],
+            currentHeight: block.h,
+          };
+          let remH = testH - col.currentHeight - margin;
+          while (remH >= minStackH) {
+            let bIdx = -1;
+            let bBlock: PackedBlock | null = null;
+            let bW = Infinity;
+            for (let i = 0; i < testPool.length; i++) {
+              for (const o of getProOrientations(testPool[i], rollW)) {
+                if (o.w <= col.width + EPS && o.h <= remH + EPS) {
+                  const diff = (col.width - o.w) * 1.5 + (remH - o.h);
+                  if (diff < bW) {
+                    bW = diff;
+                    bIdx = i;
+                    bBlock = o;
+                  }
+                }
+              }
+            }
+            if (bIdx >= 0 && bBlock) {
+              testPool.splice(bIdx, 1);
+              col.blocks.push({ ...bBlock, fit: { x: col.x, y: currentY + col.currentHeight + margin } });
+              col.currentHeight += margin + bBlock.h;
+              remH = testH - col.currentHeight - margin;
+            } else {
+              break;
+            }
+          }
+          cols.push(col);
+          wTotal = col.x + col.width;
+        };
+
+        addCol(orient);
+
+        while (true) {
+          const remW = rollW - wTotal - margin;
+          if (remW < 15) break;
+          let bIdx = -1;
+          let bBlock: PackedBlock | null = null;
+          let bSc = Infinity;
+          for (let i = 0; i < testPool.length; i++) {
+            for (const o of getProOrientations(testPool[i], rollW)) {
+              if (o.w <= remW + EPS && o.h <= testH + EPS) {
+                const sc = (testH - o.h) * 2 + (preferWidthFit ? (remW - o.w) * 0.8 : 0) + (o.rotated ? 4 : 0);
+                if (sc < bSc) {
+                  bSc = sc;
+                  bIdx = i;
+                  bBlock = o;
+                }
+              }
+            }
+          }
+          if (bIdx >= 0 && bBlock) {
+            testPool.splice(bIdx, 1);
+            addCol(bBlock);
+          } else {
+            break;
+          }
+        }
+
+        const placedArea = cols.reduce((s, col) => s + col.blocks.reduce((cs, b) => cs + b.w * b.h, 0), 0);
+        const metric = (placedArea / (testH * rollW)) * 1000 + cols.length * 30;
+        if (metric > bestMetric || !bestPlan) {
+          bestMetric = metric;
+          bestPlan = { height: testH, width: wTotal, columns: cols, remainingPool: testPool };
+        }
+      }
+
+      if (bestPlan) {
+        shelfHeight = bestPlan.height;
+        shelfWidth = bestPlan.width;
+        shelfColumns = bestPlan.columns;
+        pool = bestPlan.remainingPool;
+      }
+    } else {
+      // Greedy anchor mode
+      const firstItem = pool[0];
+      const orients = getProOrientations(firstItem, rollW);
+      if (orients.length === 0) {
+        pool.shift();
+        continue;
+      }
+
+      let anchor = orients[0];
+      if (orients.length > 1) {
+        if (preferUpright) {
+          anchor = orients.find((o) => o.rh >= o.rw) || orients[0];
+        } else {
+          anchor = orients.sort((a, b) => b.h - a.h)[0];
+        }
+      }
+
+      shelfHeight = anchor.h;
+      pool.shift();
+
+      const addCol = (block: PackedBlock) => {
+        const colX = shelfWidth > 0 ? shelfWidth + margin : 0;
+        const col: ProColumn = {
+          x: colX,
+          width: block.w,
+          blocks: [{ ...block, fit: { x: colX, y: currentY } }],
+          currentHeight: block.h,
+        };
+        let remH = shelfHeight - col.currentHeight - margin;
+        while (remH >= minStackH) {
+          let bIdx = -1;
+          let bBlock: PackedBlock | null = null;
+          let bW = Infinity;
+          for (let i = 0; i < pool.length; i++) {
+            for (const o of getProOrientations(pool[i], rollW)) {
+              if (o.w <= col.width + EPS && o.h <= remH + EPS) {
+                const diff = (col.width - o.w) * 1.5 + (remH - o.h);
+                if (diff < bW) {
+                  bW = diff;
+                  bIdx = i;
+                  bBlock = o;
+                }
+              }
+            }
+          }
+          if (bIdx >= 0 && bBlock) {
+            pool.splice(bIdx, 1);
+            col.blocks.push({ ...bBlock, fit: { x: col.x, y: currentY + col.currentHeight + margin } });
+            col.currentHeight += margin + bBlock.h;
+            remH = shelfHeight - col.currentHeight - margin;
+          } else {
+            break;
+          }
+        }
+        shelfColumns.push(col);
+        shelfWidth = col.x + col.width;
+      };
+
+      addCol(anchor);
+
+      while (true) {
+        const remW = rollW - shelfWidth - margin;
+        if (remW < 15) break;
+        let bIdx = -1;
+        let bBlock: PackedBlock | null = null;
+        let bScore = Infinity;
+        for (let i = 0; i < pool.length; i++) {
+          for (const o of getProOrientations(pool[i], rollW)) {
+            if (o.w <= remW + EPS && o.h <= shelfHeight + EPS) {
+              const heightDiff = shelfHeight - o.h;
+              const widthWaste = remW - o.w;
+              const score = heightDiff * 2 + (preferWidthFit ? widthWaste * 0.8 : 0) + (o.rotated ? 4 : 0);
+              if (score < bScore) {
+                bScore = score;
+                bIdx = i;
+                bBlock = o;
+              }
+            }
+          }
+        }
+        if (bIdx >= 0 && bBlock) {
+          pool.splice(bIdx, 1);
+          addCol(bBlock);
+        } else {
+          break;
+        }
+      }
+    }
+
+    shelves.push({
+      y: currentY,
+      height: shelfHeight,
+      width: shelfWidth,
+      columns: shelfColumns,
+    });
+
+    currentY += shelfHeight + margin;
+  }
+
+  alignProShelves(shelves, rollW);
+
+  const allBlocks: PackedBlock[] = [];
+  let totalAreaV = 0;
+  let totalUsedArea = 0;
+  let maxY = 0;
+
+  for (const shelf of shelves) {
+    for (const col of shelf.columns) {
+      for (const block of col.blocks) {
+        allBlocks.push(block);
+        totalAreaV += block.rw * block.rh;
+        totalUsedArea += block.w * block.h;
+        maxY = Math.max(maxY, (block.fit?.y ?? 0) + block.h);
+      }
+    }
+  }
+
+  const lines = allBlocks
+    .flatMap((block) => [block.fit?.y ?? 0, (block.fit?.y ?? 0) + block.h])
+    .sort((a, b) => a - b);
+  const groups: number[][] = [];
+  lines.forEach((line) => {
+    const last = groups[groups.length - 1];
+    if (last && Math.abs(last[last.length - 1] - line) <= 1.5) {
+      last.push(line);
+    } else {
+      groups.push([line]);
+    }
+  });
+  const lineCount = groups.length;
+
+  const rollArea = maxY * rollW;
+  const waste = rollArea - totalUsedArea;
+  const compactnessFactor = clamp(agressividade, 0, 100) / 100;
+  const score = maxY * 1000 + waste * (1 + (1 - compactnessFactor) * 0.5) + lineCount * (1 - compactnessFactor) * 35;
 
   return {
-    block: placedBlock,
-    footprint,
-    rect,
-    score: placementScore(state, placedBlock, footprint, rect, x, y, rollW, bias) + 1_000_000,
+    shelves,
+    blocks: allBlocks,
+    totalY: maxY,
+    areaV: totalAreaV,
+    usedArea: totalUsedArea,
+    lineCount,
+    score,
   };
 };
 
-const dedupeStates = (states: BeamState[], rollW: number, limit: number, agressividadeCorte: number) => {
-  const seen = new Set<string>();
-  const result: BeamState[] = [];
-
-  states
-    .sort((a, b) => stateScore(a, rollW, agressividadeCorte) - stateScore(b, rollW, agressividadeCorte))
-    .forEach((state) => {
-      const last = state.blocks[state.blocks.length - 1];
-      const key = [
-        Math.round(state.maxY),
-        Math.round(last.fit?.x ?? 0),
-        Math.round(last.fit?.y ?? 0),
-        Math.round(last.w),
-        Math.round(last.h),
-        state.freeRects.slice(0, 6).map((rect) => `${Math.round(rect.x)}:${Math.round(rect.y)}:${Math.round(rect.w)}`).join('|'),
-      ].join('/');
-
-      if (!seen.has(key) && result.length < limit) {
-        seen.add(key);
-        result.push(state);
-      }
-    });
-
-  return result;
-};
-
-const getOrderStrategies = (items: PackItem[], strategyLimit: number) => {
-  const byOrder = [...items];
-  const baseStrategies = [
-    byOrder,
-    [...items].sort((a, b) => (b.ow * b.oh) - (a.ow * a.oh)),
-    [...items].sort((a, b) => b.oh - a.oh || b.ow - a.ow),
-    [...items].sort((a, b) => b.ow - a.ow || b.oh - a.oh),
-    [...items].sort((a, b) => Math.round(b.oh / 5) - Math.round(a.oh / 5) || b.ow - a.ow),
-  ];
-  const strategies = items.length > 80 ? baseStrategies.slice(0, 4) : baseStrategies;
-
-  if (items.length <= 25) {
-    strategies.push(
-      [...items].sort((a, b) => Math.max(b.ow, b.oh) - Math.max(a.ow, a.oh)),
-      [...items].sort((a, b) => Math.abs(b.ow / b.oh - 1) - Math.abs(a.ow / a.oh - 1))
-    );
-  }
-
-  const seen = new Set<string>();
-  return strategies.filter((strategy) => {
-    const key = strategy.map((item) => item.id).join('|');
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  }).slice(0, strategyLimit);
-};
-
-const packEasyV2 = (items: PackItem[], rollW: number, margin: number, agressividadeCorte: number) => {
+const packEasyPro = (
+  items: PackItem[],
+  rollW: number,
+  margin: number,
+  agressividadeCorte: number = 35
+) => {
   if (items.length === 0) return { blocks: [], totalY: 0, areaV: 0 };
 
-  const searchProfile = getEasyV2SearchProfile(items.length, agressividadeCorte);
-  let bestState: BeamState | null = null;
-  const baseBias = getEaseBias(agressividadeCorte);
-  const bias: EaseBias = {
-    ...baseBias,
-    maxLineCandidates: items.length > 80 ? Math.min(baseBias.maxLineCandidates, 4) : baseBias.maxLineCandidates,
-    maxRectCandidates: items.length > 80 ? Math.min(baseBias.maxRectCandidates, 10) : items.length > 45 ? Math.min(baseBias.maxRectCandidates, 12) : baseBias.maxRectCandidates,
-  };
+  const strategies: ProStrategyConfig[] = [
+    {
+      name: 'greedy_tallest',
+      mode: 'greedy',
+      sortFn: (a, b) => Math.max(b.ow, b.oh) - Math.max(a.ow, a.oh) || (b.ow * b.oh) - (a.ow * a.oh),
+      preferUpright: true,
+    },
+    {
+      name: 'greedy_height',
+      mode: 'greedy',
+      sortFn: (a, b) => b.oh - a.oh || b.ow - a.ow,
+      preferUpright: true,
+    },
+    {
+      name: 'greedy_area',
+      mode: 'greedy',
+      sortFn: (a, b) => (b.ow * b.oh) - (a.ow * a.oh) || Math.max(b.ow, b.oh) - Math.max(a.ow, a.oh),
+      preferUpright: false,
+    },
+    {
+      name: 'greedy_clustered_15',
+      mode: 'greedy',
+      sortFn: (a, b) => Math.round(b.oh / 15) - Math.round(a.oh / 15) || b.ow - a.ow,
+      preferUpright: true,
+    },
+    {
+      name: 'greedy_clustered_25',
+      mode: 'greedy',
+      sortFn: (a, b) => Math.round(b.oh / 25) - Math.round(a.oh / 25) || (b.ow * b.oh) - (a.ow * a.oh),
+      preferUpright: false,
+    },
+    {
+      name: 'greedy_width',
+      mode: 'greedy',
+      sortFn: (a, b) => b.ow - a.ow || b.oh - a.oh,
+      preferUpright: false,
+    },
+    {
+      name: 'greedy_order',
+      mode: 'greedy',
+      sortFn: (a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0),
+      preferUpright: true,
+    },
+    {
+      name: 'greedy_narrow_upright',
+      mode: 'greedy',
+      sortFn: (a, b) => (a.ow - b.ow) || (b.oh - a.oh),
+      preferUpright: true,
+    },
+    {
+      name: 'greedy_width_fit',
+      mode: 'greedy',
+      sortFn: (a, b) => Math.max(b.ow, b.oh) - Math.max(a.ow, a.oh) || (b.ow * b.oh) - (a.ow * a.oh),
+      preferWidthFit: true,
+      preferUpright: true,
+    },
+    {
+      name: 'composer_area',
+      mode: 'composer',
+      sortFn: (a, b) => (b.ow * b.oh) - (a.ow * a.oh) || Math.max(b.ow, b.oh) - Math.max(a.ow, a.oh),
+      preferUpright: false,
+    },
+    {
+      name: 'composer_height',
+      mode: 'composer',
+      sortFn: (a, b) => b.oh - a.oh || b.ow - a.ow,
+      preferUpright: true,
+    },
+    {
+      name: 'composer_clustered',
+      mode: 'composer',
+      sortFn: (a, b) => Math.round(b.oh / 20) - Math.round(a.oh / 20) || (b.ow * b.oh) - (a.ow * a.oh),
+      preferUpright: false,
+    },
+    {
+      name: 'composer_narrow_upright',
+      mode: 'composer',
+      sortFn: (a, b) => (a.ow - b.ow) || (b.oh - a.oh),
+      preferUpright: true,
+    },
+    {
+      name: 'composer_width_fit',
+      mode: 'composer',
+      sortFn: (a, b) => b.oh - a.oh || b.ow - a.ow,
+      preferWidthFit: true,
+      preferUpright: false,
+    },
+  ];
 
-  for (const orderedItems of getOrderStrategies(items, searchProfile.orderStrategyLimit)) {
-    let beam: BeamState[] = [{
-      blocks: [],
-      freeRects: [{ x: 0, y: 0, w: rollW, h: STRIP_HEIGHT }],
-      maxY: 0,
-      areaV: 0,
-      usedArea: 0,
-      rotations: 0,
-      horizontalLines: [0],
-    }];
+  let bestResult: ReturnType<typeof packShelfStrategy> | null = null;
 
-    orderedItems.forEach((item) => {
-      const nextStates: BeamState[] = [];
-
-      beam.forEach((state) => {
-        const candidates = buildCandidates(state, item, rollW, margin, searchProfile.candidateLimit, bias);
-        const placementOptions = candidates.length > 0
-          ? candidates
-          : [buildFallbackCandidate(state, item, rollW, margin, bias)];
-
-        placementOptions.forEach((candidate) => {
-          const placed = candidate.footprint;
-          const rawBottom = (candidate.block.fit?.y ?? 0) + candidate.block.h;
-          const blocks = [...state.blocks, candidate.block];
-
-          const horizontalLines = mergeHorizontalLines(
-            mergeHorizontalLines(state.horizontalLines, candidate.block.fit?.y ?? 0, bias.lineMergeTolerance),
-            rawBottom,
-            bias.lineMergeTolerance
-          );
-
-          nextStates.push({
-            blocks,
-            freeRects: splitFreeRects(state.freeRects, placed),
-            maxY: Math.max(state.maxY, rawBottom),
-            areaV: state.areaV + candidate.block.rw * candidate.block.rh,
-            usedArea: state.usedArea + candidate.block.w * candidate.block.h,
-            rotations: state.rotations + (candidate.block.rotated ? 1 : 0),
-            horizontalLines,
-          });
-        });
-      });
-
-      beam = dedupeStates(nextStates, rollW, searchProfile.beamWidth, agressividadeCorte);
-    });
-
-    const candidateBest = beam.sort((a, b) => stateScore(a, rollW, agressividadeCorte) - stateScore(b, rollW, agressividadeCorte))[0];
-    if (!bestState || stateScore(candidateBest, rollW, agressividadeCorte) < stateScore(bestState, rollW, agressividadeCorte)) {
-      bestState = candidateBest;
+  for (const strat of strategies) {
+    const res = packShelfStrategy(items, rollW, margin, strat, agressividadeCorte);
+    if (
+      !bestResult ||
+      res.totalY < bestResult.totalY ||
+      (Math.abs(res.totalY - bestResult.totalY) < EPS && res.score < bestResult.score)
+    ) {
+      bestResult = res;
     }
   }
 
-  if (!bestState) return { blocks: [], totalY: 0, areaV: 0 };
+  if (!bestResult) return { blocks: [], totalY: 0, areaV: 0 };
 
-  const blocks = cloneBlocks(bestState.blocks).sort((a, b) => (a.fit?.y ?? 0) - (b.fit?.y ?? 0) || (a.fit?.x ?? 0) - (b.fit?.x ?? 0));
-  return { blocks, totalY: bestState.maxY, areaV: bestState.areaV };
+  const blocks = cloneBlocks(bestResult.blocks).sort(
+    (a, b) => (a.fit?.y ?? 0) - (b.fit?.y ?? 0) || (a.fit?.x ?? 0) - (b.fit?.x ?? 0)
+  );
+
+  return {
+    blocks,
+    totalY: bestResult.totalY,
+    areaV: bestResult.areaV,
+  };
+};
+
+const packEasyV2 = (
+  items: PackItem[],
+  rollW: number,
+  margin: number,
+  agressividadeCorte: number = 35
+) => {
+  return packEasyPro(items, rollW, margin, agressividadeCorte);
 };
 
 const packDensity = (items: PackItem[], rollW: number, margin: number) => {

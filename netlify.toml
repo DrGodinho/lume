@@ -86,3 +86,15 @@ Cache-Control = "public, max-age=0, must-revalidate"
 for = "/*.txt"
 [headers.values]
 Cache-Control = "public, max-age=0, must-revalidate"
+
+[[redirects]]
+  from = "/blog/como-proteger-seus-moveis-dos-raios-uv"
+  to = "/blog/como-proteger-moveis-danos-sol/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/blog/como-proteger-seus-moveis-dos-raios-uv/"
+  to = "/blog/como-proteger-moveis-danos-sol/"
+  status = 301
+  force = true

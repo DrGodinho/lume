@@ -76,6 +76,17 @@ const nextConfig = {
     ];
   },
 
+  // 301 Permanent Redirects for SEO consolidation
+  async redirects() {
+    return [
+      {
+        source: '/blog/como-proteger-seus-moveis-dos-raios-uv',
+        destination: '/blog/como-proteger-moveis-danos-sol/',
+        permanent: true,
+      },
+    ];
+  },
+
   // Webpack and Turbopack customization
   webpack: (config) => {
     config.resolve.fallback = {

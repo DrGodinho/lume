@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { InsulfilmPortasVidro } from '../../views/InsulfilmPortasVidro';
 import { businessAddressSchema, businessInfo } from '@/lib/businessInfo';
+import { buildBreadcrumbSchema } from '@/lib/schema/breadcrumbs';
 
 const pageUrl = 'https://lumecontrolesolar.com.br/insulfilm-para-portas-de-vidro/';
 const title = 'Insulfilm para Portas de Vidro no Rio de Janeiro | LUME Controle Solar';
@@ -145,9 +146,21 @@ const faqJsonLd = {
   ],
 };
 
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  ...buildBreadcrumbSchema([
+    { name: 'Início', url: 'https://lumecontrolesolar.com.br/' },
+    { name: 'Portas de Vidro', url: pageUrl },
+  ]),
+};
+
 export default function Page() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }}

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { InsulfilmEscritorio } from '../../views/InsulfilmEscritorio';
 import { businessAddressSchema, businessInfo } from '@/lib/businessInfo';
+import { buildBreadcrumbSchema } from '@/lib/schema/breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Insulfilm para Escritório | Conforto e Produtividade - LUME',
@@ -16,11 +17,11 @@ export const metadata: Metadata = {
     'insulfilm nanoceramica escritório',
     'lume controle solar'
   ],
-  alternates: { canonical: 'https://lumecontrolesolar.com.br/insulfilm-no-escritorio' },
+  alternates: { canonical: 'https://lumecontrolesolar.com.br/insulfilm-no-escritorio/' },
   openGraph: {
     title: 'Insulfilm para Escritório | Produtividade e Conforto Térmico',
     description: 'Transforme seu escritório em um ambiente produtivo. Películas que eliminam o glare, reduzem o calor e protegem equipamentos. Orçamento grátis no RJ.',
-    url: 'https://lumecontrolesolar.com.br/insulfilm-no-escritorio',
+    url: 'https://lumecontrolesolar.com.br/insulfilm-no-escritorio/',
     type: 'website',
     siteName: 'LUME Controle Solar',
     images: [{ url: 'https://lumecontrolesolar.com.br/og-image.jpg', width: 1200, height: 630, alt: 'Insulfilm para Escritório - LUME' }],
@@ -35,38 +36,47 @@ export const metadata: Metadata = {
 
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'Service',
-  name: 'Instalação de Insulfilm para Escritórios',
-  alternateName: 'Película de Controle Solar para Escritório e Home Office',
-  description: 'Instalação profissional de películas de alta performance em escritórios, salas comerciais e home offices. Ideal para eliminar glare em monitores, reduzir calor, economizar energia e garantir privacidade em divisórias de vidro. Instalação rápida sem interrupção do expediente.',
-  url: 'https://lumecontrolesolar.com.br/insulfilm-no-escritorio',
-  image: 'https://lumecontrolesolar.com.br/og-image.jpg',
-  provider: {
-    '@type': 'LocalBusiness',
-    name: 'LUME Controle Solar',
-    url: 'https://lumecontrolesolar.com.br',
-    telephone: businessInfo.phoneE164,
-    address: businessAddressSchema,
-  },
-  areaServed: {
-    '@type': 'City',
-    name: 'Rio de Janeiro',
-  },
-  offers: {
-    '@type': 'Offer',
-    priceCurrency: 'BRL',
-    availability: 'https://schema.org/InStock',
-    seller: {
-      '@type': 'LocalBusiness',
-      name: 'LUME Controle Solar',
+  '@graph': [
+    buildBreadcrumbSchema([
+      { name: 'Início', url: 'https://lumecontrolesolar.com.br/' },
+      { name: 'Soluções por Ambiente', url: 'https://lumecontrolesolar.com.br/#produtos' },
+      { name: 'Insulfilm no Escritório', url: 'https://lumecontrolesolar.com.br/insulfilm-no-escritorio/' },
+    ]),
+    {
+      '@type': 'Service',
+      name: 'Instalação de Insulfilm para Escritórios',
+      alternateName: 'Película de Controle Solar para Escritório e Home Office',
+      description: 'Instalação profissional de películas de alta performance em escritórios, salas comerciais e home offices. Ideal para eliminar glare em monitores, reduzir calor, economizar energia e garantir privacidade em divisórias de vidro. Instalação rápida sem interrupção do expediente.',
+      url: 'https://lumecontrolesolar.com.br/insulfilm-no-escritorio/',
+      image: 'https://lumecontrolesolar.com.br/og-image.jpg',
+      provider: {
+        '@type': 'LocalBusiness',
+        name: 'LUME Controle Solar',
+        url: 'https://lumecontrolesolar.com.br',
+        telephone: businessInfo.phoneE164,
+        address: businessAddressSchema,
+      },
+      areaServed: {
+        '@type': 'City',
+        name: 'Rio de Janeiro',
+      },
+      offers: {
+        '@type': 'Offer',
+        priceCurrency: 'BRL',
+        availability: 'https://schema.org/InStock',
+        seller: {
+          '@type': 'LocalBusiness',
+          name: 'LUME Controle Solar',
+        },
+      },
+      additionalProperty: [
+        { '@type': 'PropertyValue', name: 'Proteção UV', value: 'Até 99%' },
+        { '@type': 'PropertyValue', name: 'Rejeição de Calor', value: 'Alta Performance Térmica' },
+        { '@type': 'PropertyValue', name: 'Tipos Recomendados', value: 'Nano Cerâmica, Jateada e Carbono G20' },
+        { '@type': 'PropertyValue', name: 'Aplicação', value: 'Escritórios, Home Office, Salas Comerciais e Divisórias de Vidro' },
+      ],
     },
-  },
-  additionalProperty: [
-    { '@type': 'PropertyValue', name: 'Proteção UV', value: 'Até 99%' },
-    { '@type': 'PropertyValue', name: 'Rejeição de Calor', value: 'Alta Performance Térmica' },
-    { '@type': 'PropertyValue', name: 'Tipos Recomendados', value: 'Nano Cerâmica, Jateada e Carbono G20' },
-    { '@type': 'PropertyValue', name: 'Aplicação', value: 'Escritórios, Home Office, Salas Comerciais e Divisórias de Vidro' },
-  ]
+  ],
 };
 
 export default function Page() {

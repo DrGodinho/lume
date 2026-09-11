@@ -21,8 +21,8 @@ export const precoInsulfilmResidencialRioDeJaneiro: BlogPost = {
   ],
   coverImageUrl: '/blog/preco-insulfilm-residencial-rio-de-janeiro.jpg',
   coverImageAlt:
-    'Janela residencial com insulfilm e exemplo visual de preço para instalação no Rio de Janeiro',
-  authorName: 'LUME Controle Solar',
+    'Porta de vidro de correr com insulfilm instalado e exemplo visual de preço acessível (apenas R$ 300) no Rio de Janeiro',
+  authorName: 'Marcos Paulo Godinho',
   publishedAt: '2026-06-18T12:00:00.000Z',
   updatedAt: '2026-08-23T12:00:00.000Z',
   seoTitle:
@@ -103,9 +103,9 @@ export const precoInsulfilmResidencialRioDeJaneiro: BlogPost = {
     {
       type: 'image',
       url: '/blog/preco-insulfilm-residencial-rio-de-janeiro.jpg',
-      alt: 'Exemplo visual de instalação de insulfilm residencial com janela e referência de preço no Rio de Janeiro',
+      alt: 'Porta de vidro de correr com 2 folhas de 210 x 80 cm com insulfilm instalado por apenas R$ 300 no Rio de Janeiro',
       caption:
-        'Exemplo ilustrativo de insulfilm residencial em janela com faixa de preço para ajudar a visualizar o custo de instalações menores.',
+        'Exemplo real de economia: porta de vidro de correr (2 folhas de 210 × 80 cm) com película de controle solar instalada por apenas R$ 300.',
     },
     {
       type: 'comparison_table',
@@ -129,9 +129,14 @@ export const precoInsulfilmResidencialRioDeJaneiro: BlogPost = {
           values: ['2 × 100 × 50 cm', '1,00 m²', 'Nano cerâmica', 'R$ 200'],
         },
         {
-          title: 'Porta de vidro',
+          title: 'Porta de vidro (1 folha)',
           href: '/refletiva/',
           values: ['200 × 80 cm', '1,60 m²', 'Refletiva', 'R$ 144'],
+        },
+        {
+          title: 'Porta de correr (2 folhas)',
+          href: '/refletiva/',
+          values: ['2 × 210 × 80 cm', '3,36 m²', 'Refletiva / Carbono', 'R$ 300'],
         },
         {
           title: 'Porta de vidro',

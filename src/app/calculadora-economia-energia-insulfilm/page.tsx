@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { CalculadoraEconomiaEnergiaPage } from '../../views/CalculadoraEconomiaEnergia';
+import { buildBreadcrumbSchema } from '@/lib/schema/breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Calculadora de Economia de Energia com Insulfilm | LUME',
@@ -41,6 +42,10 @@ export const metadata: Metadata = {
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
+    buildBreadcrumbSchema([
+      { name: 'Início', url: 'https://lumecontrolesolar.com.br/' },
+      { name: 'Calculadora de Economia', url: 'https://lumecontrolesolar.com.br/calculadora-economia-energia-insulfilm/' },
+    ]),
     {
       '@type': 'WebPage',
       name: 'Calculadora de Economia de Energia com Insulfilm',

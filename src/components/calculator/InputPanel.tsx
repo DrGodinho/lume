@@ -4,7 +4,7 @@ import React from 'react';
 import { Smartphone, Save, FolderOpen, Layers, X, Plus } from 'lucide-react';
 import { formatNumber2 } from '../../lib/money';
 import type { FilmTypeKey } from '../../lib/films';
-import { ROOM_COLOR_SWATCHES, FILM_TYPE_LABELS } from '../../lib/films';
+import { FILM_TYPE_LABELS } from '../../lib/films';
 
 export interface ClienteProps {
     cliente: string;
@@ -171,45 +171,6 @@ export function InputPanel({
                 >
                     {usarCoresPorAmbiente ? 'Esquema: Cor por Ambiente (ON)' : 'Esquema: Cor por Tamanho (ON)'}
                 </button>
-
-                {usarCoresPorAmbiente && (
-                <div className="mb-4 rounded-xl border border-white/10 bg-[#040811] p-3 space-y-3">
-                    <div className="flex items-center justify-between">
-                        <span className="text-[9px] text-gray-500 font-bold uppercase">Cor do Ambiente</span>
-                        <div className="flex items-center gap-2">
-                            <span className="text-[9px] text-gray-400 uppercase">Atual</span>
-                            <span className="w-4 h-4 rounded-full border border-white/40" style={{ backgroundColor: currentRoomColor }} />
-                        </div>
-                    </div>
-                    {!currentRoomLabel && (
-                        <p className="text-[9px] text-gray-600 leading-relaxed">
-                            Digite o ambiente acima para escolher a cor dele.
-                        </p>
-                    )}
-                    <div className="flex flex-wrap gap-2">
-                        {ROOM_COLOR_SWATCHES.map((swatch) => (
-                            <button
-                                key={swatch}
-                                type="button"
-                                onClick={() => onSelectRoomColor(swatch)}
-                                disabled={!currentRoomLabel}
-                                className={`w-6 h-6 rounded-full border transition-all ${currentRoomColor === swatch ? 'border-[#c9a227] scale-110' : 'border-white/20'} ${!currentRoomLabel ? 'opacity-40 cursor-not-allowed' : 'hover:scale-105'}`}
-                                style={{ backgroundColor: swatch }}
-                                title={currentRoomLabel ? `Aplicar cor em ${currentRoomLabel}` : 'Digite o ambiente para escolher cor'}
-                            />
-                        ))}
-                    </div>
-                    <button
-                        type="button"
-                        onClick={() => onAplicarCorNoAmbiente(currentRoomLabel)}
-                        disabled={!currentRoomLabel || !hasCurrentRoomPieces}
-                        className="w-full bg-[#1a2c4e] text-blue-300 py-2 rounded-lg font-semibold text-[10px] uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed"
-                        title={!currentRoomLabel ? 'Digite o ambiente' : 'Reaplicar cor nas peças já adicionadas deste ambiente'}
-                    >
-                        Aplicar Cor nas Peças Deste Ambiente
-                    </button>
-                </div>
-                )}
 
                 <div className="grid grid-cols-3 gap-2 mb-4">
                     <input ref={heightRef} type="number" value={heightIn} onChange={(e) => onHeightChange(e.target.value)} onKeyDown={onHeightKeyDown} placeholder="Altura" className="bg-[#040811] border border-white/10 rounded-xl p-2.5 text-sm md:text-base text-center" />

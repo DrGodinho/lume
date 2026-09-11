@@ -62,12 +62,7 @@ export function useDraftSync(
 ): { draftRestored: boolean } {
   const [draftRestored, setDraftRestored] = useState(false);
   const cloudTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  // C3: scope resolvido 1x no restore e reutilizado nos saves — antes cada
-  // tecla disparava resolveCalculatorScopeKey() (ida à rede), com risco de
-  // salvar no scope errado se a conta trocasse no meio do debounce.
   const scopeKeyRef = useRef<string | null>(null);
-  // Objeto `actions` do pai é recriado a cada render — via ref para não
-  // reiniciar o debounce/efeitos à toa.
   const actionsRef = useRef(actions);
   useEffect(() => {
     actionsRef.current = actions;
@@ -79,9 +74,13 @@ export function useDraftSync(
     roomColors, isCutMode,
   } = values;
 
-  // ─── AUTO-SAVE (local imediato + nuvem debounced 5s) ───────────────────────
+  // Guarda o último payload para flush síncrono no unmount / beforeunload
+  const pendingDraftPayloadRef = useRef<Parameters<typeof saveDraftToCloud>[0] | null>(null);
+
+  // ─── AUTO-SAVE (local imediato + nuvem debounced 1.5s) ───────────────────────
   useEffect(() => {
     if (!draftRestored || isCutMode) return;
+    const now = Date.now();
     const draft = {
       cliente,
       phone,
@@ -96,11 +95,26 @@ export function useDraftSync(
       userName,
       selectedFilm,
       roomColors,
-      lastSaved: Date.now()
+      lastSaved: now,
     };
-    // C3: usa o scope do restore quando disponível (sem ida à rede, sem
-    // risco de trocar de scope no meio do debounce); o resolver tem cache,
-    // então o fallback também é barato.
+
+    const cloudPayload = {
+      cliente,
+      phone,
+      neighborhood,
+      vidros,
+      desconto,
+      desconto_input: descontoInput,
+      roll_w: rollW,
+      price,
+      margin,
+      modo_otimizacao: modoOtimizacao,
+      user_name: userName,
+      selected_film: selectedFilm,
+      last_saved: now,
+    };
+    pendingDraftPayloadRef.current = cloudPayload;
+
     const scopeKey = scopeKeyRef.current;
     if (scopeKey) {
       try { localStorage.setItem(buildCalculatorStorageKey('lume_calculator_draft', scopeKey), JSON.stringify(draft)); } catch { /* ignore */ }
@@ -109,7 +123,6 @@ export function useDraftSync(
         scopeKeyRef.current = resolved;
         try { localStorage.setItem(buildCalculatorStorageKey('lume_calculator_draft', resolved), JSON.stringify(draft)); } catch { /* ignore */ }
       }).catch(() => {
-        // Fallback sem scope (chave legada) para nunca perder o rascunho local.
         try { localStorage.setItem('lume_calculator_draft', JSON.stringify(draft)); } catch { /* ignore */ }
       });
     }
@@ -117,90 +130,127 @@ export function useDraftSync(
     if (cloudTimerRef.current) clearTimeout(cloudTimerRef.current);
     cloudTimerRef.current = setTimeout(async () => {
       actionsRef.current.setCloudStatus('syncing');
-      const ok = await saveDraftToCloud({
-        cliente, phone, neighborhood, vidros, desconto, desconto_input: descontoInput,
-        roll_w: rollW, price, margin, modo_otimizacao: modoOtimizacao,
-        user_name: userName, selected_film: selectedFilm,
-        last_saved: Date.now(),
-      });
+      const ok = await saveDraftToCloud(cloudPayload);
       actionsRef.current.setCloudStatus(ok ? 'synced' : 'error');
-      if (ok) setTimeout(() => actionsRef.current.setCloudStatus('idle'), 3000);
-    }, 5000);
-    return () => { if (cloudTimerRef.current) clearTimeout(cloudTimerRef.current); };
+      if (ok) {
+        pendingDraftPayloadRef.current = null;
+        setTimeout(() => actionsRef.current.setCloudStatus('idle'), 3000);
+      }
+    }, 1500);
+
+    return () => {
+      if (cloudTimerRef.current) clearTimeout(cloudTimerRef.current);
+    };
   }, [draftRestored, isCutMode, cliente, phone, neighborhood, vidros, desconto, descontoInput, rollW, price, margin, modoOtimizacao, userName, selectedFilm, roomColors]);
 
-  // RESTORE DRAFT ON MOUNT (cloud-first, localStorage fallback)
+  // Flush do rascunho pendente no descarregamento da página
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (pendingDraftPayloadRef.current) {
+        saveDraftToCloud(pendingDraftPayloadRef.current);
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      if (pendingDraftPayloadRef.current) {
+        saveDraftToCloud(pendingDraftPayloadRef.current);
+      }
+    };
+  }, []);
+
+  // RESTORE DRAFT ON MOUNT (fresher-first entre nuvem e localStorage)
   useEffect(() => {
     let mounted = true;
     const restoreDraft = async () => {
       try {
         const scopeKey = await resolveCalculatorScopeKey();
         scopeKeyRef.current = scopeKey;
-        // Resolve the configured draft expiration (minutes) directly from config
-        // so it works regardless of the config-restore effect's timing.
         const cfgSource = loadConfig(scopeKey);
         let expirationMin = cfgSource.draftExpiration ?? DEFAULT_CONFIG.draftExpiration;
         try {
           const cloudCfg = await loadConfigFromCloud();
           if (cloudCfg && cloudCfg.draftExpiration !== undefined) expirationMin = cloudCfg.draftExpiration;
         } catch { /* ignore */ }
+
         const isFresh = (lastSaved?: number) =>
           !lastSaved || expirationMin <= 0 || (Date.now() - lastSaved) <= expirationMin * 60 * 1000;
 
-        // Local draft (source of roomColors, which aren't synced to cloud)
         const saved = localStorage.getItem(buildCalculatorStorageKey('lume_calculator_draft', scopeKey));
-        let localDraft: { roomColors?: Record<string, string> } | null = null;
+        let localDraft: Record<string, unknown> | null = null;
         if (saved) {
           try { localDraft = JSON.parse(saved); } catch { localDraft = null; }
         }
+
         const applyLocalRoomColors = () => {
           if (localDraft?.roomColors && typeof localDraft.roomColors === 'object') {
-            actionsRef.current.setRoomColors(localDraft.roomColors);
+            actionsRef.current.setRoomColors(localDraft.roomColors as Record<string, string>);
           }
         };
-        // Try cloud first
-        const cloud = await loadDraftFromCloud();
-        if (cloud && Array.isArray(cloud.vidros) && cloud.vidros.length > 0 && isFresh(cloud.last_saved)) {
-          actionsRef.current.setVidros(cloud.vidros as GlassItem[]);
-          if (cloud.cliente) actionsRef.current.setCliente(cloud.cliente);
-          if (cloud.phone) actionsRef.current.setPhone(cloud.phone);
-          if (cloud.neighborhood) actionsRef.current.setNeighborhood(cloud.neighborhood);
-          if (cloud.desconto !== undefined) actionsRef.current.setDesconto(cloud.desconto);
-          if (cloud.desconto_input !== undefined) actionsRef.current.setDescontoInput(cloud.desconto_input);
-          if (cloud.roll_w) actionsRef.current.setRollW(cloud.roll_w);
-          if (cloud.price) actionsRef.current.setPrice(cloud.price);
-          if (cloud.margin !== undefined) actionsRef.current.setMargin(cloud.margin);
-          if (isOptimizationMode(cloud.modo_otimizacao)) actionsRef.current.setModoOtimizacao(cloud.modo_otimizacao);
-          if (cloud.user_name) actionsRef.current.setUserName(cloud.user_name);
-          actionsRef.current.setSelectedFilm(normalizeFilmTypeKey(cloud.selected_film));
+
+        const hasDraftContent = (d: Record<string, unknown> | null | undefined): boolean => {
+          if (!d) return false;
+          const vidros = Array.isArray(d.vidros) && d.vidros.length > 0;
+          const cliente = typeof d.cliente === 'string' && d.cliente.trim().length > 0;
+          const phone = typeof d.phone === 'string' && d.phone.trim().length > 0;
+          const neighborhood = typeof d.neighborhood === 'string' && d.neighborhood.trim().length > 0;
+          return vidros || cliente || phone || neighborhood;
+        };
+
+        const applyDraftData = (d: Record<string, unknown>, fromCloud: boolean) => {
+          if (Array.isArray(d.vidros)) actionsRef.current.setVidros(d.vidros as GlassItem[]);
+          if (typeof d.cliente === 'string') actionsRef.current.setCliente(d.cliente);
+          if (typeof d.phone === 'string') actionsRef.current.setPhone(d.phone);
+          if (typeof d.neighborhood === 'string') actionsRef.current.setNeighborhood(d.neighborhood);
+          if (typeof d.desconto === 'number') actionsRef.current.setDesconto(d.desconto);
+          const descInput = d.desconto_input ?? d.descontoInput;
+          if (descInput !== undefined) actionsRef.current.setDescontoInput(String(descInput));
+          const rollWVal = (d.roll_w ?? d.rollW) as number | undefined;
+          if (rollWVal) actionsRef.current.setRollW(rollWVal);
+          if (typeof d.price === 'number') actionsRef.current.setPrice(d.price);
+          if (typeof d.margin === 'number') actionsRef.current.setMargin(d.margin);
+          const modo = (d.modo_otimizacao ?? d.modoOtimizacao) as OptimizationMode | undefined;
+          if (modo && isOptimizationMode(modo)) actionsRef.current.setModoOtimizacao(modo);
+          const user = (d.user_name ?? d.userName) as string | undefined;
+          if (user) actionsRef.current.setUserName(user);
+          const film = (d.selected_film ?? d.selectedFilm) as FilmTypeKey | undefined;
+          if (film) actionsRef.current.setSelectedFilm(normalizeFilmTypeKey(film));
           applyLocalRoomColors();
-          actionsRef.current.setCloudStatus('synced');
-          setTimeout(() => actionsRef.current.setCloudStatus('idle'), 3000);
+          if (fromCloud) {
+            actionsRef.current.setCloudStatus('synced');
+            setTimeout(() => actionsRef.current.setCloudStatus('idle'), 3000);
+          }
+        };
+
+        const cloud = await loadDraftFromCloud();
+        const cloudRecord = cloud as Record<string, unknown> | null;
+        const cloudTime = typeof cloudRecord?.last_saved === 'number' ? (cloudRecord.last_saved as number) : 0;
+        const localTime = typeof localDraft?.lastSaved === 'number' ? (localDraft.lastSaved as number) : 0;
+
+        const cloudValid = hasDraftContent(cloudRecord) && isFresh(cloudTime);
+        const localValid = hasDraftContent(localDraft) && isFresh(localTime);
+
+        if (localValid && (!cloudValid || localTime > cloudTime)) {
+          // Versão local é mais recente (ex: usuário editou e recarregou antes de sync)
+          applyDraftData(localDraft!, false);
+          // Agenda sync para atualizar a nuvem com os dados locais mais recentes
+          if (pendingDraftPayloadRef.current) {
+            saveDraftToCloud(pendingDraftPayloadRef.current);
+          }
           return;
         }
-        // Fallback to localStorage
-        if (saved) {
-          try {
-            const draft = JSON.parse(saved);
-            if (draft.vidros && draft.vidros.length > 0 && isFresh(draft.lastSaved)) {
-              actionsRef.current.setVidros(draft.vidros);
-              if (draft.cliente) actionsRef.current.setCliente(draft.cliente);
-              if (draft.phone) actionsRef.current.setPhone(draft.phone);
-              if (draft.neighborhood) actionsRef.current.setNeighborhood(draft.neighborhood);
-              if (draft.desconto !== undefined) actionsRef.current.setDesconto(draft.desconto);
-              if (draft.descontoInput !== undefined) actionsRef.current.setDescontoInput(draft.descontoInput);
-              if (draft.rollW) actionsRef.current.setRollW(draft.rollW);
-              if (draft.price) actionsRef.current.setPrice(draft.price);
-              if (draft.margin !== undefined) actionsRef.current.setMargin(draft.margin);
-              if (isOptimizationMode(draft.modoOtimizacao)) actionsRef.current.setModoOtimizacao(draft.modoOtimizacao);
-              if (draft.userName) actionsRef.current.setUserName(draft.userName);
-              actionsRef.current.setSelectedFilm(normalizeFilmTypeKey(draft.selectedFilm));
-              applyLocalRoomColors();
-            }
-          } catch (e) {
-            logger.error('Erro ao carregar rascunho local', e);
-          }
+
+        if (cloudValid) {
+          applyDraftData(cloudRecord!, true);
+          return;
         }
+
+        if (localValid) {
+          applyDraftData(localDraft!, false);
+          return;
+        }
+      } catch (err) {
+        logger.error('Erro ao restaurar rascunho', err);
       } finally {
         if (mounted) setDraftRestored(true);
       }

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { InsulfilmBanheiro } from '../../views/InsulfilmBanheiro';
 import { businessAddressSchema, businessInfo } from '@/lib/businessInfo';
+import { buildBreadcrumbSchema } from '@/lib/schema/breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Insulfilm para Banheiro | Privacidade e Luz Natural - LUME',
@@ -14,11 +15,11 @@ export const metadata: Metadata = {
     'película para banheiro sem obra',
     'lume controle solar'
   ],
-  alternates: { canonical: 'https://lumecontrolesolar.com.br/insulfilm-no-banheiro' },
+  alternates: { canonical: 'https://lumecontrolesolar.com.br/insulfilm-no-banheiro/' },
   openGraph: {
     title: 'Insulfilm para Banheiro | Privacidade com Elegância',
     description: 'Transforme o vidro do seu banheiro com película jateada. Privacidade total, luminosidade natural e design sofisticado. Orçamento grátis.',
-    url: 'https://lumecontrolesolar.com.br/insulfilm-no-banheiro',
+    url: 'https://lumecontrolesolar.com.br/insulfilm-no-banheiro/',
     type: 'website',
     siteName: 'LUME Controle Solar',
     images: [{ url: 'https://lumecontrolesolar.com.br/og-image.jpg', width: 1200, height: 630, alt: 'Insulfilm para Banheiro - LUME' }],
@@ -33,38 +34,47 @@ export const metadata: Metadata = {
 
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'Service',
-  name: 'Instalação de Insulfilm para Banheiros',
-  alternateName: 'Película Jateada para Banheiro',
-  description: 'Instalação profissional de película jateada em vidros de banheiros residenciais. Ideal para garantir privacidade total sem perder a luminosidade natural. Instalação rápida, limpa e sem necessidade de obras.',
-  url: 'https://lumecontrolesolar.com.br/insulfilm-no-banheiro',
-  image: 'https://lumecontrolesolar.com.br/og-image.jpg',
-  provider: {
-    '@type': 'LocalBusiness',
-    name: 'LUME Controle Solar',
-    url: 'https://lumecontrolesolar.com.br',
-    telephone: businessInfo.phoneE164,
-    address: businessAddressSchema,
-  },
-  areaServed: {
-    '@type': 'City',
-    name: 'Rio de Janeiro',
-  },
-  offers: {
-    '@type': 'Offer',
-    priceCurrency: 'BRL',
-    availability: 'https://schema.org/InStock',
-    seller: {
-      '@type': 'LocalBusiness',
-      name: 'LUME Controle Solar',
+  '@graph': [
+    buildBreadcrumbSchema([
+      { name: 'Início', url: 'https://lumecontrolesolar.com.br/' },
+      { name: 'Soluções por Ambiente', url: 'https://lumecontrolesolar.com.br/#produtos' },
+      { name: 'Insulfilm no Banheiro', url: 'https://lumecontrolesolar.com.br/insulfilm-no-banheiro/' },
+    ]),
+    {
+      '@type': 'Service',
+      name: 'Instalação de Insulfilm para Banheiros',
+      alternateName: 'Película Jateada para Banheiro',
+      description: 'Instalação profissional de película jateada em vidros de banheiros residenciais. Ideal para garantir privacidade total sem perder a luminosidade natural. Instalação rápida, limpa e sem necessidade de obras.',
+      url: 'https://lumecontrolesolar.com.br/insulfilm-no-banheiro/',
+      image: 'https://lumecontrolesolar.com.br/og-image.jpg',
+      provider: {
+        '@type': 'LocalBusiness',
+        name: 'LUME Controle Solar',
+        url: 'https://lumecontrolesolar.com.br',
+        telephone: businessInfo.phoneE164,
+        address: businessAddressSchema,
+      },
+      areaServed: {
+        '@type': 'City',
+        name: 'Rio de Janeiro',
+      },
+      offers: {
+        '@type': 'Offer',
+        priceCurrency: 'BRL',
+        availability: 'https://schema.org/InStock',
+        seller: {
+          '@type': 'LocalBusiness',
+          name: 'LUME Controle Solar',
+        },
+      },
+      additionalProperty: [
+        { '@type': 'PropertyValue', name: 'Privacidade', value: 'Total' },
+        { '@type': 'PropertyValue', name: 'Transmissão de Luz', value: 'Alta (difusa)' },
+        { '@type': 'PropertyValue', name: 'Tipo Recomendado', value: 'Película Jateada' },
+        { '@type': 'PropertyValue', name: 'Resistência à Umidade', value: 'Sim, adequada para ambientes úmidos' },
+      ],
     },
-  },
-  additionalProperty: [
-    { '@type': 'PropertyValue', name: 'Privacidade', value: 'Total' },
-    { '@type': 'PropertyValue', name: 'Transmissão de Luz', value: 'Alta (difusa)' },
-    { '@type': 'PropertyValue', name: 'Tipo Recomendado', value: 'Película Jateada' },
-    { '@type': 'PropertyValue', name: 'Resistência à Umidade', value: 'Sim, adequada para ambientes úmidos' },
-  ]
+  ],
 };
 
 export default function Page() {
