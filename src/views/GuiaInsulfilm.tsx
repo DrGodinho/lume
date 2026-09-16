@@ -306,7 +306,10 @@ export function GuiaInsulfilm() {
                     <h2 className="text-3xl font-bold font-montserrat text-white mb-8 text-center md:text-left">Comparativo Técnico das Películas</h2>
 
                     <div className="overflow-x-auto rounded-2xl glass-card border border-white/10 shadow-2xl">
-                        <table className="w-full text-left border-collapse min-w-[800px]">
+                        <table className="w-full text-left border-collapse min-w-[900px]">
+                            <caption className="sr-only">
+                                Tabela comparativa técnica de películas de controle solar LUME: especificações de VLT, bloqueio UV, rejeição de calor infravermelho (IRR), energia total rejeitada (TSER), faixa de preço médio por m² e indicação ideal de uso no Rio de Janeiro.
+                            </caption>
                             <thead>
                                 <tr className="bg-[#c9a227]/10 border-b border-white/10">
                                     <th className="p-4 md:p-6 text-[#c9a227] font-bold uppercase tracking-wider text-xs md:text-sm">Película</th>
@@ -315,6 +318,7 @@ export function GuiaInsulfilm() {
                                     <th className="p-4 md:p-6 text-[#c9a227] font-bold uppercase tracking-wider text-xs md:text-sm">IRR (Calor Int)</th>
                                     <th className="p-4 md:p-6 text-[#c9a227] font-bold uppercase tracking-wider text-xs md:text-sm">TSER (Energia)</th>
                                     <th className="p-4 md:p-6 text-[#c9a227] font-bold uppercase tracking-wider text-xs md:text-sm">Preço/m²</th>
+                                    <th className="p-4 md:p-6 text-[#c9a227] font-bold uppercase tracking-wider text-xs md:text-sm">Indicação Ideal</th>
                                 </tr>
                             </thead>
                             <tbody className="text-gray-300 divide-y divide-white/5">
@@ -327,6 +331,7 @@ export function GuiaInsulfilm() {
                                     <td className="p-4 md:p-6 font-bold text-white">95% a 99%</td>
                                     <td className="p-4 md:p-6">70% a 80%</td>
                                     <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 200</td>
+                                    <td className="p-4 md:p-6 text-sm text-gray-300">Varandas gourmet, salas claras e calor extremo sem escurecer</td>
                                 </tr>
                                 <tr className="hover:bg-white/[0.02] transition-colors">
                                     <td className="p-4 md:p-6 font-bold text-white">
@@ -337,6 +342,7 @@ export function GuiaInsulfilm() {
                                     <td className="p-4 md:p-6 font-bold text-white">60% a 70%</td>
                                     <td className="p-4 md:p-6">65% a 75%</td>
                                     <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 110</td>
+                                    <td className="p-4 md:p-6 text-sm text-gray-300">Quartos com sol direto e redução de reflexo interno</td>
                                 </tr>
                                 <tr className="hover:bg-white/[0.02] transition-colors">
                                     <td className="p-4 md:p-6 font-bold text-white">
@@ -347,6 +353,7 @@ export function GuiaInsulfilm() {
                                     <td className="p-4 md:p-6 font-bold text-white">50% a 60%</td>
                                     <td className="p-4 md:p-6">55% a 65%</td>
                                     <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 110</td>
+                                    <td className="p-4 md:p-6 text-sm text-gray-300">Salas e escritórios com proteção térmica equilibrada</td>
                                 </tr>
                                 <tr className="hover:bg-white/[0.02] transition-colors">
                                     <td className="p-4 md:p-6 font-bold text-white">
@@ -357,6 +364,7 @@ export function GuiaInsulfilm() {
                                     <td className="p-4 md:p-6 font-bold text-white">45% a 55%</td>
                                     <td className="p-4 md:p-6">50% a 60%</td>
                                     <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 80</td>
+                                    <td className="p-4 md:p-6 text-sm text-gray-300">Privacidade máxima, estética grafite e cor que não fica roxa</td>
                                 </tr>
                                 <tr className="hover:bg-white/[0.02] transition-colors">
                                     <td className="p-4 md:p-6 font-bold text-white">
@@ -367,6 +375,7 @@ export function GuiaInsulfilm() {
                                     <td className="p-4 md:p-6 font-bold text-white">40% a 50%</td>
                                     <td className="p-4 md:p-6">45% a 55%</td>
                                     <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 80</td>
+                                    <td className="p-4 md:p-6 text-sm text-gray-300">Conforto visual e privacidade média para janelas residenciais</td>
                                 </tr>
                                 <tr className="hover:bg-white/[0.02] transition-colors">
                                     <td className="p-4 md:p-6 font-bold text-white">
@@ -377,6 +386,7 @@ export function GuiaInsulfilm() {
                                     <td className="p-4 md:p-6 font-bold text-white">70% a 85%</td>
                                     <td className="p-4 md:p-6">65% a 78%</td>
                                     <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 90</td>
+                                    <td className="p-4 md:p-6 text-sm text-gray-300">Sol poente severo da tarde e fachadas comerciais</td>
                                 </tr>
                                 <tr className="hover:bg-white/[0.02] transition-colors">
                                     <td className="p-4 md:p-6 font-bold text-white">
@@ -387,6 +397,7 @@ export function GuiaInsulfilm() {
                                     <td className="p-4 md:p-6 font-medium text-gray-500">{'< 10%'}</td>
                                     <td className="p-4 md:p-6">15% a 25%</td>
                                     <td className="p-4 md:p-6 text-[#c9a227] font-bold">R$ 80</td>
+                                    <td className="p-4 md:p-6 text-sm text-gray-300">Privacidade total 24h (dia e noite) para box, banheiros e divisórias</td>
                                 </tr>
                             </tbody>
                         </table>

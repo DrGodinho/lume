@@ -5,42 +5,75 @@ Disallow: /api/
 Disallow: /crm/
 Disallow: /login/
 
-# AI search and user-triggered answer engines: allow citation/discovery.
+# AI search and generative answer engines: allowed to discover and cite public content.
 User-agent: OAI-SearchBot
 Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /crm/
+Disallow: /login/
 
 User-agent: ChatGPT-User
 Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /crm/
+Disallow: /login/
+
+User-agent: GPTBot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /crm/
+Disallow: /login/
 
 User-agent: PerplexityBot
 Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /crm/
+Disallow: /login/
 
 User-agent: Claude-SearchBot
 Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /crm/
+Disallow: /login/
 
 User-agent: Claude-User
 Allow: /
-
-# AI training or broad scraping crawlers: block model-training reuse.
-User-agent: GPTBot
-Disallow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /crm/
+Disallow: /login/
 
 User-agent: ClaudeBot
-Disallow: /
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /crm/
+Disallow: /login/
 
 User-agent: Google-Extended
-Disallow: /
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /crm/
+Disallow: /login/
 
 User-agent: Applebot-Extended
-Disallow: /
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /crm/
+Disallow: /login/
 
+# Generic scrapers and aggressive crawlers
 User-agent: Bytespider
 Disallow: /
 
 User-agent: CCBot
-Disallow: /
-
-User-agent: anthropic-ai
 Disallow: /
 
 User-agent: FacebookBot

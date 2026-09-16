@@ -175,6 +175,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="pt-BR" style={fontVariables}>
       <head>
+        <link rel="alternate" type="text/markdown" href="/llms.txt" title="LLM Technical Summary" />
+        <link rel="alternate" type="text/markdown" href="/llms-full.txt" title="LLM Full Documentation" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
