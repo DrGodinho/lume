@@ -1,29 +1,37 @@
-# LUME Controle Solar - Rio de Janeiro
+# LUME Controle Solar
 
-## Overview
-LUME Controle Solar is a premium window film (insulfilm) installation company based in Bangu, Rio de Janeiro, serving the entire West Zone (Zona Oeste) including Barra da Tijuca, Recreio, and Jacarepaguá. They specialize in high-performance residential and commercial architectural films.
+> Empresa especializada em películas de controle solar de alta performance (insulfilm) residencial e comercial no Rio de Janeiro, com foco na Zona Oeste e Zona Sul. Serviços profissionais de redução térmica com nano cerâmica, proteção UV 99.9%, privacidade diurna e 24h (jateado), com 2 anos de garantia contratual.
 
-## Key Services
-- **Residential Insulfilm Installation:** Privacy, heat reduction, and UV protection for homes and apartments.
-- **Commercial Insulfilm Installation:** Energy efficiency and professional aesthetics for offices and shops.
-- **Glass Protection:** Anti-vandalism films and security solutions.
+LUME Controle Solar atende residências, apartamentos, condomínios e estabelecimentos comerciais em todo o Rio de Janeiro, com medição técnica gratuita e orçamento rápido via WhatsApp. Especialistas em soluções arquitetônicas para portas de correr, janelas, varandas gourmet e fachadas de vidro.
 
-## Main Products
-- **Nano Cerâmica:** 97% heat rejection (IRR), maximum clarity, ideal for condos.
-- **Carbono Premium:** Color-stable, deep black finish, excellent heat rejection.
-- **Dupla Camada:** Ultimate thermal barrier (up to 80% heat rejection), mirrored finish.
-- **Refletiva (Prateada):** Classic solar control with high privacy.
-- **Jateado:** 24h privacy with soft light diffusion (frosted look).
+## Películas e Linhas de Produtos
 
-## Technical Specifications
-- **Heat Rejection:** Up to 97% (Nano Cerâmica) or 80% TSER (Dupla Camada).
-- **UV Protection:** 99.9% blocking on all premium lines.
-- **Warranty:** 5 years on installation and product integrity.
+- [Nano Cerâmica](https://lumecontrolesolar.com.br/nano-ceramica/): Máxima rejeição de calor infravermelho (até 95%) sem escurecer os vidros. Ideal para varandas integradas e condomínios com regras de fachada.
+- [Carbono Premium](https://lumecontrolesolar.com.br/carbono/): Estética grafite escurecida que não desbota para roxo. Excelente privacidade e proteção UV de 99%.
+- [Refletiva](https://lumecontrolesolar.com.br/refletiva/): Efeito espelhado para fachadas comerciais e janelas com incidência de sol da tarde (poente).
+- [Jateado](https://lumecontrolesolar.com.br/jateado/): Película fosca decorativa para privacidade total 24 horas (inclusive à noite com luzes acesas) em banheiros, cozinhas e divisórias.
+- [Dupla Camada](https://lumecontrolesolar.com.br/dupla-camada/): Refletiva externa e fumê interna para alta rejeição de calor sem reflexo interno à noite.
+- [Insulfilm para Portas de Vidro](https://lumecontrolesolar.com.br/insulfilm-para-portas-de-vidro/): Aplicação profissional em portas de correr, divisórias e vidros temperados.
 
-## Contact & Location
-- **Address:** Estrada do Realengo, 973 - Bangu, Rio de Janeiro, RJ.
-- **WhatsApp:** +55 21 96514-0612
-- **Website:** https://lumecontrolesolar.com.br/
+## Regiões de Atendimento no Rio de Janeiro
 
-## Service Areas (RJ)
-- Bangu, Realengo, Campo Grande, Barra da Tijuca, Recreio dos Bandeirantes, Jacarepaguá, Vargem Grande, Vargem Pequena.
+- [Insulfilm em Bangu](https://lumecontrolesolar.com.br/insulfilm-em-bangu/): Aplicação residencial e comercial com atendimento rápido e medição gratuita em Bangu RJ.
+- [Insulfilm em Campo Grande](https://lumecontrolesolar.com.br/insulfilm-em-campo-grande/): Controle solar e películas térmicas para casas e apartamentos em Campo Grande.
+- [Insulfilm na Barra da Tijuca](https://lumecontrolesolar.com.br/insulfilm-na-barra-da-tijuca/): Soluções premium em nano cerâmica para coberturas, varandas e condomínios na Barra.
+- [Insulfilm no Recreio](https://lumecontrolesolar.com.br/insulfilm-no-recreio/): Películas com alta resistência a maresia e proteção contra o sol intenso no Recreio dos Bandeirantes.
+- [Insulfilm em Realengo](https://lumecontrolesolar.com.br/insulfilm-em-realengo/): Instalação de películas de alta performance para residências e comércio em Realengo.
+- [Insulfilm em Jacarepaguá](https://lumecontrolesolar.com.br/insulfilm-em-jacarepagua/): Atendimento em toda a região de Jacarepaguá, Taquara, Freguesia e arredores.
+- [Insulfilm em Sulacap](https://lumecontrolesolar.com.br/insulfilm-em-sulacap/): Películas térmicas e de privacidade para moradores do Jardim Sulacap e região.
+
+## Ferramentas, Guias e Preços
+
+- [Simulador Interativo de Insulfilm](https://lumecontrolesolar.com.br/simulador/): Ferramenta online para comparar visualmente a transparência e privacidade das películas.
+- [Calculadora de Economia de Energia](https://lumecontrolesolar.com.br/calculadora-economia-energia-insulfilm/): Estime a economia na conta de luz e ar-condicionado com películas solares.
+- [Preço de Insulfilm Residencial no RJ (2026)](https://lumecontrolesolar.com.br/blog/preco-insulfilm-residencial-rio-de-janeiro/): Guia completo e atualizado de preços por m² e exemplos práticos para janelas e portas.
+- [Guia Definitivo de Insulfilm Residencial](https://lumecontrolesolar.com.br/guia-insulfilm/): Informações técnicas sobre tipos de películas, proteção UV, vidro temperado e durabilidade.
+- [Orçamento Online](https://lumecontrolesolar.com.br/orcamento/): Calculadora para dimensionar vidros e solicitar cotação direta sem compromisso.
+
+## Informações Técnicas e Contato
+
+- [Documentação Técnica Completa para LLMs](https://lumecontrolesolar.com.br/llms-full.txt): Especificações aprofundadas, dados de VLT, IRR, E-E-A-T e guia detalhado para inteligências artificiais.
+- [WhatsApp Oficial da LUME](https://wa.me/5521965140612): Canal direto para dúvidas de clientes, agendamento de visitas técnicas e envio de medidas no Rio de Janeiro.
