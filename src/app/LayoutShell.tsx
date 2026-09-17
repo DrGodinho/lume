@@ -4,10 +4,15 @@ import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import dynamic from 'next/dynamic';
 import { Navbar } from '@/sections/Navbar';
-import { Footer } from '@/sections/Footer';
-import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { GoogleConversionTracker } from '@/components/GoogleConversionTracker';
+
+const Footer = dynamic(() => import('@/sections/Footer').then((mod) => mod.Footer));
+const WhatsAppButton = dynamic(
+  () => import('@/components/WhatsAppButton').then((mod) => mod.WhatsAppButton),
+  { ssr: false }
+);
 
 gsap.registerPlugin(ScrollTrigger);
 

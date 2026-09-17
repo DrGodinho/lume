@@ -2,11 +2,20 @@ import type { Metadata } from 'next';
 import dynamic from 'next/dynamic';
 import { Hero } from '../sections/Hero';
 import { PriceAdjustmentBanner } from '../components/PriceAdjustmentBanner';
-import { Products } from '../sections/Products';
-import { Benefits } from '../sections/Benefits';
-import { About } from '../sections/About';
 import { homeFaqs } from '../content/homeFaq';
 
+const Benefits = dynamic(
+  () => import('../sections/Benefits').then((mod) => mod.Benefits),
+  { loading: () => <div className="min-h-[300px]" /> }
+);
+const Products = dynamic(
+  () => import('../sections/Products').then((mod) => mod.Products),
+  { loading: () => <div className="min-h-[400px]" /> }
+);
+const About = dynamic(
+  () => import('../sections/About').then((mod) => mod.About),
+  { loading: () => <div className="min-h-[300px]" /> }
+);
 const SelectionGuide = dynamic(
   () => import('../sections/SelectionGuide').then((mod) => mod.SelectionGuide),
   { loading: () => <div className="min-h-[300px]" /> }

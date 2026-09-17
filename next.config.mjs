@@ -97,6 +97,10 @@ const nextConfig = {
     return config;
   },
 
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'date-fns'],
+  },
+
   turbopack: {},
 };
 

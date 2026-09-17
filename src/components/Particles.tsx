@@ -43,7 +43,8 @@ export function Particles() {
 
     // Initialize particles
     const colors = ['#c9a227', '#ffffff', '#e8d179'];
-    const particleCount = window.innerWidth < 768 ? 30 : 60;
+    const isMobile = window.innerWidth < 768;
+    const particleCount = isMobile ? 25 : 60;
     
     particlesRef.current = Array.from({ length: particleCount }, () => ({
       x: Math.random() * canvas.width,
@@ -58,7 +59,9 @@ export function Particles() {
     const handleMouseMove = (e: MouseEvent) => {
       mouseRef.current = { x: e.clientX, y: e.clientY };
     };
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    if (!isMobile) {
+      window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    }
 
     let frameCount = 0;
     let isDocumentVisible = !document.hidden;
@@ -92,8 +95,8 @@ export function Particles() {
           particle.x += particle.vx;
           particle.y += particle.vy;
 
-          // Mouse interaction (only for every 5th particle)
-          if (i % 5 === 0) {
+          // Mouse interaction (desktop only)
+          if (!isMobile && i % 5 === 0) {
             const dx = mouseRef.current.x - particle.x;
             const dy = mouseRef.current.y - particle.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
@@ -114,8 +117,8 @@ export function Particles() {
           ctx.globalAlpha = particle.opacity;
           ctx.fill();
 
-          // Draw connections (limited)
-          if (i % 3 === 0) {
+          // Draw connections (desktop only)
+          if (!isMobile && i % 3 === 0) {
             particlesRef.current.slice(i + 1, i + 4).forEach((other) => {
               const dx = particle.x - other.x;
               const dy = particle.y - other.y;
@@ -138,11 +141,18 @@ export function Particles() {
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    animationRef.current = requestAnimationFrame(animate);
+
+    // Defer start by 500ms so CPU remains free for initial paint & hydration
+    const startTimer = setTimeout(() => {
+      animationRef.current = requestAnimationFrame(animate);
+    }, 500);
 
     return () => {
+      clearTimeout(startTimer);
       window.removeEventListener('resize', resizeCanvas);
-      window.removeEventListener('mousemove', handleMouseMove);
+      if (!isMobile) {
+        window.removeEventListener('mousemove', handleMouseMove);
+      }
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
