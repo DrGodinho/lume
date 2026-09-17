@@ -19,7 +19,7 @@ export const precoInsulfilmResidencialRioDeJaneiro: BlogPost = {
     'insulfilm zona oeste rio',
     'insulfilm barra da tijuca',
   ],
-  coverImageUrl: '/blog/preco-insulfilm-residencial-rio-de-janeiro.jpg',
+  coverImageUrl: '/blog/preco-insulfilm-residencial-rio-de-janeiro.webp',
   coverImageAlt:
     'Porta de vidro de correr com insulfilm instalado e exemplo visual de preço acessível (apenas R$ 300) no Rio de Janeiro',
   authorName: 'Marcos Paulo Godinho',
@@ -102,7 +102,7 @@ export const precoInsulfilmResidencialRioDeJaneiro: BlogPost = {
     },
     {
       type: 'image',
-      url: '/blog/preco-insulfilm-residencial-rio-de-janeiro.jpg',
+      url: '/blog/preco-insulfilm-residencial-rio-de-janeiro.webp',
       alt: 'Porta de vidro de correr com 2 folhas de 210 x 80 cm com insulfilm instalado por apenas R$ 300 no Rio de Janeiro',
       caption:
         'Exemplo real de economia: porta de vidro de correr (2 folhas de 210 × 80 cm) com película de controle solar instalada por apenas R$ 300.',

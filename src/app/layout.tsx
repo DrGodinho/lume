@@ -1,14 +1,23 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
-import type { CSSProperties } from 'react';
+import { Montserrat, Open_Sans } from 'next/font/google';
 import './globals.css';
 import { LayoutShell } from './LayoutShell';
 import { businessAddressSchema, businessInfo, businessSameAs } from '@/lib/businessInfo';
 
-const fontVariables: CSSProperties = {
-  '--font-montserrat': '"Montserrat", "Segoe UI", Arial, sans-serif',
-  '--font-open-sans': '"Open Sans", "Segoe UI", Arial, sans-serif',
-} as CSSProperties;
+const montserrat = Montserrat({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800', '900'],
+  variable: '--font-montserrat',
+  display: 'swap',
+});
+
+const openSans = Open_Sans({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-open-sans',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://lumecontrolesolar.com.br'),
@@ -48,7 +57,14 @@ export const metadata: Metadata = {
     images: ['https://lumecontrolesolar.com.br/novo-logo-lume.png'],
   },
   icons: {
-    icon: '/novo-logo-lume.png',
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/icon-32x32.png', type: 'image/png', sizes: '32x32' },
+      { url: '/icon-192x192.png', type: 'image/png', sizes: '192x192' },
+    ],
+    apple: [
+      { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
   },
   other: {
     'theme-color': '#04080f',
@@ -173,7 +189,7 @@ const jsonLd = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" style={fontVariables}>
+    <html lang="pt-BR" className={`${montserrat.variable} ${openSans.variable}`}>
       <head>
         <link rel="alternate" type="text/markdown" href="/llms.txt" title="LLM Technical Summary" />
         <link rel="alternate" type="text/markdown" href="/llms-full.txt" title="LLM Full Documentation" />
@@ -184,11 +200,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Google tag (gtag.js) */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-RKVB0YQTJY"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
         <Script 
           id="gtag-init" 
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           dangerouslySetInnerHTML={{
             __html: `
               window.dataLayer=window.dataLayer||[];

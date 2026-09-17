@@ -23,7 +23,7 @@ export function RefletivaPage() {
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden px-4">
                 <div className="absolute inset-0 z-0">
-                    <Image src="/refletiva-hero.png" alt="Edifício moderno com Insulfilm Refletivo LUME - Rio de Janeiro" fill sizes="(max-width: 768px) 100vw, 100vw" priority className="w-full h-full object-cover opacity-50" />
+                    <Image src="/refletiva-hero.webp" alt="Edifício moderno com Insulfilm Refletivo LUME - Rio de Janeiro" fill sizes="(max-width: 768px) 100vw, 100vw" priority className="w-full h-full object-cover opacity-50" />
                     <div className="absolute inset-0 bg-gradient-to-b from-[#04080f] via-[#04080f]/40 to-[#04080f]" />
                 </div>
 

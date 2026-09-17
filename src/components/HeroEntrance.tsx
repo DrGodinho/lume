@@ -14,7 +14,13 @@ export function HeroEntrance({ children, className }: HeroEntranceProps) {
   const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
-    if (prefersReducedMotion) return;
+    if (prefersReducedMotion) {
+      const words = containerRef.current?.querySelectorAll('.word');
+      words?.forEach((w) => ((w as HTMLElement).style.opacity = '1'));
+      const items = containerRef.current?.querySelectorAll('.animate-hero');
+      items?.forEach((i) => ((i as HTMLElement).style.opacity = '1'));
+      return;
+    }
 
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });

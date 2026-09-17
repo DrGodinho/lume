@@ -1,15 +1,32 @@
 import type { Metadata } from 'next';
+import dynamic from 'next/dynamic';
 import { Hero } from '../sections/Hero';
 import { PriceAdjustmentBanner } from '../components/PriceAdjustmentBanner';
 import { Products } from '../sections/Products';
 import { Benefits } from '../sections/Benefits';
 import { About } from '../sections/About';
-import { Coverage } from '../sections/Coverage';
-import { SelectionGuide } from '../sections/SelectionGuide';
-import { ContactCTA } from '../sections/ContactCTA';
-import { GoogleReviews } from '../components/GoogleReviews';
-import { HomeFaq } from '../sections/HomeFaq';
 import { homeFaqs } from '../content/homeFaq';
+
+const SelectionGuide = dynamic(
+  () => import('../sections/SelectionGuide').then((mod) => mod.SelectionGuide),
+  { loading: () => <div className="min-h-[300px]" /> }
+);
+const Coverage = dynamic(
+  () => import('../sections/Coverage').then((mod) => mod.Coverage),
+  { loading: () => <div className="min-h-[300px]" /> }
+);
+const GoogleReviews = dynamic(
+  () => import('../components/GoogleReviews').then((mod) => mod.GoogleReviews),
+  { loading: () => <div className="min-h-[300px]" /> }
+);
+const HomeFaq = dynamic(
+  () => import('../sections/HomeFaq').then((mod) => mod.HomeFaq),
+  { loading: () => <div className="min-h-[300px]" /> }
+);
+const ContactCTA = dynamic(
+  () => import('../sections/ContactCTA').then((mod) => mod.ContactCTA),
+  { loading: () => <div className="min-h-[200px]" /> }
+);
 
 export const metadata: Metadata = {
   title: 'LUME Controle Solar | Insulfilm Residencial e Comercial no Rio de Janeiro',

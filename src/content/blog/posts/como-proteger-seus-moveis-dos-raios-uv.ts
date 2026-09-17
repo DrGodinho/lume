@@ -8,7 +8,7 @@ export const comoProtegerSeusMoveisDosRaiosUv: BlogPost = {
     'Entenda como os raios UV afetam sofás, cortinas, madeira e pisos, e veja como o insulfilm ajuda a reduzir desbotamento, ressecamento e desgaste dentro de casa.',
   category: 'Guias',
   tags: ['proteção UV', 'móveis', 'controle solar', 'insulfilm residencial', 'desbotamento'],
-  coverImageUrl: '/blog/como-proteger-moveis-danos-sol.png',
+  coverImageUrl: '/blog/como-proteger-moveis-danos-sol.webp',
   coverImageAlt: 'Sala residencial iluminada com vidro protegido por insulfilm de controle solar',
   authorName: 'LUME Controle Solar',
   publishedAt: '2026-06-10T12:00:00.000Z',

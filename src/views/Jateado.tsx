@@ -23,7 +23,7 @@ export function JateadoPage() {
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden px-4">
                 <div className="absolute inset-0 z-0">
-                    <Image src="/jateado-hero.png" alt="Escritório moderno com divisórias de vidro jateado LUME - Rio de Janeiro" fill sizes="(max-width: 768px) 100vw, 100vw" priority className="w-full h-full object-cover opacity-40" />
+                    <Image src="/jateado-hero.webp" alt="Escritório moderno com divisórias de vidro jateado LUME - Rio de Janeiro" fill sizes="(max-width: 768px) 100vw, 100vw" priority className="w-full h-full object-cover opacity-40" />
                     <div className="absolute inset-0 bg-gradient-to-b from-[#04080f] via-transparent to-[#04080f]" />
                 </div>
 

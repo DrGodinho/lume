@@ -14,7 +14,7 @@ export function SulacapPage({ faqs }: { faqs: { q: string; a: string }[] }) {
             <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden px-4">
                 {/* Background Image */}
                 <div className="absolute inset-0 z-0">
-                    <Image src="/hero-bg-v2.png" alt="Instalação de insulfilm profissional no Jardim Sulacap - LUME Controle Solar" fill sizes="(max-width: 768px) 100vw, 100vw" priority className="w-full h-full object-cover" />
+                    <Image src="/hero-bg-v2.webp" alt="Instalação de insulfilm profissional no Jardim Sulacap - LUME Controle Solar" fill sizes="(max-width: 768px) 100vw, 100vw" priority className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-r from-[#04080f]/95 via-[#04080f]/80 to-[#04080f]/60" />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#04080f] via-transparent to-[#04080f]/50" />
                 </div>

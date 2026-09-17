@@ -13,7 +13,7 @@ export function Hero() {
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/hero-bg-v2.png"
+          src="/hero-bg-v2.webp"
           alt="Sala de estar moderna com grandes janelas protegidas por insulfilm LUME, mostrando o contraste entre vidros protegidos e claros."
           fill
           sizes="100vw"

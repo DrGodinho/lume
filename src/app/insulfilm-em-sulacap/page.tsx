@@ -24,13 +24,13 @@ export const metadata: Metadata = {
     url: 'https://lumecontrolesolar.com.br/insulfilm-em-sulacap/',
     type: 'website',
     siteName: 'LUME Controle Solar',
-    images: [{ url: 'https://lumecontrolesolar.com.br/hero-bg-v2.png', width: 1200, height: 630, alt: 'Insulfilm em Sulacap RJ - LUME Controle Solar' }],
+    images: [{ url: 'https://lumecontrolesolar.com.br/hero-bg-v2.webp', width: 1200, height: 630, alt: 'Insulfilm em Sulacap RJ - LUME Controle Solar' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Insulfilm em Sulacap RJ | LUME Controle Solar',
     description: 'Redução de calor, privacidade e proteção UV em Sulacap. Garantia de 2 anos. Orçamento grátis.',
-    images: ['https://lumecontrolesolar.com.br/hero-bg-v2.png'],
+    images: ['https://lumecontrolesolar.com.br/hero-bg-v2.webp'],
   },
 };
 
@@ -93,7 +93,7 @@ const jsonLd = {
       '@type': 'LocalBusiness',
       '@id': 'https://lumecontrolesolar.com.br/insulfilm-em-sulacap/#localbusiness',
       'name': 'LUME Controle Solar - Sulacap',
-      'image': 'https://lumecontrolesolar.com.br/hero-bg-v2.png',
+      'image': 'https://lumecontrolesolar.com.br/hero-bg-v2.webp',
       'url': 'https://lumecontrolesolar.com.br/insulfilm-em-sulacap/',
       'telephone': businessInfo.phoneE164,
       'priceRange': '$$',

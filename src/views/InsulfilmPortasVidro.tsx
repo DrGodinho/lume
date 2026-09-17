@@ -271,7 +271,7 @@ export function InsulfilmPortasVidro() {
       <section className="relative flex min-h-[88svh] items-center overflow-hidden px-4 pb-12 pt-28 sm:min-h-[92vh] sm:pb-16 sm:pt-32">
         <div className="absolute inset-0 z-0">
           <Image
-            src="/hero-bg-v2.png"
+            src="/hero-bg-v2.webp"
             alt="Porta de vidro com película de controle solar instalada pela LUME"
             fill
             priority

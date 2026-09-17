@@ -16,7 +16,7 @@ export const comoProtegerMoveisDanosSol: BlogPost = {
     'controle solar',
     'desbotamento',
   ],
-  coverImageUrl: '/blog/como-proteger-moveis-danos-sol.png',
+  coverImageUrl: '/blog/como-proteger-moveis-danos-sol.webp',
   coverImageAlt: 'Sala residencial moderna de alto padrão com grandes janelas de vidro protegidas por insulfilm de controle solar',
   authorName: 'Marcos Paulo Godinho',
   publishedAt: '2026-06-11T12:00:00.000Z',
