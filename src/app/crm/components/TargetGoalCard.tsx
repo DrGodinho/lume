@@ -46,6 +46,7 @@ export function TargetGoalCard({
             type="number"
             value={targetInput}
             min={1}
+            inputMode="numeric"
             onChange={(event) => onInputChange(event.target.value)}
             onBlur={onCommitEdit}
             onKeyDown={(event) => {

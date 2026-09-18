@@ -41,17 +41,31 @@ export const useLeadOrcamento = (): UseLeadOrcamentoReturn => {
       }
 
       const trimmedName = lead.name.trim();
-      if (!trimmedName) return null;
+      if (trimmedName) {
+        const byNameResponse = await fetchWithTimeout(
+          `/api/calculator/history?cliente=${encodeURIComponent(trimmedName)}&unlinked=1`,
+          { credentials: 'include', cache: 'no-store' }
+        );
 
-      const byNameResponse = await fetchWithTimeout(
-        `/api/calculator/history?cliente=${encodeURIComponent(trimmedName)}&unlinked=1`,
-        { credentials: 'include', cache: 'no-store' }
-      );
+        if (byNameResponse.ok) {
+          const payload = await byNameResponse.json();
+          const items = Array.isArray(payload?.items) ? payload.items : [];
+          if (items.length > 0) return mapRow(items[0]);
+        }
+      }
 
-      if (byNameResponse.ok) {
-        const payload = await byNameResponse.json();
-        const items = Array.isArray(payload?.items) ? payload.items : [];
-        if (items.length > 0) return mapRow(items[0]);
+      const cleanPhone = lead.phone ? lead.phone.replace(/\D/g, '') : '';
+      if (cleanPhone.length >= 8) {
+        const byPhoneResponse = await fetchWithTimeout(
+          `/api/calculator/history?phone=${encodeURIComponent(cleanPhone)}&unlinked=1`,
+          { credentials: 'include', cache: 'no-store' }
+        );
+
+        if (byPhoneResponse.ok) {
+          const payload = await byPhoneResponse.json();
+          const items = Array.isArray(payload?.items) ? payload.items : [];
+          if (items.length > 0) return mapRow(items[0]);
+        }
       }
 
       return null;

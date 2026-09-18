@@ -1,25 +1,10 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import {
-  formatCurrencyBRL,
-  getLeadActivityDate,
-  getLeadFollowUpDate,
-  getLeadPhoneHref,
-  getLeadServiceDate,
-  getLeadServiceStatus,
-  getLeadStatusClasses,
-  getWhatsAppHref,
-  isClosedLead,
-  SERVICE_STATUS_META,
-} from '../hooks/useAgenda';
-import { useCrm } from '../context/CrmContext';
-import { useCrmSettings } from '../hooks/useCrmSettings';
-import { useMetrics } from '../hooks/useMetrics';
-import { formatLeadCurrency } from '../utils';
-import { RJ_NEIGHBORHOODS } from '../constants';
 import { TabErrorBoundary } from './ErrorBoundary';
 import type { CrmTab } from '../types';
+import type { useCrmSettings } from '../hooks/useCrmSettings';
+import type { useMetrics } from '../hooks/useMetrics';
 
 const AgendaSection = dynamic(() => import('./AgendaSection').then((m) => m.AgendaSection), {
   loading: () => <TabSkeleton />,
@@ -65,48 +50,16 @@ function TabSkeleton() {
 interface CrmTabRouterProps {
   activeTab: CrmTab;
   onSelectTab: (tab: CrmTab) => void;
-  metrics: ReturnType<typeof useMetrics>;
-  crmSettings: ReturnType<typeof useCrmSettings>;
+  metrics?: ReturnType<typeof useMetrics>;
+  crmSettings?: ReturnType<typeof useCrmSettings>;
   searchInputRef?: React.RefObject<HTMLInputElement | null>;
 }
 
-export function CrmTabRouter({ activeTab, onSelectTab, metrics, crmSettings, searchInputRef }: CrmTabRouterProps) {
-  const crm = useCrm();
+export function CrmTabRouter({ activeTab, onSelectTab, searchInputRef }: CrmTabRouterProps) {
   if (activeTab === 'dashboard') {
     return (
       <TabErrorBoundary fallbackTitle="Painel Geral">
-        <MetricsPanel
-          leads={crm.leads}
-          stats={metrics.stats}
-          monthlyEvolution={metrics.monthlyEvolution}
-          periodSummary={metrics.periodSummary}
-          metricsPeriod={crm.metricsPeriod}
-          onMetricsPeriodChange={crm.setMetricsPeriod}
-          customStart={crm.customStart}
-          customEnd={crm.customEnd}
-          onCustomStartChange={crm.setCustomStart}
-          onCustomEndChange={crm.setCustomEnd}
-          monthDifference={metrics.monthDifference}
-          monthDifferencePercent={metrics.monthDifferencePercent}
-          monthTrendIsPositive={metrics.monthTrendIsPositive}
-          visibleMonthlySeries={crm.visibleMonthlySeries}
-          onToggleMonthlySeries={crm.toggleMonthlySeries}
-          formatDashboardCurrency={metrics.formatDashboardCurrency}
-          onOpenLead={crm.setLeadDetail}
-          onOpenCreateModal={() => crm.openCreateModal()}
-          onOpenAgendaToday={() => {
-            crm.setAgendaInitialView('hoje');
-            onSelectTab('agenda');
-          }}
-          onOpenLeads={() => onSelectTab('leads')}
-          targetGoal={crm.targetGoal}
-          targetPercent={metrics.targetPercent}
-          editingTarget={crm.editingTarget}
-          targetInput={crm.targetInput}
-          setTargetInput={crm.setTargetInput}
-          setEditingTarget={crm.setEditingTarget}
-          saveTargetGoal={crm.saveTargetGoal}
-        />
+        <MetricsPanel onSelectTab={onSelectTab} />
       </TabErrorBoundary>
     );
   }
@@ -114,45 +67,7 @@ export function CrmTabRouter({ activeTab, onSelectTab, metrics, crmSettings, sea
   if (activeTab === 'leads') {
     return (
       <TabErrorBoundary fallbackTitle="Leads">
-        <KanbanBoard
-          leads={crm.leads}
-          filteredLeads={crm.filteredLeads}
-          sortedFilteredLeads={crm.sortedFilteredLeads}
-          searchQuery={crm.searchQuery}
-          setSearchQuery={crm.setSearchQuery}
-          filterNeighborhood={crm.filterNeighborhood}
-          setFilterNeighborhood={crm.setFilterNeighborhood}
-          filterStatus={crm.filterStatus}
-          setFilterStatus={crm.setFilterStatus}
-          hasActiveFilters={crm.hasActiveFilters}
-          onClearFilters={crm.clearFilters}
-          neighborhoods={RJ_NEIGHBORHOODS}
-          viewMode={crm.viewMode}
-          setViewMode={crm.setViewMode}
-          collapsedCards={crm.collapsedCards}
-          onCollapseAll={() => crm.setCollapsedStateForAllLeads(true)}
-          onExpandAll={() => crm.setCollapsedStateForAllLeads(false)}
-          onToggleCollapse={crm.toggleCollapsedCard}
-          onOpenCreateModal={crm.openCreateModal}
-          onOpenDetail={crm.setLeadDetail}
-          onOpenEdit={crm.openEditModal}
-          onDelete={crm.handleDeleteLead}
-          onStatusChange={crm.handleStatusChange}
-          onReorderLead={crm.handleKanbanReorder}
-          onTogglePin={crm.handleTogglePin}
-          onTableRowClick={crm.handleLeadTableRowClick}
-          onTableRowDoubleClick={crm.handleLeadTableRowDoubleClick}
-          sortKey={crm.sortKey}
-          sortDir={crm.sortDir}
-          onToggleSort={crm.toggleSort}
-          daysInStatus={crm.daysInStatus}
-          formatCurrency={formatLeadCurrency}
-          getLeadServiceDate={getLeadServiceDate}
-          getLeadFollowUpDate={getLeadFollowUpDate}
-          getLeadStatusClasses={getLeadStatusClasses}
-          searchInputRef={searchInputRef}
-          leadSyncState={crm.leadSyncState}
-        />
+        <KanbanBoard searchInputRef={searchInputRef} />
       </TabErrorBoundary>
     );
   }
@@ -160,13 +75,7 @@ export function CrmTabRouter({ activeTab, onSelectTab, metrics, crmSettings, sea
   if (activeTab === 'trash') {
     return (
       <TabErrorBoundary fallbackTitle="Lixeira de Leads">
-        <ArchivedLeadsView
-          mode="trash"
-          leads={crm.trashedLeads}
-          loading={crm.loadingTrashLeads}
-          onRefresh={crm.loadTrashLeads}
-          onRestore={(lead) => crm.handleRestoreLead(lead)}
-        />
+        <ArchivedLeadsView mode="trash" />
       </TabErrorBoundary>
     );
   }
@@ -174,13 +83,7 @@ export function CrmTabRouter({ activeTab, onSelectTab, metrics, crmSettings, sea
   if (activeTab === 'archive') {
     return (
       <TabErrorBoundary fallbackTitle="Arquivo de Leads">
-        <ArchivedLeadsView
-          mode="archive"
-          leads={crm.archivedLeads}
-          loading={crm.loadingArchivedLeads}
-          onRefresh={crm.loadArchivedLeads}
-          onRestore={(lead) => crm.handleRestoreFromArchive(lead)}
-        />
+        <ArchivedLeadsView mode="archive" />
       </TabErrorBoundary>
     );
   }
@@ -188,10 +91,7 @@ export function CrmTabRouter({ activeTab, onSelectTab, metrics, crmSettings, sea
   if (activeTab === 'historico') {
     return (
       <TabErrorBoundary fallbackTitle="Orçamentos">
-        <HistoricoSupabase
-          setActiveTab={onSelectTab}
-          openCreateModal={crm.openCreateModal}
-        />
+        <HistoricoSupabase setActiveTab={onSelectTab} />
       </TabErrorBoundary>
     );
   }
@@ -206,24 +106,8 @@ export function CrmTabRouter({ activeTab, onSelectTab, metrics, crmSettings, sea
 
   if (activeTab === 'settings') {
     return (
-      <TabErrorBoundary fallbackTitle="Configuracoes do CRM">
-        <PlaybookSettings
-          activeSellerId={crm.activeSellerId}
-          activePlaybook={crm.activePlaybook}
-          sellerIds={crm.sellerIds}
-          loading={crm.playbookLoading}
-          saving={crm.playbookSaving}
-          error={crm.playbookError}
-          onChangeSeller={crm.setActiveSellerId}
-          onUpdateRule={crm.updatePlaybookRule}
-          onResetPlaybook={crm.resetActivePlaybook}
-          onReload={crm.reloadPlaybooks}
-          archiveAfterDays={crmSettings.archiveAfterDays}
-          loadingArchiveAfterDays={crmSettings.loadingArchiveAfterDays}
-          savingArchiveAfterDays={crmSettings.savingArchiveAfterDays}
-          archiveAfterDaysError={crmSettings.archiveAfterDaysError}
-          onUpdateArchiveAfterDays={crmSettings.updateArchiveAfterDays}
-        />
+      <TabErrorBoundary fallbackTitle="Configurações do CRM">
+        <PlaybookSettings />
       </TabErrorBoundary>
     );
   }
@@ -231,26 +115,7 @@ export function CrmTabRouter({ activeTab, onSelectTab, metrics, crmSettings, sea
   if (activeTab === 'agenda') {
     return (
       <TabErrorBoundary fallbackTitle="Agenda & Follow-up">
-        <AgendaSection
-          leads={crm.leads}
-          initialView={crm.agendaInitialView}
-          onAgendarRetorno={crm.handleAgendaSchedule}
-          onMarcarFeito={crm.handleAgendaMarkDone}
-          onSetDormant={crm.handleDormantStateChange}
-          onUpdateServiceStatus={crm.handleServiceStatusChange}
-          onAbrirLead={crm.setLeadDetail}
-          onRestoreFromArchive={crm.handleRestoreFromArchive}
-          isClosedLead={isClosedLead}
-          getLeadFollowUpDate={getLeadFollowUpDate}
-          getLeadServiceDate={getLeadServiceDate}
-          getLeadActivityDate={getLeadActivityDate}
-          getLeadServiceStatus={getLeadServiceStatus}
-          getLeadStatusClasses={getLeadStatusClasses}
-          getLeadPhoneHref={getLeadPhoneHref}
-          getWhatsAppHref={getWhatsAppHref}
-          formatCurrencyBRL={formatCurrencyBRL}
-          serviceStatusMeta={SERVICE_STATUS_META}
-        />
+        <AgendaSection />
       </TabErrorBoundary>
     );
   }

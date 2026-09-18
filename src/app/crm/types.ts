@@ -143,6 +143,7 @@ export interface CalculatorHistoryRow {
   id: string;
   cliente?: string;
   phone?: string;
+  neighborhood?: string;
   selected_film?: string;
   modo_otimizacao?: string;
   valor?: number;

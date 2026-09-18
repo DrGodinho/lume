@@ -14,50 +14,65 @@ import { AgendaFilters } from './AgendaFilters';
 import { AgendaWeekStrip } from './AgendaWeekStrip';
 import { AgendaMonthCalendar } from './AgendaMonthCalendar';
 import { useAgendaLists } from '../hooks/useAgendaLists';
+import { useCrm } from '../context/CrmContext';
+import {
+  formatCurrencyBRL as defaultFormatCurrencyBRL,
+  getLeadActivityDate as defaultGetLeadActivityDate,
+  getLeadFollowUpDate as defaultGetLeadFollowUpDate,
+  getLeadPhoneHref as defaultGetLeadPhoneHref,
+  getLeadServiceDate as defaultGetLeadServiceDate,
+  getLeadServiceStatus as defaultGetLeadServiceStatus,
+  getLeadStatusClasses as defaultGetLeadStatusClasses,
+  getWhatsAppHref as defaultGetWhatsAppHref,
+  isClosedLead as defaultIsClosedLead,
+  SERVICE_STATUS_META,
+} from '../hooks/useAgenda';
 import type { WhatsAppTemplateType } from './WhatsAppTemplateMenu';
 import type { AgendaView, Lead, LeadCardKind, ServiceStatus, ServiceStatusMeta } from '../types';
 
 interface AgendaSectionProps {
-  leads: Lead[];
+  leads?: Lead[];
   initialView?: AgendaView;
-  onAgendarRetorno: (leadId: string, data: string) => Promise<void>;
-  onMarcarFeito: (leadId: string) => Promise<void>;
-  onSetDormant: (leadId: string, dormant: boolean) => Promise<void>;
-  onUpdateServiceStatus: (leadId: string, serviceStatus: ServiceStatus) => Promise<void>;
-  onAbrirLead: (lead: Lead) => void;
+  onAgendarRetorno?: (leadId: string, data: string) => Promise<void>;
+  onMarcarFeito?: (leadId: string) => Promise<void>;
+  onSetDormant?: (leadId: string, dormant: boolean) => Promise<void>;
+  onUpdateServiceStatus?: (leadId: string, serviceStatus: ServiceStatus) => Promise<void>;
+  onAbrirLead?: (lead: Lead) => void;
   onRestoreFromArchive?: (lead: Lead) => Promise<void>;
-  isClosedLead: (status: Lead['status']) => boolean;
-  getLeadFollowUpDate: (lead: Lead) => Date | null;
-  getLeadServiceDate: (lead: Lead) => Date | null;
-  getLeadActivityDate: (lead: Lead) => Date | null;
-  getLeadServiceStatus: (lead: Lead) => ServiceStatus;
-  getLeadStatusClasses: (status: Lead['status']) => string;
-  getLeadPhoneHref: (phone?: string | null) => string;
-  getWhatsAppHref: (lead: Lead, template?: WhatsAppTemplateType) => string;
-  formatCurrencyBRL: (value: number) => string;
-  serviceStatusMeta: Record<ServiceStatus, ServiceStatusMeta>;
+  isClosedLead?: (status: Lead['status']) => boolean;
+  getLeadFollowUpDate?: (lead: Lead) => Date | null;
+  getLeadServiceDate?: (lead: Lead) => Date | null;
+  getLeadActivityDate?: (lead: Lead) => Date | null;
+  getLeadServiceStatus?: (lead: Lead) => ServiceStatus;
+  getLeadStatusClasses?: (status: Lead['status']) => string;
+  getLeadPhoneHref?: (phone?: string | null) => string;
+  getWhatsAppHref?: (lead: Lead, template?: WhatsAppTemplateType) => string;
+  formatCurrencyBRL?: (value: number) => string;
+  serviceStatusMeta?: Record<ServiceStatus, ServiceStatusMeta>;
 }
 
-export function AgendaSection({
-  leads,
-  initialView = 'hoje',
-  onAgendarRetorno,
-  onMarcarFeito,
-  onSetDormant,
-  onUpdateServiceStatus,
-  onAbrirLead,
-  onRestoreFromArchive,
-  isClosedLead,
-  getLeadFollowUpDate,
-  getLeadServiceDate,
-  getLeadActivityDate,
-  getLeadServiceStatus,
-  getLeadStatusClasses,
-  getLeadPhoneHref,
-  getWhatsAppHref,
-  formatCurrencyBRL,
-  serviceStatusMeta,
-}: AgendaSectionProps) {
+export function AgendaSection(props: AgendaSectionProps = {}) {
+  const crm = useCrm();
+
+  const leads = props.leads ?? crm.leads;
+  const initialView = props.initialView ?? crm.agendaInitialView;
+  const onAgendarRetorno = props.onAgendarRetorno ?? crm.handleAgendaSchedule;
+  const onMarcarFeito = props.onMarcarFeito ?? crm.handleAgendaMarkDone;
+  const onSetDormant = props.onSetDormant ?? crm.handleDormantStateChange;
+  const onUpdateServiceStatus = props.onUpdateServiceStatus ?? crm.handleServiceStatusChange;
+  const onAbrirLead = props.onAbrirLead ?? crm.setLeadDetail;
+  const onRestoreFromArchive = props.onRestoreFromArchive ?? crm.handleRestoreFromArchive;
+  const isClosedLead = props.isClosedLead ?? defaultIsClosedLead;
+  const getLeadFollowUpDate = props.getLeadFollowUpDate ?? defaultGetLeadFollowUpDate;
+  const getLeadServiceDate = props.getLeadServiceDate ?? defaultGetLeadServiceDate;
+  const getLeadActivityDate = props.getLeadActivityDate ?? defaultGetLeadActivityDate;
+  const getLeadServiceStatus = props.getLeadServiceStatus ?? defaultGetLeadServiceStatus;
+  const getLeadStatusClasses = props.getLeadStatusClasses ?? defaultGetLeadStatusClasses;
+  const getLeadPhoneHref = props.getLeadPhoneHref ?? defaultGetLeadPhoneHref;
+  const getWhatsAppHref = props.getWhatsAppHref ?? defaultGetWhatsAppHref;
+  const formatCurrencyBRL = props.formatCurrencyBRL ?? defaultFormatCurrencyBRL;
+  const serviceStatusMeta = props.serviceStatusMeta ?? SERVICE_STATUS_META;
+
   const [diaSelecionado, setDiaSelecionado] = useState<Date | null>(null);
   const [agendaView, setAgendaView] = useState<AgendaView>('hoje');
   const [mesVisivel, setMesVisivel] = useState(() => startOfMonth(new Date()));

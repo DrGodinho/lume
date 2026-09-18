@@ -4,8 +4,15 @@ import { DndContext, DragOverlay, KeyboardSensor, MouseSensor, TouchSensor, useD
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { X } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
-import { LEAD_STAGES, LEAD_STAGE_STYLES } from '../constants';
+import { LEAD_STAGES, LEAD_STAGE_STYLES, RJ_NEIGHBORHOODS } from '../constants';
 import type { LeadStatus } from '../constants/stages';
+import { useCrm } from '../context/CrmContext';
+import {
+  getLeadFollowUpDate as defaultGetLeadFollowUpDate,
+  getLeadServiceDate as defaultGetLeadServiceDate,
+  getLeadStatusClasses as defaultGetLeadStatusClasses,
+} from '../hooks/useAgenda';
+import { formatLeadCurrency } from '../utils';
 import { resolveKanbanDrop, type KanbanDragData } from '../utils/kanbanDnd';
 import { LeadCard } from './LeadCard';
 import { LeadListItem } from './LeadListItem';
@@ -15,86 +22,87 @@ import { SortableLeadCard } from './SortableLeadCard';
 import type { Lead, LeadSortKey, LeadSyncStatus } from '../types';
 
 interface KanbanBoardProps {
-  leads: Lead[];
-  filteredLeads: Lead[];
-  sortedFilteredLeads: Lead[];
-  searchQuery: string;
-  setSearchQuery: (value: string) => void;
-  filterNeighborhood: string[];
-  setFilterNeighborhood: (value: string[]) => void;
-  filterStatus: LeadStatus[];
-  setFilterStatus: (value: LeadStatus[]) => void;
-  hasActiveFilters: boolean;
-  onClearFilters: () => void;
-  neighborhoods: readonly string[];
-  viewMode: 'kanban' | 'table';
-  setViewMode: (mode: 'kanban' | 'table') => void;
-  collapsedCards: Set<string>;
-  onCollapseAll: () => void;
-  onExpandAll: () => void;
-  onToggleCollapse: (leadId: string) => void;
-  onOpenCreateModal: () => void;
-  onOpenDetail: (lead: Lead) => void;
-  onOpenEdit: (lead: Lead) => void;
-  onDelete: (leadId: string) => void;
-  onTogglePin: (leadId: string) => void;
-  onStatusChange: (leadId: string, status: Lead['status']) => void;
-  onReorderLead: (activeLeadId: string, overLeadId: string) => void;
-  onTableRowClick: (lead: Lead) => void;
-  onTableRowDoubleClick: (lead: Lead) => void;
-  sortKey: LeadSortKey;
-  sortDir: 'asc' | 'desc';
-  onToggleSort: (key: LeadSortKey) => void;
-  daysInStatus: (lead: Lead) => number;
-  formatCurrency: (value: number) => string;
-  getLeadServiceDate: (lead: Lead) => Date | null;
-  getLeadFollowUpDate: (lead: Lead) => Date | null;
-  getLeadStatusClasses: (status: Lead['status']) => string;
-  leadSyncState: Record<string, LeadSyncStatus>;
+  leads?: Lead[];
+  filteredLeads?: Lead[];
+  sortedFilteredLeads?: Lead[];
+  searchQuery?: string;
+  setSearchQuery?: (value: string) => void;
+  filterNeighborhood?: string[];
+  setFilterNeighborhood?: (value: string[]) => void;
+  filterStatus?: LeadStatus[];
+  setFilterStatus?: (value: LeadStatus[]) => void;
+  hasActiveFilters?: boolean;
+  onClearFilters?: () => void;
+  neighborhoods?: readonly string[];
+  viewMode?: 'kanban' | 'table';
+  setViewMode?: (mode: 'kanban' | 'table') => void;
+  collapsedCards?: Set<string>;
+  onCollapseAll?: () => void;
+  onExpandAll?: () => void;
+  onToggleCollapse?: (leadId: string) => void;
+  onOpenCreateModal?: () => void;
+  onOpenDetail?: (lead: Lead) => void;
+  onOpenEdit?: (lead: Lead) => void;
+  onDelete?: (leadId: string) => void;
+  onTogglePin?: (leadId: string) => void;
+  onStatusChange?: (leadId: string, status: Lead['status']) => void;
+  onReorderLead?: (activeLeadId: string, overLeadId: string) => void;
+  onTableRowClick?: (lead: Lead) => void;
+  onTableRowDoubleClick?: (lead: Lead) => void;
+  sortKey?: LeadSortKey;
+  sortDir?: 'asc' | 'desc';
+  onToggleSort?: (key: LeadSortKey) => void;
+  daysInStatus?: (lead: Lead) => number;
+  formatCurrency?: (value: number) => string;
+  getLeadServiceDate?: (lead: Lead) => Date | null;
+  getLeadFollowUpDate?: (lead: Lead) => Date | null;
+  getLeadStatusClasses?: (status: Lead['status']) => string;
+  leadSyncState?: Record<string, LeadSyncStatus>;
   searchInputRef?: React.RefObject<HTMLInputElement | null>;
 }
 
 const STATUS_OPTIONS = LEAD_STAGES as unknown as readonly LeadStatus[];
 
-export function KanbanBoard({
-  leads,
-  filteredLeads,
-  sortedFilteredLeads,
-  searchQuery,
-  setSearchQuery,
-  filterNeighborhood,
-  setFilterNeighborhood,
-  filterStatus,
-  setFilterStatus,
-  hasActiveFilters,
-  onClearFilters,
-  neighborhoods,
-  viewMode,
-  setViewMode,
-  collapsedCards,
-  onCollapseAll,
-  onExpandAll,
-  onToggleCollapse,
-  onOpenCreateModal,
-  onOpenDetail,
-  onOpenEdit,
-  onDelete,
-  onTogglePin,
-  onStatusChange,
-  onReorderLead,
-  onTableRowClick,
-  onTableRowDoubleClick,
-  sortKey,
-  sortDir,
-  onToggleSort,
-  daysInStatus,
-  formatCurrency,
-  getLeadServiceDate,
-  getLeadFollowUpDate,
-  getLeadStatusClasses,
-  leadSyncState,
-  searchInputRef,
-}: KanbanBoardProps) {
+export function KanbanBoard(props: KanbanBoardProps = {}) {
+  const crm = useCrm();
+
+  const leads = props.leads ?? crm.leads;
+  const filteredLeads = props.filteredLeads ?? crm.filteredLeads;
+  const sortedFilteredLeads = props.sortedFilteredLeads ?? crm.sortedFilteredLeads;
+  const searchQuery = props.searchQuery ?? crm.searchQuery;
+  const setSearchQuery = props.setSearchQuery ?? crm.setSearchQuery;
+  const filterNeighborhood = props.filterNeighborhood ?? crm.filterNeighborhood;
+  const setFilterNeighborhood = props.setFilterNeighborhood ?? crm.setFilterNeighborhood;
+  const filterStatus = props.filterStatus ?? crm.filterStatus;
+  const setFilterStatus = props.setFilterStatus ?? crm.setFilterStatus;
+  const hasActiveFilters = props.hasActiveFilters ?? crm.hasActiveFilters;
+  const onClearFilters = props.onClearFilters ?? crm.clearFilters;
+  const neighborhoods = props.neighborhoods ?? RJ_NEIGHBORHOODS;
+  const viewMode = props.viewMode ?? crm.viewMode;
+  const setViewMode = props.setViewMode ?? crm.setViewMode;
+  const collapsedCards = props.collapsedCards ?? crm.collapsedCards;
+  const onCollapseAll = props.onCollapseAll ?? (() => crm.setCollapsedStateForAllLeads(true));
+  const onExpandAll = props.onExpandAll ?? (() => crm.setCollapsedStateForAllLeads(false));
+  const onToggleCollapse = props.onToggleCollapse ?? crm.toggleCollapsedCard;
+  const onOpenCreateModal = props.onOpenCreateModal ?? crm.openCreateModal;
+  const onOpenDetail = props.onOpenDetail ?? crm.setLeadDetail;
+  const onOpenEdit = props.onOpenEdit ?? crm.openEditModal;
+  const onDelete = props.onDelete ?? crm.handleDeleteLead;
+  const onTogglePin = props.onTogglePin ?? crm.handleTogglePin;
+  const onStatusChange = props.onStatusChange ?? crm.handleStatusChange;
+  const onReorderLead = props.onReorderLead ?? crm.handleKanbanReorder;
+  const onTableRowClick = props.onTableRowClick ?? crm.handleLeadTableRowClick;
+  const onTableRowDoubleClick = props.onTableRowDoubleClick ?? crm.handleLeadTableRowDoubleClick;
+  const sortKey = props.sortKey ?? crm.sortKey;
+  const sortDir = props.sortDir ?? crm.sortDir;
+  const onToggleSort = props.onToggleSort ?? crm.toggleSort;
+  const daysInStatus = props.daysInStatus ?? crm.daysInStatus;
+  const formatCurrency = props.formatCurrency ?? formatLeadCurrency;
+  const getLeadServiceDate = props.getLeadServiceDate ?? defaultGetLeadServiceDate;
+  const getLeadFollowUpDate = props.getLeadFollowUpDate ?? defaultGetLeadFollowUpDate;
+  const getLeadStatusClasses = props.getLeadStatusClasses ?? defaultGetLeadStatusClasses;
+  const leadSyncState = props.leadSyncState ?? crm.leadSyncState;
+  const searchInputRef = props.searchInputRef;
   const [tableVisibleCount, setTableVisibleCount] = useState(KANBAN_COLUMN_PAGE_SIZE);
   const visibleTableLeads = sortedFilteredLeads.slice(0, tableVisibleCount);
   const hiddenTableCount = sortedFilteredLeads.length - visibleTableLeads.length;

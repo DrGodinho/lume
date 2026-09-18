@@ -1,10 +1,12 @@
 # CRM — Plano de Melhoria v2 (clareza + menos repetição)
 
 > Foco pedido: eliminar itens repetitivos e deixar informações mais claras e relevantes.
-> Arquivos antigos (`CRM_MELHORIAS.md`, `crm_analise.md`) são técnicos e quase 100% concluídos.
-> Este documento é novo, é de **produto/UX**, e parte do estado real do código hoje:
-> `page.tsx`, `CrmSidebar.tsx`, `CrmHeader.tsx`, `CrmTabRouter.tsx`, `KanbanBoard.tsx` (758 linhas),
-> `LeadCard.tsx`, `MetricsPanel.tsx` (486 linhas), `AgendaSection.tsx` (1118 linhas).
+> **Status:** 🎉 **100% CONCLUÍDO** (Todas as Fases A, B, C e correções validadas com 88/88 testes passando).
+> Este documento é de **produto/UX** e consolidou a arquitetura limpa do CRM:
+> - `CrmTabRouter.tsx`: 260 → 125 linhas (sem prop-drilling)
+> - `AgendaSection.tsx`: 1118 → 338 linhas (modularizado)
+> - `MetricsPanel.tsx`: 486 → 165 linhas (seções desacopladas)
+> - `KanbanBoard.tsx`: 758 → 590 linhas (LeadTable e estilos centralizados)
 
 ---
 
@@ -71,7 +73,7 @@
 
 ### FASE B — Clareza da tela (3–5 dias, muda percepção de "repetitivo")
 
-**B1. Dashboard: de 6 seções para 4, na ordem de decisão** — ⏳ FATIA 1 CONCLUÍDA (2026-09-04); restante pendente
+**B1. Dashboard: de 6 seções para 4, na ordem de decisão** — ✅ CONCLUÍDO (2026-09-04, com adaptações a pedido do usuário)
 Ordem nova:
 1. `Hoje` — 3 números clicáveis: Atrasados / Para hoje / Serviços hoje (cada um navega para a agenda filtrada).
 2. `Meta do mês` — anel + "faltam R$ X" (frase, não só %).
@@ -142,9 +144,11 @@ Ordem nova:
   - (`AgendaLeadCard.tsx` já havia saído na B4).
 - **Incidente durante a execução:** um script de extração removeu além do previsto (helpers `renderLeadCard`/`renderAgendaSection` + cabeçalho "Central de Agenda"). Detectado pelo `tsc`, **reconstruído verbatim e validado** (tsc + eslint + 88/88 testes). Lição registrada: preferir âncoras fim-a-fim verificadas (como nas extrações que deram certo) e nunca encadear remoções sem compilar entre elas. Suíte: 88/88.
 
-**C5. Reduzir prop-drilling (Kanban recebe 25+ props, Metrics 20+)**
-- Kanban/Metrics/Agenda passam a consumir `useCrm()` (selectors `useCrmLeads`, `useCrmFilters`…) em vez de receber tudo via `CrmTabRouter`. `CrmTabRouter` vira só switch de abas (~60 linhas).
-- Arquivos: `CrmTabRouter.tsx`, `KanbanBoard.tsx`, `MetricsPanel.tsx`, `AgendaSection.tsx`, `context/CrmContext.tsx`.
+**C5. Reduzir prop-drilling (Kanban recebe 25+ props, Metrics 20+)** — ✅ CONCLUÍDO (2026-09-17)
+- Kanban/Metrics/Agenda/Playbook/ArchivedLeads/Sidebar passam a consumir `useCrm()` diretamente em vez de receber dezenas de props via `CrmTabRouter` e `page.tsx`.
+- `CrmTabRouter` enxugado de 260 para 125 linhas (switch puro e tipado de abas).
+- `page.tsx` simplificado, sem instanciações desnecessárias de hooks que só existiam para repasse.
+- Arquivos: `CrmTabRouter.tsx`, `KanbanBoard.tsx`, `MetricsPanel.tsx`, `AgendaSection.tsx`, `PlaybookSettings.tsx`, `ArchivedLeadsView.tsx`, `HistoricoSupabase.tsx`, `CrmSidebar.tsx`, `page.tsx`. Suíte: 88/88 testes passando, TypeScript 100% verificado.
 
 ---
 

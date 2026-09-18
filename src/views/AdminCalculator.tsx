@@ -66,9 +66,12 @@ import {
   LossMode,
   OptimizationMode,
   OrcamentoSalvo,
+  buildRoomColorMap,
   createGlassId,
+  getRoomColorByIndex,
   getSizeColor,
   isColorMode,
+  isLegacyDefaultRoomColors,
   isLossMode,
   isOptimizationMode,
   normalizeFilmTypeKey,
@@ -394,8 +397,22 @@ export function AdminCalculator() {
       return getSizeColor(h, w);
     }
     const key = resolveRoomKey(roomLabel);
-    return roomColors[key] || stableRoomColor(roomLabel);
-  }, [usarCoresPorAmbiente, roomColors]);
+    if (!isLegacyDefaultRoomColors(roomColors) && roomColors[key]) {
+      return roomColors[key];
+    }
+    const existingRooms: string[] = [];
+    if (!isLegacyDefaultRoomColors(roomColors)) {
+      Object.keys(roomColors).forEach(k => {
+        if (!existingRooms.includes(k)) existingRooms.push(k);
+      });
+    }
+    vidros.forEach(v => {
+      const k = resolveRoomKey(v.label || '');
+      if (k && !existingRooms.includes(k)) existingRooms.push(k);
+    });
+    const idx = existingRooms.indexOf(key);
+    return getRoomColorByIndex(idx >= 0 ? idx : existingRooms.length);
+  }, [usarCoresPorAmbiente, roomColors, vidros]);
 
     // ─── AÇÕES DE VIDROS ───────────────────────────────────────────────────────
 
@@ -422,6 +439,11 @@ export function AdminCalculator() {
         }
         const label = labelIn.trim();
         const roomColor = getColorForItem(label, h, w);
+        const key = resolveRoomKey(label);
+        if (key && (isLegacyDefaultRoomColors(roomColors) || !roomColors[key])) {
+            const cleanColors = isLegacyDefaultRoomColors(roomColors) ? {} : roomColors;
+            setRoomColors({ ...cleanColors, [key]: roomColor });
+        }
         const novos: GlassItem[] = [];
         for (let i = 0; i < q; i++) {
             novos.push({
@@ -458,6 +480,7 @@ export function AdminCalculator() {
             confirmLabel: 'Remover tudo',
             onConfirm: () => {
                 setVidros([]);
+                setRoomColors({});
                 try { localStorage.removeItem(CLIPBOARD_KEY); } catch { /* ignore */ }
                 setItensCopiados(null);
                 setDesconto(0);
@@ -517,7 +540,27 @@ export function AdminCalculator() {
             setRenameError('Já existe um ambiente com este nome.');
             return;
         }
-        setVidros(prev => prev.map(v => (v.label || '') === labelAntigo ? { ...v, label: novoNome || undefined } : v));
+        const oldKey = resolveRoomKey(labelAntigo);
+        const newKey = resolveRoomKey(novoNome);
+        const cleanColors = isLegacyDefaultRoomColors(roomColors) ? {} : roomColors;
+        const currentColor = (oldKey && cleanColors[oldKey]) || getColorForItem(novoNome, undefined, undefined, true);
+
+        setRoomColors(prev => {
+            const next = isLegacyDefaultRoomColors(prev) ? {} : { ...prev };
+            if (oldKey && next[oldKey]) {
+                delete next[oldKey];
+            }
+            if (newKey) {
+                next[newKey] = currentColor;
+            }
+            return next;
+        });
+
+        setVidros(prev => prev.map(v => (v.label || '') === labelAntigo ? {
+            ...v,
+            label: novoNome || undefined,
+            cor: usarCoresPorAmbiente ? currentColor : v.cor
+        } : v));
         setEditingAmbiente(null);
         setEditNome('');
         setRenameError(null);
@@ -576,6 +619,12 @@ export function AdminCalculator() {
 
     const colarItens = (labelDestino: string) => {
         if (!itensCopiados || itensCopiados.length === 0) return;
+        const color = getColorForItem(labelDestino, undefined, undefined);
+        const key = resolveRoomKey(labelDestino);
+        if (key && (isLegacyDefaultRoomColors(roomColors) || !roomColors[key])) {
+            const cleanColors = isLegacyDefaultRoomColors(roomColors) ? {} : roomColors;
+            setRoomColors({ ...cleanColors, [key]: color });
+        }
         const novos = itensCopiados.map(item => ({
             ...item,
             id: createGlassId(),
@@ -587,6 +636,16 @@ export function AdminCalculator() {
         setItensCopiados(null);
         try { localStorage.removeItem(CLIPBOARD_KEY); } catch { /* ignore */ }
         setShowColarModal(false);
+    };
+
+    const handleNeighborhoodChange = (v: string) => {
+        const digits = v.replace(/\D/g, '');
+        if (!phone && digits.length >= 8 && digits.length <= 13 && (v.includes('+') || v.includes('(') || v.includes('-') || digits.length >= 10)) {
+            setPhone(v);
+            setNeighborhood('');
+            return;
+        }
+        setNeighborhood(v);
     };
 
     // ─── DRAG HANDLERS COM MAGNETIC SNAP ────────────────────────────────────────
@@ -617,10 +676,17 @@ export function AdminCalculator() {
 
     // C1: persistência no hook (com schema); aqui só o snapshot da sessão.
     const salvarNoHistorico = useCallback(() => {
+        let finalPhone = phone.trim();
+        let finalNeighborhood = neighborhood.trim();
+        const digits = finalNeighborhood.replace(/\D/g, '');
+        if (!finalPhone && digits.length >= 8 && digits.length <= 13 && (finalNeighborhood.includes('+') || finalNeighborhood.includes('(') || digits.length >= 10)) {
+            finalPhone = finalNeighborhood;
+            finalNeighborhood = '';
+        }
         salvarNoHistoricoHook({
             cliente: cliente || 'Sem nome',
-            phone,
-            neighborhood,
+            phone: finalPhone,
+            neighborhood: finalNeighborhood,
             valor: finalPrice,
             qtd: vidros.length,
             vidros: [...vidros],
@@ -636,7 +702,14 @@ export function AdminCalculator() {
     }, [vidros, cliente, phone, neighborhood, finalPrice, rollW, price, margin, desconto, modoOtimizacao, selectedFilm, currentLeadId, compensarPerdas, modoPerdas, perdasFixas, salvarNoHistoricoHook]);
 
     const criarLead = useCallback(async () => {
-      if (!cliente && !phone) {
+      let finalPhone = phone.trim();
+      let finalNeighborhood = neighborhood.trim();
+      const digits = finalNeighborhood.replace(/\D/g, '');
+      if (!finalPhone && digits.length >= 8 && digits.length <= 13 && (finalNeighborhood.includes('+') || finalNeighborhood.includes('(') || digits.length >= 10)) {
+          finalPhone = finalNeighborhood;
+          finalNeighborhood = '';
+      }
+      if (!cliente && !finalPhone) {
         showToast('Preencha o nome ou telefone do cliente.', 'error');
         return;
       }
@@ -646,11 +719,11 @@ export function AdminCalculator() {
         headers: await getCrmLeadHeaders(),
         credentials: 'include',
         body: JSON.stringify({
-          name: cliente || `Cliente ${phone}`,
-          phone,
+          name: cliente || `Cliente ${finalPhone}`,
+          phone: finalPhone,
           email: '',
           address: '',
-          neighborhood: neighborhood || '',
+          neighborhood: finalNeighborhood,
           filmType: FILM_TYPE_LABELS[selectedFilm] || 'Nano Cerâmica',
             sqm: totalM2,
             value: finalPrice,
@@ -664,12 +737,12 @@ export function AdminCalculator() {
         setCurrentLeadId(leadId);
 
         if (vidros.length > 0 && leadId) {
-          const clienteNome = cliente || `Cliente ${phone}`;
+          const clienteNome = cliente || `Cliente ${finalPhone}`;
           const existing = historico.find(h => h.cliente === clienteNome && !h.leadId);
           if (existing) {
-            const atualizado = historico.map(h => (h.id === existing.id ? { ...h, leadId } : h));
+            saveHistoryItemToCloud({ ...existing, leadId, phone: finalPhone, neighborhood: finalNeighborhood });
+            const atualizado = historico.map(h => h.id === existing.id ? { ...h, leadId, phone: finalPhone, neighborhood: finalNeighborhood } : h);
             setHistorico(atualizado);
-            saveHistoryItemToCloud({ ...existing, leadId });
             resolveCalculatorScopeKey().then((scopeKey) => {
               localStorage.setItem(buildCalculatorStorageKey('lume_historico', scopeKey), JSON.stringify(atualizado));
             }).catch(() => null);
@@ -678,8 +751,8 @@ export function AdminCalculator() {
             await saveHistoryItemToCloud({
               id: orcId,
               cliente: clienteNome,
-              phone,
-              neighborhood,
+              phone: finalPhone,
+              neighborhood: finalNeighborhood,
               data: new Date().toLocaleDateString('pt-BR'),
               valor: finalPrice,
               qtd: vidros.length,
@@ -693,8 +766,8 @@ export function AdminCalculator() {
             const novoLocal: OrcamentoSalvo = {
               id: orcId,
               cliente: clienteNome,
-              phone,
-              neighborhood,
+              phone: finalPhone,
+              neighborhood: finalNeighborhood,
               data: new Date().toLocaleDateString('pt-BR'),
               valor: finalPrice,
               qtd: vidros.length,
@@ -769,7 +842,15 @@ const carregarDoHistorico = (orc: OrcamentoSalvo) => {
         try {
             const d = JSON.parse(atob(code)) as ImportedZapPayload;
             if (!Array.isArray(d.v)) throw new Error('Payload sem vidros');
-            setCliente(`${d.n} (${d.b}) - ${d.f}`);
+            setCliente(d.n || '');
+            if (d.b) {
+                const digits = d.b.replace(/\D/g, '');
+                if (digits.length >= 8 && digits.length <= 13 && (d.b.includes('+') || d.b.includes('(') || digits.length >= 10)) {
+                    setPhone(d.b);
+                } else {
+                    setNeighborhood(d.b);
+                }
+            }
             if (d.p) setPhone(d.p);
             setVidros(d.v.map((v) => ({ ...v, id: createGlassId(), oh: v.oh ?? v.h ?? 0, ow: v.ow ?? v.w ?? 0, forceRotate: undefined, alignRight: false })) as GlassItem[]);
             setImportAberto(false);
@@ -925,11 +1006,24 @@ const carregarDoHistorico = (orc: OrcamentoSalvo) => {
 const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: AppConfig[K]) => {
     if (key === 'modoCorConfig') {
       const nextMode = value as ColorMode;
-      setUsarCoresPorAmbiente(nextMode === 'ambiente');
-      setVidros(prev => prev.map(v => ({
-        ...v,
-        cor: getColorForItem(v.label, v.oh, v.ow, nextMode === 'ambiente'),
-      })));
+      const isAmbiente = nextMode === 'ambiente';
+      setUsarCoresPorAmbiente(isAmbiente);
+      if (isAmbiente) {
+        const cleanColors = isLegacyDefaultRoomColors(roomColors) ? {} : roomColors;
+        const updatedMap = buildRoomColorMap(vidros, cleanColors);
+        setRoomColors(updatedMap);
+        setVidros(prev => prev.map(v => {
+          const roomLabel = (v.label || '').trim();
+          const rKey = resolveRoomKey(roomLabel);
+          const color = (rKey && updatedMap[rKey]) || getSizeColor(v.oh, v.ow);
+          return { ...v, cor: color };
+        }));
+      } else {
+        setVidros(prev => prev.map(v => ({
+          ...v,
+          cor: getSizeColor(v.oh, v.ow),
+        })));
+      }
     } else {
       switch (key) {
         case 'rollW':
@@ -1026,12 +1120,18 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
 
     const currentRoomLabel = labelIn.trim();
     const currentRoomKey = resolveRoomKey(currentRoomLabel);
-    const currentRoomColor = currentRoomLabel ? (roomColors[currentRoomKey] || stableRoomColor(currentRoomLabel)) : '#94a3b8';
+    const currentRoomColor = currentRoomLabel
+      ? ((!isLegacyDefaultRoomColors(roomColors) && roomColors[currentRoomKey]) || getColorForItem(currentRoomLabel, undefined, undefined, true))
+      : '#94a3b8';
     const hasCurrentRoomPieces = currentRoomLabel ? vidros.some(v => (v.label || '') === currentRoomLabel) : false;
     const aplicarCorNoAmbiente = (ambiente: string) => {
         const trimmed = ambiente.trim();
         if (!trimmed) return;
         const color = getColorForItem(trimmed, undefined, undefined, true);
+        const key = resolveRoomKey(trimmed);
+        if (key) {
+            setRoomColors(prev => ({ ...prev, [key]: color }));
+        }
         setVidros(prev => prev.map(v => (v.label || '') === trimmed ? { ...v, cor: color } : v));
     };
 
@@ -1039,10 +1139,22 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
     const handleToggleCorEsquema = () => {
         const next = !usarCoresPorAmbiente;
         setUsarCoresPorAmbiente(next);
-        setVidros(prev => prev.map(v => ({
-            ...v,
-            cor: getColorForItem(v.label, v.oh, v.ow, next)
-        })));
+        if (next) {
+            const cleanColors = isLegacyDefaultRoomColors(roomColors) ? {} : roomColors;
+            const updatedMap = buildRoomColorMap(vidros, cleanColors);
+            setRoomColors(updatedMap);
+            setVidros(prev => prev.map(v => {
+                const roomLabel = (v.label || '').trim();
+                const key = resolveRoomKey(roomLabel);
+                const color = (key && updatedMap[key]) || getSizeColor(v.oh, v.ow);
+                return { ...v, cor: color };
+            }));
+        } else {
+            setVidros(prev => prev.map(v => ({
+                ...v,
+                cor: getSizeColor(v.oh, v.ow)
+            })));
+        }
     };
     const handleSelectRoomColor = (swatch: string) => {
         if (!currentRoomLabel) return;
@@ -1223,7 +1335,7 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
                             cliente, phone, neighborhood,
                             onClienteChange: setCliente,
                             onPhoneChange: setPhone,
-                            onNeighborhoodChange: setNeighborhood,
+                            onNeighborhoodChange: handleNeighborhoodChange,
                             onImportarZap: importarZap,
                             onSalvarProjeto: salvarProjeto,
                             fileInputRef,

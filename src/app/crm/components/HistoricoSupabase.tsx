@@ -3,6 +3,7 @@
 import { fetchWithTimeout } from '@/lib/fetchWithTimeout';
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { roundCurrency, roundMeasure } from '@/lib/numberPrecision';
+import { useCrm } from '../context/CrmContext';
 import { getHistoryFilmLabel } from '../utils';
 import type { CalculatorHistoryRow, CreateLeadModalOptions, CrmTab, Lead } from '../types';
 
@@ -16,13 +17,16 @@ const formatMonthLabel = (monthKey: string) => {
 };
 
 interface HistoricoSupabaseProps {
-  setActiveTab: (tab: CrmTab) => void;
-  openCreateModal: (options?: CreateLeadModalOptions) => void;
+  setActiveTab?: (tab: CrmTab) => void;
+  openCreateModal?: (options?: CreateLeadModalOptions) => void;
 }
 
 type HistoryFilterMode = 'todos' | 'pendentes' | 'vinculados';
 
-export function HistoricoSupabase({ setActiveTab, openCreateModal }: HistoricoSupabaseProps) {
+export function HistoricoSupabase(props: HistoricoSupabaseProps = {}) {
+  const crm = useCrm();
+  const setActiveTab = props.setActiveTab;
+  const openCreateModal = props.openCreateModal ?? crm.openCreateModal;
   const [history, setHistory] = useState<CalculatorHistoryRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -165,13 +169,36 @@ export function HistoricoSupabase({ setActiveTab, openCreateModal }: HistoricoSu
   const convertToLead = useCallback((orcamento: CalculatorHistoryRow) => {
     if (orcamento.lead_id) return;
 
+    let detectedPhone = (orcamento.phone || '').trim();
+    let detectedNeighborhood = (orcamento.neighborhood || '').trim();
+
+    // Fallback se o telefone tiver sido digitado/salvo no campo neighborhood por engano
+    if (!detectedPhone && detectedNeighborhood) {
+      const digits = detectedNeighborhood.replace(/\D/g, '');
+      if (digits.length >= 8 && digits.length <= 13) {
+        detectedPhone = detectedNeighborhood;
+        detectedNeighborhood = '';
+      }
+    }
+
+    // Fallback se o telefone estiver no campo cliente (ex: "Nome (21) 98130-8654")
+    if (!detectedPhone && orcamento.cliente) {
+      const match = orcamento.cliente.match(/(?:\+?55\s*)?(?:\(?\d{2}\)?\s*)?9?\d{4}[-\s]?\d{4}/);
+      if (match) {
+        const digits = match[0].replace(/\D/g, '');
+        if (digits.length >= 8 && digits.length <= 13) {
+          detectedPhone = match[0].trim();
+        }
+      }
+    }
+
     const totalM2 = roundMeasure((orcamento.vidros?.reduce((sum, vidro) => sum + (vidro.h || 0) * (vidro.w || 0), 0) || 0) / 10000);
     const prefill: Omit<Lead, 'id' | 'createdAt'> = {
       name: orcamento.cliente || 'Cliente do Histórico',
-      phone: orcamento.phone || '',
+      phone: detectedPhone,
       email: '',
       address: '',
-      neighborhood: 'Barra da Tijuca',
+      neighborhood: detectedNeighborhood || 'Barra da Tijuca',
       filmType: getHistoryFilmLabel(orcamento),
       sqm: totalM2,
       value: roundCurrency(orcamento.valor),
@@ -181,9 +208,9 @@ export function HistoricoSupabase({ setActiveTab, openCreateModal }: HistoricoSu
       serviceStatus: null,
       proximoContato: null,
       dormant: false,
-      notes: `Orçamento convertido do Supabase (ID: ${orcamento.id}).\nPelícula: ${getHistoryFilmLabel(orcamento)}.\nVidros: ${orcamento.qtd}.`,
+      notes: `Orçamento convertido do Supabase (ID: ${orcamento.id}).\nPelícula: ${getHistoryFilmLabel(orcamento)}.\nVidros: ${orcamento.qtd}.${detectedPhone ? `\nTelefone: ${detectedPhone}` : ''}`,
     };
-    setActiveTab('leads');
+    setActiveTab?.('leads');
     openCreateModal({ prefill, sourceCalculatorHistoryId: orcamento.id });
   }, [openCreateModal, setActiveTab]);
 
@@ -483,6 +510,23 @@ export function HistoricoSupabase({ setActiveTab, openCreateModal }: HistoricoSu
                 <span className="text-sm font-bold text-white">
                   {selectedOrcamento.created_at ? new Date(selectedOrcamento.created_at).toLocaleDateString('pt-BR') : '—'}
                 </span>
+              </div>
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
+                <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-white/50">Telefone</span>
+                {selectedOrcamento.phone ? (
+                  <a
+                    href={`tel:${selectedOrcamento.phone.replace(/\D/g, '')}`}
+                    className="text-sm font-bold text-[#c9a227] hover:underline"
+                  >
+                    {selectedOrcamento.phone}
+                  </a>
+                ) : (
+                  <span className="text-sm text-white/40">—</span>
+                )}
+              </div>
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
+                <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-white/50">Bairro</span>
+                <span className="text-sm font-bold text-white">{selectedOrcamento.neighborhood || '—'}</span>
               </div>
               <div className="col-span-2 rounded-xl border border-white/5 bg-white/[0.02] p-3">
                 <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-white/50">Vínculo com Lead</span>

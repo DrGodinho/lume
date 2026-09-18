@@ -63,45 +63,79 @@ export const DEFAULT_CONFIG: AppConfig = {
   draftExpiration: 15,
   };
 
-export const DEFAULT_ROOM_COLORS: Record<string, string> = {
-  sala: '#60a5fa',
-  cozinha: '#facc15',
-  quarto: '#c084fc',
-  banheiro: '#34d399',
-  varanda: '#fb923c',
-  area: '#f87171',
-  escritorio: '#38bdf8',
-  garagem: '#a78bfa',
-  lavanderia: '#2dd4bf',
-  hall: '#fbbf24',
-  suite: '#e879f9',
-  closet: '#fb7185',
-  corredor: '#a3e635',
-  terraco: '#f59e0b',
-  jardim: '#4ade80',
-  lavabo: '#22c55e',
-  sacada: '#f97316',
-  homeoffice: '#0ea5e9',
-  sala_jantar: '#d97706',
-  sala_tv: '#3b82f6',
-  area_gourmet: '#f59e0b',
-  area_servico: '#14b8a6',
+export const DEFAULT_ROOM_COLORS: Record<string, string> = {};
+
+export const ROOM_PALETTE: string[] = [
+  '#ef4444', // 1: Vermelho
+  '#3b82f6', // 2: Azul
+  '#10b981', // 3: Verde
+  '#f59e0b', // 4: Âmbar / Laranja
+  '#06b6d4', // 5: Ciano
+  '#f43f5e', // 6: Rosa / Coral
+  '#84cc16', // 7: Lima
+  '#eab308', // 8: Amarelo
+  '#14b8a6', // 9: Teal
+  '#f97316', // 10: Laranja vivo
+  '#0284c7', // 11: Azul oceano
+  '#059669', // 12: Verde escuro
+  '#d97706', // 13: Âmbar escuro
+  '#dc2626', // 14: Vermelho carmim
+  '#2dd4bf', // 15: Menta claro
+  '#2563eb', // 16: Azul royal
+];
+
+export const ROOM_COLOR_SWATCHES = ROOM_PALETTE;
+export const ROOM_SWATCHES = ROOM_PALETTE;
+
+export const getRoomColorByIndex = (index: number): string => {
+  return ROOM_PALETTE[Math.abs(index) % ROOM_PALETTE.length];
 };
-
-export const ROOM_COLOR_SWATCHES = [
-  '#60a5fa', '#facc15', '#c084fc', '#34d399', '#fb923c',
-  '#f87171', '#38bdf8', '#a78bfa', '#2dd4bf', '#fbbf24',
-  '#e879f9', '#fb7185', '#a3e635', '#f59e0b', '#4ade80',
-];
-
-export const ROOM_SWATCHES = [
-  '#60a5fa', '#eab308', '#c084fc', '#34d399', '#fb923c',
-  '#f87171', '#38bdf8', '#a78bfa', '#2dd4bf', '#fbbf24',
-  '#e879f9', '#fb7185', '#a3e635', '#f59e0b', '#4ade80',
-];
 
 export const normalizeRoomKey = (label: string) =>
   label.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase().replace(/\s+/g, ' ');
+
+export const resolveRoomKey = (label: string): string => {
+  return normalizeRoomKey(label);
+};
+
+export const isLegacyDefaultRoomColors = (colors?: Record<string, string> | null): boolean => {
+  if (!colors || typeof colors !== 'object') return false;
+  return colors.sala === '#60a5fa' && colors.quarto === '#c084fc';
+};
+
+export const buildRoomColorMap = (
+  items: Array<string | { label?: string }>,
+  existingMap: Record<string, string> = {}
+): Record<string, string> => {
+  const result: Record<string, string> = isLegacyDefaultRoomColors(existingMap) ? {} : { ...existingMap };
+  let nextIndex = Object.keys(result).length;
+
+  for (const item of items) {
+    const raw = typeof item === 'string' ? item : item?.label;
+    const key = resolveRoomKey(raw || '');
+    if (!key) continue;
+    if (!result[key]) {
+      result[key] = getRoomColorByIndex(nextIndex);
+      nextIndex++;
+    }
+  }
+
+  return result;
+};
+
+export const stableRoomColor = (label: string, roomColors?: Record<string, string>): string => {
+  const key = resolveRoomKey(label);
+  if (!key) return '#94a3b8';
+  if (roomColors && !isLegacyDefaultRoomColors(roomColors) && roomColors[key]) {
+    return roomColors[key];
+  }
+  let hash = 0;
+  for (let i = 0; i < key.length; i++) {
+    hash = ((hash << 5) - hash) + key.charCodeAt(i);
+    hash |= 0;
+  }
+  return ROOM_PALETTE[Math.abs(hash) % ROOM_PALETTE.length];
+};
 
 export const createGlassId = () =>
   typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
@@ -151,50 +185,6 @@ export const getSizeColor = (h?: number, w?: number) => {
   const saturation = 60 + (Math.round(area) % 20);
   const lightness = 68 + (Math.round(area * 7) % 12);
   return `hsl(${hue.toFixed(1)}, ${saturation}%, ${lightness}%)`;
-};
-
-const ROOM_ALIAS_RULES: Array<{ test: RegExp; key: string }> = [
-  { test: /\bsala\b.*\b(jantar)?\b/, key: 'sala_jantar' },
-  { test: /\bsala\b.*\b(tv)?\b/, key: 'sala_tv' },
-  { test: /\bsala\b/, key: 'sala' },
-  { test: /\bcozinha\b/, key: 'cozinha' },
-  { test: /\bquarto\b|\bdormitorio\b/, key: 'quarto' },
-  { test: /\bsu[ií]te\b/, key: 'suite' },
-  { test: /\bbanheiro\b|\btoalete\b/, key: 'banheiro' },
-  { test: /\blavabo\b/, key: 'lavabo' },
-  { test: /\bvaranda\b|\bsacada\b/, key: 'varanda' },
-  { test: /\barea\s+gourmet\b/, key: 'area_gourmet' },
-  { test: /\barea\s+de\s+servico\b|\blavanderia\b/, key: 'lavanderia' },
-  { test: /\bescritorio\b|\bhome\s*office\b/, key: 'escritorio' },
-  { test: /\bgaragem\b/, key: 'garagem' },
-  { test: /\bhall\b/, key: 'hall' },
-  { test: /\bcloset\b/, key: 'closet' },
-  { test: /\bcorredor\b/, key: 'corredor' },
-  { test: /\bterraco\b/, key: 'terraco' },
-  { test: /\bjardim\b/, key: 'jardim' },
-];
-
-export const resolveRoomKey = (label: string) => {
-  const normalized = normalizeRoomKey(label);
-  if (!normalized) return '';
-  const directKey = normalized.replace(/\s+/g, '_');
-  if (DEFAULT_ROOM_COLORS[directKey]) return directKey;
-  const matched = ROOM_ALIAS_RULES.find((r) => r.test.test(normalized));
-  if (matched && DEFAULT_ROOM_COLORS[matched.key]) return matched.key;
-  return directKey;
-};
-
-export const stableRoomColor = (label: string) => {
-  const normalized = normalizeRoomKey(label);
-  if (!normalized) return '#94a3b8';
-  const key = resolveRoomKey(label);
-  if (DEFAULT_ROOM_COLORS[key]) return DEFAULT_ROOM_COLORS[key];
-  let hash = 0;
-  for (let i = 0; i < normalized.length; i++) {
-    hash = ((hash << 5) - hash) + normalized.charCodeAt(i);
-    hash |= 0;
-  }
-  return ROOM_SWATCHES[Math.abs(hash) % ROOM_SWATCHES.length];
 };
 
 export interface GlassItem {

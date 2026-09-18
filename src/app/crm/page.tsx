@@ -8,12 +8,7 @@ import {
   getLeadServiceDate,
   getLeadStatusClasses,
   getWhatsAppHref,
-  useAgenda,
 } from './hooks/useAgenda';
-import { useLogout } from './hooks/useLogout';
-import { useMetrics } from './hooks/useMetrics';
-import { useMonthlySnapshots } from './hooks/useMonthlySnapshots';
-import { useCrmSettings } from './hooks/useCrmSettings';
 import { usePullToRefresh } from './hooks/usePullToRefresh';
 import { formatLeadCurrency } from './utils';
 import { RefreshCw } from 'lucide-react';
@@ -88,12 +83,6 @@ function CrmContent() {
 
 function CrmApp({ activeTab, onSelectTab }: { activeTab: CrmTab; onSelectTab: (tab: CrmTab) => void }) {
   const crm = useCrm();
-  const [sidebarEditingTarget, setSidebarEditingTarget] = useState(false);
-  const { agendaUrgentCount } = useAgenda(crm.leads);
-  const { snapshots: monthlySnapshots } = useMonthlySnapshots();
-  const crmSettings = useCrmSettings();
-  const metrics = useMetrics(crm.leads, crm.targetGoal, monthlySnapshots, crm.metricsPeriod, crm.customStart, crm.customEnd, crm.archivedLeads);
-  const { isLoggingOut, logout: handleLogout } = useLogout('/login');
 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const pendingFocusSearchRef = useRef(false);
@@ -163,27 +152,6 @@ function CrmApp({ activeTab, onSelectTab }: { activeTab: CrmTab; onSelectTab: (t
     }
   }, [activeTab]);
 
-  const beginSidebarTargetEdit = useCallback(() => {
-    crm.setTargetInput(String(crm.targetGoal ?? DEFAULT_CRM_TARGET_GOAL));
-    setSidebarEditingTarget(true);
-  }, [crm]);
-
-  const closeSidebarTargetEdit = useCallback(() => {
-    crm.setTargetInput(String(crm.targetGoal ?? DEFAULT_CRM_TARGET_GOAL));
-    setSidebarEditingTarget(false);
-  }, [crm]);
-
-  const commitTargetGoal = useCallback(() => {
-    const value = parseInt(crm.targetInput, 10);
-    if (value > 0) {
-      void crm.saveTargetGoal(value);
-      setSidebarEditingTarget(false);
-      return;
-    }
-
-    closeSidebarTargetEdit();
-  }, [closeSidebarTargetEdit, crm]);
-
   return (
     <div className="crm-technical-density flex min-h-screen flex-col overflow-x-hidden bg-[#03060b] font-sans lg:flex-row">
       <OfflineBanner />
@@ -192,18 +160,6 @@ function CrmApp({ activeTab, onSelectTab }: { activeTab: CrmTab; onSelectTab: (t
       <CrmSidebar
         activeTab={activeTab}
         onSelectTab={onSelectTab}
-        agendaUrgentCount={agendaUrgentCount}
-        sidebarEditingTarget={sidebarEditingTarget}
-        onBeginTargetEdit={beginSidebarTargetEdit}
-        onCommitTargetEdit={commitTargetGoal}
-        onCancelTargetEdit={closeSidebarTargetEdit}
-        targetInput={crm.targetInput}
-        onTargetInputChange={crm.setTargetInput}
-        targetGoal={crm.targetGoal}
-        targetPercent={metrics.targetPercent}
-        onOpenCreateModal={() => crm.openCreateModal()}
-        onLogout={() => void handleLogout()}
-        isLoggingOut={isLoggingOut}
       />
 
       <main className="relative z-10 flex-1 overflow-x-hidden p-3 sm:p-5 lg:p-7">
@@ -231,8 +187,6 @@ function CrmApp({ activeTab, onSelectTab }: { activeTab: CrmTab; onSelectTab: (t
         <CrmTabRouter
           activeTab={activeTab}
           onSelectTab={onSelectTab}
-          metrics={metrics}
-          crmSettings={crmSettings}
           searchInputRef={searchInputRef}
         />
       </main>

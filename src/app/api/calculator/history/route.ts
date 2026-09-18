@@ -23,9 +23,10 @@ export async function GET(request: NextRequest) {
   const leadId = params.get('leadId');
   const leadIds = params.get('leadIds');
   const cliente = params.get('cliente');
+  const phone = params.get('phone');
   const unlinked = params.get('unlinked') === '1';
 
-  if (leadId || leadIds || cliente) {
+  if (leadId || leadIds || cliente || phone) {
     let query = supabaseAdmin.from('calculator_history').select('*');
     if (leadId) {
       query = query.eq('lead_id', leadId);
@@ -37,6 +38,11 @@ export async function GET(request: NextRequest) {
       query = query.in('lead_id', ids);
     } else if (cliente) {
       query = query.ilike('cliente', `%${cliente}%`);
+      if (unlinked) query = query.is('lead_id', null);
+    } else if (phone) {
+      const cleanDigits = phone.replace(/\D/g, '');
+      const searchPattern = cleanDigits.length >= 8 ? cleanDigits.slice(-8) : cleanDigits;
+      query = query.ilike('phone', `%${searchPattern}%`);
       if (unlinked) query = query.is('lead_id', null);
     }
 

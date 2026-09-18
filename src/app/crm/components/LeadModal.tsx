@@ -235,9 +235,22 @@ export function LeadFormModal({
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-[10px] font-semibold uppercase tracking-widest text-white/50">Telefone/WhatsApp</label>
+              <div className="mb-1 flex items-center justify-between">
+                <label className="block text-[10px] font-semibold uppercase tracking-widest text-white/50">Telefone/WhatsApp</label>
+                {linkedOrcamento?.phone && !leadForm.phone && (
+                  <button
+                    type="button"
+                    onClick={() => setLeadForm({ ...leadForm, phone: linkedOrcamento.phone || '' })}
+                    className="text-[10px] text-[#c9a227] hover:underline"
+                  >
+                    Usar do orçamento ({linkedOrcamento.phone})
+                  </button>
+                )}
+              </div>
               <input
-                type="text"
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel"
                 placeholder="(21) XXXXX-XXXX"
                 value={leadForm.phone}
                 onChange={(event) => setLeadForm({ ...leadForm, phone: event.target.value })}
@@ -308,6 +321,8 @@ export function LeadFormModal({
               <input
                 type="number"
                 step="0.01"
+                min="0"
+                inputMode="decimal"
                 value={leadForm.sqm || ''}
                 onChange={(event) => setLeadForm({ ...leadForm, sqm: parseFloat(event.target.value) || 0 })}
                 className={inputClasses(fieldError('sqm'))}
@@ -321,6 +336,8 @@ export function LeadFormModal({
               <input
                 type="number"
                 step="0.01"
+                min="0"
+                inputMode="decimal"
                 value={leadForm.value || ''}
                 onChange={(event) => setLeadForm({ ...leadForm, value: parseFloat(event.target.value) || 0 })}
                 className={inputClasses(fieldError('value'))}
@@ -492,9 +509,16 @@ export function LeadDetailModal({
         <div className="grid grid-cols-2 gap-3">
           <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
             <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-white/50">Telefone</span>
-            {getLeadPhoneHref(leadDetail.phone) ? (
-              <a href={getLeadPhoneHref(leadDetail.phone)} className="text-sm font-bold text-white transition hover:text-[#f5d77a]">
-                {leadDetail.phone}
+            {getLeadPhoneHref(leadDetail.phone || linkedOrcamento?.phone || '') ? (
+              <a
+                href={getLeadPhoneHref(leadDetail.phone || linkedOrcamento?.phone || '')}
+                className="text-sm font-bold text-white transition hover:text-[#f5d77a]"
+              >
+                {leadDetail.phone || (
+                  <span className="text-[#c9a227]">
+                    {linkedOrcamento?.phone} <span className="text-[10px] font-normal text-white/50">(Orçamento)</span>
+                  </span>
+                )}
               </a>
             ) : (
               <span className="text-sm font-bold text-white">—</span>
@@ -568,6 +592,18 @@ export function LeadDetailModal({
                   {linkedOrcamento.desconto ? `${linkedOrcamento.desconto}%` : '—'}
                 </p>
               </div>
+              {linkedOrcamento.phone && (
+                <div>
+                  <p className="text-[9px] uppercase tracking-wider text-white/40">Telefone</p>
+                  <p className="font-semibold text-white">{linkedOrcamento.phone}</p>
+                </div>
+              )}
+              {linkedOrcamento.neighborhood && (
+                <div>
+                  <p className="text-[9px] uppercase tracking-wider text-white/40">Bairro</p>
+                  <p className="font-semibold text-white">{linkedOrcamento.neighborhood}</p>
+                </div>
+              )}
             </div>
             <button
               type="button"

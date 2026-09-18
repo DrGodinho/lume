@@ -2,16 +2,17 @@
 
 import { differenceInDays, format, parseISO } from 'date-fns';
 import { Archive } from 'lucide-react';
+import { useCrm } from '../context/CrmContext';
 import type { Lead } from '../types';
 
 export type ArchivedLeadsMode = 'archive' | 'trash';
 
 interface ArchivedLeadsViewProps {
   mode: ArchivedLeadsMode;
-  leads: Lead[];
-  loading: boolean;
-  onRefresh: () => Promise<void>;
-  onRestore: (lead: Lead) => Promise<void>;
+  leads?: Lead[];
+  loading?: boolean;
+  onRefresh?: () => Promise<void>;
+  onRestore?: (lead: Lead) => Promise<void>;
 }
 
 const parseAgendaDate = (value?: string | null) => {
@@ -43,13 +44,15 @@ const MODE_META = {
 
 /** Visão única para Arquivo (`mode="archive"`) e Lixeira (`mode="trash"`).
  * Estrutura, skeleton e layout são compartilhados; só textos, selos e ação mudam. */
-export function ArchivedLeadsView({
-  mode,
-  leads,
-  loading,
-  onRefresh,
-  onRestore,
-}: ArchivedLeadsViewProps) {
+export function ArchivedLeadsView(props: ArchivedLeadsViewProps) {
+  const crm = useCrm();
+  const { mode } = props;
+
+  const leads = props.leads ?? (mode === 'trash' ? crm.trashedLeads : crm.archivedLeads);
+  const loading = props.loading ?? (mode === 'trash' ? crm.loadingTrashLeads : crm.loadingArchivedLeads);
+  const onRefresh = props.onRefresh ?? (mode === 'trash' ? crm.loadTrashLeads : crm.loadArchivedLeads);
+  const onRestore = props.onRestore ?? (mode === 'trash' ? crm.handleRestoreLead : crm.handleRestoreFromArchive);
+
   const meta = MODE_META[mode];
 
   if (loading) {

@@ -7,24 +7,26 @@ import {
   MAX_CRM_ARCHIVE_AFTER_DAYS,
   MIN_CRM_ARCHIVE_AFTER_DAYS,
 } from '../constants';
+import { useCrm } from '../context/CrmContext';
+import { useCrmSettings } from '../hooks/useCrmSettings';
 import type { FollowUpPlaybookRule, SellerPlaybook } from '../types';
 
 interface PlaybookSettingsProps {
-  activeSellerId: string;
-  activePlaybook: SellerPlaybook;
-  sellerIds: string[];
-  loading: boolean;
-  saving: boolean;
-  error: string | null;
-  onChangeSeller: (sellerId: string) => void;
-  onUpdateRule: (ruleId: string, patch: Partial<FollowUpPlaybookRule>) => void;
-  onResetPlaybook: () => void;
-  onReload: () => Promise<void>;
-  archiveAfterDays: number;
-  loadingArchiveAfterDays: boolean;
-  savingArchiveAfterDays: boolean;
-  archiveAfterDaysError: string | null;
-  onUpdateArchiveAfterDays: (next: number) => void;
+  activeSellerId?: string;
+  activePlaybook?: SellerPlaybook;
+  sellerIds?: string[];
+  loading?: boolean;
+  saving?: boolean;
+  error?: string | null;
+  onChangeSeller?: (sellerId: string) => void;
+  onUpdateRule?: (ruleId: string, patch: Partial<FollowUpPlaybookRule>) => void;
+  onResetPlaybook?: () => void;
+  onReload?: () => Promise<void>;
+  archiveAfterDays?: number;
+  loadingArchiveAfterDays?: boolean;
+  savingArchiveAfterDays?: boolean;
+  archiveAfterDaysError?: string | null;
+  onUpdateArchiveAfterDays?: (next: number) => void;
 }
 
 const statusLabels: Record<FollowUpPlaybookRule['triggerStatus'], string> = {
@@ -35,23 +37,26 @@ const statusLabels: Record<FollowUpPlaybookRule['triggerStatus'], string> = {
   Perdido: 'Perdido',
 };
 
-export function PlaybookSettings({
-  activeSellerId,
-  activePlaybook,
-  sellerIds,
-  loading,
-  saving,
-  error,
-  onChangeSeller,
-  onUpdateRule,
-  onResetPlaybook,
-  onReload,
-  archiveAfterDays,
-  loadingArchiveAfterDays,
-  savingArchiveAfterDays,
-  archiveAfterDaysError,
-  onUpdateArchiveAfterDays,
-}: PlaybookSettingsProps) {
+export function PlaybookSettings(props: PlaybookSettingsProps = {}) {
+  const crm = useCrm();
+  const internalSettings = useCrmSettings();
+
+  const activeSellerId = props.activeSellerId ?? crm.activeSellerId;
+  const activePlaybook = props.activePlaybook ?? crm.activePlaybook;
+  const sellerIds = props.sellerIds ?? crm.sellerIds;
+  const loading = props.loading ?? crm.playbookLoading;
+  const saving = props.saving ?? crm.playbookSaving;
+  const error = props.error ?? crm.playbookError;
+  const onChangeSeller = props.onChangeSeller ?? crm.setActiveSellerId;
+  const onUpdateRule = props.onUpdateRule ?? crm.updatePlaybookRule;
+  const onResetPlaybook = props.onResetPlaybook ?? crm.resetActivePlaybook;
+  const onReload = props.onReload ?? crm.reloadPlaybooks;
+  const archiveAfterDays = props.archiveAfterDays ?? internalSettings.archiveAfterDays;
+  const loadingArchiveAfterDays = props.loadingArchiveAfterDays ?? internalSettings.loadingArchiveAfterDays;
+  const savingArchiveAfterDays = props.savingArchiveAfterDays ?? internalSettings.savingArchiveAfterDays;
+  const archiveAfterDaysError = props.archiveAfterDaysError ?? internalSettings.archiveAfterDaysError;
+  const onUpdateArchiveAfterDays = props.onUpdateArchiveAfterDays ?? internalSettings.updateArchiveAfterDays;
+
   const [sellerInput, setSellerInput] = useState(activeSellerId);
   const [archiveInput, setArchiveInput] = useState<string>(String(archiveAfterDays || DEFAULT_CRM_ARCHIVE_AFTER_DAYS));
 
@@ -200,6 +205,7 @@ export function PlaybookSettings({
                   type="number"
                   min={0}
                   max={60}
+                  inputMode="numeric"
                   value={rule.scheduleOffsetDays}
                   onChange={(event) => onUpdateRule(rule.id, { scheduleOffsetDays: Number(event.target.value) })}
                   className="h-9 rounded-lg border border-white/10 bg-[#03060b] px-2 text-center text-sm font-black text-white outline-none transition focus:border-[#c9a227]/40"

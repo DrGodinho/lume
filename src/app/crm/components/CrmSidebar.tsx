@@ -1,8 +1,13 @@
 'use client';
 
+import { useCallback, useMemo, useState } from 'react';
 import { Archive, BarChart3, Calculator, CalendarClock, Database, LogOut, Plus, ReceiptText, Settings, Trash2, UsersRound, type LucideIcon } from 'lucide-react';
 import type { CrmTab } from '../types';
 import { TargetGoalCard } from './TargetGoalCard';
+import { useCrm } from '../context/CrmContext';
+import { useAgenda } from '../hooks/useAgenda';
+import { useLogout } from '../hooks/useLogout';
+import { DEFAULT_CRM_TARGET_GOAL } from '../constants';
 
 type NavTone = 'gold' | 'red' | 'slate';
 
@@ -44,9 +49,9 @@ const CRM_NAV_SECTIONS: Array<{ label: string; items: CrmNavItem[] }> = [
   {
     label: 'Dados',
     items: [
-      { id: 'historico', label: 'Orçamentos', description: 'Da calculadora', icon: Database, tone: 'slate' },
-      { id: 'extratos', label: 'Extratos Mensais', description: 'Fechamentos por mês', icon: ReceiptText, tone: 'slate' },
-      { id: 'settings', label: 'Configuracoes', description: 'Playbooks e automacoes', icon: Settings, tone: 'slate' },
+      { id: 'historico', label: 'Orçamentos', description: 'Calculadora Supabase', icon: Database, tone: 'gold' },
+      { id: 'extratos', label: 'Extratos Mensais', description: 'Metas e fechamentos', icon: ReceiptText, tone: 'slate' },
+      { id: 'settings', label: 'Playbook', description: 'Automação de regras', icon: Settings, tone: 'slate' },
       { id: 'archive', label: 'Arquivo', description: 'Leads fechados antigos', icon: Archive, tone: 'gold' },
       { id: 'trash', label: 'Lixeira', description: 'Leads removidos', icon: Trash2, tone: 'red' },
     ],
@@ -56,36 +61,65 @@ const CRM_NAV_SECTIONS: Array<{ label: string; items: CrmNavItem[] }> = [
 interface CrmSidebarProps {
   activeTab: CrmTab;
   onSelectTab: (tab: CrmTab) => void;
-  agendaUrgentCount: number;
-  sidebarEditingTarget: boolean;
-  onBeginTargetEdit: () => void;
-  onCommitTargetEdit: () => void;
+  agendaUrgentCount?: number;
+  sidebarEditingTarget?: boolean;
+  onBeginTargetEdit?: () => void;
+  onCommitTargetEdit?: () => void;
   onCancelTargetEdit?: () => void;
-  targetInput: string;
-  onTargetInputChange: (value: string) => void;
-  targetGoal: number | null;
-  targetPercent: number | null;
-  onOpenCreateModal: () => void;
-  onLogout: () => void;
-  isLoggingOut: boolean;
+  targetInput?: string;
+  onTargetInputChange?: (value: string) => void;
+  targetGoal?: number | null;
+  targetPercent?: number | null;
+  onOpenCreateModal?: () => void;
+  onLogout?: () => void;
+  isLoggingOut?: boolean;
 }
 
-export function CrmSidebar({
-  activeTab,
-  onSelectTab,
-  agendaUrgentCount,
-  sidebarEditingTarget,
-  onBeginTargetEdit,
-  onCommitTargetEdit,
-  onCancelTargetEdit,
-  targetInput,
-  onTargetInputChange,
-  targetGoal,
-  targetPercent,
-  onOpenCreateModal,
-  onLogout,
-  isLoggingOut,
-}: CrmSidebarProps) {
+export function CrmSidebar(props: CrmSidebarProps) {
+  const crm = useCrm();
+  const { agendaUrgentCount: internalAgendaUrgentCount } = useAgenda(crm.leads);
+  const { isLoggingOut: internalIsLoggingOut, logout: internalLogout } = useLogout('/login');
+  const [internalSidebarEditingTarget, setInternalSidebarEditingTarget] = useState(false);
+
+  const activeTab = props.activeTab;
+  const onSelectTab = props.onSelectTab;
+  const agendaUrgentCount = props.agendaUrgentCount ?? internalAgendaUrgentCount;
+  const targetGoal = props.targetGoal ?? crm.targetGoal;
+  const targetInput = props.targetInput ?? crm.targetInput;
+  const onTargetInputChange = props.onTargetInputChange ?? crm.setTargetInput;
+  const onOpenCreateModal = props.onOpenCreateModal ?? (() => crm.openCreateModal());
+  const onLogout = props.onLogout ?? (() => void internalLogout());
+  const isLoggingOut = props.isLoggingOut ?? internalIsLoggingOut;
+
+  const sidebarEditingTarget = props.sidebarEditingTarget ?? internalSidebarEditingTarget;
+  const onBeginTargetEdit = props.onBeginTargetEdit ?? (() => {
+    crm.setTargetInput(String(targetGoal ?? DEFAULT_CRM_TARGET_GOAL));
+    setInternalSidebarEditingTarget(true);
+  });
+  const onCommitTargetEdit = props.onCommitTargetEdit ?? (() => {
+    const value = parseInt(targetInput, 10);
+    if (value > 0) {
+      void crm.saveTargetGoal(value);
+      setInternalSidebarEditingTarget(false);
+      return;
+    }
+    setInternalSidebarEditingTarget(false);
+  });
+  const onCancelTargetEdit = props.onCancelTargetEdit ?? (() => setInternalSidebarEditingTarget(false));
+
+  const targetPercent = props.targetPercent !== undefined
+    ? props.targetPercent
+    : useMemo(() => {
+        if (!targetGoal || targetGoal <= 0) return null;
+        const now = new Date();
+        const start = new Date(now.getFullYear(), now.getMonth(), 1);
+        const end = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+        const monthWonRevenue = crm.leads
+          .filter((l) => l.status === 'Fechado' && new Date(l.updatedAt || l.createdAt) >= start && new Date(l.updatedAt || l.createdAt) <= end)
+          .reduce((acc, l) => acc + (l.value || 0), 0);
+        return Math.round((monthWonRevenue / targetGoal) * 100);
+      }, [crm.leads, targetGoal]);
+
   return (
     <aside className="sticky top-0 z-40 flex w-full flex-col border-b border-white/10 bg-[#050b13] p-3 lg:relative lg:z-10 lg:w-64 lg:border-b-0 lg:border-r lg:p-4">
       <div className="flex items-center justify-between gap-3 lg:justify-start">

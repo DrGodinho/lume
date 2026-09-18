@@ -7,7 +7,7 @@ import {
   saveDraftToCloud, loadDraftFromCloud,
   loadConfigFromCloud,
 } from '../lib/cloudSync';
-import { DEFAULT_CONFIG, isOptimizationMode, normalizeFilmTypeKey } from '../lib/films';
+import { DEFAULT_CONFIG, isLegacyDefaultRoomColors, isOptimizationMode, normalizeFilmTypeKey } from '../lib/films';
 import type { FilmTypeKey, GlassItem, OptimizationMode } from '../lib/films';
 import { createScopedLogger } from '../lib/logger';
 import type { SetVidros } from './useCalculatorState';
@@ -183,7 +183,7 @@ export function useDraftSync(
         }
 
         const applyLocalRoomColors = () => {
-          if (localDraft?.roomColors && typeof localDraft.roomColors === 'object') {
+          if (localDraft?.roomColors && typeof localDraft.roomColors === 'object' && !isLegacyDefaultRoomColors(localDraft.roomColors as Record<string, string>)) {
             actionsRef.current.setRoomColors(localDraft.roomColors as Record<string, string>);
           }
         };

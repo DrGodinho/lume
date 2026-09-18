@@ -8,68 +8,87 @@ import { PeriodPills } from './PeriodPills';
 import { SemanaServicos } from './SemanaServicos';
 import { TargetGoalCard } from './TargetGoalCard';
 import { DEFAULT_CRM_TARGET_GOAL } from '../constants';
+import { useCrm } from '../context/CrmContext';
+import { useMetrics } from '../hooks/useMetrics';
+import { useMonthlySnapshots } from '../hooks/useMonthlySnapshots';
 import type { MetricsPeriod } from '../utils/metricsPeriod';
-import type { DashboardStats, Lead, MonthlyEvolutionData, MonthlyEvolutionSeries } from '../types';
+import type { CrmTab, DashboardStats, Lead, MonthlyEvolutionData, MonthlyEvolutionSeries } from '../types';
 
 interface MetricsPanelProps {
-  leads: Lead[];
-  stats: DashboardStats;
-  monthlyEvolution: MonthlyEvolutionData;
-  periodSummary: { revenue: number; count: number; label: string };
-  metricsPeriod: MetricsPeriod;
-  onMetricsPeriodChange: (period: MetricsPeriod) => void;
-  customStart: string | null;
-  customEnd: string | null;
-  onCustomStartChange: (value: string | null) => void;
-  onCustomEndChange: (value: string | null) => void;
-  monthDifference: number;
-  monthDifferencePercent: number;
-  monthTrendIsPositive: boolean;
-  visibleMonthlySeries: Record<MonthlyEvolutionSeries, boolean>;
-  onToggleMonthlySeries: (series: MonthlyEvolutionSeries) => void;
-  formatDashboardCurrency: (value: number) => string;
-  onOpenLead: (lead: Lead) => void;
-  onOpenCreateModal: () => void;
-  onOpenAgendaToday: () => void;
-  onOpenLeads: () => void;
-  targetGoal: number | null;
-  targetPercent: number | null;
-  editingTarget: boolean;
-  targetInput: string;
-  setTargetInput: (value: string) => void;
-  setEditingTarget: (value: boolean) => void;
-  saveTargetGoal: (value: number) => Promise<void>;
+  onSelectTab?: (tab: CrmTab) => void;
+  leads?: Lead[];
+  stats?: DashboardStats;
+  monthlyEvolution?: MonthlyEvolutionData;
+  periodSummary?: { revenue: number; count: number; label: string };
+  metricsPeriod?: MetricsPeriod;
+  onMetricsPeriodChange?: (period: MetricsPeriod) => void;
+  customStart?: string | null;
+  customEnd?: string | null;
+  onCustomStartChange?: (value: string | null) => void;
+  onCustomEndChange?: (value: string | null) => void;
+  monthDifference?: number;
+  monthDifferencePercent?: number;
+  monthTrendIsPositive?: boolean;
+  visibleMonthlySeries?: Record<MonthlyEvolutionSeries, boolean>;
+  onToggleMonthlySeries?: (series: MonthlyEvolutionSeries) => void;
+  formatDashboardCurrency?: (value: number) => string;
+  onOpenLead?: (lead: Lead) => void;
+  onOpenCreateModal?: () => void;
+  onOpenAgendaToday?: () => void;
+  onOpenLeads?: () => void;
+  targetGoal?: number | null;
+  targetPercent?: number | null;
+  editingTarget?: boolean;
+  targetInput?: string;
+  setTargetInput?: (value: string) => void;
+  setEditingTarget?: (value: boolean) => void;
+  saveTargetGoal?: (value: number) => Promise<void>;
 }
 
-export function MetricsPanel({
-  leads,
-  stats,
-  monthlyEvolution,
-  periodSummary,
-  metricsPeriod,
-  onMetricsPeriodChange,
-  customStart,
-  customEnd,
-  onCustomStartChange,
-  onCustomEndChange,
-  monthDifference,
-  monthDifferencePercent,
-  monthTrendIsPositive,
-  visibleMonthlySeries,
-  onToggleMonthlySeries,
-  formatDashboardCurrency,
-  onOpenLead,
-  onOpenCreateModal,
-  onOpenAgendaToday,
-  onOpenLeads,
-  targetGoal,
-  targetPercent,
-  editingTarget,
-  targetInput,
-  setTargetInput,
-  setEditingTarget,
-  saveTargetGoal,
-}: MetricsPanelProps) {
+export function MetricsPanel(props: MetricsPanelProps = {}) {
+  const crm = useCrm();
+  const { snapshots: monthlySnapshots } = useMonthlySnapshots();
+
+  const internalMetrics = useMetrics(
+    props.leads ?? crm.leads,
+    props.targetGoal ?? crm.targetGoal,
+    monthlySnapshots,
+    props.metricsPeriod ?? crm.metricsPeriod,
+    props.customStart ?? crm.customStart,
+    props.customEnd ?? crm.customEnd,
+    crm.archivedLeads,
+  );
+
+  const leads = props.leads ?? crm.leads;
+  const stats = props.stats ?? internalMetrics.stats;
+  const monthlyEvolution = props.monthlyEvolution ?? internalMetrics.monthlyEvolution;
+  const periodSummary = props.periodSummary ?? internalMetrics.periodSummary;
+  const metricsPeriod = props.metricsPeriod ?? crm.metricsPeriod;
+  const onMetricsPeriodChange = props.onMetricsPeriodChange ?? crm.setMetricsPeriod;
+  const customStart = props.customStart ?? crm.customStart;
+  const customEnd = props.customEnd ?? crm.customEnd;
+  const onCustomStartChange = props.onCustomStartChange ?? crm.setCustomStart;
+  const onCustomEndChange = props.onCustomEndChange ?? crm.setCustomEnd;
+  const monthDifference = props.monthDifference ?? internalMetrics.monthDifference;
+  const monthDifferencePercent = props.monthDifferencePercent ?? internalMetrics.monthDifferencePercent;
+  const monthTrendIsPositive = props.monthTrendIsPositive ?? internalMetrics.monthTrendIsPositive;
+  const visibleMonthlySeries = props.visibleMonthlySeries ?? crm.visibleMonthlySeries;
+  const onToggleMonthlySeries = props.onToggleMonthlySeries ?? crm.toggleMonthlySeries;
+  const formatDashboardCurrency = props.formatDashboardCurrency ?? internalMetrics.formatDashboardCurrency;
+  const onOpenLead = props.onOpenLead ?? crm.setLeadDetail;
+  const onOpenCreateModal = props.onOpenCreateModal ?? (() => crm.openCreateModal());
+  const onOpenAgendaToday = props.onOpenAgendaToday ?? (() => {
+    crm.setAgendaInitialView('hoje');
+    props.onSelectTab?.('agenda');
+  });
+  const onOpenLeads = props.onOpenLeads ?? (() => props.onSelectTab?.('leads'));
+  const targetGoal = props.targetGoal ?? crm.targetGoal;
+  const targetPercent = props.targetPercent ?? internalMetrics.targetPercent;
+  const editingTarget = props.editingTarget ?? crm.editingTarget;
+  const targetInput = props.targetInput ?? crm.targetInput;
+  const setTargetInput = props.setTargetInput ?? crm.setTargetInput;
+  const setEditingTarget = props.setEditingTarget ?? crm.setEditingTarget;
+  const saveTargetGoal = props.saveTargetGoal ?? crm.saveTargetGoal;
   const beginTargetEdit = () => {
     setTargetInput(String(targetGoal ?? DEFAULT_CRM_TARGET_GOAL));
     setEditingTarget(true);

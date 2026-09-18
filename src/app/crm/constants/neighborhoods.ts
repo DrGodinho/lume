@@ -2,6 +2,7 @@ export const RJ_NEIGHBORHOODS = [
   'Barra da Tijuca',
   'Recreio dos Bandeirantes',
   'Jacarepagua',
+  'Freguesia',
   'Bangu',
   'Realengo',
   'Campo Grande',
