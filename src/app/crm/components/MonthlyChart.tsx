@@ -149,6 +149,7 @@ export function MonthlyChart({
               <CartesianGrid strokeDasharray="4 6" stroke="rgba(255,255,255,0.06)" vertical={false} />
               <XAxis dataKey="dia" tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.45)' }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
               <YAxis
+                domain={[0, (dataMax: number) => Math.max(2000, Number.isFinite(dataMax) ? dataMax : 2000)]}
                 tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.42)' }}
                 tickFormatter={(value: number) => `R$${(value / 1000).toFixed(1)}k`}
                 width={56}

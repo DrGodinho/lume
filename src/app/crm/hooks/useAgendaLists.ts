@@ -149,6 +149,36 @@ export function useAgendaLists({
     });
   }, [diaSelecionado, getLeadServiceDate, hoje, leadsComServico]);
 
+  const servicosAguardandoConfirmacao = useMemo(() => {
+    return leadsComServico
+      .filter((lead) => {
+        const serviceDate = getLeadServiceDate(lead);
+        if (!serviceDate) return false;
+        const status = getLeadServiceStatus(lead);
+        if (status === 'Concluido') return false;
+        return isToday(serviceDate) || isPast(serviceDate);
+      })
+      .sort((a, b) => {
+        const aDate = getLeadServiceDate(a)?.getTime() || 0;
+        const bDate = getLeadServiceDate(b)?.getTime() || 0;
+        return aDate - bDate;
+      });
+  }, [getLeadServiceDate, getLeadServiceStatus, leadsComServico]);
+
+  const servicosHojeAguardando = useMemo(() => {
+    return servicosAguardandoConfirmacao.filter((lead) => {
+      const serviceDate = getLeadServiceDate(lead);
+      return serviceDate ? isToday(serviceDate) : false;
+    });
+  }, [getLeadServiceDate, servicosAguardandoConfirmacao]);
+
+  const servicosAtrasadosAguardando = useMemo(() => {
+    return servicosAguardandoConfirmacao.filter((lead) => {
+      const serviceDate = getLeadServiceDate(lead);
+      return serviceDate ? isPast(serviceDate) && !isToday(serviceDate) : false;
+    });
+  }, [getLeadServiceDate, servicosAguardandoConfirmacao]);
+
   const serviceStatusCounts = useMemo(() => {
     return servicosAgendados.reduce<Record<ServiceStatus, number>>((acc, lead) => {
       const status = getLeadServiceStatus(lead);
@@ -305,6 +335,9 @@ export function useAgendaLists({
     emDiaCount,
     servicosAgendados,
     servicosHoje,
+    servicosAguardandoConfirmacao,
+    servicosHojeAguardando,
+    servicosAtrasadosAguardando,
     serviceStatusCounts,
     serviceRouteGroups,
     monthlyFollowUps,

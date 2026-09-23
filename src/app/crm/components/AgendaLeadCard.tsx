@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { differenceInDays, format, isPast, isToday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { CalendarPlus } from 'lucide-react';
+import { CalendarPlus, CheckCircle2 } from 'lucide-react';
 import { WhatsAppTemplateMenu, type WhatsAppTemplateType } from './WhatsAppTemplateMenu';
 import { buildGoogleCalendarUrl } from '../utils/googleCalendar';
 import type { Lead, LeadCardKind, ServiceStatus, ServiceStatusMeta } from '../types';
@@ -15,6 +15,7 @@ interface AgendaLeadCardProps {
   onMarcarFeito: (leadId: string) => Promise<void>;
   onSetDormant: (leadId: string, dormant: boolean) => Promise<void>;
   onUpdateServiceStatus: (leadId: string, serviceStatus: ServiceStatus) => Promise<void>;
+  onCompleteService?: (leadId: string) => Promise<void>;
   onAbrirLead: (lead: Lead) => void;
   onRestoreFromArchive?: (lead: Lead) => Promise<void>;
   getLeadFollowUpDate: (lead: Lead) => Date | null;
@@ -34,6 +35,7 @@ export function AgendaLeadCard({
   onMarcarFeito,
   onSetDormant,
   onUpdateServiceStatus,
+  onCompleteService,
   onAbrirLead,
   onRestoreFromArchive,
   getLeadFollowUpDate,
@@ -62,28 +64,38 @@ export function AgendaLeadCard({
   const serviceMeta = serviceStatusMeta[serviceStatus];
 
   const isFiveYearsCompleted = serviceDate ? differenceInDays(new Date(), serviceDate) >= 1826 : false;
+  const isServiceToday = isServiceCard && !!serviceDate && isToday(serviceDate);
+  const isServiceOverdue = isServiceCard && !!serviceDate && isPast(serviceDate) && !isToday(serviceDate) && serviceStatus !== 'Concluido';
 
   const cardLabel = isFiveYearsCompleted && lead.archived
     ? 'Ciclo 5 Anos'
-    : isServiceCard
-      ? 'Serviço'
-      : isDormantCard
-        ? 'Dormente'
-        : isIdleCard
-          ? 'Sem próxima ação'
-          : 'Follow-up';
+    : isServiceToday
+      ? 'Serviço • Hoje'
+      : isServiceOverdue
+        ? 'Serviço • Pendente'
+        : isServiceCard
+          ? 'Serviço'
+          : isDormantCard
+            ? 'Dormente'
+            : isIdleCard
+              ? 'Sem próxima ação'
+              : 'Follow-up';
 
   const cardClasses = atrasado
     ? 'border-red-500/20 bg-red-500/[0.06] hover:border-red-500/35'
     : isFiveYearsCompleted && lead.archived
       ? 'border-[#c9a227]/40 bg-[#c9a227]/[0.08] hover:border-[#c9a227]/60 shadow-[inset_0_0_12px_rgba(201,162,39,0.06)]'
-      : isServiceCard
-        ? 'border-sky-500/15 bg-sky-500/[0.05] hover:border-sky-500/30'
-        : isDormantCard
-          ? 'border-slate-500/20 bg-slate-500/[0.05] hover:border-slate-500/30'
-        : isIdleCard
-          ? 'border-white/10 bg-white/[0.025] hover:border-[#c9a227]/20'
-          : 'border-white/5 bg-[#04080f]/90 hover:border-[#c9a227]/20';
+      : isServiceToday
+        ? 'border-[#c9a227]/40 bg-[#c9a227]/[0.06] hover:border-[#c9a227]/60 shadow-lg shadow-black/25'
+        : isServiceOverdue
+          ? 'border-amber-500/30 bg-amber-500/[0.06] hover:border-amber-500/50'
+          : isServiceCard
+            ? 'border-sky-500/15 bg-sky-500/[0.05] hover:border-sky-500/30'
+            : isDormantCard
+              ? 'border-slate-500/20 bg-slate-500/[0.05] hover:border-slate-500/30'
+              : isIdleCard
+                ? 'border-white/10 bg-white/[0.025] hover:border-[#c9a227]/20'
+                : 'border-white/5 bg-[#04080f]/90 hover:border-[#c9a227]/20';
 
   const salvarAgendamento = async () => {
     if (!novaData) return;
@@ -105,13 +117,17 @@ export function AgendaLeadCard({
             className={`mb-2 inline-flex rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] ${
               isFiveYearsCompleted && lead.archived
                 ? 'border-[#c9a227]/40 bg-[#c9a227]/20 text-[#f5d77a]'
-                : isServiceCard
-                  ? 'border-sky-500/20 bg-sky-500/10 text-sky-300'
-                  : isDormantCard
-                    ? 'border-slate-500/20 bg-slate-500/10 text-slate-300'
-                  : isIdleCard
-                    ? 'border-white/10 bg-white/[0.03] text-white/45'
-                    : 'border-[#c9a227]/20 bg-[#c9a227]/10 text-[#f5d77a]'
+                : isServiceToday
+                  ? 'border-[#c9a227]/40 bg-[#c9a227]/20 text-[#f5d77a] animate-pulse'
+                  : isServiceOverdue
+                    ? 'border-amber-500/30 bg-amber-500/20 text-amber-300'
+                    : isServiceCard
+                      ? 'border-sky-500/20 bg-sky-500/10 text-sky-300'
+                      : isDormantCard
+                        ? 'border-slate-500/20 bg-slate-500/10 text-slate-300'
+                      : isIdleCard
+                        ? 'border-white/10 bg-white/[0.03] text-white/45'
+                        : 'border-[#c9a227]/20 bg-[#c9a227]/10 text-[#f5d77a]'
             }`}
           >
             {cardLabel}
@@ -249,6 +265,16 @@ export function AgendaLeadCard({
               className="rounded-2xl border border-slate-500/20 px-4 py-2 text-xs font-semibold text-slate-300 transition hover:bg-slate-500/10"
             >
               {lead.dormant ? 'Reativar lead' : 'Marcar dormente'}
+            </button>
+          )}
+          {isServiceCard && onCompleteService && serviceStatus !== 'Concluido' && (
+            <button
+              onClick={() => onCompleteService(lead.id)}
+              className="inline-flex items-center gap-1.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-3.5 py-2 text-xs font-bold text-white shadow-md shadow-emerald-500/20 transition hover:brightness-110"
+              title="Concluir serviço e fechar venda"
+            >
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              Concluir Serviço
             </button>
           )}
           {hasFollowUp && (

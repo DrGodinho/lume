@@ -53,4 +53,17 @@ describe('parseOrcamentoSalvo', () => {
     expect(parsed).not.toBeNull();
     expect((parsed as unknown as Record<string, unknown>).campoFuturo).toBe(42);
   });
+
+  it('preserva e normaliza o campo desconto corretamente', () => {
+    const comDesconto = parseOrcamentoSalvo({ ...valido, desconto: 50 });
+    expect(comDesconto?.desconto).toBe(50);
+
+    const descontoString = parseOrcamentoSalvo({ ...valido, desconto: '75.5' as unknown as number });
+    expect(descontoString?.desconto).toBe(75.5);
+
+    const { desconto, ...semDesconto } = valido;
+    void desconto;
+    const parsedSemDesconto = parseOrcamentoSalvo(semDesconto);
+    expect(parsedSemDesconto?.desconto).toBe(0);
+  });
 });

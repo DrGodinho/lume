@@ -66,7 +66,14 @@ export const HistoryPanel: React.FC<HistoryPanelProps> = ({
                                         </div>
                                         <span className="text-[10px] text-gray-500 shrink-0 ml-2">{orc.data}</span>
                                     </div>
-                                    <p className="text-green-400 font-bold text-base">{formatBRL(orc.valor)}</p>
+                                    <div className="flex items-baseline justify-between mb-1">
+                                        <p className="text-green-400 font-bold text-base">{formatBRL(orc.valor)}</p>
+                                        {orc.desconto > 0 && (
+                                            <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-400/10 px-1.5 py-0.5 rounded">
+                                                -{formatBRL(orc.desconto)}
+                                            </span>
+                                        )}
+                                    </div>
                                     <p className="text-[11px] text-gray-500 mb-3">{orc.qtd} peças · rolo {orc.config.rollW}cm</p>
                                     <div className="flex gap-2">
                                         <button onClick={() => onCarregar(orc)} className="flex-1 flex items-center justify-center gap-1.5 bg-[#c9a227]/10 hover:bg-[#c9a227]/20 text-[#c9a227] text-[11px] font-bold py-1.5 rounded-lg transition-colors">

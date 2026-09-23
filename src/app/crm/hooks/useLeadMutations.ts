@@ -43,6 +43,8 @@ export interface UseLeadMutationsReturn {
   handleRestoreFromArchive: (lead: Lead) => Promise<void>;
   handleAgendaSchedule: (leadId: string, date: string) => Promise<void>;
   handleServiceStatusChange: (leadId: string, serviceStatus: ServiceStatus) => Promise<void>;
+  handleCompleteService: (leadId: string) => Promise<void>;
+  handleRescheduleService: (leadId: string, newDate: string) => Promise<void>;
   handleAgendaMarkDone: (leadId: string) => Promise<void>;
   handleDormantStateChange: (leadId: string, dormant: boolean) => Promise<void>;
   handleTogglePin: (leadId: string) => Promise<void>;
@@ -249,6 +251,35 @@ export const useLeadMutations = ({
     }
   }, [leads, patchLeadStatusInfo, toast]);
 
+  const handleCompleteService = useCallback(async (leadId: string) => {
+    const today = new Date().toISOString().split('T')[0];
+    const { synced } = await patchLeadStatusInfo(leadId, {
+      serviceStatus: 'Concluido',
+      status: 'Fechado',
+      statusChangedAt: today,
+      dormant: false,
+    });
+    if (synced) {
+      toast.success('Serviço concluído e venda fechada!');
+    } else {
+      toast.error('Não foi possível concluir o serviço no Supabase.');
+    }
+  }, [patchLeadStatusInfo, toast]);
+
+  const handleRescheduleService = useCallback(async (leadId: string, newDate: string) => {
+    const { synced } = await patchLeadStatusInfo(leadId, {
+      dataServico: newDate,
+      serviceStatus: 'Reagendar',
+      status: 'Agendado',
+      dormant: false,
+    });
+    if (synced) {
+      toast.success(`Serviço reagendado com sucesso.`);
+    } else {
+      toast.error('Não foi possível reagendar o serviço no Supabase.');
+    }
+  }, [patchLeadStatusInfo, toast]);
+
   const handleAgendaMarkDone = useCallback(async (leadId: string) => {
     const { synced } = await patchLeadStatusInfo(leadId, { proximoContato: null });
     if (synced) {
@@ -351,6 +382,8 @@ export const useLeadMutations = ({
     handleRestoreFromArchive,
     handleAgendaSchedule,
     handleServiceStatusChange,
+    handleCompleteService,
+    handleRescheduleService,
     handleAgendaMarkDone,
     handleDormantStateChange,
     handleTogglePin,

@@ -193,7 +193,9 @@ export function LeadFormModal({
                 <div className="flex justify-between">
                   <span className="text-white/50">Desconto:</span>
                   <span className="font-semibold text-emerald-400">
-                    {linkedOrcamento.desconto ? `${linkedOrcamento.desconto}%` : '—'}
+                    {linkedOrcamento.desconto && Number(linkedOrcamento.desconto) > 0
+                      ? Number(linkedOrcamento.desconto).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                      : '—'}
                   </span>
                 </div>
               </div>
@@ -464,6 +466,7 @@ interface LeadDetailModalProps {
   onOpenEdit: (lead: Lead) => void;
   onDuplicate: (lead: Lead) => void;
   onOpenCommercialAction: (lead: Lead, action: CommercialActionDraft['action']) => void;
+  onMarkLost?: (lead: Lead) => void;
   onOpenHistory: () => void;
 }
 
@@ -482,6 +485,7 @@ export function LeadDetailModal({
   onOpenEdit,
   onDuplicate,
   onOpenCommercialAction,
+  onMarkLost,
   onOpenHistory,
 }: LeadDetailModalProps) {
   const { notes: leadNotes, loading: loadingLeadNotes, adding: addingLeadNote, error: leadNotesError, addNote } =
@@ -589,7 +593,9 @@ export function LeadDetailModal({
               <div>
                 <p className="text-[9px] uppercase tracking-wider text-white/40">Desconto</p>
                 <p className="font-semibold text-emerald-400">
-                  {linkedOrcamento.desconto ? `${linkedOrcamento.desconto}%` : '—'}
+                  {linkedOrcamento.desconto && Number(linkedOrcamento.desconto) > 0
+                    ? Number(linkedOrcamento.desconto).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                    : '—'}
                 </p>
               </div>
               {linkedOrcamento.phone && (
@@ -726,7 +732,17 @@ export function LeadDetailModal({
           <button type="button" onClick={() => onOpenCommercialAction(leadDetail, 'fechado')} className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2.5 text-xs font-bold text-emerald-300 transition hover:bg-emerald-500/15">
             Fechar Venda
           </button>
-          <button type="button" onClick={() => onOpenCommercialAction(leadDetail, 'perdido')} className="rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2.5 text-xs font-bold text-red-300 transition hover:bg-red-500/15">
+          <button
+            type="button"
+            onClick={() => {
+              if (onMarkLost) {
+                onMarkLost(leadDetail);
+              } else {
+                onOpenCommercialAction(leadDetail, 'perdido');
+              }
+            }}
+            className="rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2.5 text-xs font-bold text-red-300 transition hover:bg-red-500/15"
+          >
             Marcar Perdido
           </button>
         </div>

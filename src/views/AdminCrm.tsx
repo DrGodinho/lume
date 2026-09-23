@@ -173,7 +173,7 @@ function KanbanCard({
         </span>
         {orc.desconto > 0 && (
           <span className="text-[10px] font-semibold text-green-400 bg-green-400/10 px-1.5 py-0.5 rounded-full">
-            -{orc.desconto}%
+            -{formatCurrency(orc.desconto)}
           </span>
         )}
       </div>
@@ -294,7 +294,7 @@ function EditModal({
             )}
             {orc.desconto > 0 && (
               <div className="flex items-center gap-1.5 rounded-lg border border-green-500/20 bg-green-500/[0.05] px-3 py-2">
-                <span className="text-xs text-green-400">-{orc.desconto}% desconto</span>
+                <span className="text-xs text-green-400">-{formatCurrency(orc.desconto)} desconto</span>
               </div>
             )}
             <div className="flex items-center gap-1.5 rounded-lg border border-white/8 bg-white/[0.03] px-3 py-2 ml-auto">

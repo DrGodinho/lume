@@ -14,8 +14,6 @@ interface PackingParams {
   onEmptyVidros?: () => void;
   /** Chamado quando a lista esvazia em modo de corte (só limpa seleção). */
   onCutModeEmpty?: () => void;
-  /** Chamado quando a quantidade de peças muda (o pai zera o desconto). */
-  onVidrosCountChange?: () => void;
   onError?: (msg: string) => void;
 }
 
@@ -61,7 +59,6 @@ export function usePackingWorker({
   isCutMode,
   onEmptyVidros,
   onCutModeEmpty,
-  onVidrosCountChange,
   onError,
 }: PackingParams) {
   const [blocosCalculados, setBlocosCalculados] = useState<Block[]>([]);
@@ -72,9 +69,9 @@ export function usePackingWorker({
   const workerRef = useRef<Worker | null>(null);
   const prevVidrosLengthRef = useRef(0);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const callbacksRef = useRef({ onEmptyVidros, onCutModeEmpty, onVidrosCountChange, onError });
+  const callbacksRef = useRef({ onEmptyVidros, onCutModeEmpty, onError });
   useEffect(() => {
-    callbacksRef.current = { onEmptyVidros, onCutModeEmpty, onVidrosCountChange, onError };
+    callbacksRef.current = { onEmptyVidros, onCutModeEmpty, onError };
   });
 
   const clearPackTimeout = () => {
@@ -135,9 +132,6 @@ export function usePackingWorker({
         failPacking('Cálculo demorou demais e foi reiniciado.');
       }, PACK_TIMEOUT_MS);
       workerRef.current?.postMessage({ vidros, rollW, margin, modoOtimizacao, agressividadeCorte });
-      if (vidros.length !== prevVidrosLengthRef.current) {
-        callbacksRef.current.onVidrosCountChange?.();
-      }
     } else {
       setBlocosCalculados([]);
       setMaxY(0);

@@ -98,7 +98,11 @@ export const useLeadCommercialAction = (
     });
 
     setCommercialAction(null);
-    setLeadDetail(updatedLead);
+    if (action === 'perdido') {
+      setLeadDetail(null);
+    } else {
+      setLeadDetail(updatedLead);
+    }
 
     const actionLabel = {
       retorno: 'Retorno comercial agendado',

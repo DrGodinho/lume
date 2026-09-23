@@ -164,10 +164,12 @@ interface InvoicePDFProps {
     areaV: number;
     eficiencia: number;
     finalPrice: number;
-    descontoInput: string;
+    descontoInput?: string;
+    desconto?: number;
 }
 
-export const InvoicePDF = ({ cliente, userName, resumo, totalAreaM2, areaV, finalPrice, descontoInput }: InvoicePDFProps) => {
+export const InvoicePDF = ({ cliente, userName, resumo, totalAreaM2, areaV, finalPrice, descontoInput, desconto }: InvoicePDFProps) => {
+  const descVal = typeof desconto === 'number' ? desconto : (parseFloat(descontoInput || '0') / 100 || 0);
   
   // Group items by label
   const groupedResumo = groupByAmbiente(resumo);
@@ -235,10 +237,10 @@ export const InvoicePDF = ({ cliente, userName, resumo, totalAreaM2, areaV, fina
       <View style={styles.totalSection}>
         <View>
             <Text style={styles.totalLabel}>Total Final</Text>
-            {parseFloat(descontoInput) > 0 && (
+            {descVal > 0 && (
                 <View style={{backgroundColor: '#000000', padding: '3 8', borderRadius: 4, marginTop: 6}}>
                     <Text style={{fontSize: 10, color: '#ef4444', fontWeight: 'bold'}}>
-                        DESCONTO: - R$ {parseFloat(descontoInput).toFixed(2)}
+                        DESCONTO: - {formatBRL(descVal)}
                     </Text>
                 </View>
             )}

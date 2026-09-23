@@ -110,6 +110,7 @@ interface SavedProjectPayload {
     preco?: number | string;
     selectedFilm?: string;
     compensarPerdas?: boolean;
+    desconto?: number;
   };
   vidros?: ImportedGlass[];
 }
@@ -272,7 +273,6 @@ export function AdminCalculator() {
         vidros, rollW, margin, modoOtimizacao, agressividadeCorte, isCutMode,
         onEmptyVidros: () => { setDesconto(0); setSelectedIds([]); },
         onCutModeEmpty: () => { setSelectedIds([]); },
-        onVidrosCountChange: () => { setDesconto(0); },
         onError: (msg) => showToast(msg, 'error'),
     });
 
@@ -725,10 +725,10 @@ export function AdminCalculator() {
           address: '',
           neighborhood: finalNeighborhood,
           filmType: FILM_TYPE_LABELS[selectedFilm] || 'Nano Cerâmica',
-            sqm: totalM2,
-            value: finalPrice,
+          sqm: totalM2,
+          value: finalPrice,
           status: 'Novo',
-          notes: `Película: ${FILM_TYPE_LABELS[selectedFilm]}.`,
+          notes: `Película: ${FILM_TYPE_LABELS[selectedFilm] || 'Nano Cerâmica'}.${desconto > 0 ? ` | Desconto aplicado: ${formatBRL(desconto)}` : ''}`,
         }),
       });
       if (res.ok) {
@@ -738,61 +738,53 @@ export function AdminCalculator() {
 
         if (vidros.length > 0 && leadId) {
           const clienteNome = cliente || `Cliente ${finalPhone}`;
-          const existing = historico.find(h => h.cliente === clienteNome && !h.leadId);
-          if (existing) {
-            saveHistoryItemToCloud({ ...existing, leadId, phone: finalPhone, neighborhood: finalNeighborhood });
-            const atualizado = historico.map(h => h.id === existing.id ? { ...h, leadId, phone: finalPhone, neighborhood: finalNeighborhood } : h);
-            setHistorico(atualizado);
-            resolveCalculatorScopeKey().then((scopeKey) => {
-              localStorage.setItem(buildCalculatorStorageKey('lume_historico', scopeKey), JSON.stringify(atualizado));
-            }).catch(() => null);
-          } else {
-            const orcId = crypto.randomUUID();
-            await saveHistoryItemToCloud({
-              id: orcId,
-              cliente: clienteNome,
-              phone: finalPhone,
-              neighborhood: finalNeighborhood,
-              data: new Date().toLocaleDateString('pt-BR'),
-              valor: finalPrice,
-              qtd: vidros.length,
-              vidros: vidros.map(v => ({ h: v.oh, w: v.ow, label: v.label || '' })),
-              config: { rollW, price, margin },
-              desconto,
-              modoOtimizacao: modoOtimizacao,
-              selectedFilm,
-              leadId,
-            });
-            const novoLocal: OrcamentoSalvo = {
-              id: orcId,
-              cliente: clienteNome,
-              phone: finalPhone,
-              neighborhood: finalNeighborhood,
-              data: new Date().toLocaleDateString('pt-BR'),
-              valor: finalPrice,
-              qtd: vidros.length,
-              vidros: [...vidros],
-              config: { rollW, price, margin },
-              desconto,
-              modoOtimizacao: modoOtimizacao,
-              selectedFilm,
-              leadId,
-            };
-            const atualizado = [novoLocal, ...historico].slice(0, 100);
-            setHistorico(atualizado);
-            resolveCalculatorScopeKey().then((scopeKey) => {
-              localStorage.setItem(buildCalculatorStorageKey('lume_historico', scopeKey), JSON.stringify(atualizado));
-            }).catch(() => null);
-          }
+          const existing = historico.find(h => (currentLeadId && h.leadId === currentLeadId) || (h.cliente === clienteNome && !h.leadId));
+          const snapshotVidros = vidros.map(v => ({
+            id: v.id,
+            h: v.h,
+            w: v.w,
+            oh: v.oh,
+            ow: v.ow,
+            label: v.label || '',
+            cor: v.cor,
+            sortOrder: v.sortOrder,
+          }));
+          const orcId = existing ? existing.id : crypto.randomUUID();
+          const itemToSave: OrcamentoSalvo = {
+            id: orcId,
+            cliente: clienteNome,
+            phone: finalPhone,
+            neighborhood: finalNeighborhood,
+            data: existing?.data || new Date().toLocaleDateString('pt-BR'),
+            valor: finalPrice,
+            qtd: vidros.length,
+            vidros: snapshotVidros,
+            config: { rollW, price, margin, compensarPerdas, modoPerdas, perdasFixas },
+            desconto,
+            modoOtimizacao,
+            selectedFilm,
+            leadId,
+            compensarPerdas,
+            modoPerdas,
+            perdasFixas,
+          };
+          await saveHistoryItemToCloud(itemToSave);
+          const atualizado = existing
+            ? historico.map(h => h.id === existing.id ? itemToSave : h)
+            : [itemToSave, ...historico].slice(0, 100);
+          setHistorico(atualizado);
+          resolveCalculatorScopeKey().then((scopeKey) => {
+            localStorage.setItem(buildCalculatorStorageKey('lume_historico', scopeKey), JSON.stringify(atualizado));
+          }).catch(() => null);
         }
 
         showToast('Lead criado com sucesso!', 'success');
       } else {
-        const err = await res.json();
+        const err = await res.json().catch(() => ({}));
         const details = [err.error, err.details, err.hint].filter(Boolean).join(' - ');
         showToast('Erro ao criar lead: ' + (details || 'desconhecido'), 'error');
       }
-    }, [cliente, phone, neighborhood, vidros, selectedFilm, finalPrice, rollW, price, margin, desconto, modoOtimizacao, historico, setHistorico, showToast]);
+    }, [cliente, phone, neighborhood, vidros, selectedFilm, finalPrice, rollW, price, margin, desconto, modoOtimizacao, currentLeadId, compensarPerdas, modoPerdas, perdasFixas, historico, setHistorico, showToast]);
 
 // C1: abrir passa pelo schema do hook; aqui só a aplicação na sessão.
 const carregarDoHistorico = (orc: OrcamentoSalvo) => {
@@ -803,10 +795,9 @@ const carregarDoHistorico = (orc: OrcamentoSalvo) => {
     setRollW(valid.config.rollW);
         setPrice(valid.config.price);
         setMargin(valid.config.margin);
-        if (valid.desconto !== undefined) {
-            setDesconto(valid.desconto);
-            setDescontoInput((valid.desconto * 100).toString());
-        }
+        const desc = typeof valid.desconto === 'number' && !isNaN(valid.desconto) ? valid.desconto : 0;
+        setDesconto(desc);
+        setDescontoInput(Math.round(desc * 100).toString());
   if (isOptimizationMode(valid.modoOtimizacao)) setModoOtimizacao(valid.modoOtimizacao);
     setSelectedFilm(normalizeFilmTypeKey(valid.selectedFilm));
     if (valid.leadId) setCurrentLeadId(valid.leadId);
@@ -862,7 +853,7 @@ const carregarDoHistorico = (orc: OrcamentoSalvo) => {
 
     const salvarProjeto = () => {
         const dados = {
-            config: { cliente, phone, neighborhood, rolo: rollW, preco: price, selectedFilm, compensarPerdas },
+            config: { cliente, phone, neighborhood, rolo: rollW, preco: price, selectedFilm, compensarPerdas, desconto },
             vidros: [...vidros],
         };
         const blob = new Blob([JSON.stringify(dados)], { type: 'application/json' });
@@ -890,7 +881,9 @@ const carregarDoHistorico = (orc: OrcamentoSalvo) => {
                 if (d.config?.compensarPerdas !== undefined) {
                     setCompensarPerdas(Boolean(d.config.compensarPerdas));
                 }
-                setDesconto(0);
+                const desc = typeof d.config?.desconto === 'number' && !isNaN(d.config.desconto) ? d.config.desconto : 0;
+                setDesconto(desc);
+                setDescontoInput(Math.round(desc * 100).toString());
             } catch {
                 showToast('Arquivo inválido.', 'error');
             }
@@ -968,6 +961,7 @@ const carregarDoHistorico = (orc: OrcamentoSalvo) => {
                     eficiencia={eficiencia}
                     finalPrice={finalPrice}
                     descontoInput={descontoInput}
+                    desconto={desconto}
                 />
             ).toBlob();
 

@@ -133,6 +133,25 @@ export function useCrmState(activeTab: CrmTab) {
     }
   }, [commercialAction, leadList.leads, leadMutations, playbooks.activePlaybook.rules, toast]);
 
+  const handleMarkLeadLost = useCallback(async (lead: Lead) => {
+    leadModal.closeLeadDetailModal();
+    const today = new Date().toISOString().split('T')[0];
+    const { synced } = await leadMutations.updateSingleLead(lead.id, (currentLead) => ({
+      ...currentLead,
+      status: 'Perdido',
+      statusChangedAt: today,
+      proximoContato: null,
+      dormant: false,
+      updatedAt: new Date().toISOString(),
+    }));
+
+    if (synced) {
+      toast.success('Lead marcado como perdido.');
+    } else {
+      toast.error('Nao foi possivel marcar o lead como perdido.');
+    }
+  }, [leadModal, leadMutations, toast]);
+
   const handleKanbanReorder = useCallback((activeLeadId: string, overLeadId: string) => {
     setLeads((currentLeads) => reorderKanbanItems(currentLeads, activeLeadId, overLeadId));
   }, [setLeads]);
@@ -228,9 +247,12 @@ export function useCrmState(activeTab: CrmTab) {
     handleArchiveLead: leadMutations.handleArchiveLead,
     handleRestoreFromArchive: leadMutations.handleRestoreFromArchive,
     handleStatusChange,
+    handleMarkLeadLost,
     handleKanbanReorder,
     handleAgendaSchedule: leadMutations.handleAgendaSchedule,
     handleServiceStatusChange: leadMutations.handleServiceStatusChange,
+    handleCompleteService: leadMutations.handleCompleteService,
+    handleRescheduleService: leadMutations.handleRescheduleService,
     handleAgendaMarkDone: leadMutations.handleAgendaMarkDone,
     handleDormantStateChange: leadMutations.handleDormantStateChange,
     handleTogglePin: leadMutations.handleTogglePin,
@@ -383,6 +405,8 @@ export function useCrmMutations() {
     handleRestoreFromArchive: crm.handleRestoreFromArchive,
     handleAgendaSchedule: crm.handleAgendaSchedule,
     handleServiceStatusChange: crm.handleServiceStatusChange,
+    handleCompleteService: crm.handleCompleteService,
+    handleRescheduleService: crm.handleRescheduleService,
     handleAgendaMarkDone: crm.handleAgendaMarkDone,
     handleDormantStateChange: crm.handleDormantStateChange,
     handleTogglePin: crm.handleTogglePin,
@@ -396,6 +420,7 @@ export function useCrmCommercial() {
     setCommercialAction: crm.setCommercialAction,
     openCommercialAction: crm.openCommercialAction,
     applyCommercialAction: crm.applyCommercialAction,
+    handleMarkLeadLost: crm.handleMarkLeadLost,
     commercialActionTitle: crm.commercialActionTitle,
     commercialActionLabel: crm.commercialActionLabel,
   };

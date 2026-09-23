@@ -13,18 +13,22 @@ import {
   setMonth,
   setYear,
   startOfMonth,
+  subMonths,
 } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import toast, { Toaster } from 'react-hot-toast';
 import {
-  BarChart3,
+  ArrowDownRight,
+  ArrowUpRight,
+  Award,
   CalendarRange,
+  Clock,
   Download,
   Layers3,
-  Link2,
   Loader2,
+  MapPin,
   Package,
   ReceiptText,
   Sparkles,
@@ -43,10 +47,10 @@ import {
 } from 'recharts';
 
 type GlassPane = {
-  oh?: number;
-  ow?: number;
-  h?: number;
   w?: number;
+  h?: number;
+  ow?: number;
+  oh?: number;
   label?: string;
 };
 
@@ -105,6 +109,16 @@ type FilmRankingItem = {
   area: number;
   ticket: number;
   share: number;
+  valorPorM2: number;
+  areaShare: number;
+};
+
+type BairroItem = {
+  bairro: string;
+  valor: number;
+  jobs: number;
+  ticket: number;
+  share: number;
 };
 
 const FILM_LABELS: Record<string, string> = {
@@ -117,8 +131,6 @@ const FILM_LABELS: Record<string, string> = {
   nano_ceramica_g20: 'Nano Cerâmica G20',
   jateado: 'Jateado',
 };
-
-const WEEK_LABELS = ['Sem. 1', 'Sem. 2', 'Sem. 3', 'Sem. 4', 'Sem. 5'] as const;
 
 const KPI_TONES: Record<KpiCard['tone'], string> = {
   gold: 'border-[#c9a227]/20 bg-[#c9a227]/10 text-[#f5d77a]',
@@ -163,16 +175,14 @@ function formatPercent(value: number) {
   return `${Math.round(value)}%`;
 }
 
-function semanaDoMes(diaDoMes: number) {
-  if (diaDoMes <= 7) return 'Sem. 1';
-  if (diaDoMes <= 14) return 'Sem. 2';
-  if (diaDoMes <= 21) return 'Sem. 3';
-  if (diaDoMes <= 28) return 'Sem. 4';
-  return 'Sem. 5';
-}
-
 function normalizeServiceStatus(status: unknown): ServiceStatus | null {
-  if (status === 'Marcado' || status === 'Confirmado' || status === 'Em Execucao' || status === 'Concluido' || status === 'Reagendar') {
+  if (
+    status === 'Marcado' ||
+    status === 'Confirmado' ||
+    status === 'Em Execucao' ||
+    status === 'Concluido' ||
+    status === 'Reagendar'
+  ) {
     return status;
   }
   if (status === 'Em execução' || status === 'Em execuÃ§Ã£o') return 'Em Execucao';
@@ -189,7 +199,11 @@ function getLeadServiceStatus(lead: LeadServiceRecord): ServiceStatus | null {
 }
 
 function getLeadServiceReferenceDate(lead: LeadServiceRecord) {
-  return parseDateValue(lead.data_servico) || parseDateValue(lead.status_changed_at) || parseDateValue(lead.created_at);
+  return (
+    parseDateValue(lead.data_servico) ||
+    parseDateValue(lead.status_changed_at) ||
+    parseDateValue(lead.created_at)
+  );
 }
 
 function isServiceLeadInPeriod(lead: LeadServiceRecord, inicio: Date, fim: Date) {
@@ -205,12 +219,6 @@ function isServiceLeadInPeriod(lead: LeadServiceRecord, inicio: Date, fim: Date)
   return referenceDate >= inicio && referenceDate <= fim;
 }
 
-function getServiceStatusLabel(status?: ServiceStatus | null) {
-  if (status === 'Em Execucao') return 'Em execução';
-  if (status === 'Concluido') return 'Feito';
-  return status || 'Serviço';
-}
-
 function normalizeRecord(row: Record<string, unknown>, lead?: LeadServiceRecord): ExtratoRecord {
   const serviceStatus = lead ? getLeadServiceStatus(lead) : null;
   const serviceDate = lead ? getLeadServiceReferenceDate(lead)?.toISOString() || null : null;
@@ -220,11 +228,23 @@ function normalizeRecord(row: Record<string, unknown>, lead?: LeadServiceRecord)
     cliente: asString(row.cliente) || asString(row.name) || asString(row.nome) || lead?.name || '',
     valor: asNumber(row.valor) || asNumber(lead?.value),
     qtd: asNumber(row.qtd),
-    created_at: serviceDate || asString(row.created_at) || asString(row.data) || asString(row.createdAt) || new Date().toISOString(),
-    selected_film: asNullableString(row.selected_film) || asNullableString(row.selectedFilm) || asNullableString(lead?.film_type),
+    created_at:
+      serviceDate ||
+      asString(row.created_at) ||
+      asString(row.data) ||
+      asString(row.createdAt) ||
+      new Date().toISOString(),
+    selected_film:
+      asNullableString(row.selected_film) ||
+      asNullableString(row.selectedFilm) ||
+      asNullableString(lead?.film_type),
     modo_otimizacao: asNullableString(row.modo_otimizacao) || asNullableString(row.modoOtimizacao),
-    vidros: Array.isArray(row.vidros) ? row.vidros as GlassPane[] : [],
-    bairro: asNullableString(row.bairro) || asNullableString(row.neighborhood) || asNullableString(row.bairro_cliente) || asNullableString(lead?.neighborhood),
+    vidros: Array.isArray(row.vidros) ? (row.vidros as GlassPane[]) : [],
+    bairro:
+      asNullableString(row.bairro) ||
+      asNullableString(row.neighborhood) ||
+      asNullableString(row.bairro_cliente) ||
+      asNullableString(lead?.neighborhood),
     neighborhood: asNullableString(row.neighborhood) || asNullableString(lead?.neighborhood),
     area: row.area === null || row.area === undefined ? null : asNumber(row.area),
     m2: row.m2 === null || row.m2 === undefined ? lead?.sqm ?? null : asNumber(row.m2),
@@ -283,10 +303,13 @@ function LoadingSkeleton() {
         ))}
       </div>
       <div className="grid gap-5 xl:grid-cols-[1.45fr_1fr]">
-        <div className="h-[320px] rounded-2xl border border-white/5 bg-white/[0.03] animate-pulse" />
-        <div className="h-[320px] rounded-2xl border border-white/5 bg-white/[0.03] animate-pulse" />
+        <div className="h-[340px] rounded-2xl border border-white/5 bg-white/[0.03] animate-pulse" />
+        <div className="h-[340px] rounded-2xl border border-white/5 bg-white/[0.03] animate-pulse" />
       </div>
-      <div className="h-[420px] rounded-2xl border border-white/5 bg-white/[0.03] animate-pulse" />
+      <div className="grid gap-5 xl:grid-cols-[1.35fr_1fr]">
+        <div className="h-[380px] rounded-2xl border border-white/5 bg-white/[0.03] animate-pulse" />
+        <div className="h-[380px] rounded-2xl border border-white/5 bg-white/[0.03] animate-pulse" />
+      </div>
     </div>
   );
 }
@@ -296,6 +319,7 @@ export function ExtratosMensaisSupabase() {
   const [mesSelecionado, setMesSelecionado] = useState(getMonth(hoje));
   const [anoSelecionado, setAnoSelecionado] = useState(getYear(hoje));
   const [registros, setRegistros] = useState<ExtratoRecord[]>([]);
+  const [allLeads, setAllLeads] = useState<LeadServiceRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [exportando, setExportando] = useState(false);
@@ -337,13 +361,21 @@ export function ExtratosMensaisSupabase() {
         if (!leadsResponse.ok || !Array.isArray(leadsPayload)) {
           const details = getCrmApiErrorMessage(leadsPayload, leadsResponse.statusText);
           setRegistros([]);
+          setAllLeads([]);
           setErrorMessage(`Erro ao carregar serviços do CRM: ${details}`);
           toast.error('Erro ao carregar serviços do CRM');
           return;
         }
 
-        const serviceLeads = (leadsPayload as LeadServiceRecord[])
-          .filter((lead) => isServiceLeadInPeriod(lead, inicio, fim));
+        const validLeads = (leadsPayload as LeadServiceRecord[]).filter((lead) => {
+          if (lead.deleted_at || lead.status === 'Perdido') return false;
+          const sStatus = getLeadServiceStatus(lead);
+          return sStatus && sStatus !== 'Reagendar' && !!getLeadServiceReferenceDate(lead);
+        });
+
+        setAllLeads(validLeads);
+
+        const serviceLeads = validLeads.filter((lead) => isServiceLeadInPeriod(lead, inicio, fim));
         const serviceLeadIds = serviceLeads.map((lead) => lead.id).filter(Boolean);
 
         if (serviceLeadIds.length === 0) {
@@ -359,17 +391,13 @@ export function ExtratosMensaisSupabase() {
 
         if (cancelled) return;
 
-        if (!historyResponse.ok || !historyPayload || !Array.isArray(historyPayload.items)) {
-          setRegistros([]);
-          setErrorMessage('Erro ao carregar orçamentos vinculados aos serviços.');
-          toast.error('Erro ao carregar orçamentos vinculados');
-          return;
-        }
-
-        const historyData = historyPayload.items as Record<string, unknown>[];
+        const historyData =
+          historyPayload && Array.isArray(historyPayload.items)
+            ? (historyPayload.items as Record<string, unknown>[])
+            : [];
 
         const historyByLeadId = new Map<string, Record<string, unknown>>();
-        (historyData || []).forEach((row) => {
+        historyData.forEach((row) => {
           const leadId = asNullableString(row.lead_id);
           if (leadId && !historyByLeadId.has(leadId)) {
             historyByLeadId.set(leadId, row);
@@ -380,10 +408,11 @@ export function ExtratosMensaisSupabase() {
       } catch (error) {
         if (!cancelled) {
           setRegistros([]);
+          setAllLeads([]);
           setErrorMessage(
             isAbortError(error)
               ? 'A consulta demorou muito (timeout). Tente novamente.'
-              : 'Erro inesperado ao carregar o extrato. Tente novamente.',
+              : 'Erro inesperado ao carregar o extrato. Tente novamente.'
           );
           toast.error('Erro ao carregar o extrato mensal');
         }
@@ -403,16 +432,6 @@ export function ExtratosMensaisSupabase() {
     format(setMonth(new Date(), mesSelecionado), 'MMMM', { locale: ptBR })
   );
 
-  const dadosOrdenados = useMemo(
-    () =>
-      [...registros].sort((a, b) => {
-        const da = new Date(a.created_at || 0).getTime();
-        const db = new Date(b.created_at || 0).getTime();
-        return db - da;
-      }),
-    [registros]
-  );
-
   const faturamentoTotal = useMemo(
     () => registros.reduce((sum, row) => sum + Number(row.valor || 0), 0),
     [registros]
@@ -430,15 +449,7 @@ export function ExtratosMensaisSupabase() {
     [registros]
   );
 
-  const maiorOrcamento = useMemo(
-    () => (registros.length > 0 ? Math.max(...registros.map((row) => Number(row.valor || 0))) : 0),
-    [registros]
-  );
-
-  const calculatorSourceCount = useMemo(
-    () => registros.filter((record) => record.source === 'calculator').length,
-    [registros]
-  );
+  const precoMedioPorM2 = m2Total > 0 ? faturamentoTotal / m2Total : 0;
 
   const servicosFeitos = useMemo(
     () => registros.filter((record) => record.service_status === 'Concluido').length,
@@ -446,21 +457,82 @@ export function ExtratosMensaisSupabase() {
   );
 
   const servicosAgendados = Math.max(0, numJobs - servicosFeitos);
+  const taxaConclusao = numJobs > 0 ? Math.round((servicosFeitos / numJobs) * 100) : 0;
 
-  const dadosSemana = useMemo(() => {
-    const base = WEEK_LABELS.reduce<Record<typeof WEEK_LABELS[number], number>>((acc, label) => {
-      acc[label] = 0;
-      return acc;
-    }, {} as Record<typeof WEEK_LABELS[number], number>);
+  // --- COMPARAÇÃO MÊS ANTERIOR (MoM) ---
+  const dadosMesAnterior = useMemo(() => {
+    const dataRefAnt = subMonths(setYear(setMonth(new Date(), mesSelecionado), anoSelecionado), 1);
+    const inicioAnt = startOfMonth(dataRefAnt);
+    const fimAnt = endOfMonth(dataRefAnt);
+    const leadsAnt = allLeads.filter((l) => isServiceLeadInPeriod(l, inicioAnt, fimAnt));
+    const faturamento = leadsAnt.reduce((acc, l) => acc + (Number(l.value) || 0), 0);
+    const jobs = leadsAnt.length;
+    const ticket = jobs > 0 ? faturamento / jobs : 0;
+    return { faturamento, jobs, ticket };
+  }, [allLeads, mesSelecionado, anoSelecionado]);
 
-    registros.forEach((record) => {
-      const key = semanaDoMes(getDate(new Date(record.created_at || new Date()))) as typeof WEEK_LABELS[number];
-      base[key] += Number(record.valor || 0);
+  const variacaoMoM = useMemo(() => {
+    if (dadosMesAnterior.faturamento <= 0) return null;
+    const diff = faturamentoTotal - dadosMesAnterior.faturamento;
+    const percentual = (diff / dadosMesAnterior.faturamento) * 100;
+    return { diff, percentual };
+  }, [faturamentoTotal, dadosMesAnterior.faturamento]);
+
+  // --- COMPARAÇÃO ANO ANTERIOR (YoY) ---
+  const dadosMesAnoAnterior = useMemo(() => {
+    const dataRefYoY = setYear(setMonth(new Date(), mesSelecionado), anoSelecionado - 1);
+    const inicioYoY = startOfMonth(dataRefYoY);
+    const fimYoY = endOfMonth(dataRefYoY);
+    const leadsYoY = allLeads.filter((l) => isServiceLeadInPeriod(l, inicioYoY, fimYoY));
+    const faturamento = leadsYoY.reduce((acc, l) => acc + (Number(l.value) || 0), 0);
+    const jobs = leadsYoY.length;
+    return { faturamento, jobs };
+  }, [allLeads, mesSelecionado, anoSelecionado]);
+
+  const variacaoYoY = useMemo(() => {
+    if (dadosMesAnoAnterior.faturamento <= 0) return null;
+    const diff = faturamentoTotal - dadosMesAnoAnterior.faturamento;
+    const percentual = (diff / dadosMesAnoAnterior.faturamento) * 100;
+    return { diff, percentual };
+  }, [faturamentoTotal, dadosMesAnoAnterior.faturamento]);
+
+  // --- TRAJETÓRIA ANUAL DOS 12 MESES (SAZONALIDADE) ---
+  const dadosAno12Meses = useMemo(() => {
+    const mesesAbrev = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+    return mesesAbrev.map((abrev, index) => {
+      const dRef = setYear(setMonth(new Date(), index), anoSelecionado);
+      const dInicio = startOfMonth(dRef);
+      const dFim = endOfMonth(dRef);
+      const leadsDoMes = allLeads.filter((l) => isServiceLeadInPeriod(l, dInicio, dFim));
+      const faturamento = leadsDoMes.reduce((acc, l) => acc + (Number(l.value) || 0), 0);
+      const jobs = leadsDoMes.length;
+      return {
+        index,
+        mes: abrev,
+        mesCompleto: capitalizeFirst(format(setMonth(new Date(), index), 'MMMM', { locale: ptBR })),
+        valor: faturamento,
+        jobs,
+        isSelected: index === mesSelecionado,
+      };
     });
+  }, [allLeads, anoSelecionado, mesSelecionado]);
 
-    return WEEK_LABELS.map((semana) => ({ semana, valor: base[semana] }));
-  }, [registros]);
+  const melhorMesDoAno = useMemo(() => {
+    const mesesComValor = dadosAno12Meses.filter((m) => m.valor > 0);
+    if (mesesComValor.length === 0) return null;
+    return mesesComValor.reduce((best, cur) => (cur.valor > best.valor ? cur : best));
+  }, [dadosAno12Meses]);
 
+  const faturamentoAcumuladoAno = useMemo(() => {
+    return dadosAno12Meses.reduce((acc, m) => acc + m.valor, 0);
+  }, [dadosAno12Meses]);
+
+  const mediaMensalAno = useMemo(() => {
+    const mesesComValor = dadosAno12Meses.filter((m) => m.valor > 0);
+    return mesesComValor.length > 0 ? faturamentoAcumuladoAno / mesesComValor.length : 0;
+  }, [dadosAno12Meses, faturamentoAcumuladoAno]);
+
+  // --- UPGRADE MASTER NO RANKING DE PELÍCULAS ---
   const rankingPeliculas = useMemo<FilmRankingItem[]>(() => {
     const porPelicula: Record<string, { valor: number; jobs: number; jobsComValor: number; area: number }> = {};
 
@@ -482,22 +554,34 @@ export function ExtratosMensaisSupabase() {
         area: dados.area,
         ticket: dados.jobsComValor > 0 ? dados.valor / dados.jobsComValor : 0,
         share: faturamentoTotal > 0 ? (dados.valor / faturamentoTotal) * 100 : 0,
+        valorPorM2: dados.area > 0 ? dados.valor / dados.area : 0,
+        areaShare: m2Total > 0 ? (dados.area / m2Total) * 100 : 0,
       }))
       .sort((a, b) => b.valor - a.valor);
-  }, [faturamentoTotal, registros]);
+  }, [faturamentoTotal, m2Total, registros]);
 
-  const melhorSemana = useMemo(() => {
-    if (faturamentoTotal <= 0) return null;
-    return dadosSemana.reduce((best, current) => (current.valor > best.valor ? current : best));
-  }, [dadosSemana, faturamentoTotal]);
+  // --- RITMO OPERACIONAL & MÉDIAS DO MÊS ---
+  const diasComAtendimento = useMemo(() => {
+    const dias = new Set<string>();
+    registros.forEach((r) => {
+      if (r.created_at) {
+        dias.add(format(new Date(r.created_at), 'yyyy-MM-dd'));
+      }
+    });
+    return dias.size;
+  }, [registros]);
+
+  const mediaDiariaAtiva = useMemo(() => {
+    return diasComAtendimento > 0 ? faturamentoTotal / diasComAtendimento : 0;
+  }, [diasComAtendimento, faturamentoTotal]);
 
   const melhorDia = useMemo(() => {
     if (faturamentoTotal <= 0) return null;
 
-    const porDia: Record<string, { valor: number; jobs: number }> = {};
+    const porDia: Record<string, { valor: number; jobs: number; clientePrincipal: string }> = {};
     registros.forEach((record) => {
       const key = format(new Date(record.created_at || new Date()), 'yyyy-MM-dd');
-      if (!porDia[key]) porDia[key] = { valor: 0, jobs: 0 };
+      if (!porDia[key]) porDia[key] = { valor: 0, jobs: 0, clientePrincipal: record.cliente || '' };
       porDia[key].valor += Number(record.valor || 0);
       porDia[key].jobs += 1;
     });
@@ -507,35 +591,82 @@ export function ExtratosMensaisSupabase() {
       .sort((a, b) => b.valor - a.valor)[0] || null;
   }, [faturamentoTotal, registros]);
 
-  const peliculaLider = rankingPeliculas[0] || null;
+  const quinzenas = useMemo(() => {
+    let q1 = 0;
+    let q2 = 0;
+    registros.forEach((r) => {
+      const dia = getDate(new Date(r.created_at || new Date()));
+      const val = Number(r.valor || 0);
+      if (dia <= 15) q1 += val;
+      else q2 += val;
+    });
+    const total = q1 + q2;
+    return {
+      q1Valor: q1,
+      q2Valor: q2,
+      q1Percent: total > 0 ? (q1 / total) * 100 : 0,
+      q2Percent: total > 0 ? (q2 / total) * 100 : 0,
+    };
+  }, [registros]);
 
-  const tabelaResumo = useMemo(
-    () =>
-      dadosOrdenados.map((record) => ({
-        cliente: record.cliente || 'Sem nome',
-        pelicula: getFilmLabel(record),
-        valor: formatBRL(Number(record.valor || 0)),
-        area: getAreaTotal(record),
-        data: record.created_at ? format(new Date(record.created_at), 'dd/MM/yyyy') : '-',
-        status: getServiceStatusLabel(record.service_status),
-        origem: record.source === 'calculator' ? 'Orçamento' : 'Lead',
-      })),
-    [dadosOrdenados]
-  );
+  const projecaoFechamento = useMemo(() => {
+    const hojeData = new Date();
+    const isCurrentMonthAndYear =
+      getMonth(hojeData) === mesSelecionado && getYear(hojeData) === anoSelecionado;
+    if (!isCurrentMonthAndYear || faturamentoTotal <= 0) return null;
 
+    const diaAtual = getDate(hojeData);
+    const totalDiasMes = getDate(endOfMonth(hojeData));
+    if (diaAtual <= 0) return null;
+
+    const runRate = faturamentoTotal / diaAtual;
+    return runRate * totalDiasMes;
+  }, [mesSelecionado, anoSelecionado, faturamentoTotal]);
+
+  // --- GEOLOCALIZAÇÃO: TOP BAIRROS ---
+  const topBairros = useMemo<BairroItem[]>(() => {
+    const porBairro: Record<string, { valor: number; jobs: number }> = {};
+    registros.forEach((r) => {
+      let b = r.neighborhood || r.bairro;
+      if (!b || b.trim() === '') b = 'Outros / Não inf.';
+      else b = capitalizeFirst(b.trim());
+      if (!porBairro[b]) porBairro[b] = { valor: 0, jobs: 0 };
+      porBairro[b].valor += Number(r.valor || 0);
+      porBairro[b].jobs += 1;
+    });
+
+    return Object.entries(porBairro)
+      .map(([bairro, dados]) => ({
+        bairro,
+        valor: dados.valor,
+        jobs: dados.jobs,
+        ticket: dados.jobs > 0 ? dados.valor / dados.jobs : 0,
+        share: faturamentoTotal > 0 ? (dados.valor / faturamentoTotal) * 100 : 0,
+      }))
+      .sort((a, b) => b.valor - a.valor)
+      .slice(0, 5);
+  }, [registros, faturamentoTotal]);
+
+  // --- TOP 4 KPIS COM SUBTEXTOS INTELIGENTES ---
   const kpis: KpiCard[] = useMemo(() => {
+    let subtextFaturamento = 'faturamento de serviços do mês';
+    if (variacaoMoM !== null) {
+      const sinal = variacaoMoM.percentual >= 0 ? '+' : '';
+      subtextFaturamento = `${sinal}${variacaoMoM.percentual.toFixed(1)}% vs mês anterior`;
+    }
+
     return [
       {
         label: 'Faturamento',
         value: formatBRL(faturamentoTotal),
-        subtext: 'serviços feitos e agendados',
+        subtext: subtextFaturamento,
         icon: Wallet,
         tone: 'gold',
       },
       {
         label: 'Serviços',
         value: String(numJobs),
-        subtext: `${servicosAgendados} agendado${servicosAgendados !== 1 ? 's' : ''} • ${servicosFeitos} feito${servicosFeitos !== 1 ? 's' : ''}`,
+        subtext: `${taxaConclusao}% concluídos (${servicosFeitos} feitos • ${servicosAgendados} agendados)`,
         icon: ReceiptText,
         tone: 'white',
       },
@@ -543,21 +674,32 @@ export function ExtratosMensaisSupabase() {
         label: 'Ticket médio',
         value: formatBRL(ticketMedio),
         subtext:
-          servicosComValor.length > 0 && servicosComValor.length < numJobs
-            ? `média de ${servicosComValor.length} serviço${servicosComValor.length !== 1 ? 's' : ''} com valor`
-            : 'receita média por serviço',
+          servicosComValor.length > 0
+            ? `média em ${servicosComValor.length} serviço(s) com valor`
+            : 'receita média por atendimento',
         icon: TrendingUp,
         tone: 'emerald',
       },
       {
-        label: m2Total > 0 ? 'Área estimada' : 'Maior serviço',
-        value: m2Total > 0 ? `${m2Total.toFixed(1)} m²` : formatBRL(maiorOrcamento),
-        subtext: m2Total > 0 ? 'm² somados no extrato' : 'maior valor individual',
+        label: 'Área aplicada',
+        value: `${m2Total.toFixed(1)} m²`,
+        subtext: precoMedioPorM2 > 0 ? `média de ${formatBRL(precoMedioPorM2)}/m² instalado` : 'metragem somada no extrato',
         icon: Package,
         tone: 'sky',
       },
     ];
-  }, [faturamentoTotal, maiorOrcamento, m2Total, numJobs, servicosAgendados, servicosFeitos, servicosComValor.length, ticketMedio]);
+  }, [
+    faturamentoTotal,
+    m2Total,
+    numJobs,
+    precoMedioPorM2,
+    servicosAgendados,
+    servicosComValor.length,
+    servicosFeitos,
+    taxaConclusao,
+    ticketMedio,
+    variacaoMoM,
+  ]);
 
   async function exportarPDF() {
     const elemento = document.getElementById('extrato-conteudo');
@@ -567,7 +709,7 @@ export function ExtratosMensaisSupabase() {
 
     try {
       setExportando(true);
-      toastId = toast.loading('Gerando PDF...');
+      toastId = toast.loading('Gerando PDF analítico...');
 
       const canvas = await html2canvas(elemento, {
         scale: 2,
@@ -593,7 +735,7 @@ export function ExtratosMensaisSupabase() {
   }
 
   return (
-    <div className="relative min-h-[calc(100vh-2rem)] overflow-hidden space-y-5 bg-[#040811] px-4 py-6 md:px-6 md:py-8">
+    <div className="relative min-h-[calc(100vh-2rem)] overflow-hidden space-y-5 bg-[#040811] px-4 py-6 md:px-6 md:py-8 font-sans">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute left-[8%] top-12 h-80 w-80 rounded-full bg-[#c9a227]/6 blur-[120px]" />
         <div className="absolute right-[6%] top-32 h-[420px] w-[420px] rounded-full bg-sky-500/5 blur-[160px]" />
@@ -611,19 +753,20 @@ export function ExtratosMensaisSupabase() {
         }}
       />
 
+      {/* HEADER DA PÁGINA */}
       <div className="relative rounded-2xl border border-white/5 bg-gradient-to-br from-[#07111d]/95 via-[#07111d]/80 to-[#04080f]/95 p-5 shadow-2xl shadow-black/20 backdrop-blur-md md:p-6">
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#c9a227]/40 to-transparent" />
         <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
           <div className="max-w-3xl">
             <span className="inline-flex items-center gap-2 rounded-full border border-[#c9a227]/20 bg-[#c9a227]/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.3em] text-[#eab308]">
               <span className="h-1.5 w-1.5 rounded-full bg-[#eab308]" />
-              Fechamento comercial
+              Inteligência Financeira
             </span>
-            <h2 className="mt-4 text-3xl font-black tracking-tight text-white md:text-5xl">
+            <h2 className="mt-4 text-3xl font-black tracking-tight text-white md:text-4xl lg:text-5xl font-heading">
               Extratos Mensais
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-white/55 md:text-[15px]">
-              Receita, mix de películas e lista de serviços feitos ou agendados no mês, sem misturar orçamentos que não viraram execução.
+              Visão analítica de sazonalidade anual, eficiência de faturamento por película, ritmo operacional e distribuição geográfica.
             </p>
           </div>
 
@@ -672,7 +815,7 @@ export function ExtratosMensaisSupabase() {
               ) : (
                 <Download className="h-4 w-4" />
               )}
-              PDF
+              Baixar PDF
             </button>
           </div>
         </div>
@@ -685,7 +828,8 @@ export function ExtratosMensaisSupabase() {
           <p className="font-semibold">{errorMessage}</p>
         </div>
       ) : (
-        <div id="extrato-conteudo" className="relative space-y-5">
+        <div id="extrato-conteudo" className="relative space-y-6">
+          {/* SECTION 1: TOP 4 KPIS */}
           <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
             {kpis.map((card) => {
               const Icon = card.icon;
@@ -703,9 +847,11 @@ export function ExtratosMensaisSupabase() {
                       <p className="mt-2 truncate text-2xl font-black tracking-tight text-white">
                         {card.value}
                       </p>
-                      <p className="mt-1 text-xs text-white/40">{card.subtext}</p>
+                      <p className="mt-1 truncate text-xs text-white/45">{card.subtext}</p>
                     </div>
-                    <div className={`rounded-2xl border p-3 shadow-inner shadow-black/20 transition ${KPI_TONES[card.tone]}`}>
+                    <div
+                      className={`rounded-2xl border p-3 shadow-inner shadow-black/20 transition ${KPI_TONES[card.tone]}`}
+                    >
                       <Icon className="h-5 w-5" />
                     </div>
                   </div>
@@ -714,241 +860,453 @@ export function ExtratosMensaisSupabase() {
             })}
           </section>
 
+          {/* SECTION 2: VISÃO ANUAL (12 MESES) & INTELIGÊNCIA TEMPORAL */}
           <section className="grid gap-5 xl:grid-cols-[1.45fr_1fr]">
+            {/* GRÁFICO ANUAL: 12 MESES (SAZONALIDADE) */}
             <article className="rounded-2xl border border-white/5 bg-[#07111d]/78 p-5 shadow-2xl shadow-black/20 backdrop-blur-md md:p-6">
               <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                  <span className="text-[10px] uppercase tracking-[0.26em] text-white/40 font-semibold">
-                    Faturamento por semana
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] uppercase tracking-[0.26em] text-white/40 font-semibold">
+                      Sazonalidade & Trajetória Anual
+                    </span>
+                    <span className="rounded bg-[#c9a227]/15 px-2 py-0.5 text-[10px] font-bold text-[#f5d77a]">
+                      12 Meses
+                    </span>
+                  </div>
                   <h3 className="mt-1 text-lg font-bold text-white">
-                    {tituloMes} / {anoSelecionado}
+                    Faturamento Mensal de {anoSelecionado}
                   </h3>
+                  <p className="text-xs text-white/40">
+                    Acompanhe qual é a melhor época do ano e a evolução de receita mês a mês.
+                  </p>
                 </div>
                 <span className="inline-flex w-fit items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs font-semibold text-white/55">
                   <CalendarRange className="h-3.5 w-3.5 text-[#eab308]" />
-                  {numJobs} serviço{numJobs !== 1 ? 's' : ''}
+                  Mês ativo: {tituloMes}
                 </span>
               </div>
 
-              <div className="h-[285px]">
-                {faturamentoTotal <= 0 ? (
+              <div className="h-[270px]">
+                {faturamentoAcumuladoAno <= 0 ? (
                   <div className="flex h-full items-center justify-center rounded-2xl border border-dashed border-white/10 bg-white/[0.02] text-center text-sm text-white/35">
-                    Nenhum serviço feito ou agendado neste período.
+                    Nenhum serviço registrado no ano de {anoSelecionado}.
                   </div>
                 ) : (
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={dadosSemana} barSize={44} barGap={8}>
+                    <BarChart
+                      data={dadosAno12Meses}
+                      barSize={28}
+                      barGap={6}
+                      onClick={(state) => {
+                        const activeIndex = state?.activeTooltipIndex;
+                        if (typeof activeIndex === 'number' && activeIndex >= 0 && activeIndex <= 11) {
+                          setMesSelecionado(activeIndex);
+                        }
+                      }}
+                      className="cursor-pointer"
+                    >
                       <CartesianGrid
                         strokeDasharray="3 3"
-                        stroke="rgba(255,255,255,0.045)"
+                        stroke="rgba(255,255,255,0.04)"
                         vertical={false}
                       />
                       <XAxis
-                        dataKey="semana"
-                        tick={{ fontSize: 12, fill: 'rgba(255,255,255,0.58)' }}
+                        dataKey="mes"
+                        tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.6)' }}
                         axisLine={false}
                         tickLine={false}
                       />
                       <YAxis
-                        tick={{ fontSize: 12, fill: 'rgba(255,255,255,0.5)' }}
+                        tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.45)' }}
                         tickFormatter={(value) => `R$${(Number(value) / 1000).toFixed(0)}k`}
-                        width={56}
+                        width={52}
                         axisLine={false}
                         tickLine={false}
                       />
                       <Tooltip
-                        cursor={{ fill: 'rgba(255,255,255,0.045)' }}
-                        formatter={(value: number) => formatBRL(Number(value))}
+                        cursor={{ fill: 'rgba(255,255,255,0.04)' }}
+                        formatter={(value: number) => [formatBRL(Number(value)), 'Faturamento']}
+                        labelFormatter={(_, payload) => {
+                          const item = payload?.[0]?.payload as (typeof dadosAno12Meses)[number] | undefined;
+                          return item ? `${item.mesCompleto} / ${anoSelecionado} (${item.jobs} serviços)` : '';
+                        }}
                         contentStyle={{
                           background: '#04080f',
-                          border: '1px solid rgba(255,255,255,0.08)',
-                          borderRadius: 14,
+                          border: '1px solid rgba(255,255,255,0.1)',
+                          borderRadius: 12,
                           color: '#fff',
                         }}
                       />
-                      <Bar dataKey="valor" radius={[8, 8, 0, 0]}>
-                        {dadosSemana.map((entry) => (
-                          <Cell
-                            key={entry.semana}
-                            fill={entry.semana === melhorSemana?.semana ? '#f7d66a' : '#8a6d10'}
-                            fillOpacity={entry.valor > 0 ? 1 : 0.28}
-                          />
-                        ))}
+                      <Bar dataKey="valor" radius={[6, 6, 0, 0]}>
+                        {dadosAno12Meses.map((entry) => {
+                          const isCurrent = entry.index === mesSelecionado;
+                          const isBest = melhorMesDoAno?.index === entry.index;
+                          return (
+                            <Cell
+                              key={entry.mes}
+                              fill={isCurrent ? '#f7d66a' : isBest ? '#c9a227' : '#735914'}
+                              fillOpacity={entry.valor > 0 ? (isCurrent ? 1 : 0.75) : 0.15}
+                            />
+                          );
+                        })}
                       </Bar>
                     </BarChart>
                   </ResponsiveContainer>
                 )}
               </div>
+              <p className="mt-2 text-center text-[11px] text-white/30">
+                💡 Dica: Clique na barra de qualquer mês para navegar e analisar seus dados.
+              </p>
             </article>
 
-            <article className="rounded-2xl border border-white/5 bg-[#07111d]/78 p-5 shadow-2xl shadow-black/20 backdrop-blur-md md:p-6">
-              <div className="mb-5 flex items-center justify-between gap-3">
-                <div>
-                  <span className="text-[10px] uppercase tracking-[0.26em] text-white/40 font-semibold">
-                    Leitura do mês
-                  </span>
-                  <h3 className="mt-1 text-lg font-bold text-white">Sinais úteis</h3>
+            {/* INTELIGÊNCIA ANUAL & SINAIS ESTRATÉGICOS */}
+            <article className="flex flex-col justify-between rounded-2xl border border-white/5 bg-[#07111d]/78 p-5 shadow-2xl shadow-black/20 backdrop-blur-md md:p-6">
+              <div>
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <div>
+                    <span className="text-[10px] uppercase tracking-[0.26em] text-white/40 font-semibold">
+                      Leitura Estratégica
+                    </span>
+                    <h3 className="mt-1 text-lg font-bold text-white">Sinais & Comparativos</h3>
+                  </div>
+                  <Sparkles className="h-5 w-5 text-[#f5d77a]" />
                 </div>
-                <Sparkles className="h-5 w-5 text-[#f5d77a]" />
+
+                <div className="space-y-3">
+                  {/* MELHOR MÊS DO ANO */}
+                  <div className="rounded-2xl border border-[#c9a227]/20 bg-[#c9a227]/10 p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-[#f5d77a]">
+                        <Award className="h-3.5 w-3.5" />
+                        Melhor Época / Mês Recorde ({anoSelecionado})
+                      </span>
+                      {melhorMesDoAno && (
+                        <span className="text-[11px] font-semibold text-white/50">
+                          {melhorMesDoAno.jobs} serviços
+                        </span>
+                      )}
+                    </div>
+                    <div className="mt-2 flex items-baseline justify-between gap-2">
+                      <p className="text-xl font-black text-white">
+                        {melhorMesDoAno ? melhorMesDoAno.mesCompleto : 'Sem dados'}
+                      </p>
+                      <p className="text-base font-extrabold text-[#f5d77a]">
+                        {melhorMesDoAno ? formatBRL(melhorMesDoAno.valor) : '-'}
+                      </p>
+                    </div>
+                    <p className="mt-1 text-[11px] text-white/50">
+                      Mês de maior pico financeiro da LUME neste exercício.
+                    </p>
+                  </div>
+
+                  {/* CARDS COMPARATIVOS: MoM e YoY */}
+                  <div className="grid gap-2.5 sm:grid-cols-2">
+                    {/* COMPARATIVO MoM */}
+                    <div className="rounded-2xl border border-white/5 bg-white/[0.025] p-3.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] uppercase tracking-wider text-white/40">
+                          vs Mês Anterior
+                        </span>
+                        {variacaoMoM !== null && (
+                          <span
+                            className={`flex items-center text-xs font-bold ${
+                              variacaoMoM.percentual >= 0 ? 'text-emerald-400' : 'text-rose-400'
+                            }`}
+                          >
+                            {variacaoMoM.percentual >= 0 ? (
+                              <ArrowUpRight className="h-3.5 w-3.5" />
+                            ) : (
+                              <ArrowDownRight className="h-3.5 w-3.5" />
+                            )}
+                            {Math.abs(variacaoMoM.percentual).toFixed(1)}%
+                          </span>
+                        )}
+                      </div>
+                      <p className="mt-1.5 text-base font-black text-white">
+                        {variacaoMoM !== null ? formatBRL(variacaoMoM.diff) : '-'}
+                      </p>
+                      <p className="text-[10px] text-white/40">
+                        {dadosMesAnterior.faturamento > 0
+                          ? `Ant: ${formatBRL(dadosMesAnterior.faturamento)}`
+                          : 'Sem dados no mês anterior'}
+                      </p>
+                    </div>
+
+                    {/* COMPARATIVO YoY */}
+                    <div className="rounded-2xl border border-white/5 bg-white/[0.025] p-3.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] uppercase tracking-wider text-white/40">
+                          vs Mesmo Mês ({anoSelecionado - 1})
+                        </span>
+                        {variacaoYoY !== null && (
+                          <span
+                            className={`flex items-center text-xs font-bold ${
+                              variacaoYoY.percentual >= 0 ? 'text-emerald-400' : 'text-rose-400'
+                            }`}
+                          >
+                            {variacaoYoY.percentual >= 0 ? (
+                              <ArrowUpRight className="h-3.5 w-3.5" />
+                            ) : (
+                              <ArrowDownRight className="h-3.5 w-3.5" />
+                            )}
+                            {Math.abs(variacaoYoY.percentual).toFixed(1)}%
+                          </span>
+                        )}
+                      </div>
+                      <p className="mt-1.5 text-base font-black text-white">
+                        {variacaoYoY !== null ? formatBRL(variacaoYoY.diff) : '-'}
+                      </p>
+                      <p className="text-[10px] text-white/40">
+                        {dadosMesAnoAnterior.faturamento > 0
+                          ? `${formatBRL(dadosMesAnoAnterior.faturamento)} em ${anoSelecionado - 1}`
+                          : `Sem base em ${anoSelecionado - 1}`}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div className="space-y-3">
-                <div className="rounded-2xl border border-[#c9a227]/10 bg-[#c9a227]/10 p-4">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#f5d77a]/70">
-                    Película líder
-                  </p>
-                  <div className="mt-2 flex items-end justify-between gap-3">
-                    <p className="min-w-0 truncate text-2xl font-black text-white">
-                      {peliculaLider?.nome || 'Sem dados'}
-                    </p>
-                    <p className="shrink-0 text-sm font-bold text-[#f5d77a]">
-                      {peliculaLider ? formatPercent(peliculaLider.share) : '-'}
-                    </p>
-                  </div>
-                  <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10">
-                    <div
-                      className="h-full rounded-full bg-gradient-to-r from-[#8a6d10] via-[#eab308] to-[#f7d66a]"
-                      style={{ width: peliculaLider ? `${Math.min(100, peliculaLider.share)}%` : '0%' }}
-                    />
-                  </div>
+              {/* RODAPÉ DO CARD ANUAL: YTD E MÉDIA MENSAL */}
+              <div className="mt-4 flex items-center justify-between border-t border-white/5 pt-3.5 text-xs">
+                <div>
+                  <span className="text-white/40">Acumulado {anoSelecionado}:</span>
+                  <span className="ml-1.5 font-bold text-white">
+                    {formatBRL(faturamentoAcumuladoAno)}
+                  </span>
                 </div>
-
-                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
-                  <div className="flex items-center justify-between gap-4 rounded-2xl border border-white/5 bg-white/[0.025] px-4 py-3">
-                    <div className="min-w-0">
-                      <p className="text-xs text-white/40">Melhor semana</p>
-                      <p className="mt-1 font-bold text-white">{melhorSemana?.semana || '-'}</p>
-                    </div>
-                    <p className="shrink-0 text-sm font-bold text-[#f5d77a]">
-                      {formatBRL(melhorSemana?.valor || 0)}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-4 rounded-2xl border border-white/5 bg-white/[0.025] px-4 py-3">
-                    <div className="min-w-0">
-                      <p className="text-xs text-white/40">Melhor dia</p>
-                      <p className="mt-1 font-bold text-white">
-                        {melhorDia ? format(new Date(`${melhorDia.dia}T12:00:00`), 'dd/MM') : '-'}
-                      </p>
-                    </div>
-                    <p className="shrink-0 text-sm font-bold text-[#f5d77a]">
-                      {formatBRL(melhorDia?.valor || 0)}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-4 rounded-2xl border border-white/5 bg-white/[0.025] px-4 py-3">
-                    <div className="min-w-0">
-                      <p className="text-xs text-white/40">Com orçamento vinculado</p>
-                      <p className="mt-1 font-bold text-white">
-                        {calculatorSourceCount}/{numJobs}
-                      </p>
-                    </div>
-                    <Link2 className="h-4 w-4 text-sky-200" />
-                  </div>
+                <div>
+                  <span className="text-white/40">Média mensal:</span>
+                  <span className="ml-1.5 font-bold text-[#f5d77a]">
+                    {formatBRL(mediaMensalAno)}
+                  </span>
                 </div>
               </div>
             </article>
           </section>
 
+          {/* SECTION 3: MIX DE PELÍCULAS (UPGRADE MASTER) & RITMO / BAIRROS */}
           <section className="grid gap-5 xl:grid-cols-[1.35fr_1fr]">
+            {/* UPGRADE MASTER: RANKING DE PELÍCULAS (ANÁLISE DE PRODUTO) */}
             <article className="rounded-2xl border border-white/5 bg-[#07111d]/78 p-5 shadow-2xl shadow-black/20 backdrop-blur-md md:p-6">
-              <div className="mb-5 flex items-center justify-between gap-3">
+              <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <span className="text-[10px] uppercase tracking-[0.26em] text-white/40 font-semibold">
-                    Ranking de películas
+                    Mix de Películas & Rentabilidade
                   </span>
-                  <h3 className="mt-1 text-lg font-bold text-white">Mix de receita e volume</h3>
+                  <h3 className="mt-1 text-lg font-bold text-white">
+                    Eficiência por Linha de Película
+                  </h3>
                 </div>
-                <Layers3 className="h-5 w-5 text-[#c9a227]" />
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-[#c9a227]/20 bg-[#c9a227]/10 px-3 py-1 text-xs font-semibold text-[#f5d77a]">
+                    <Layers3 className="h-3.5 w-3.5" />
+                    {rankingPeliculas.length} película{rankingPeliculas.length !== 1 ? 's' : ''} no mix
+                  </span>
+                </div>
               </div>
 
               {rankingPeliculas.length === 0 ? (
-                <p className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] px-4 py-8 text-center text-sm text-white/40">
-                  Nenhum dado para agrupar por película.
+                <p className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] px-4 py-12 text-center text-sm text-white/40">
+                  Nenhum serviço registrado neste mês para agrupar por película.
                 </p>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-3.5">
                   {rankingPeliculas.map((item, index) => (
                     <div
                       key={item.nome}
-                      className="rounded-2xl border border-white/5 bg-white/[0.025] px-4 py-4 transition hover:border-[#c9a227]/20 hover:bg-white/[0.04]"
+                      className="group rounded-2xl border border-white/5 bg-white/[0.025] p-4 transition hover:border-[#c9a227]/30 hover:bg-white/[0.045]"
                     >
-                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        <div className="flex min-w-0 items-center gap-3">
-                          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-xs font-black text-white/55">
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                        <div className="flex min-w-0 items-start gap-3">
+                          <span
+                            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border text-xs font-black ${
+                              index === 0
+                                ? 'border-[#c9a227]/40 bg-[#c9a227]/20 text-[#f5d77a]'
+                                : 'border-white/10 bg-white/[0.04] text-white/60'
+                            }`}
+                          >
                             {index + 1}
                           </span>
                           <div className="min-w-0">
-                            <p className="truncate text-sm font-bold text-white">{item.nome}</p>
-                            <p className="text-xs text-white/40">
+                            <div className="flex items-center gap-2">
+                              <p className="truncate text-base font-bold text-white">{item.nome}</p>
+                              {index === 0 && (
+                                <span className="rounded-full bg-[#c9a227]/20 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#f5d77a]">
+                                  Líder
+                                </span>
+                              )}
+                            </div>
+                            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-white/45">
+                              <span>
+                                {item.jobs} atendimento{item.jobs !== 1 ? 's' : ''}
+                              </span>
+                              <span>•</span>
+                              <span>Ticket Médio {formatBRL(item.ticket)}</span>
+                              {item.area > 0 && (
+                                <>
+                                  <span>•</span>
+                                  <span>{item.area.toFixed(1)} m² aplicados</span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex sm:flex-col sm:items-end justify-between items-baseline gap-1">
+                          <p className="text-base font-black text-[#f5d77a]">{formatBRL(item.valor)}</p>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-semibold text-white/50">
+                              {formatPercent(item.share)} do mês
+                            </span>
+                            {item.valorPorM2 > 0 && (
+                              <span className="rounded-md border border-emerald-500/20 bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-bold text-emerald-300">
+                                {formatBRL(item.valorPorM2)}/m²
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* BARRA DE PARTICIPAÇÃO VISUAL */}
+                      <div className="mt-3.5 flex items-center gap-3">
+                        <div className="h-2 flex-1 overflow-hidden rounded-full bg-white/10">
+                          <div
+                            className="h-full rounded-full bg-gradient-to-r from-[#8a6d10] via-[#c9a227] to-[#f5d77a]"
+                            style={{ width: `${Math.max(4, Math.min(100, item.share))}%` }}
+                          />
+                        </div>
+                        <span className="shrink-0 text-[11px] font-semibold text-white/40">
+                          {item.share.toFixed(1)}%
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </article>
+
+            {/* COLUNA DA DIREITA: RITMO OPERACIONAL + GEOLOCALIZAÇÃO BAIRROS */}
+            <div className="space-y-5">
+              {/* CARD: RITMO OPERACIONAL DO MÊS */}
+              <article className="rounded-2xl border border-white/5 bg-[#07111d]/78 p-5 shadow-2xl shadow-black/20 backdrop-blur-md md:p-6">
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <div>
+                    <span className="text-[10px] uppercase tracking-[0.26em] text-white/40 font-semibold">
+                      Ritmo & Médias Operacionais
+                    </span>
+                    <h3 className="mt-1 text-lg font-bold text-white">Velocidade de Venda</h3>
+                  </div>
+                  <Clock className="h-5 w-5 text-[#c9a227]" />
+                </div>
+
+                <div className="space-y-3">
+                  {/* MÉDIA DIÁRIA ÚTIL & PROJEÇÃO */}
+                  <div className="grid gap-2.5 sm:grid-cols-2">
+                    <div className="rounded-2xl border border-white/5 bg-white/[0.025] p-3.5">
+                      <p className="text-[10px] uppercase tracking-wider text-white/40">
+                        Média / Dia com Serviço
+                      </p>
+                      <p className="mt-1 text-base font-black text-white">
+                        {formatBRL(mediaDiariaAtiva)}
+                      </p>
+                      <p className="text-[10px] text-white/40">
+                        {diasComAtendimento} dia{diasComAtendimento !== 1 ? 's' : ''} com serviços
+                      </p>
+                    </div>
+
+                    <div className="rounded-2xl border border-white/5 bg-white/[0.025] p-3.5">
+                      <p className="text-[10px] uppercase tracking-wider text-white/40">
+                        {projecaoFechamento ? 'Projeção Fechamento' : 'Pico do Mês'}
+                      </p>
+                      <p className="mt-1 text-base font-black text-[#f5d77a]">
+                        {projecaoFechamento
+                          ? formatBRL(projecaoFechamento)
+                          : melhorDia
+                          ? formatBRL(melhorDia.valor)
+                          : '-'}
+                      </p>
+                      <p className="text-[10px] text-white/40">
+                        {projecaoFechamento
+                          ? 'ritmo atual até o fim do mês'
+                          : melhorDia
+                          ? `em ${format(new Date(`${melhorDia.dia}T12:00:00`), 'dd/MM')}`
+                          : 'sem dados'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* DIVISÃO QUINZENAL (1ª vs 2ª Quinzena) */}
+                  <div className="rounded-2xl border border-white/5 bg-white/[0.025] p-3.5">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-white/60 font-semibold">1ª Quinzena (dias 1-15)</span>
+                      <span className="text-white/60 font-semibold">2ª Quinzena (16-fim)</span>
+                    </div>
+                    <div className="mt-2 flex items-center justify-between font-bold text-sm">
+                      <span className="text-white">{formatBRL(quinzenas.q1Valor)}</span>
+                      <span className="text-[#f5d77a]">{formatBRL(quinzenas.q2Valor)}</span>
+                    </div>
+                    <div className="mt-2 h-2 flex overflow-hidden rounded-full bg-white/10">
+                      <div
+                        className="h-full bg-white/40"
+                        style={{ width: `${quinzenas.q1Percent}%` }}
+                        title={`1ª Quinzena: ${quinzenas.q1Percent.toFixed(0)}%`}
+                      />
+                      <div
+                        className="h-full bg-gradient-to-r from-[#c9a227] to-[#f5d77a]"
+                        style={{ width: `${quinzenas.q2Percent}%` }}
+                        title={`2ª Quinzena: ${quinzenas.q2Percent.toFixed(0)}%`}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </article>
+
+              {/* CARD: GEOLOCALIZAÇÃO - TOP BAIRROS DO RJ */}
+              <article className="rounded-2xl border border-white/5 bg-[#07111d]/78 p-5 shadow-2xl shadow-black/20 backdrop-blur-md md:p-6">
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <div>
+                    <span className="text-[10px] uppercase tracking-[0.26em] text-white/40 font-semibold">
+                      Geolocalização RJ
+                    </span>
+                    <h3 className="mt-1 text-lg font-bold text-white">Top Bairros em Receita</h3>
+                  </div>
+                  <MapPin className="h-5 w-5 text-[#c9a227]" />
+                </div>
+
+                {topBairros.length === 0 ? (
+                  <p className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-4 text-center text-xs text-white/40">
+                    Nenhum endereço informado nos atendimentos deste mês.
+                  </p>
+                ) : (
+                  <div className="space-y-2.5">
+                    {topBairros.map((item, index) => (
+                      <div
+                        key={item.bairro}
+                        className="flex items-center justify-between rounded-xl border border-white/5 bg-white/[0.02] px-3.5 py-2.5 transition hover:bg-white/[0.04]"
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-white/5 text-[10px] font-bold text-white/50">
+                            {index + 1}
+                          </span>
+                          <div className="min-w-0">
+                            <p className="truncate text-xs font-bold text-white">{item.bairro}</p>
+                            <p className="text-[10px] text-white/40">
                               {item.jobs} serviço{item.jobs !== 1 ? 's' : ''} • ticket {formatBRL(item.ticket)}
                             </p>
                           </div>
                         </div>
 
-                        <div className="text-left sm:text-right">
-                          <p className="text-sm font-bold text-[#f5d77a]">{formatBRL(item.valor)}</p>
-                          <p className="text-xs text-white/40">
-                            {formatPercent(item.share)} do mês{item.area > 0 ? ` • ${item.area.toFixed(1)} m²` : ''}
-                          </p>
+                        <div className="text-right shrink-0">
+                          <p className="text-xs font-bold text-[#f5d77a]">{formatBRL(item.valor)}</p>
+                          <p className="text-[10px] text-white/40">{item.share.toFixed(0)}% do mês</p>
                         </div>
                       </div>
-
-                      <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10">
-                        <div
-                          className="h-full rounded-full bg-gradient-to-r from-[#8a6d10] via-[#d4ad30] to-[#f5d77a]"
-                          style={{ width: `${Math.max(4, Math.min(100, item.share))}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </article>
-
-            <article className="rounded-2xl border border-white/5 bg-[#07111d]/78 p-5 shadow-2xl shadow-black/20 backdrop-blur-md md:p-6">
-              <div className="mb-5 flex items-center justify-between gap-3">
-                <div>
-                  <span className="text-[10px] uppercase tracking-[0.26em] text-white/40 font-semibold">
-                    Serviços do período
-                  </span>
-                  <h3 className="mt-1 text-lg font-bold text-white">Lista operacional</h3>
-                </div>
-                <BarChart3 className="h-5 w-5 text-[#c9a227]" />
-              </div>
-
-              {tabelaResumo.length === 0 ? (
-                <p className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] px-4 py-8 text-center text-sm text-white/40">
-                  Nenhum serviço feito ou agendado em {tituloMes} {anoSelecionado}.
-                </p>
-              ) : (
-                <div className="max-h-[520px] space-y-2 overflow-y-auto pr-1">
-                  {tabelaResumo.map((row, index) => (
-                    <div
-                      key={`${row.cliente}-${row.data}-${index}`}
-                      className="rounded-2xl border border-white/5 bg-white/[0.025] px-4 py-3 transition hover:border-white/10 hover:bg-white/[0.04]"
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <p className="truncate text-sm font-bold text-white">{row.cliente}</p>
-                          <p className="mt-1 truncate text-xs text-white/45">
-                            {row.pelicula} • {row.status} • {row.data}
-                            {row.area > 0 ? ` • ${row.area.toFixed(1)} m²` : ''}
-                          </p>
-                        </div>
-                        <div className="shrink-0 text-right">
-                          <p className="text-sm font-bold text-[#f5d77a]">{row.valor}</p>
-                          <p className={`mt-1 text-[10px] font-semibold uppercase tracking-[0.16em] ${row.origem === 'Orçamento' ? 'text-sky-200/80' : 'text-white/40'}`}>
-                            {row.origem}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </article>
+                    ))}
+                  </div>
+                )}
+              </article>
+            </div>
           </section>
         </div>
       )}

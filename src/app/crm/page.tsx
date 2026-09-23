@@ -262,7 +262,11 @@ function CrmApp({ activeTab, onSelectTab }: { activeTab: CrmTab; onSelectTab: (t
           onSelectTab('historico');
           crm.closeLeadDetailModal();
         }}
-        onOpenCommercialAction={crm.openCommercialAction}
+        onOpenCommercialAction={(lead, action) => {
+          crm.closeLeadDetailModal();
+          crm.openCommercialAction(lead, action);
+        }}
+        onMarkLost={crm.handleMarkLeadLost}
       />
 
       <CommercialActionModal

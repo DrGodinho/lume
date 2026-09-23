@@ -10,6 +10,7 @@ import {
 } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AgendaLeadCard } from './AgendaLeadCard';
+import { ServiceCheckInBanner } from './ServiceCheckInBanner';
 import { AgendaFilters } from './AgendaFilters';
 import { AgendaWeekStrip } from './AgendaWeekStrip';
 import { AgendaMonthCalendar } from './AgendaMonthCalendar';
@@ -37,6 +38,9 @@ interface AgendaSectionProps {
   onMarcarFeito?: (leadId: string) => Promise<void>;
   onSetDormant?: (leadId: string, dormant: boolean) => Promise<void>;
   onUpdateServiceStatus?: (leadId: string, serviceStatus: ServiceStatus) => Promise<void>;
+  onCompleteService?: (leadId: string) => Promise<void>;
+  onRescheduleService?: (leadId: string, newDate: string) => Promise<void>;
+  onMarkLost?: (lead: Lead) => Promise<void> | void;
   onAbrirLead?: (lead: Lead) => void;
   onRestoreFromArchive?: (lead: Lead) => Promise<void>;
   isClosedLead?: (status: Lead['status']) => boolean;
@@ -60,6 +64,9 @@ export function AgendaSection(props: AgendaSectionProps = {}) {
   const onMarcarFeito = props.onMarcarFeito ?? crm.handleAgendaMarkDone;
   const onSetDormant = props.onSetDormant ?? crm.handleDormantStateChange;
   const onUpdateServiceStatus = props.onUpdateServiceStatus ?? crm.handleServiceStatusChange;
+  const onCompleteService = props.onCompleteService ?? crm.handleCompleteService;
+  const onRescheduleService = props.onRescheduleService ?? crm.handleRescheduleService;
+  const onMarkLost = props.onMarkLost ?? crm.handleMarkLeadLost;
   const onAbrirLead = props.onAbrirLead ?? crm.setLeadDetail;
   const onRestoreFromArchive = props.onRestoreFromArchive ?? crm.handleRestoreFromArchive;
   const isClosedLead = props.isClosedLead ?? defaultIsClosedLead;
@@ -90,6 +97,7 @@ export function AgendaSection(props: AgendaSectionProps = {}) {
     emDiaCount,
     servicosAgendados,
     servicosHoje,
+    servicosAguardandoConfirmacao,
     serviceStatusCounts,
     serviceRouteGroups,
     monthlyFollowUps,
@@ -159,6 +167,7 @@ export function AgendaSection(props: AgendaSectionProps = {}) {
       onMarcarFeito={onMarcarFeito}
       onSetDormant={onSetDormant}
       onUpdateServiceStatus={onUpdateServiceStatus}
+      onCompleteService={onCompleteService}
       onAbrirLead={onAbrirLead}
       onRestoreFromArchive={onRestoreFromArchive}
       getLeadFollowUpDate={getLeadFollowUpDate}
@@ -231,6 +240,11 @@ export function AgendaSection(props: AgendaSectionProps = {}) {
               </span>
               <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-white/60">{emDiaCount} em dia</span>
               <span className="rounded-full border border-sky-500/20 bg-sky-500/10 px-3 py-1 text-sky-300">{servicosAgendados.length} servicos</span>
+              {servicosAguardandoConfirmacao.length > 0 && (
+                <span className="rounded-full border border-amber-500/30 bg-amber-500/15 px-3 py-1 text-amber-300 shadow-[0_0_0_1px_rgba(245,158,11,0.15)] animate-pulse">
+                  {servicosAguardandoConfirmacao.length} {servicosAguardandoConfirmacao.length === 1 ? 'check-in pendente' : 'check-ins pendentes'}
+                </span>
+              )}
               {leadsCincoAnos.length > 0 && (
                 <span className="rounded-full border border-[#c9a227]/30 bg-[#c9a227]/15 px-3 py-1 text-[#f5d77a] shadow-[0_0_0_1px_rgba(201,162,39,0.15)] animate-pulse">
                   {leadsCincoAnos.length} ciclo de 5 anos
@@ -240,6 +254,20 @@ export function AgendaSection(props: AgendaSectionProps = {}) {
           </div>
         </div>
       </section>
+
+      {servicosAguardandoConfirmacao.length > 0 && (
+        <ServiceCheckInBanner
+          pendingServices={servicosAguardandoConfirmacao}
+          onCompleteService={onCompleteService}
+          onRescheduleService={onRescheduleService}
+          onMarkLost={onMarkLost}
+          onAbrirLead={onAbrirLead}
+          getLeadServiceDate={getLeadServiceDate}
+          getLeadServiceStatus={getLeadServiceStatus}
+          getWhatsAppHref={getWhatsAppHref}
+          formatCurrencyBRL={formatCurrencyBRL}
+        />
+      )}
 
       <AgendaFilters activeView={agendaView} counts={filterCounts} onSelect={openAgendaView} />
 

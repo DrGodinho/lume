@@ -208,7 +208,7 @@ export function HistoricoSupabase(props: HistoricoSupabaseProps = {}) {
       serviceStatus: null,
       proximoContato: null,
       dormant: false,
-      notes: `Orçamento convertido do Supabase (ID: ${orcamento.id}).\nPelícula: ${getHistoryFilmLabel(orcamento)}.\nVidros: ${orcamento.qtd}.${detectedPhone ? `\nTelefone: ${detectedPhone}` : ''}`,
+      notes: `Orçamento convertido do Supabase (ID: ${orcamento.id}).\nPelícula: ${getHistoryFilmLabel(orcamento)}.\nVidros: ${orcamento.qtd}.${detectedPhone ? `\nTelefone: ${detectedPhone}` : ''}${orcamento.desconto && Number(orcamento.desconto) > 0 ? `\nDesconto: ${formatCurrency(Number(orcamento.desconto))}` : ''}`,
     };
     setActiveTab?.('leads');
     openCreateModal({ prefill, sourceCalculatorHistoryId: orcamento.id });
@@ -391,7 +391,12 @@ export function HistoricoSupabase(props: HistoricoSupabaseProps = {}) {
                             {getHistoryFilmLabel(item)}
                           </span>
                         </td>
-                        <td className="py-3.5 text-right font-bold text-[#c9a227]">{formatCurrency(item.valor || 0)}</td>
+                        <td className="py-3.5 text-right font-bold text-[#c9a227]">
+                          <div>{formatCurrency(item.valor || 0)}</div>
+                          {item.desconto && Number(item.desconto) > 0 ? (
+                            <div className="text-[10px] font-normal text-emerald-400">-{formatCurrency(Number(item.desconto))}</div>
+                          ) : null}
+                        </td>
                         <td className="py-3.5 text-center font-mono">{item.qtd || 0}</td>
                         <td className="py-3.5">
                           {item.lead_id ? (
@@ -500,6 +505,14 @@ export function HistoricoSupabase(props: HistoricoSupabaseProps = {}) {
               <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
                 <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-white/50">Valor Total</span>
                 <span className="text-lg font-black text-[#c9a227]">{formatCurrency(selectedOrcamento.valor || 0)}</span>
+              </div>
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
+                <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-white/50">Desconto</span>
+                <span className="text-sm font-bold text-emerald-400">
+                  {selectedOrcamento.desconto && Number(selectedOrcamento.desconto) > 0
+                    ? `-${formatCurrency(Number(selectedOrcamento.desconto))}`
+                    : '—'}
+                </span>
               </div>
               <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
                 <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-white/50">Quantidade</span>

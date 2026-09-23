@@ -38,7 +38,7 @@ const OrcamentoSalvoSchema = z.object({
     modoPerdas: z.string().optional(),
     perdasFixas: z.number().optional(),
   }).catchall(z.unknown()),
-  desconto: z.number(),
+  desconto: z.coerce.number().default(0),
   modoOtimizacao: z.string(),
   selectedFilm: z.string().optional(),
   leadId: z.string().nullable().optional(),
