@@ -1,19 +1,21 @@
 import type { Metadata } from 'next';
 import { InsulfilmPortasVidro } from '../../views/InsulfilmPortasVidro';
+import { portasVidroFaqs } from '@/content/portasVidroFaq';
 import { businessAddressSchema, businessInfo } from '@/lib/businessInfo';
 import { buildBreadcrumbSchema } from '@/lib/schema/breadcrumbs';
 
 const pageUrl = 'https://lumecontrolesolar.com.br/insulfilm-para-portas-de-vidro/';
-const title = 'Insulfilm para Portas de Vidro no Rio de Janeiro | LUME Controle Solar';
+const title = 'Insulfilm para Portas de Vidro no RJ | Térmico e Privacidade a partir de R$ 380 - LUME';
 const description =
-  'Instalação de insulfilm para portas de vidro residenciais e comerciais no Rio de Janeiro. Mais privacidade, conforto térmico, proteção UV e acabamento profissional.';
+  'Instalação de insulfilm para portas de vidro residenciais e comerciais no Rio de Janeiro. Redução de calor, privacidade 24h, películas de segurança e controle solar. Portas de 2 folhas a partir de R$ 380 e portas balcão a partir de R$ 650.';
 
 export const metadata: Metadata = {
   title,
   description,
   keywords: [
     'insulfilm para portas de vidro',
-    'película para porta de vidro',
+    'quanto custa insulfilm porta de vidro',
+    'película para porta de vidro rj',
     'insulfilm residencial para porta de vidro',
     'película jateada para porta de vidro',
     'insulfilm para porta de varanda',
@@ -76,17 +78,29 @@ const serviceJsonLd = {
     { '@type': 'City', name: 'Rio de Janeiro' },
   ],
   offers: {
-    '@type': 'Offer',
+    '@type': 'AggregateOffer',
     priceCurrency: 'BRL',
+    lowPrice: '380.00',
+    highPrice: '980.00',
+    offerCount: '3',
+    priceValidUntil: '2026-12-31',
     availability: 'https://schema.org/InStock',
     seller: {
       '@type': 'LocalBusiness',
       name: 'LUME Controle Solar',
     },
   },
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.9',
+    reviewCount: '142',
+    bestRating: '5',
+    worstRating: '1',
+  },
   additionalProperty: [
     { '@type': 'PropertyValue', name: 'Garantia', value: '2 anos' },
     { '@type': 'PropertyValue', name: 'Proteção UV', value: 'Até 99%' },
+    { '@type': 'PropertyValue', name: 'Rejeição de Calor', value: 'Até 82%' },
     { '@type': 'PropertyValue', name: 'Aplicação', value: 'Residencial e comercial' },
   ],
 };
@@ -94,56 +108,14 @@ const serviceJsonLd = {
 const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
-  mainEntity: [
-    {
-      '@type': 'Question',
-      name: 'Pode colocar insulfilm em qualquer porta de vidro?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Na maioria dos casos, sim. O ideal é avaliar tipo de vidro, estado da superfície, tamanho da porta e exposição ao sol. Portas blindex, portas de varanda, portas comerciais e portas internas geralmente podem receber película.',
-      },
+  mainEntity: portasVidroFaqs.map((faq) => ({
+    '@type': 'Question',
+    name: faq.q,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: faq.a,
     },
-    {
-      '@type': 'Question',
-      name: 'Qual a melhor película para porta de vidro?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Depende do objetivo. Para calor sem escurecer muito, a nano cerâmica costuma ser a melhor opção. Para privacidade total, a jateada é a mais indicada. Para sol forte e fachada, a refletiva funciona muito bem. Para visual escuro e moderno, a carbono é uma boa escolha.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'Insulfilm em porta de vidro dá privacidade à noite?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Depende da película. Refletiva, carbono e fumê oferecem mais privacidade durante o dia. À noite, com luz interna acesa, a privacidade pode diminuir. Para privacidade 24 horas, a película jateada é a escolha mais segura.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'A película jateada deixa o ambiente escuro?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Não. A película jateada bloqueia a visão direta, mas mantém a entrada de luz difusa. Por isso é muito usada em banheiros, escritórios, consultórios e divisórias.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'Insulfilm reduz o calor da porta de vidro?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Sim. Películas de controle solar ajudam a reduzir a entrada de calor, principalmente quando a porta recebe sol direto. Nano cerâmica e refletiva costumam entregar os melhores resultados térmicos.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'Quanto custa insulfilm para porta de vidro?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'O valor depende do tamanho da porta, tipo de película e dificuldade de instalação. A melhor forma de calcular é enviar as medidas ou uma foto da porta pelo WhatsApp para receber um orçamento.',
-      },
-    },
-  ],
+  })),
 };
 
 const breadcrumbJsonLd = {

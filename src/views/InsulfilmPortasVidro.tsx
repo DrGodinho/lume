@@ -22,12 +22,17 @@ import {
   Sun,
   Thermometer,
   Wand2,
+  Tag,
+  Check,
+  Star,
 } from 'lucide-react';
 import { WhatsAppButton } from '../components/WhatsAppButton';
 import { Particles } from '../components/Particles';
 import { NavigationBreadcrumbs } from '../components/NavigationBreadcrumbs';
 import { HeroEntrance } from '../components/HeroEntrance';
 import { GoogleReviews } from '../components/GoogleReviews';
+import { AnimatedCounter } from '../components/AnimatedCounter';
+import { portasVidroFaqs } from '../content/portasVidroFaq';
 
 const whatsapp =
   'https://wa.me/5521965140612?text=Olá! Quero um orçamento de insulfilm para porta de vidro.';
@@ -174,17 +179,6 @@ const comparison = [
   },
 ];
 
-const faqs = [
-  ['Pode colocar insulfilm em qualquer porta de vidro?', 'Na maioria dos casos, sim. O ideal é avaliar tipo de vidro, estado da superfície, tamanho da porta e exposição ao sol.'],
-  ['Qual a melhor película para porta de vidro?', 'Depende do objetivo. Nano cerâmica é excelente para calor sem escurecer; jateada para privacidade total; refletiva para fachada com sol forte; carbono para visual escuro e moderno.'],
-  ['Insulfilm em porta de vidro dá privacidade à noite?', 'Películas refletivas e carbono dão mais privacidade durante o dia. Para privacidade 24 horas, a jateada é a opção mais segura.'],
-  ['A película jateada deixa o ambiente escuro?', 'Não. Ela bloqueia a visão direta, mas mantém a entrada de luz difusa.'],
-  ['Insulfilm reduz o calor da porta de vidro?', 'Sim. Películas de controle solar reduzem a entrada de calor, principalmente quando a porta recebe sol direto.'],
-  ['A instalação faz sujeira?', 'A instalação é limpa e feita diretamente no vidro, sem obra e sem trocar a porta.'],
-  ['Quanto custa insulfilm para porta de vidro?', 'O valor depende do tamanho da porta, tipo de película e dificuldade. Envie uma foto ou medidas para receber uma estimativa.'],
-  ['A LUME atende quais bairros?', 'Atendemos principalmente a Zona Oeste do Rio, incluindo Bangu, Campo Grande, Realengo, Jacarepaguá, Barra da Tijuca, Recreio e regiões próximas.'],
-];
-
 function SectionHeader({
   eyebrow,
   title,
@@ -312,8 +306,8 @@ export function InsulfilmPortasVidro() {
               <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="btn-primary inline-flex w-full items-center justify-center gap-3 sm:w-auto">
                 Solicitar orçamento <MessageCircle size={19} />
               </a>
-              <a href="#tipos" className="btn-secondary inline-flex w-full items-center justify-center gap-3 sm:w-auto">
-                Ver tipos de película <ArrowRight size={18} />
+              <a href="#exemplos-precos" className="btn-secondary inline-flex w-full items-center justify-center gap-3 sm:w-auto">
+                <Tag size={18} className="text-[#c9a227]" /> Ver Exemplos de Preços
               </a>
             </div>
             <div className="animate-hero opacity-0 mt-8 grid gap-3 sm:mt-10 sm:grid-cols-2 lg:grid-cols-4">
@@ -335,6 +329,41 @@ export function InsulfilmPortasVidro() {
             <span className="animated-card flex w-full items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-2 sm:w-auto"><Thermometer size={16} className="text-[#c9a227]" /> Controle de calor</span>
             <span className="animated-card flex w-full items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-2 sm:w-auto"><Eye size={16} className="text-[#c9a227]" /> Privacidade sob medida</span>
             <span className="animated-card flex w-full items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-2 sm:w-auto"><Sparkles size={16} className="text-[#c9a227]" /> Acabamento premium</span>
+          </div>
+        </div>
+      </section>
+
+      {/* Estatísticas com AnimatedCounter */}
+      <section className="py-14 bg-[#04080f] border-b border-white/5 relative">
+        <div className="container-lume max-w-5xl mx-auto px-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-center">
+            <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5">
+              <div className="text-3xl sm:text-4xl md:text-5xl font-black font-montserrat text-[#c9a227] mb-2">
+                <AnimatedCounter target="82" suffix="%" />
+              </div>
+              <div className="text-xs sm:text-sm text-gray-400 font-medium">Rejeição de Calor Solar</div>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5">
+              <div className="text-3xl sm:text-4xl md:text-5xl font-black font-montserrat text-[#c9a227] mb-2">
+                <AnimatedCounter target="99" suffix="%" />
+              </div>
+              <div className="text-xs sm:text-sm text-gray-400 font-medium">Bloqueio Anti-UV</div>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5">
+              <div className="text-3xl sm:text-4xl md:text-5xl font-black font-montserrat text-[#c9a227] mb-2">
+                <AnimatedCounter target="100" suffix="%" />
+              </div>
+              <div className="text-xs sm:text-sm text-gray-400 font-medium">Segurança e Retenção de Vidro</div>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5">
+              <div className="text-3xl sm:text-4xl md:text-5xl font-black font-montserrat text-[#c9a227] mb-2">
+                <AnimatedCounter target="10" suffix=" Anos" />
+              </div>
+              <div className="text-xs sm:text-sm text-gray-400 font-medium">Durabilidade Estimada LUME</div>
+            </div>
           </div>
         </div>
       </section>
@@ -569,6 +598,171 @@ export function InsulfilmPortasVidro() {
         </div>
       </section>
 
+      {/* SEÇÃO PRINCIPAL: EXEMPLOS REAIS DE PREÇOS PARA PORTAS DE VIDRO */}
+      <section id="exemplos-precos" className="section-padding bg-gradient-to-b from-[#04080f] via-[#071324] to-[#04080f] px-4 scroll-mt-16">
+        <div className="container-lume max-w-6xl mx-auto">
+          <SectionHeader
+            eyebrow="Transparência de Investimento"
+            title="Quanto custa colocar insulfilm em porta de vidro?"
+            text="Veja exemplos reais de investimento para portas de vidro residenciais e comerciais no Rio de Janeiro:"
+          />
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Opção 1: Porta de Vidro Residencial (2 Folhas) */}
+            <div className="animated-card page-entrance relative bg-[#0a1628]/80 rounded-2xl p-7 border border-[#c9a227]/40 hover:border-[#c9a227] transition-all flex flex-col justify-between shadow-[0_0_30px_rgba(201,162,39,0.1)]">
+              <div className="absolute -top-3 right-6 bg-[#c9a227] text-[#04080f] font-bold text-xs uppercase px-3 py-1 rounded-full shadow-md">
+                Mais Solicitado
+              </div>
+
+              <div>
+                <div className="flex items-center gap-2 mb-2 text-[#c9a227]">
+                  <Home size={18} />
+                  <span className="text-xs uppercase tracking-wider font-semibold">Porta Residencial</span>
+                </div>
+                <h3 className="text-2xl font-bold font-montserrat text-white mb-2">Porta de Vidro 2 Folhas</h3>
+                <p className="text-gray-400 text-xs mb-6">Medida média estimada: ~1,60m a 2,00m x 2,10m</p>
+
+                <div className="p-4 rounded-xl bg-white/[0.04] border border-white/10 mb-6">
+                  <div className="text-xs text-gray-400 mb-1">Investimento médio completo</div>
+                  <div className="text-3xl font-black font-montserrat text-gradient-gold">
+                    R$ 380 ~ R$ 550
+                  </div>
+                  <div className="text-[11px] text-gray-400 mt-1">Película de Controle Solar + Aplicação Profissional</div>
+                </div>
+
+                <div className="space-y-3 mb-8 text-sm text-gray-300">
+                  <div className="flex items-start gap-2">
+                    <Check size={16} className="text-[#c9a227] mt-0.5 shrink-0" />
+                    <span>Linhas <strong>Refletiva</strong>, <strong>Carbono</strong> ou <strong>Jateada</strong></span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check size={16} className="text-[#c9a227] mt-0.5 shrink-0" />
+                    <span>Redução drástica de calor e brilho excessivo</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check size={16} className="text-[#c9a227] mt-0.5 shrink-0" />
+                    <span>Privacidade sob medida para o seu ambiente</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check size={16} className="text-[#c9a227] mt-0.5 shrink-0" />
+                    <span>Garantia oficial de 2 anos LUME</span>
+                  </div>
+                </div>
+              </div>
+
+              <a
+                href={`${whatsapp}&text=Olá! Vi o exemplo da Porta de Vidro 2 Folhas (R$ 380 - 550) e gostaria de um orçamento.`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-primary w-full py-3.5 text-center text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 rounded-xl"
+              >
+                Orçar Porta no WhatsApp <ArrowRight size={16} />
+              </a>
+            </div>
+
+            {/* Opção 2: Porta Balcão de Varanda (4 Folhas) */}
+            <div className="animated-card page-entrance relative bg-[#0a1628]/60 rounded-2xl p-7 border border-white/10 hover:border-[#c9a227]/50 transition-all flex flex-col justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-2 text-[#c9a227]">
+                  <Sparkles size={18} />
+                  <span className="text-xs uppercase tracking-wider font-semibold">Varanda & Sacada</span>
+                </div>
+                <h3 className="text-2xl font-bold font-montserrat text-white mb-2">Porta Balcão 4 Folhas</h3>
+                <p className="text-gray-400 text-xs mb-6">Medida média estimada: ~2,40m a 3,00m x 2,10m</p>
+
+                <div className="p-4 rounded-xl bg-white/[0.04] border border-white/10 mb-6">
+                  <div className="text-xs text-gray-400 mb-1">Investimento médio completo</div>
+                  <div className="text-3xl font-black font-montserrat text-white">
+                    R$ 650 ~ R$ 980
+                  </div>
+                  <div className="text-[11px] text-gray-400 mt-1">Conforme a tecnologia (Nano Cerâmica ou Refletiva)</div>
+                </div>
+
+                <div className="space-y-3 mb-8 text-sm text-gray-300">
+                  <div className="flex items-start gap-2">
+                    <Check size={16} className="text-[#c9a227] mt-0.5 shrink-0" />
+                    <span>Opção <strong>Nano Cerâmica</strong> para manter vista livre</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check size={16} className="text-[#c9a227] mt-0.5 shrink-0" />
+                    <span>Barreira potente contra o sol da tarde no Rio</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check size={16} className="text-[#c9a227] mt-0.5 shrink-0" />
+                    <span>Proteção antidesbotamento para pisos e sofás</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check size={16} className="text-[#c9a227] mt-0.5 shrink-0" />
+                    <span>Instalação limpa e concluída no mesmo dia</span>
+                  </div>
+                </div>
+              </div>
+
+              <a
+                href={`${whatsapp}&text=Olá! Gostaria de um orçamento para Porta Balcão de 4 Folhas.`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-outline w-full py-3.5 text-center text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 rounded-xl border border-white/20 hover:border-[#c9a227] text-white hover:text-[#c9a227]"
+              >
+                Orçar Varanda no WhatsApp <ArrowRight size={16} />
+              </a>
+            </div>
+
+            {/* Opção 3: Comercial / Lojas / Divisórias (Por M²) */}
+            <div className="animated-card page-entrance relative bg-[#0a1628]/60 rounded-2xl p-7 border border-white/10 hover:border-[#c9a227]/50 transition-all flex flex-col justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-2 text-[#c9a227]">
+                  <Star size={18} />
+                  <span className="text-xs uppercase tracking-wider font-semibold">Comércio & Empresas</span>
+                </div>
+                <h3 className="text-2xl font-bold font-montserrat text-white mb-2">Comercial & Lojas (m²)</h3>
+                <p className="text-gray-400 text-xs mb-6">Fachadas de lojas, consultórios e recepções</p>
+
+                <div className="p-4 rounded-xl bg-white/[0.04] border border-white/10 mb-6">
+                  <div className="text-xs text-gray-400 mb-1">A partir de</div>
+                  <div className="text-3xl font-black font-montserrat text-white">
+                    R$ 90 ~ R$ 180 <span className="text-base font-normal text-gray-400">/ m²</span>
+                  </div>
+                  <div className="text-[11px] text-gray-400 mt-1">Refletiva, Segurança Antivandalismo ou Jateado</div>
+                </div>
+
+                <div className="space-y-3 mb-8 text-sm text-gray-300">
+                  <div className="flex items-start gap-2">
+                    <Check size={16} className="text-[#c9a227] mt-0.5 shrink-0" />
+                    <span>Opção de película de <strong>segurança antivandalismo</strong></span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check size={16} className="text-[#c9a227] mt-0.5 shrink-0" />
+                    <span>Proteção de produtos de vitrine contra raios UV</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check size={16} className="text-[#c9a227] mt-0.5 shrink-0" />
+                    <span>Desconto progressivo para metragens comerciais</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check size={16} className="text-[#c9a227] mt-0.5 shrink-0" />
+                    <span>Emissão de NF e certificação para empresas</span>
+                  </div>
+                </div>
+              </div>
+
+              <a
+                href={`${whatsapp}&text=Olá! Gostaria de um orçamento corporativo para Portas de Vidro da minha empresa.`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-outline w-full py-3.5 text-center text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 rounded-xl border border-white/20 hover:border-[#c9a227] text-white hover:text-[#c9a227]"
+              >
+                Orçar Comercial no WhatsApp <ArrowRight size={16} />
+              </a>
+            </div>
+          </div>
+
+          <div className="mt-12 text-center text-xs text-gray-400 max-w-2xl mx-auto">
+            * Valores de referência no Rio de Janeiro. Envie uma foto ou as medidas aproximadas da sua porta pelo WhatsApp para obter o orçamento exato em minutos.
+          </div>
+        </div>
+      </section>
+
       <section className="section-padding bg-[#070f1a] px-4">
         <div className="container-lume">
           <SectionHeader
@@ -576,12 +770,12 @@ export function InsulfilmPortasVidro() {
             title="Perguntas frequentes sobre insulfilm para portas de vidro"
           />
           <div className="mx-auto grid max-w-5xl gap-4 md:grid-cols-2">
-            {faqs.map(([question, answer]) => (
-              <details key={question} className="animated-card page-entrance group rounded-lg border border-white/10 bg-white/[0.035] p-5 open:border-[#c9a227]/40">
+            {portasVidroFaqs.map((faq) => (
+              <details key={faq.q} className="animated-card page-entrance group rounded-lg border border-white/10 bg-white/[0.035] p-5 open:border-[#c9a227]/40">
                 <summary className="cursor-pointer list-none font-montserrat text-base font-bold text-white sm:text-lg">
-                  {question}
+                  {faq.q}
                 </summary>
-                <p className="mt-4 leading-relaxed text-gray-400">{answer}</p>
+                <p className="mt-4 leading-relaxed text-gray-400">{faq.a}</p>
               </details>
             ))}
           </div>
