@@ -66,3 +66,33 @@ export function calcValorPraticoM2(finalPrice: number, areaV: number): number {
 export function calcMetrosComprar(maxY: number): number {
   return maxY / 100;
 }
+
+export interface ValorSelecionadosInput {
+  areaSelecionadaM2: number;
+  price: number;
+  compensarPerdas: boolean;
+  modoPerdas: LossMode;
+  perdasFixas: number;
+  eficiencia: number;
+}
+
+/** Valor total das peças selecionadas, considerando perdas quando ativadas. */
+export function calcValorSelecionados({
+  areaSelecionadaM2,
+  price,
+  compensarPerdas,
+  modoPerdas,
+  perdasFixas,
+  eficiencia,
+}: ValorSelecionadosInput): number {
+  if (areaSelecionadaM2 <= 0) return 0;
+  const subtotalBruto = calcSubtotalBruto(areaSelecionadaM2, price);
+  const compensacaoPerda = calcCompensacaoPerda({
+    compensarPerdas,
+    modoPerdas,
+    perdasFixas,
+    eficiencia,
+    subtotalBruto,
+  });
+  return roundCurrency(subtotalBruto + compensacaoPerda);
+}

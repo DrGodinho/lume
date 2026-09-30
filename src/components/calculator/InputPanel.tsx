@@ -23,11 +23,14 @@ export interface ClienteProps {
 export interface RoloProps {
     rollW: number;
     selectedFilm: FilmTypeKey;
+    customFilmName?: string;
     margin: number;
     price: number;
     onRollWChange: (v: number) => void;
     onSelectedFilmChange: (v: FilmTypeKey) => void;
+    onCustomFilmNameChange?: (v: string) => void;
     onMarginChange: (v: number) => void;
+    onPriceChange?: (v: number) => void;
 }
 
 export interface CorProps {
@@ -78,8 +81,8 @@ export function InputPanel({
         onImportarZap, onSalvarProjeto, fileInputRef, onAbrirProjeto,
     } = clienteProps;
     const {
-        rollW, selectedFilm, margin, price,
-        onRollWChange, onSelectedFilmChange, onMarginChange,
+        rollW, selectedFilm, customFilmName, margin, price,
+        onRollWChange, onSelectedFilmChange, onCustomFilmNameChange, onMarginChange, onPriceChange,
     } = roloProps;
     const {
         usarCoresPorAmbiente,
@@ -142,7 +145,10 @@ export function InputPanel({
 
             <div className="admin-entrance bg-[#070c14] border-2 border-[#c9a227]/25 rounded-2xl p-5 shadow-2xl">
                 <div className="grid grid-cols-3 gap-2">
-                    <div><label className="block text-[10px] text-gray-400 mb-1 text-center font-bold uppercase">Rolo</label><input type="number" inputMode="decimal" step="0.01" min="0" value={rollW} onChange={(e) => onRollWChange(parseFloat(e.target.value) || 0)} onFocus={(e) => e.target.select()} className="w-full bg-[#040811] border border-white/10 rounded-lg p-3 text-sm text-center font-bold" /></div>
+                    <div>
+                        <label className="block text-[10px] text-gray-400 mb-1 text-center font-bold uppercase">Rolo</label>
+                        <input type="number" inputMode="decimal" step="0.01" min="0" value={rollW} onChange={(e) => onRollWChange(parseFloat(e.target.value) || 0)} onFocus={(e) => e.target.select()} className="w-full bg-[#040811] border border-white/10 rounded-lg p-3 text-sm text-center font-bold" />
+                    </div>
                     <div>
                         <label className="block text-[10px] text-gray-400 mb-1 text-center font-bold uppercase">Película</label>
                         <select value={selectedFilm} onChange={(e) => onSelectedFilmChange(e.target.value as FilmTypeKey)} className="w-full bg-[#040811] border border-white/10 rounded-lg p-3 text-sm text-center font-bold appearance-none cursor-pointer">
@@ -151,11 +157,41 @@ export function InputPanel({
                             ))}
                         </select>
                     </div>
-                    <div><label className="block text-[10px] text-gray-400 mb-1 text-center font-bold uppercase">Margem</label><input type="number" inputMode="decimal" step="0.01" min="0" value={margin} onChange={(e) => onMarginChange(parseFloat(e.target.value) || 0)} onFocus={(e) => e.target.select()} className="w-full bg-[#040811] border border-white/10 rounded-lg p-3 text-sm text-center font-bold" /></div>
+                    <div>
+                        <label className="block text-[10px] text-gray-400 mb-1 text-center font-bold uppercase">Margem</label>
+                        <input type="number" inputMode="decimal" step="0.01" min="0" value={margin} onChange={(e) => onMarginChange(parseFloat(e.target.value) || 0)} onFocus={(e) => e.target.select()} className="w-full bg-[#040811] border border-white/10 rounded-lg p-3 text-sm text-center font-bold" />
+                    </div>
                 </div>
-                <div className="mt-2 text-center">
-                    <span className="text-[10px] text-gray-500">R$/m²: </span>
-                    <span className="text-[10px] text-[#c9a227] font-bold">{formatNumber2(price)}</span>
+
+                {selectedFilm === 'personalizado' && (
+                    <div className="mt-3">
+                        <label className="block text-[9px] text-gray-400 mb-1 font-bold uppercase tracking-wider">Nome da Película Personalizada</label>
+                        <input
+                            type="text"
+                            value={customFilmName || ''}
+                            onChange={(e) => onCustomFilmNameChange?.(e.target.value)}
+                            placeholder="Ex: Fumê 35%, Película Térmica X..."
+                            className="w-full bg-[#040811] border border-[#c9a227]/40 rounded-xl px-3 py-2 text-xs font-bold text-[#c9a227] placeholder:text-gray-600 outline-none focus:border-[#c9a227]"
+                        />
+                    </div>
+                )}
+
+                <div className="mt-3 pt-3 border-t border-white/5 flex items-center justify-between">
+                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Valor do m²:</span>
+                    <div className="flex items-center gap-1.5 bg-[#040811] border border-[#c9a227]/30 hover:border-[#c9a227]/60 focus-within:border-[#c9a227] rounded-lg px-2.5 py-1 transition-colors">
+                        <span className="text-xs text-[#c9a227] font-bold">R$</span>
+                        <input
+                            type="number"
+                            inputMode="decimal"
+                            step="0.01"
+                            min="0"
+                            value={price || ''}
+                            onChange={(e) => onPriceChange?.(parseFloat(e.target.value) || 0)}
+                            onFocus={(e) => e.target.select()}
+                            className="w-20 bg-transparent text-right text-sm font-bold text-[#c9a227] outline-none"
+                            title="Preço por m² (editável)"
+                        />
+                    </div>
                 </div>
             </div>
 

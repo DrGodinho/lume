@@ -29,6 +29,7 @@ interface DraftValues {
   modoOtimizacao: OptimizationMode;
   userName: string;
   selectedFilm: FilmTypeKey;
+  customFilmName?: string;
   roomColors: Record<string, string>;
   isCutMode: boolean;
 }
@@ -46,6 +47,7 @@ interface DraftActions {
   setModoOtimizacao: (v: OptimizationMode) => void;
   setUserName: (v: string) => void;
   setSelectedFilm: (v: FilmTypeKey) => void;
+  setCustomFilmName?: (v: string) => void;
   setRoomColors: (updater: Record<string, string> | ((prev: Record<string, string>) => Record<string, string>)) => void;
   setCloudStatus: (v: CloudStatus) => void;
 }
@@ -70,7 +72,7 @@ export function useDraftSync(
 
   const {
     cliente, phone, neighborhood, vidros, desconto, descontoInput,
-    rollW, price, margin, modoOtimizacao, userName, selectedFilm,
+    rollW, price, margin, modoOtimizacao, userName, selectedFilm, customFilmName,
     roomColors, isCutMode,
   } = values;
 
@@ -94,6 +96,7 @@ export function useDraftSync(
       modoOtimizacao,
       userName,
       selectedFilm,
+      customFilmName,
       roomColors,
       lastSaved: now,
     };
@@ -111,6 +114,7 @@ export function useDraftSync(
       modo_otimizacao: modoOtimizacao,
       user_name: userName,
       selected_film: selectedFilm,
+      custom_film_name: customFilmName,
       last_saved: now,
     };
     pendingDraftPayloadRef.current = cloudPayload;
@@ -141,7 +145,7 @@ export function useDraftSync(
     return () => {
       if (cloudTimerRef.current) clearTimeout(cloudTimerRef.current);
     };
-  }, [draftRestored, isCutMode, cliente, phone, neighborhood, vidros, desconto, descontoInput, rollW, price, margin, modoOtimizacao, userName, selectedFilm, roomColors]);
+  }, [draftRestored, isCutMode, cliente, phone, neighborhood, vidros, desconto, descontoInput, rollW, price, margin, modoOtimizacao, userName, selectedFilm, customFilmName, roomColors]);
 
   // Flush do rascunho pendente no descarregamento da página
   useEffect(() => {
@@ -215,6 +219,8 @@ export function useDraftSync(
           if (user) actionsRef.current.setUserName(user);
           const film = (d.selected_film ?? d.selectedFilm) as FilmTypeKey | undefined;
           if (film) actionsRef.current.setSelectedFilm(normalizeFilmTypeKey(film));
+          const customFilm = (d.custom_film_name ?? d.customFilmName) as string | undefined;
+          if (typeof customFilm === 'string') actionsRef.current.setCustomFilmName?.(customFilm);
           applyLocalRoomColors();
           if (fromCloud) {
             actionsRef.current.setCloudStatus('synced');

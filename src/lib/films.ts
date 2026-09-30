@@ -3,7 +3,21 @@
  * Tipos de película, modos, AppConfig + defaults, cores de ambiente e itens.
  */
 
-export type FilmTypeKey = 'carbono_g5' | 'carbono_g20' | 'refletiva' | 'dupla_camada' | 'nano_ceramica' | 'nano_ceramica_g20' | 'jateado';
+export type FilmTypeKey =
+  | 'carbono_g5'
+  | 'carbono_g20'
+  | 'refletiva'
+  | 'dupla_camada'
+  | 'nano_ceramica'
+  | 'nano_ceramica_g20'
+  | 'jateado'
+  | 'window_blue_75'
+  | 'window_blue_05'
+  | 'window_blue_20'
+  | 'nano_carbon_20'
+  | 'nano_carbon_05'
+  | 'personalizado';
+
 export type OptimizationMode = 'densidade' | 'facilidade' | 'facilidade_v2';
 export type LossMode = 'dinamico' | 'fixo';
 export type ColorMode = 'ambiente' | 'tamanho';
@@ -11,7 +25,24 @@ export type ColorMode = 'ambiente' | 'tamanho';
 export const OPTIMIZATION_MODES: OptimizationMode[] = ['densidade', 'facilidade', 'facilidade_v2'];
 export const LOSS_MODES: LossMode[] = ['dinamico', 'fixo'];
 export const COLOR_MODES: ColorMode[] = ['ambiente', 'tamanho'];
-export const FILM_TYPE_KEYS: FilmTypeKey[] = ['carbono_g5', 'carbono_g20', 'refletiva', 'dupla_camada', 'nano_ceramica', 'nano_ceramica_g20', 'jateado'];
+export const STANDARD_FILM_TYPE_KEYS: FilmTypeKey[] = [
+  'carbono_g5',
+  'carbono_g20',
+  'refletiva',
+  'dupla_camada',
+  'nano_ceramica',
+  'nano_ceramica_g20',
+  'jateado',
+  'window_blue_75',
+  'window_blue_05',
+  'window_blue_20',
+  'nano_carbon_20',
+  'nano_carbon_05',
+];
+export const FILM_TYPE_KEYS: FilmTypeKey[] = [
+  ...STANDARD_FILM_TYPE_KEYS,
+  'personalizado',
+];
 
 export const FILM_TYPE_LABELS: Record<FilmTypeKey, string> = {
   carbono_g5: 'Carbono G5',
@@ -21,6 +52,12 @@ export const FILM_TYPE_LABELS: Record<FilmTypeKey, string> = {
   nano_ceramica: 'Nano Cerâmica 75',
   nano_ceramica_g20: 'Nano Cerâmica G20',
   jateado: 'Jateado',
+  window_blue_75: 'Window Blue 75%',
+  window_blue_05: 'Window Blue 05%',
+  window_blue_20: 'Window Blue 20%',
+  nano_carbon_20: 'Nano Carbon 20%',
+  nano_carbon_05: 'Nano Carbon 05%',
+  personalizado: 'Personalizado...',
 };
 
 export interface AppConfig {
@@ -46,6 +83,12 @@ export const DEFAULT_FILM_TYPES: Record<FilmTypeKey, number> = {
   nano_ceramica: 220,
   nano_ceramica_g20: 180,
   jateado: 90,
+  window_blue_75: 300,
+  window_blue_05: 220,
+  window_blue_20: 220,
+  nano_carbon_20: 110,
+  nano_carbon_05: 110,
+  personalizado: 100,
 };
 
 export const DEFAULT_CONFIG: AppConfig = {
@@ -87,6 +130,8 @@ export const ROOM_PALETTE: string[] = [
 export const ROOM_COLOR_SWATCHES = ROOM_PALETTE;
 export const ROOM_SWATCHES = ROOM_PALETTE;
 
+import { SEM_AMBIENTE_LABEL } from './grouping';
+
 export const getRoomColorByIndex = (index: number): string => {
   return ROOM_PALETTE[Math.abs(index) % ROOM_PALETTE.length];
 };
@@ -94,8 +139,9 @@ export const getRoomColorByIndex = (index: number): string => {
 export const normalizeRoomKey = (label: string) =>
   label.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase().replace(/\s+/g, ' ');
 
-export const resolveRoomKey = (label: string): string => {
-  return normalizeRoomKey(label);
+export const resolveRoomKey = (label?: string | null): string => {
+  const trimmed = (label || '').trim();
+  return normalizeRoomKey(trimmed || SEM_AMBIENTE_LABEL);
 };
 
 export const isLegacyDefaultRoomColors = (colors?: Record<string, string> | null): boolean => {
@@ -112,7 +158,7 @@ export const buildRoomColorMap = (
 
   for (const item of items) {
     const raw = typeof item === 'string' ? item : item?.label;
-    const key = resolveRoomKey(raw || '');
+    const key = resolveRoomKey(raw);
     if (!key) continue;
     if (!result[key]) {
       result[key] = getRoomColorByIndex(nextIndex);
@@ -123,7 +169,7 @@ export const buildRoomColorMap = (
   return result;
 };
 
-export const stableRoomColor = (label: string, roomColors?: Record<string, string>): string => {
+export const stableRoomColor = (label?: string | null, roomColors?: Record<string, string>): string => {
   const key = resolveRoomKey(label);
   if (!key) return '#94a3b8';
   if (roomColors && !isLegacyDefaultRoomColors(roomColors) && roomColors[key]) {
@@ -236,6 +282,7 @@ export interface OrcamentoSalvo {
   desconto: number;
   modoOtimizacao: OptimizationMode;
   selectedFilm?: string;
+  customFilmName?: string;
   leadId?: string | null;
   compensarPerdas?: boolean;
   modoPerdas?: LossMode;

@@ -11,6 +11,7 @@ interface InvoicePNGProps {
     desconto: number;
     perdas?: number;
     formatBRL: (v: number) => string;
+    filmName?: string;
 }
 
 export const InvoicePNG = forwardRef<HTMLDivElement, InvoicePNGProps>(({
@@ -22,7 +23,8 @@ export const InvoicePNG = forwardRef<HTMLDivElement, InvoicePNGProps>(({
     subtotalBruto,
     desconto,
     perdas = 0,
-    formatBRL
+    formatBRL,
+    filmName,
 }, ref) => {
     return (
         <div style={{ position: 'absolute', left: '-9999px', top: '0', width: '400px' }}>
@@ -55,14 +57,24 @@ export const InvoicePNG = forwardRef<HTMLDivElement, InvoicePNGProps>(({
 
                 <div style={{ height: '2px', background: 'linear-gradient(90deg, #c9a227 0%, rgba(201,162,39,0.2) 60%, transparent 100%)', marginBottom: '18px', borderRadius: '2px' }} />
 
-                <div style={{ marginBottom: '16px', width: '100%' }}>
-                    <div style={{ fontSize: '7.5px', fontWeight: '800', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '3px', marginBottom: '4px' }}>Para</div>
-                    <div style={{ fontSize: '16px', fontWeight: '900', color: '#ffffff', letterSpacing: '-0.3px', lineHeight: 1.3 }}>
-                        {cliente || 'Consumidor Final'}
+                <div style={{ marginBottom: '16px', width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div>
+                        <div style={{ fontSize: '7.5px', fontWeight: '800', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '3px', marginBottom: '4px' }}>Para</div>
+                        <div style={{ fontSize: '16px', fontWeight: '900', color: '#ffffff', letterSpacing: '-0.3px', lineHeight: 1.3 }}>
+                            {cliente || 'Consumidor Final'}
+                        </div>
+                        <div style={{ fontSize: '9px', fontWeight: '600', color: '#9ca3af', marginTop: '2px' }}>
+                            Responsável: {userName}
+                        </div>
                     </div>
-                    <div style={{ fontSize: '9px', fontWeight: '600', color: '#9ca3af', marginTop: '2px' }}>
-                        Responsável: {userName}
-                    </div>
+                    {filmName && (
+                        <div style={{ textAlign: 'right' }}>
+                            <div style={{ fontSize: '7.5px', fontWeight: '800', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '3px', marginBottom: '4px' }}>Película</div>
+                            <div style={{ fontSize: '12px', fontWeight: '800', color: '#c9a227' }}>
+                                {filmName}
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 <div style={{ marginBottom: '18px', width: '100%' }}>

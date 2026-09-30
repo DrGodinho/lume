@@ -7,6 +7,7 @@ import {
   calcSubtotalBruto,
   calcTotalAreaM2,
   calcValorPraticoM2,
+  calcValorSelecionados,
 } from '../pricing';
 
 describe('calcTotalAreaM2', () => {
@@ -88,3 +89,63 @@ describe('calcMetrosComprar', () => {
     expect(calcMetrosComprar(250)).toBe(2.5);
   });
 });
+
+describe('calcValorSelecionados', () => {
+  it('zera quando a área selecionada é 0', () => {
+    expect(calcValorSelecionados({
+      areaSelecionadaM2: 0,
+      price: 100,
+      compensarPerdas: true,
+      modoPerdas: 'fixo',
+      perdasFixas: 20,
+      eficiencia: 80,
+    })).toBe(0);
+  });
+
+  it('calcula valor bruto quando compensarPerdas está desligado', () => {
+    expect(calcValorSelecionados({
+      areaSelecionadaM2: 1.5,
+      price: 100,
+      compensarPerdas: false,
+      modoPerdas: 'fixo',
+      perdasFixas: 20,
+      eficiencia: 80,
+    })).toBe(150);
+  });
+
+  it('aplica perdas fixas quando ativado', () => {
+    // 2m² a R$100 = 200 + 20% perda = 240
+    expect(calcValorSelecionados({
+      areaSelecionadaM2: 2,
+      price: 100,
+      compensarPerdas: true,
+      modoPerdas: 'fixo',
+      perdasFixas: 20,
+      eficiencia: 80,
+    })).toBe(240);
+  });
+
+  it('aplica perdas dinâmicas baseadas na eficiência', () => {
+    // 2m² a R$100 = 200, eficiência 75% -> 25% de perdas -> 200 + 50 = 250
+    expect(calcValorSelecionados({
+      areaSelecionadaM2: 2,
+      price: 100,
+      compensarPerdas: true,
+      modoPerdas: 'dinamico',
+      perdasFixas: 20,
+      eficiencia: 75,
+    })).toBe(250);
+  });
+
+  it('não adiciona perdas dinâmicas se eficiência for 100%', () => {
+    expect(calcValorSelecionados({
+      areaSelecionadaM2: 2,
+      price: 100,
+      compensarPerdas: true,
+      modoPerdas: 'dinamico',
+      perdasFixas: 20,
+      eficiencia: 100,
+    })).toBe(200);
+  });
+});
+

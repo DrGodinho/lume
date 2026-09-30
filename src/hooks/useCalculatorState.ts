@@ -89,6 +89,7 @@ export function useCalculatorState(cfg: AppConfig) {
   const [agressividadeCorte, setAgressividadeCorte] = useState(cfg.agressividadeCorte);
   const [filmTypes, setFilmTypes] = useState<Record<FilmTypeKey, number>>(normalizeFilmTypes(cfg.filmTypes));
   const [selectedFilm, setSelectedFilm] = useState<FilmTypeKey>(normalizeFilmTypeKey(cfg.selectedFilm));
+  const [customFilmName, setCustomFilmName] = useState('');
   const [draftExpiration, setDraftExpiration] = useState(cfg.draftExpiration);
   const [configRestored, setConfigRestored] = useState(false);
   const [heightIn, setHeightIn] = useState('');
@@ -174,6 +175,7 @@ export function useCalculatorState(cfg: AppConfig) {
     agressividadeCorte, setAgressividadeCorte,
     filmTypes, setFilmTypes,
     selectedFilm, setSelectedFilm,
+    customFilmName, setCustomFilmName,
     draftExpiration, setDraftExpiration,
     configRestored, setConfigRestored,
     heightIn, setHeightIn,

@@ -166,9 +166,10 @@ interface InvoicePDFProps {
     finalPrice: number;
     descontoInput?: string;
     desconto?: number;
+    filmName?: string;
 }
 
-export const InvoicePDF = ({ cliente, userName, resumo, totalAreaM2, areaV, finalPrice, descontoInput, desconto }: InvoicePDFProps) => {
+export const InvoicePDF = ({ cliente, userName, resumo, totalAreaM2, areaV, finalPrice, descontoInput, desconto, filmName }: InvoicePDFProps) => {
   const descVal = typeof desconto === 'number' ? desconto : (parseFloat(descontoInput || '0') / 100 || 0);
   
   // Group items by label
@@ -194,9 +195,19 @@ export const InvoicePDF = ({ cliente, userName, resumo, totalAreaM2, areaV, fina
       <View style={styles.divider} />
 
       <View style={styles.clientSection}>
-        <Text style={styles.clientLabel}>Para</Text>
-        <Text style={styles.clientName}>{cliente || 'Consumidor Final'}</Text>
-        <Text style={styles.clientResponsavel}>Responsável: {userName}</Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <View>
+            <Text style={styles.clientLabel}>Para</Text>
+            <Text style={styles.clientName}>{cliente || 'Consumidor Final'}</Text>
+            <Text style={styles.clientResponsavel}>Responsável: {userName}</Text>
+          </View>
+          {filmName && (
+            <View style={{ alignItems: 'flex-end' }}>
+              <Text style={styles.clientLabel}>Película</Text>
+              <Text style={{ fontSize: 13, fontWeight: 'bold', color: '#c9a227', marginTop: 2 }}>{filmName}</Text>
+            </View>
+          )}
+        </View>
       </View>
 
       <View style={{ marginBottom: 10 }}>

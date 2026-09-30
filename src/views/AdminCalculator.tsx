@@ -35,6 +35,7 @@ import {
   calcSubtotalBruto,
   calcTotalAreaM2,
   calcValorPraticoM2,
+  calcValorSelecionados,
 } from '../lib/pricing';
 import { formatBRL, formatNumber2 } from '../lib/money';
 import { groupByAmbiente } from '../lib/grouping';
@@ -77,7 +78,6 @@ import {
   normalizeFilmTypeKey,
   normalizeFilmTypes,
   resolveRoomKey,
-  stableRoomColor,
 } from '../lib/films';
 import { loadConfig, saveConfig } from '../lib/calculatorConfig';
 import { useCalculatorState } from '../hooks/useCalculatorState';
@@ -109,6 +109,7 @@ interface SavedProjectPayload {
     rolo?: number | string;
     preco?: number | string;
     selectedFilm?: string;
+    customFilmName?: string;
     compensarPerdas?: boolean;
     desconto?: number;
   };
@@ -141,6 +142,7 @@ export function AdminCalculator() {
     agressividadeCorte, setAgressividadeCorte,
     filmTypes, setFilmTypes,
     selectedFilm, setSelectedFilm,
+    customFilmName, setCustomFilmName,
     draftExpiration, setDraftExpiration,
     configRestored, setConfigRestored,
     heightIn, setHeightIn,
@@ -160,9 +162,12 @@ export function AdminCalculator() {
   const [isCutMode, setIsCutMode] = useState(false);
   const [vidrosBackup, setVidrosBackup] = useState<GlassItem[]>([]);
 
-  useEffect(() => {
-    setPrice(filmTypes[selectedFilm] || 0);
-  }, [selectedFilm, filmTypes, setPrice]);
+  const handleSelectedFilmChange = useCallback((film: FilmTypeKey) => {
+    setSelectedFilm(film);
+    if (film !== 'personalizado') {
+      setPrice(filmTypes[film] || 0);
+    }
+  }, [filmTypes, setSelectedFilm, setPrice]);
 
 
 
@@ -315,7 +320,7 @@ export function AdminCalculator() {
   useDraftSync(
     {
       cliente, phone, neighborhood, vidros, desconto, descontoInput,
-      rollW, price, margin, modoOtimizacao, userName, selectedFilm,
+      rollW, price, margin, modoOtimizacao, userName, selectedFilm, customFilmName,
       roomColors, isCutMode,
     },
     {
@@ -323,7 +328,7 @@ export function AdminCalculator() {
       setCliente, setPhone, setNeighborhood,
       setDesconto, setDescontoInput,
       setRollW, setPrice, setMargin,
-      setModoOtimizacao, setUserName, setSelectedFilm,
+      setModoOtimizacao, setUserName, setSelectedFilm, setCustomFilmName,
       setRoomColors, setCloudStatus,
     },
     authRefreshKey,
@@ -392,11 +397,7 @@ export function AdminCalculator() {
     if (!useRoomScheme) {
       return getSizeColor(h, w);
     }
-    const roomLabel = (label || '').trim();
-    if (!roomLabel) {
-      return getSizeColor(h, w);
-    }
-    const key = resolveRoomKey(roomLabel);
+    const key = resolveRoomKey(label);
     if (!isLegacyDefaultRoomColors(roomColors) && roomColors[key]) {
       return roomColors[key];
     }
@@ -407,7 +408,7 @@ export function AdminCalculator() {
       });
     }
     vidros.forEach(v => {
-      const k = resolveRoomKey(v.label || '');
+      const k = resolveRoomKey(v.label);
       if (k && !existingRooms.includes(k)) existingRooms.push(k);
     });
     const idx = existingRooms.indexOf(key);
@@ -442,7 +443,8 @@ export function AdminCalculator() {
         const key = resolveRoomKey(label);
         if (key && (isLegacyDefaultRoomColors(roomColors) || !roomColors[key])) {
             const cleanColors = isLegacyDefaultRoomColors(roomColors) ? {} : roomColors;
-            setRoomColors({ ...cleanColors, [key]: roomColor });
+            const rColor = usarCoresPorAmbiente ? roomColor : getColorForItem(label, h, w, true);
+            setRoomColors({ ...cleanColors, [key]: rColor });
         }
         const novos: GlassItem[] = [];
         for (let i = 0; i < q; i++) {
@@ -490,6 +492,8 @@ export function AdminCalculator() {
                 setNeighborhood('');
                 setRollW(DEFAULT_CONFIG.rollW);
                 setPrice(DEFAULT_CONFIG.price);
+                setSelectedFilm(DEFAULT_CONFIG.selectedFilm);
+                setCustomFilmName('');
                 setMargin(DEFAULT_CONFIG.margin);
                 setSelectedIds([]);
                 setConfirmDialog(null);
@@ -619,7 +623,7 @@ export function AdminCalculator() {
 
     const colarItens = (labelDestino: string) => {
         if (!itensCopiados || itensCopiados.length === 0) return;
-        const color = getColorForItem(labelDestino, undefined, undefined);
+        const color = getColorForItem(labelDestino, undefined, undefined, true);
         const key = resolveRoomKey(labelDestino);
         if (key && (isLegacyDefaultRoomColors(roomColors) || !roomColors[key])) {
             const cleanColors = isLegacyDefaultRoomColors(roomColors) ? {} : roomColors;
@@ -724,11 +728,11 @@ export function AdminCalculator() {
           email: '',
           address: '',
           neighborhood: finalNeighborhood,
-          filmType: FILM_TYPE_LABELS[selectedFilm] || 'Nano Cerâmica',
+          filmType: selectedFilm === 'personalizado' ? (customFilmName || 'Personalizado') : (FILM_TYPE_LABELS[selectedFilm] || 'Nano Cerâmica 75'),
           sqm: totalM2,
           value: finalPrice,
           status: 'Novo',
-          notes: `Película: ${FILM_TYPE_LABELS[selectedFilm] || 'Nano Cerâmica'}.${desconto > 0 ? ` | Desconto aplicado: ${formatBRL(desconto)}` : ''}`,
+          notes: `Película: ${selectedFilm === 'personalizado' ? (customFilmName || 'Personalizado') : (FILM_TYPE_LABELS[selectedFilm] || 'Nano Cerâmica 75')}.${desconto > 0 ? ` | Desconto aplicado: ${formatBRL(desconto)}` : ''}`,
         }),
       });
       if (res.ok) {
@@ -853,7 +857,7 @@ const carregarDoHistorico = (orc: OrcamentoSalvo) => {
 
     const salvarProjeto = () => {
         const dados = {
-            config: { cliente, phone, neighborhood, rolo: rollW, preco: price, selectedFilm, compensarPerdas, desconto },
+            config: { cliente, phone, neighborhood, rolo: rollW, preco: price, selectedFilm, customFilmName, compensarPerdas, desconto },
             vidros: [...vidros],
         };
         const blob = new Blob([JSON.stringify(dados)], { type: 'application/json' });
@@ -877,6 +881,8 @@ const carregarDoHistorico = (orc: OrcamentoSalvo) => {
                 setRollW(parseFloat(String(d.config?.rolo ?? '')) || 152);
                 setPrice(parseFloat(String(d.config?.preco ?? '')) || 80);
                 setSelectedFilm(normalizeFilmTypeKey(d.config?.selectedFilm));
+                if (d.config?.customFilmName) setCustomFilmName(d.config.customFilmName);
+                else setCustomFilmName('');
                 setVidros((d.vidros || []).map((v) => ({ ...v, oh: v.oh ?? v.h ?? 0, ow: v.ow ?? v.w ?? 0 })) as GlassItem[]);
                 if (d.config?.compensarPerdas !== undefined) {
                     setCompensarPerdas(Boolean(d.config.compensarPerdas));
@@ -962,6 +968,7 @@ const carregarDoHistorico = (orc: OrcamentoSalvo) => {
                     finalPrice={finalPrice}
                     descontoInput={descontoInput}
                     desconto={desconto}
+                    filmName={selectedFilm === 'personalizado' ? (customFilmName || 'Personalizado') : FILM_TYPE_LABELS[selectedFilm]}
                 />
             ).toBlob();
 
@@ -1088,16 +1095,22 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
 
     // ─── MEMOS ─────────────────────────────────────────────────────────────────
 
-    const valorSelecionados = useMemo(() => {
-        if (selectedIds.length === 0) return 0;
-        const area = vidros.filter(v => selectedIds.includes(v.id)).reduce((acc, v) => acc + (v.ow * v.oh), 0);
-        return (area / 10000) * price;
-    }, [vidros, selectedIds, price]);
     const areaSelecionadaM2 = useMemo(() => {
         if (selectedIds.length === 0) return 0;
         const area = vidros.filter(v => selectedIds.includes(v.id)).reduce((acc, v) => acc + (v.ow * v.oh), 0);
         return area / 10000;
-  }, [vidros, selectedIds]);
+    }, [vidros, selectedIds]);
+
+    const valorSelecionados = useMemo(() => {
+        return calcValorSelecionados({
+            areaSelecionadaM2,
+            price,
+            compensarPerdas,
+            modoPerdas,
+            perdasFixas,
+            eficiencia,
+        });
+    }, [areaSelecionadaM2, price, compensarPerdas, modoPerdas, perdasFixas, eficiencia]);
 
     const resumo = useMemo(() => {
         const map = new Map<string, { h: number, w: number, q: number, label: string }>();
@@ -1120,13 +1133,13 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
     const hasCurrentRoomPieces = currentRoomLabel ? vidros.some(v => (v.label || '') === currentRoomLabel) : false;
     const aplicarCorNoAmbiente = (ambiente: string) => {
         const trimmed = ambiente.trim();
-        if (!trimmed) return;
-        const color = getColorForItem(trimmed, undefined, undefined, true);
-        const key = resolveRoomKey(trimmed);
+        const targetLabel = trimmed === 'Sem Ambiente' ? '' : trimmed;
+        const color = getColorForItem(targetLabel, undefined, undefined, true);
+        const key = resolveRoomKey(targetLabel);
         if (key) {
             setRoomColors(prev => ({ ...prev, [key]: color }));
         }
-        setVidros(prev => prev.map(v => (v.label || '') === trimmed ? { ...v, cor: color } : v));
+        setVidros(prev => prev.map(v => (v.label || '') === targetLabel ? { ...v, cor: color } : v));
     };
 
     // C2: callbacks de intenção (filhos não recebem setter cru).
@@ -1197,7 +1210,14 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
                 <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-[#1e293b] border border-[#3b82f6]/50 shadow-[0_0_30px_rgba(59,130,246,0.2)] p-3 rounded-2xl z-50 flex flex-col gap-3 transition-all animate-fade-in w-[95%] max-w-md">
                     <div className="flex items-center justify-between gap-3">
                         <span className="text-sm sm:text-base font-black text-white leading-none whitespace-nowrap">{selectedIds.length} <span className="text-gray-400 text-xs">filme(s)</span></span>
-                        <span className="text-base sm:text-lg xl:text-xl font-black text-green-400 leading-none">{formatBRL(valorSelecionados)}</span>
+                        <div className="flex items-center gap-1.5">
+                            <span className="text-base sm:text-lg xl:text-xl font-black text-green-400 leading-none">{formatBRL(valorSelecionados)}</span>
+                            {compensarPerdas && (
+                                <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-green-500/10 text-green-400 border border-green-500/20" title="Valor inclui compensação de perdas">
+                                    c/ perdas
+                                </span>
+                            )}
+                        </div>
                         <span className="text-sm sm:text-base font-bold text-blue-300 leading-none whitespace-nowrap">{areaSelecionadaM2.toFixed(2)} m²</span>
                     </div>
                     <div className="h-px w-full bg-white/10" />
@@ -1336,10 +1356,12 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
                             onAbrirProjeto: abrirProjeto,
                         }}
                         roloProps={{
-                            rollW, selectedFilm, margin, price,
+                            rollW, selectedFilm, customFilmName, margin, price,
                             onRollWChange: setRollW,
-                            onSelectedFilmChange: setSelectedFilm,
+                            onSelectedFilmChange: handleSelectedFilmChange,
+                            onCustomFilmNameChange: setCustomFilmName,
                             onMarginChange: setMargin,
+                            onPriceChange: setPrice,
                         }}
                         corProps={{
                             usarCoresPorAmbiente,
@@ -1465,6 +1487,7 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
                 desconto={desconto}
                 perdas={compensacaoPerda}
                 formatBRL={formatBRL}
+                filmName={selectedFilm === 'personalizado' ? (customFilmName || 'Personalizado') : FILM_TYPE_LABELS[selectedFilm]}
             />
 
             <div className="text-center text-[10px] text-gray-500 mt-10 pb-4 font-bold tracking-widest uppercase">

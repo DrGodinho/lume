@@ -78,4 +78,29 @@ describe('Room color system', () => {
       expect(purpleHexes).not.toContain(color.toLowerCase());
     }
   });
+
+  it('treats empty label, undefined, and Sem Ambiente as a single unified room key', () => {
+    expect(resolveRoomKey('')).toBe('sem ambiente');
+    expect(resolveRoomKey('   ')).toBe('sem ambiente');
+    expect(resolveRoomKey(undefined)).toBe('sem ambiente');
+    expect(resolveRoomKey('Sem Ambiente')).toBe('sem ambiente');
+    expect(resolveRoomKey('SEM AMBIENTE')).toBe('sem ambiente');
+  });
+
+  it('assigns the same room color to all pieces in sem ambiente alongside other rooms', () => {
+    const items = [
+      { label: '' },
+      { label: 'Sala' },
+      { label: undefined },
+      { label: 'Sem Ambiente' },
+      { label: 'Quarto' },
+    ];
+
+    const map = buildRoomColorMap(items);
+    expect(map['sem ambiente']).toBeDefined();
+    expect(map['sem ambiente']).toBe('#ef4444');
+    expect(map['sala']).toBe('#3b82f6');
+    expect(map['quarto']).toBe('#10b981');
+    expect(Object.keys(map)).toHaveLength(3);
+  });
 });

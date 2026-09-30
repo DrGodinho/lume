@@ -225,6 +225,12 @@ const DEFAULT_FILM_TYPES: Record<string, number> = {
   nano_ceramica: 240,
   nano_ceramica_g20: 180,
   jateado: 99,
+  window_blue_75: 300,
+  window_blue_05: 220,
+  window_blue_20: 220,
+  nano_carbon_20: 110,
+  nano_carbon_05: 110,
+  personalizado: 100,
 };
 
 const normalizeSelectedFilm = (value: unknown) => {

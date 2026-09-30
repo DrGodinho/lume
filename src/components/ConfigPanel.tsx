@@ -5,6 +5,7 @@ import {
   FILM_TYPE_KEYS,
   FILM_TYPE_LABELS,
   FilmTypeKey,
+  STANDARD_FILM_TYPE_KEYS,
 } from '../lib/films';
 
 interface ConfigPanelProps {
@@ -182,7 +183,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
             <div>
               <FieldLabel>Preços por Película (R$/m²)</FieldLabel>
               <div className="space-y-2">
-                {FILM_TYPE_KEYS.map((key) => (
+                {STANDARD_FILM_TYPE_KEYS.map((key) => (
                   <div key={key} className="flex items-center gap-2">
                     <span className="text-[10px] text-gray-400 font-bold w-24 truncate">
                       {FILM_TYPE_LABELS[key]}

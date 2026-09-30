@@ -130,6 +130,11 @@ const FILM_LABELS: Record<string, string> = {
   nano_ceramica: 'Nano Cerâmica 75',
   nano_ceramica_g20: 'Nano Cerâmica G20',
   jateado: 'Jateado',
+  window_blue_75: 'Window Blue 75%',
+  window_blue_05: 'Window Blue 05%',
+  window_blue_20: 'Window Blue 20%',
+  nano_carbon_20: 'Nano Carbon 20%',
+  nano_carbon_05: 'Nano Carbon 05%',
 };
 
 const KPI_TONES: Record<KpiCard['tone'], string> = {
