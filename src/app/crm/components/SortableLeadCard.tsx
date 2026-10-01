@@ -18,6 +18,7 @@ interface SortableLeadCardProps {
   onOpenDetail: (lead: Lead) => void;
   onOpenEdit: (lead: Lead) => void;
   onDelete: (leadId: string) => void;
+  onArchive?: (leadId: string) => void;
   onTogglePin: (leadId: string) => void;
   onMoveLeft: (leadId: string) => void;
   onMoveRight: (leadId: string) => void;
@@ -37,6 +38,7 @@ export const SortableLeadCard = memo(function SortableLeadCard({
   onOpenDetail,
   onOpenEdit,
   onDelete,
+  onArchive,
   onTogglePin,
   onMoveLeft,
   onMoveRight,
@@ -60,6 +62,7 @@ export const SortableLeadCard = memo(function SortableLeadCard({
       onOpenDetail={onOpenDetail}
       onOpenEdit={onOpenEdit}
       onDelete={onDelete}
+      onArchive={onArchive}
       onTogglePin={onTogglePin}
       onMoveLeft={onMoveLeft}
       onMoveRight={onMoveRight}

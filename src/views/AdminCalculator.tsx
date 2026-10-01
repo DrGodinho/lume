@@ -36,6 +36,7 @@ import {
   calcTotalAreaM2,
   calcValorPraticoM2,
   calcValorSelecionados,
+  calcLucroCalculadora,
 } from '../lib/pricing';
 import { formatBRL, formatNumber2 } from '../lib/money';
 import { groupByAmbiente } from '../lib/grouping';
@@ -61,6 +62,9 @@ import {
   AppConfig,
   ColorMode,
   DEFAULT_CONFIG,
+  DEFAULT_FILM_CATALOG,
+  DEFAULT_FILM_TYPES,
+  FilmCatalogItem,
   FILM_TYPE_LABELS,
   FilmTypeKey,
   GlassItem,
@@ -75,6 +79,7 @@ import {
   isLegacyDefaultRoomColors,
   isLossMode,
   isOptimizationMode,
+  normalizeFilmCatalog,
   normalizeFilmTypeKey,
   normalizeFilmTypes,
   resolveRoomKey,
@@ -141,6 +146,7 @@ export function AdminCalculator() {
     perdasFixas, setPerdasFixas,
     agressividadeCorte, setAgressividadeCorte,
     filmTypes, setFilmTypes,
+    filmCatalog, setFilmCatalog,
     selectedFilm, setSelectedFilm,
     customFilmName, setCustomFilmName,
     draftExpiration, setDraftExpiration,
@@ -161,13 +167,38 @@ export function AdminCalculator() {
 
   const [isCutMode, setIsCutMode] = useState(false);
   const [vidrosBackup, setVidrosBackup] = useState<GlassItem[]>([]);
+  const [usarSobra, setUsarSobra] = useState(false);
+  const [custoAjudante, setCustoAjudante] = useState(0);
 
   const handleSelectedFilmChange = useCallback((film: FilmTypeKey) => {
     setSelectedFilm(film);
     if (film !== 'personalizado') {
-      setPrice(filmTypes[film] || 0);
+      const salePrice =
+        filmCatalog?.[film]?.priceSale ??
+        filmTypes[film] ??
+        DEFAULT_FILM_CATALOG[film]?.priceSale ??
+        DEFAULT_FILM_TYPES[film] ??
+        0;
+      setPrice(salePrice);
     }
-  }, [filmTypes, setSelectedFilm, setPrice]);
+  }, [filmCatalog, filmTypes, setSelectedFilm, setPrice]);
+
+  const handlePriceChange = useCallback((newPrice: number) => {
+    setPrice(newPrice);
+    if (selectedFilm !== 'personalizado') {
+      setFilmTypes((prev) => ({ ...prev, [selectedFilm]: newPrice }));
+      setFilmCatalog((prev) => {
+        if (!prev[selectedFilm]) return prev;
+        return {
+          ...prev,
+          [selectedFilm]: {
+            ...prev[selectedFilm],
+            priceSale: newPrice,
+          },
+        };
+      });
+    }
+  }, [selectedFilm, setPrice, setFilmTypes, setFilmCatalog]);
 
 
 
@@ -353,8 +384,18 @@ export function AdminCalculator() {
         const cloud = await loadConfigFromCloud();
         const source = cloud || loadConfig(scopeKey);
 
+        const rawTypes = source.filmTypes;
+        const normalizedTypes = normalizeFilmTypes(rawTypes);
+        const catalog = normalizeFilmCatalog(source.filmCatalog, normalizedTypes);
+
+        // Sincroniza os precos de venda em filmTypes a partir do catalogo
+        (Object.entries(catalog) as [string, FilmCatalogItem][]).forEach(([key, item]) => {
+          if (item && Number.isFinite(item.priceSale) && item.priceSale > 0) {
+            normalizedTypes[key as keyof typeof normalizedTypes] = item.priceSale;
+          }
+        });
+
         if (source.rollW) setRollW(source.rollW);
-        if (source.price) setPrice(source.price);
         if (source.margin !== undefined) setMargin(source.margin);
         if (isOptimizationMode(source.modoOtimizacao)) setModoOtimizacao(source.modoOtimizacao);
         if (source.userName) setUserName(source.userName);
@@ -362,8 +403,20 @@ export function AdminCalculator() {
         if (source.perdasFixas !== undefined) setPerdasFixas(source.perdasFixas);
         if (isColorMode(source.modoCorConfig)) setUsarCoresPorAmbiente(source.modoCorConfig === 'ambiente');
         if (source.agressividadeCorte !== undefined) setAgressividadeCorte(source.agressividadeCorte);
-        if (source.filmTypes) setFilmTypes(normalizeFilmTypes(source.filmTypes));
-        setSelectedFilm(normalizeFilmTypeKey(source.selectedFilm));
+        
+        setFilmTypes(normalizedTypes);
+        setFilmCatalog(catalog);
+
+        const currentFilm = normalizeFilmTypeKey(source.selectedFilm);
+        setSelectedFilm(currentFilm);
+
+        if (currentFilm !== 'personalizado') {
+          const filmPrice = catalog[currentFilm]?.priceSale ?? normalizedTypes[currentFilm] ?? (source.price || 80);
+          setPrice(filmPrice);
+        } else if (source.price) {
+          setPrice(source.price);
+        }
+
         if (source.draftExpiration !== undefined) setDraftExpiration(source.draftExpiration);
 
         if (cloud) {
@@ -373,8 +426,9 @@ export function AdminCalculator() {
             modoOtimizacao: isOptimizationMode(source.modoOtimizacao) ? source.modoOtimizacao : DEFAULT_CONFIG.modoOtimizacao,
             modoPerdas: isLossMode(source.modoPerdas) ? source.modoPerdas : DEFAULT_CONFIG.modoPerdas,
             modoCorConfig: isColorMode(source.modoCorConfig) ? source.modoCorConfig : DEFAULT_CONFIG.modoCorConfig,
-            selectedFilm: normalizeFilmTypeKey(source.selectedFilm),
-            filmTypes: normalizeFilmTypes(source.filmTypes),
+            selectedFilm: currentFilm,
+            filmTypes: normalizedTypes,
+            filmCatalog: catalog,
           }, scopeKey);
         }
       } finally {
@@ -382,7 +436,7 @@ export function AdminCalculator() {
       }
     };
     restoreConfig();
-  }, [authRefreshKey, setRollW, setPrice, setMargin, setModoOtimizacao, setUserName, setModoPerdas, setPerdasFixas, setUsarCoresPorAmbiente, setAgressividadeCorte, setFilmTypes, setSelectedFilm, setDraftExpiration, setConfigRestored]);
+  }, [authRefreshKey, setRollW, setPrice, setMargin, setModoOtimizacao, setUserName, setModoPerdas, setPerdasFixas, setUsarCoresPorAmbiente, setAgressividadeCorte, setFilmTypes, setFilmCatalog, setSelectedFilm, setDraftExpiration, setConfigRestored]);
 
   // C1: restore do rascunho movido para useDraftSync (nuvem primeiro, local como fallback).
 
@@ -1180,6 +1234,31 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
     const m = calcMetrosComprar(maxY);
     const valorPraticoM2 = calcValorPraticoM2(finalPrice, areaV);
 
+    const catalogItem = useMemo(() => {
+        const key = selectedFilm;
+        if (filmCatalog && filmCatalog[key]) return filmCatalog[key];
+        if (DEFAULT_FILM_CATALOG[key]) return DEFAULT_FILM_CATALOG[key];
+        return {
+            id: key,
+            name: selectedFilm === 'personalizado' ? (customFilmName || 'Personalizado') : (FILM_TYPE_LABELS[key] || key),
+            priceSale: price,
+            priceCost: selectedFilm === 'personalizado' ? Math.round(price * 0.4) : 90,
+            purchaseType: 'metro' as const,
+            active: true,
+        };
+    }, [filmCatalog, selectedFilm, customFilmName, price]);
+
+    const lucroInfo = useMemo(() => {
+        return calcLucroCalculadora({
+            finalPrice,
+            metrosComprar: m,
+            priceCost: catalogItem.priceCost,
+            purchaseType: catalogItem.purchaseType,
+            usarSobra,
+            custoAjudante,
+        });
+    }, [finalPrice, m, catalogItem, usarSobra, custoAjudante]);
+
     // ─── RENDER ────────────────────────────────────────────────────────────────
 
     return (
@@ -1357,11 +1436,12 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
                         }}
                         roloProps={{
                             rollW, selectedFilm, customFilmName, margin, price,
+                            filmCatalog,
                             onRollWChange: setRollW,
                             onSelectedFilmChange: handleSelectedFilmChange,
                             onCustomFilmNameChange: setCustomFilmName,
                             onMarginChange: setMargin,
-                            onPriceChange: setPrice,
+                            onPriceChange: handlePriceChange,
                         }}
                         corProps={{
                             usarCoresPorAmbiente,
@@ -1432,6 +1512,11 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
                                 onGerarImagem={gerarImagem}
                                 onGerarPDF={gerarPDF}
                                 formatBRL={formatBRL}
+                                lucroInfo={lucroInfo}
+                                usarSobra={usarSobra}
+                                onToggleUsarSobra={() => setUsarSobra(prev => !prev)}
+                                custoAjudante={custoAjudante}
+                                onCustoAjudanteChange={setCustoAjudante}
                             />
 
                             <CutModeToolbar

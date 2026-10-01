@@ -30,11 +30,56 @@ export const parseAgendaDate = (value?: string | null) => {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 };
 
+export const parseLeadServiceTime = (dataServico?: string | null, notes?: string | null): string => {
+  if (dataServico && dataServico.includes('T')) {
+    const timePart = dataServico.split('T')[1];
+    if (timePart) {
+      const match = timePart.match(/^(\d{2}:\d{2})/);
+      if (match && match[1] !== '00:00') return match[1];
+    }
+  }
+  if (notes) {
+    const match = notes.match(/\[Hor[aá]rio:\s*(\d{1,2}:\d{2})\]/i);
+    if (match) return match[1].padStart(5, '0');
+  }
+  return '';
+};
+
+export const formatServiceDateTimeValue = (dateStr?: string | null, timeStr?: string | null): string | null => {
+  if (!dateStr) return null;
+  const cleanDate = dateStr.split('T')[0];
+  if (!cleanDate) return null;
+  if (!timeStr || !timeStr.trim()) return cleanDate;
+  return `${cleanDate}T${timeStr.trim()}:00`;
+};
+
+export const syncServiceTimeInNotes = (notes?: string | null, timeStr?: string | null): string => {
+  const currentNotes = notes || '';
+  const timeTagRegex = /\[Hor[aá]rio:\s*[^\]]+\]\s*/gi;
+  const cleaned = currentNotes.replace(timeTagRegex, '').trim();
+  if (!timeStr || !timeStr.trim()) return cleaned;
+  const tag = `[Horário: ${timeStr.trim()}]`;
+  return cleaned ? `${cleaned}\n${tag}` : tag;
+};
+
 export const getLeadActivityDate = (lead: Lead) => parseAgendaDate(lead.updatedAt || lead.statusChangedAt || lead.createdAt);
 
 export const getLeadFollowUpDate = (lead: Lead) => parseAgendaDate(lead.proximoContato || null);
 
-export const getLeadServiceDate = (lead: Lead) => parseAgendaDate(lead.dataServico || null);
+export const getLeadServiceDate = (lead: Lead) => {
+  const baseDate = parseAgendaDate(lead.dataServico || null);
+  if (!baseDate) return null;
+  const time = parseLeadServiceTime(lead.dataServico, lead.notes);
+  if (time) {
+    const [hours, minutes] = time.split(':').map(Number);
+    if (!isNaN(hours) && !isNaN(minutes)) {
+      const dateWithTime = new Date(baseDate);
+      dateWithTime.setHours(hours, minutes, 0, 0);
+      return dateWithTime;
+    }
+  }
+  return baseDate;
+};
 
 export const getLeadServiceStatus = (lead: Lead): ServiceStatus => {
   const normalized = normalizeServiceStatus(lead.serviceStatus);
@@ -100,7 +145,12 @@ export const getLeadPhoneHref = (phone?: string | null) => {
 
 export const getWhatsAppTemplateText = (lead: Lead, template: 'generic' | 'retorno' | 'servico') => {
   const serviceDate = getLeadServiceDate(lead);
-  const serviceDateLabel = serviceDate ? format(serviceDate, 'dd/MM/yyyy', { locale: ptBR }) : null;
+  const hasSpecificTime = Boolean(serviceDate && (serviceDate.getHours() !== 0 || serviceDate.getMinutes() !== 0));
+  const serviceDateLabel = serviceDate
+    ? hasSpecificTime
+      ? `${format(serviceDate, 'dd/MM/yyyy', { locale: ptBR })} às ${format(serviceDate, 'HH:mm')}`
+      : format(serviceDate, 'dd/MM/yyyy', { locale: ptBR })
+    : null;
   const neighborhood = lead.neighborhood || 'seu endereço';
 
   if (template === 'retorno') {

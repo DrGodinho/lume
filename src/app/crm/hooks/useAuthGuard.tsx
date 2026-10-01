@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { logger } from '../../../lib/logger';
+import { fetchWithTimeout, isAbortError } from '@/lib/fetchWithTimeout';
 
 interface UseAuthGuardReturn {
   isAuthenticated: boolean;
@@ -22,15 +23,18 @@ export function useAuthGuard(): UseAuthGuardReturn {
   useEffect(() => {
     let cancelled = false;
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 12000);
 
     const checkAuth = async () => {
       try {
-        const response = await fetch('/api/auth/me', {
-          credentials: 'include',
-          cache: 'no-store',
-          signal: controller.signal,
-        });
+        const response = await fetchWithTimeout(
+          '/api/auth/me',
+          {
+            credentials: 'include',
+            cache: 'no-store',
+            signal: controller.signal,
+          },
+          25000 // 25s timeout (evita falsos-positivos durante compilação do Next.js)
+        );
 
         if (cancelled) return;
 
@@ -46,15 +50,23 @@ export function useAuthGuard(): UseAuthGuardReturn {
         }
       } catch (err) {
         if (cancelled) return;
-        setError(
-          controller.signal.aborted
-            ? 'A verificação de sessão demorou demais (o servidor pode estar compilando ou indisponível na rede local).'
-            : 'Não foi possível verificar a sessão. Verifique se o notebook está acessível na rede.'
-        );
+
+        const isTimeoutOrAbort = isAbortError(err) || controller.signal.aborted;
+
+        if (isTimeoutOrAbort) {
+          if (cancelled) return;
+
+          logger.warn('[useAuthGuard] timeout ao verificar /api/auth/me (servidor compilando ou lento)');
+          setError(
+            'A verificação de sessão demorou muito para responder (o servidor pode estar compilando rotas). Tente novamente.'
+          );
+        } else {
+          logger.error('[useAuthGuard] falha ao verificar /api/auth/me', err);
+          setError('Não foi possível verificar a sessão. Verifique se o servidor está acessível.');
+        }
+
         setIsAuthenticated(false);
-        logger.error('[useAuthGuard] falha ao verificar /api/auth/me', err);
       } finally {
-        clearTimeout(timeout);
         if (!cancelled) {
           setIsLoading(false);
         }
@@ -64,8 +76,7 @@ export function useAuthGuard(): UseAuthGuardReturn {
     checkAuth();
     return () => {
       cancelled = true;
-      controller.abort();
-      clearTimeout(timeout);
+      controller.abort(new DOMException('useAuthGuard desmontado', 'AbortError'));
     };
   }, [router, pathname, attempt]);
 

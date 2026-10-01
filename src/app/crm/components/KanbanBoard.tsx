@@ -44,6 +44,7 @@ interface KanbanBoardProps {
   onOpenDetail?: (lead: Lead) => void;
   onOpenEdit?: (lead: Lead) => void;
   onDelete?: (leadId: string) => void;
+  onArchive?: (leadId: string) => void;
   onTogglePin?: (leadId: string) => void;
   onStatusChange?: (leadId: string, status: Lead['status']) => void;
   onReorderLead?: (activeLeadId: string, overLeadId: string) => void;
@@ -88,6 +89,7 @@ export function KanbanBoard(props: KanbanBoardProps = {}) {
   const onOpenDetail = props.onOpenDetail ?? crm.setLeadDetail;
   const onOpenEdit = props.onOpenEdit ?? crm.openEditModal;
   const onDelete = props.onDelete ?? crm.handleDeleteLead;
+  const onArchive = props.onArchive ?? crm.handleArchiveLead;
   const onTogglePin = props.onTogglePin ?? crm.handleTogglePin;
   const onStatusChange = props.onStatusChange ?? crm.handleStatusChange;
   const onReorderLead = props.onReorderLead ?? crm.handleKanbanReorder;
@@ -254,6 +256,7 @@ export function KanbanBoard(props: KanbanBoardProps = {}) {
           onOpenDetail={onOpenDetail}
           onOpenEdit={onOpenEdit}
           onDelete={onDelete}
+          onArchive={onArchive}
           onTogglePin={onTogglePin}
           onReorderLead={onReorderLead}
           formatCurrency={formatCurrency}
@@ -274,6 +277,7 @@ export function KanbanBoard(props: KanbanBoardProps = {}) {
                 onOpenDetail={onOpenDetail}
                 onOpenEdit={onOpenEdit}
                 onDelete={onDelete}
+                onArchive={onArchive}
               />
             ))}
             {hiddenTableCount > 0 && (
@@ -303,6 +307,7 @@ export function KanbanBoard(props: KanbanBoardProps = {}) {
             onRowClick={onTableRowClick}
             onRowDoubleClick={onTableRowDoubleClick}
             onDelete={onDelete}
+            onArchive={onArchive}
             sortKey={sortKey}
             sortDir={sortDir}
             onToggleSort={onToggleSort}
@@ -345,6 +350,7 @@ interface KanbanDnDProps {
   onOpenDetail: (lead: Lead) => void;
   onOpenEdit: (lead: Lead) => void;
   onDelete: (leadId: string) => void;
+  onArchive: (leadId: string) => void;
   onTogglePin: (leadId: string) => void;
   formatCurrency: (value: number) => string;
   getLeadServiceDate: (lead: Lead) => Date | null;
@@ -360,6 +366,7 @@ function KanbanDnD({
   onOpenDetail,
   onOpenEdit,
   onDelete,
+  onArchive,
   onTogglePin,
   onReorderLead,
   formatCurrency,
@@ -461,6 +468,7 @@ function KanbanDnD({
               onOpenDetail={onOpenDetail}
               onOpenEdit={onOpenEdit}
               onDelete={onDelete}
+              onArchive={onArchive}
               onTogglePin={onTogglePin}
               formatCurrency={formatCurrency}
               getLeadServiceDate={getLeadServiceDate}
@@ -483,6 +491,7 @@ function KanbanDnD({
             onOpenDetail={onOpenDetail}
             onOpenEdit={onOpenEdit}
             onDelete={onDelete}
+            onArchive={onArchive}
             onTogglePin={onTogglePin}
             onMoveLeft={NOOP_MOVE}
             onMoveRight={NOOP_MOVE}
@@ -507,6 +516,7 @@ interface KanbanColumnProps {
   onOpenDetail: (lead: Lead) => void;
   onOpenEdit: (lead: Lead) => void;
   onDelete: (leadId: string) => void;
+  onArchive: (leadId: string) => void;
   onTogglePin: (leadId: string) => void;
   formatCurrency: (value: number) => string;
   getLeadServiceDate: (lead: Lead) => Date | null;
@@ -524,6 +534,7 @@ function KanbanColumn({
   onOpenDetail,
   onOpenEdit,
   onDelete,
+  onArchive,
   onTogglePin,
   formatCurrency,
   getLeadServiceDate,
@@ -581,6 +592,7 @@ function KanbanColumn({
               onOpenDetail={onOpenDetail}
               onOpenEdit={onOpenEdit}
               onDelete={onDelete}
+              onArchive={onArchive}
               onTogglePin={onTogglePin}
               onMoveLeft={handleMoveLeft}
               onMoveRight={handleMoveRight}

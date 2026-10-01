@@ -2,7 +2,7 @@
 
 import { useCallback, useState, type Dispatch, type FormEvent, type SetStateAction } from 'react';
 import { appendCommercialNote } from '../utils';
-import { formatDateInputValue, getLeadServiceStatus } from './useAgenda';
+import { formatDateInputValue, formatServiceDateTimeValue, getLeadServiceStatus, parseLeadServiceTime, syncServiceTimeInNotes } from './useAgenda';
 import type { CommercialActionDraft, Lead } from '../types';
 
 interface ToastApi {
@@ -38,6 +38,7 @@ export const useLeadCommercialAction = (
       action,
       followUpDate: formatDateInputValue(lead.proximoContato) || new Date().toISOString().split('T')[0],
       serviceDate: formatDateInputValue(lead.dataServico) || new Date().toISOString().split('T')[0],
+      serviceTime: parseLeadServiceTime(lead.dataServico, lead.notes),
       note: action === 'servico' && getLeadServiceStatus(lead) === 'Reagendar' ? 'Reagendado a pedido do cliente.' : '',
     });
   }, []);
@@ -46,7 +47,7 @@ export const useLeadCommercialAction = (
     event.preventDefault();
     if (!commercialAction) return;
 
-    const { lead, action, followUpDate, serviceDate, note } = commercialAction;
+    const { lead, action, followUpDate, serviceDate, serviceTime, note } = commercialAction;
     if (action === 'retorno' && !followUpDate) {
       toast.warning('Escolha a data do proximo retorno.');
       return;
@@ -59,7 +60,6 @@ export const useLeadCommercialAction = (
     const today = new Date().toISOString().split('T')[0];
     const now = new Date().toISOString();
     const nextContact = followUpDate ? new Date(`${followUpDate}T12:00:00`).toISOString() : null;
-    const nextService = serviceDate || null;
 
     const { synced, lead: updatedLead } = await updateSingleLead(lead.id, (currentLead) => {
       const baseLead = {
@@ -79,8 +79,11 @@ export const useLeadCommercialAction = (
       }
 
       if (action === 'servico') {
+        const nextService = formatServiceDateTimeValue(serviceDate, serviceTime);
+        const notesWithTime = syncServiceTimeInNotes(baseLead.notes, serviceTime);
         return {
           ...baseLead,
+          notes: notesWithTime,
           status: 'Agendado',
           statusChangedAt: currentLead.status === 'Agendado' ? currentLead.statusChangedAt : today,
           dataServico: nextService,

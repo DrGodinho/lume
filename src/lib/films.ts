@@ -60,6 +60,17 @@ export const FILM_TYPE_LABELS: Record<FilmTypeKey, string> = {
   personalizado: 'Personalizado...',
 };
 
+export type FilmPurchaseType = 'metro' | 'bloco_7_5m';
+
+export interface FilmCatalogItem {
+  id: string;
+  name: string;
+  priceSale: number;
+  priceCost: number;
+  purchaseType: FilmPurchaseType;
+  active: boolean;
+}
+
 export interface AppConfig {
   rollW: number;
   price: number;
@@ -73,6 +84,7 @@ export interface AppConfig {
   filmTypes: Record<FilmTypeKey, number>;
   selectedFilm: FilmTypeKey;
   draftExpiration: number;
+  filmCatalog?: Record<string, FilmCatalogItem>;
 }
 
 export const DEFAULT_FILM_TYPES: Record<FilmTypeKey, number> = {
@@ -91,6 +103,76 @@ export const DEFAULT_FILM_TYPES: Record<FilmTypeKey, number> = {
   personalizado: 100,
 };
 
+export const DEFAULT_FILM_CATALOG: Record<string, FilmCatalogItem> = {
+  carbono_g5: { id: 'carbono_g5', name: 'Carbono G5', priceSale: 80, priceCost: 93.75, purchaseType: 'bloco_7_5m', active: true },
+  carbono_g20: { id: 'carbono_g20', name: 'Carbono G20', priceSale: 80, priceCost: 93.75, purchaseType: 'bloco_7_5m', active: true },
+  refletiva: { id: 'refletiva', name: 'Refletiva', priceSale: 95, priceCost: 239.85, purchaseType: 'bloco_7_5m', active: true },
+  dupla_camada: { id: 'dupla_camada', name: 'Dupla Camada', priceSale: 120, priceCost: 365.87, purchaseType: 'bloco_7_5m', active: true },
+  nano_ceramica: { id: 'nano_ceramica', name: 'Nano Cerâmica 75', priceSale: 220, priceCost: 90.00, purchaseType: 'metro', active: true },
+  nano_ceramica_g20: { id: 'nano_ceramica_g20', name: 'Nano Cerâmica G20', priceSale: 180, priceCost: 52.00, purchaseType: 'metro', active: true },
+  jateado: { id: 'jateado', name: 'Jateado', priceSale: 90, priceCost: 239.85, purchaseType: 'bloco_7_5m', active: true },
+  window_blue_75: { id: 'window_blue_75', name: 'Window Blue 75%', priceSale: 300, priceCost: 139.98, purchaseType: 'metro', active: true },
+  window_blue_05: { id: 'window_blue_05', name: 'Window Blue 05%', priceSale: 220, priceCost: 69.98, purchaseType: 'metro', active: true },
+  window_blue_20: { id: 'window_blue_20', name: 'Window Blue 20%', priceSale: 220, priceCost: 69.98, purchaseType: 'metro', active: true },
+  nano_carbon_20: { id: 'nano_carbon_20', name: 'Nano Carbon 20%', priceSale: 110, priceCost: 262.35, purchaseType: 'bloco_7_5m', active: true },
+  nano_carbon_05: { id: 'nano_carbon_05', name: 'Nano Carbon 05%', priceSale: 110, priceCost: 262.35, purchaseType: 'bloco_7_5m', active: true },
+  personalizado: { id: 'personalizado', name: 'Personalizado...', priceSale: 100, priceCost: 40.00, purchaseType: 'metro', active: true },
+};
+
+const LEGACY_PLACEHOLDER_COSTS = new Set([200, 220, 280, 75, 210, 130, 95, 250]);
+
+export const normalizeFilmCatalog = (
+  rawCatalog: unknown,
+  fallbackTypes?: Record<string, number>
+): Record<string, FilmCatalogItem> => {
+  const result: Record<string, FilmCatalogItem> = {};
+  
+  // 1. Inicia com o catálogo padrão com custos Bluetech
+  Object.entries(DEFAULT_FILM_CATALOG).forEach(([key, item]) => {
+    result[key] = { ...item };
+    if (fallbackTypes && Number.isFinite(Number(fallbackTypes[key]))) {
+      result[key].priceSale = Number(fallbackTypes[key]);
+    }
+  });
+
+  // 2. Mescla com os dados salvos se existirem
+  if (rawCatalog && typeof rawCatalog === 'object' && !Array.isArray(rawCatalog)) {
+    Object.entries(rawCatalog as Record<string, unknown>).forEach(([key, val]) => {
+      if (val && typeof val === 'object' && !Array.isArray(val)) {
+        const item = val as Partial<FilmCatalogItem>;
+        const existing = result[key] || {
+          id: key,
+          name: typeof item.name === 'string' ? item.name : key,
+          priceSale: Number(item.priceSale) || 100,
+          priceCost: Number(item.priceCost) || 40,
+          purchaseType: item.purchaseType === 'bloco_7_5m' ? 'bloco_7_5m' : 'metro',
+          active: typeof item.active === 'boolean' ? item.active : true,
+        };
+
+        const defaultItem = DEFAULT_FILM_CATALOG[key];
+        const costVal = Number(item.priceCost);
+        const resolvedCost =
+          defaultItem && (LEGACY_PLACEHOLDER_COSTS.has(costVal) || !Number.isFinite(costVal))
+            ? defaultItem.priceCost
+            : Number.isFinite(costVal)
+            ? costVal
+            : existing.priceCost;
+
+        result[key] = {
+          ...existing,
+          name: typeof item.name === 'string' ? item.name : existing.name,
+          priceSale: Number.isFinite(Number(item.priceSale)) ? Number(item.priceSale) : existing.priceSale,
+          priceCost: resolvedCost,
+          purchaseType: item.purchaseType === 'bloco_7_5m' ? 'bloco_7_5m' : 'metro',
+          active: typeof item.active === 'boolean' ? item.active : existing.active,
+        };
+      }
+    });
+  }
+
+  return result;
+};
+
 export const DEFAULT_CONFIG: AppConfig = {
   rollW: 152,
   price: 80,
@@ -102,9 +184,10 @@ export const DEFAULT_CONFIG: AppConfig = {
   modoCorConfig: 'ambiente',
   agressividadeCorte: 35,
   filmTypes: { ...DEFAULT_FILM_TYPES },
+  filmCatalog: { ...DEFAULT_FILM_CATALOG },
   selectedFilm: 'carbono_g20',
   draftExpiration: 15,
-  };
+};
 
 export const DEFAULT_ROOM_COLORS: Record<string, string> = {};
 

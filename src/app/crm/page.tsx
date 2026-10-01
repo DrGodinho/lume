@@ -24,7 +24,7 @@ import { OfflineBanner } from './components/OfflineBanner';
 import { CRM_ACTIVE_TAB_STORAGE_KEY, DEFAULT_CRM_TARGET_GOAL, RJ_NEIGHBORHOODS } from './constants';
 import { CrmProvider, useCrm } from './context/CrmContext';
 
-const VALID_CRM_TABS = new Set<CrmTab>(['dashboard', 'leads', 'trash', 'archive', 'historico', 'extratos', 'agenda', 'settings']);
+const VALID_CRM_TABS = new Set<CrmTab>(['dashboard', 'leads', 'trash', 'archive', 'historico', 'extratos', 'agenda', 'settings', 'peliculas']);
 
 function CrmContent() {
   useTokenRefresh();
@@ -267,6 +267,10 @@ function CrmApp({ activeTab, onSelectTab }: { activeTab: CrmTab; onSelectTab: (t
           crm.openCommercialAction(lead, action);
         }}
         onMarkLost={crm.handleMarkLeadLost}
+        onArchiveLead={async (lead) => {
+          crm.closeLeadDetailModal();
+          await crm.handleArchiveLead(lead.id);
+        }}
       />
 
       <CommercialActionModal

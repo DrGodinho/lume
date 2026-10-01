@@ -5,9 +5,11 @@ import {
   DEFAULT_ROOM_COLORS,
   normalizeFilmTypeKey,
   normalizeFilmTypes,
+  normalizeFilmCatalog,
 } from '../lib/films';
 import type {
   AppConfig,
+  FilmCatalogItem,
   FilmTypeKey,
   GlassItem,
   LossMode,
@@ -75,9 +77,31 @@ export function useCalculatorState(cfg: AppConfig) {
   const [cliente, setCliente] = useState('');
   const [phone, setPhone] = useState('');
   const [neighborhood, setNeighborhood] = useState('');
+  const initialFilmCatalog = useMemo(
+    () => normalizeFilmCatalog(cfg.filmCatalog, cfg.filmTypes),
+    [cfg.filmCatalog, cfg.filmTypes]
+  );
+  const initialFilmTypes = useMemo(() => {
+    const types = normalizeFilmTypes(cfg.filmTypes);
+    Object.entries(initialFilmCatalog).forEach(([k, item]) => {
+      if (item && Number.isFinite(item.priceSale) && item.priceSale > 0) {
+        types[k as keyof typeof types] = item.priceSale;
+      }
+    });
+    return types;
+  }, [cfg.filmTypes, initialFilmCatalog]);
+
+  const initialSelectedFilm = useMemo(() => normalizeFilmTypeKey(cfg.selectedFilm), [cfg.selectedFilm]);
+  const initialPrice = useMemo(() => {
+    if (initialSelectedFilm !== 'personalizado') {
+      return initialFilmCatalog[initialSelectedFilm]?.priceSale ?? initialFilmTypes[initialSelectedFilm] ?? cfg.price;
+    }
+    return cfg.price;
+  }, [initialSelectedFilm, initialFilmCatalog, initialFilmTypes, cfg.price]);
+
   const [rollW, setRollW] = useState(cfg.rollW);
   const [margin, setMargin] = useState(cfg.margin);
-  const [price, setPrice] = useState(cfg.price);
+  const [price, setPrice] = useState(initialPrice);
   const [userName, setUserName] = useState(cfg.userName);
   const [desconto, setDesconto] = useState(0);
   const [descontoInput, setDescontoInput] = useState('0');
@@ -87,8 +111,9 @@ export function useCalculatorState(cfg: AppConfig) {
   const [modoPerdas, setModoPerdas] = useState<LossMode>(cfg.modoPerdas);
   const [perdasFixas, setPerdasFixas] = useState(cfg.perdasFixas);
   const [agressividadeCorte, setAgressividadeCorte] = useState(cfg.agressividadeCorte);
-  const [filmTypes, setFilmTypes] = useState<Record<FilmTypeKey, number>>(normalizeFilmTypes(cfg.filmTypes));
-  const [selectedFilm, setSelectedFilm] = useState<FilmTypeKey>(normalizeFilmTypeKey(cfg.selectedFilm));
+  const [filmTypes, setFilmTypes] = useState<Record<FilmTypeKey, number>>(initialFilmTypes);
+  const [filmCatalog, setFilmCatalog] = useState<Record<string, FilmCatalogItem>>(initialFilmCatalog);
+  const [selectedFilm, setSelectedFilm] = useState<FilmTypeKey>(initialSelectedFilm);
   const [customFilmName, setCustomFilmName] = useState('');
   const [draftExpiration, setDraftExpiration] = useState(cfg.draftExpiration);
   const [configRestored, setConfigRestored] = useState(false);
@@ -140,6 +165,7 @@ export function useCalculatorState(cfg: AppConfig) {
     modoCorConfig: usarCoresPorAmbiente ? 'ambiente' : 'tamanho',
     agressividadeCorte,
     filmTypes,
+    filmCatalog,
     selectedFilm,
     draftExpiration,
   }), [
@@ -153,6 +179,7 @@ export function useCalculatorState(cfg: AppConfig) {
     usarCoresPorAmbiente,
     agressividadeCorte,
     filmTypes,
+    filmCatalog,
     selectedFilm,
     draftExpiration,
   ]);
@@ -174,6 +201,7 @@ export function useCalculatorState(cfg: AppConfig) {
     perdasFixas, setPerdasFixas,
     agressividadeCorte, setAgressividadeCorte,
     filmTypes, setFilmTypes,
+    filmCatalog, setFilmCatalog,
     selectedFilm, setSelectedFilm,
     customFilmName, setCustomFilmName,
     draftExpiration, setDraftExpiration,

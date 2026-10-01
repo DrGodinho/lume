@@ -12,6 +12,7 @@ interface LeadListItemProps {
   onOpenDetail: (lead: Lead) => void;
   onOpenEdit: (lead: Lead) => void;
   onDelete: (leadId: string) => void;
+  onArchive?: (leadId: string) => void;
 }
 
 /** Card de lead para listas mobile (visão tabela no celular). */
@@ -22,6 +23,7 @@ export function LeadListItem({
   onOpenDetail,
   onOpenEdit,
   onDelete,
+  onArchive,
 }: LeadListItemProps) {
   return (
     <article className="rounded-2xl border border-white/5 bg-[#04080f]/85 p-4">
@@ -40,7 +42,11 @@ export function LeadListItem({
         <span className="rounded-full border border-white/5 bg-white/[0.03] px-2.5 py-1 text-white/60">{lead.filmType}</span>
         {getLeadServiceDate(lead) && (
           <span className="rounded-full border border-sky-500/20 bg-sky-500/10 px-2.5 py-1 font-semibold text-sky-300">
-            Serviço {format(getLeadServiceDate(lead)!, 'dd/MM')}
+            {(() => {
+              const sDate = getLeadServiceDate(lead)!;
+              const hasTime = sDate.getHours() !== 0 || sDate.getMinutes() !== 0;
+              return hasTime ? `Serviço ${format(sDate, 'dd/MM')} às ${format(sDate, 'HH:mm')}` : `Serviço ${format(sDate, 'dd/MM')}`;
+            })()}
           </span>
         )}
         <span className={`rounded-full border px-2.5 py-1 font-bold uppercase tracking-wider ${getLeadStatusClasses(lead.status)}`}>{lead.status}</span>
@@ -50,7 +56,11 @@ export function LeadListItem({
         <span className="text-xs text-white/40">{lead.sqm.toFixed(2)}m² · {daysInStatus(lead)}d no status</span>
         <div className="flex gap-3">
           <button type="button" onClick={() => onOpenEdit(lead)} className="text-xs font-semibold text-white/60 hover:text-white">Editar</button>
-          <button type="button" onClick={() => onDelete(lead.id)} className="text-xs font-semibold text-red-300/70 hover:text-red-300">Excluir</button>
+          {lead.status === 'Fechado' && onArchive ? (
+            <button type="button" onClick={() => onArchive(lead.id)} className="text-xs font-semibold text-[#f5d77a]/80 hover:text-[#f5d77a]">Arquivar</button>
+          ) : (
+            <button type="button" onClick={() => onDelete(lead.id)} className="text-xs font-semibold text-red-300/70 hover:text-red-300">Excluir</button>
+          )}
         </div>
       </div>
     </article>

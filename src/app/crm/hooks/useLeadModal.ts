@@ -43,6 +43,8 @@ const buildEmptyLeadForm = (filmType: string): LeadFormValues => ({
   dormant: false,
   pinned: false,
   notes: '',
+  custoAjudante: 0,
+  outrasDespesas: 0,
 });
 
 export const useLeadModal = (
@@ -128,12 +130,14 @@ export const useLeadModal = (
       value: roundCurrency(lead.value),
       status: lead.status,
       statusChangedAt: lead.statusChangedAt,
-      dataServico: formatDateInputValue(lead.dataServico),
+      dataServico: lead.dataServico || null,
       serviceStatus: lead.serviceStatus || null,
       proximoContato: formatDateInputValue(lead.proximoContato),
       dormant: lead.dormant,
       pinned: Boolean(lead.pinned),
       notes: lead.notes,
+      custoAjudante: lead.custoAjudante ?? 0,
+      outrasDespesas: lead.outrasDespesas ?? 0,
     };
     setSelectedLead(lead);
     setPendingCalculatorHistoryId(null);

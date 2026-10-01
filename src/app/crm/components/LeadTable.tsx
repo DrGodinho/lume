@@ -1,6 +1,7 @@
 'use client';
 
 import { format } from 'date-fns';
+import { Archive } from 'lucide-react';
 import { formatBRL } from '../utils';
 import { getLeadStatusClasses } from '../hooks/useAgenda';
 import type { Lead, LeadSortKey } from '../types';
@@ -22,6 +23,7 @@ export type LeadTableProps = LeadTableBaseProps &
         onRowClick: (lead: Lead) => void;
         onRowDoubleClick: (lead: Lead) => void;
         onDelete: (leadId: string) => void;
+        onArchive?: (leadId: string) => void;
         sortKey: LeadSortKey;
         sortDir: 'asc' | 'desc';
         onToggleSort: (key: LeadSortKey) => void;
@@ -131,7 +133,12 @@ export function LeadTable(props: LeadTableProps) {
             {props.compact !== true && (
               <>
                 <td className="py-3.5 text-center text-xs font-semibold text-sky-300">
-                  {props.getLeadServiceDate(lead) ? format(props.getLeadServiceDate(lead)!, 'dd/MM/yyyy') : '—'}
+                  {(() => {
+                    const sDate = props.getLeadServiceDate(lead);
+                    if (!sDate) return '—';
+                    const hasTime = sDate.getHours() !== 0 || sDate.getMinutes() !== 0;
+                    return hasTime ? `${format(sDate, 'dd/MM/yyyy')} às ${format(sDate, 'HH:mm')}` : format(sDate, 'dd/MM/yyyy');
+                  })()}
                 </td>
                 <td className="py-3.5 text-center font-mono text-xs text-white/40">{props.daysInStatus(lead)}d</td>
                 <td className="py-3.5 text-right">
@@ -150,20 +157,36 @@ export function LeadTable(props: LeadTableProps) {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                       </svg>
                     </button>
-                    <button
-                      type="button"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        props.onDelete(lead.id);
-                      }}
-                      onDoubleClick={(event) => event.stopPropagation()}
-                      className="text-white/30 hover:text-red-400"
-                      title="Excluir"
-                    >
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
+                    {lead.status === 'Fechado' && props.onArchive ? (
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          props.onArchive!(lead.id);
+                        }}
+                        onDoubleClick={(event) => event.stopPropagation()}
+                        className="text-[#c9a227]/70 hover:text-[#f5d77a]"
+                        title="Arquivar lead fechado"
+                        aria-label="Arquivar lead fechado"
+                      >
+                        <Archive className="h-4 w-4" />
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          props.onDelete(lead.id);
+                        }}
+                        onDoubleClick={(event) => event.stopPropagation()}
+                        className="text-white/30 hover:text-red-400"
+                        title="Excluir"
+                      >
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    )}
                   </div>
                 </td>
               </>

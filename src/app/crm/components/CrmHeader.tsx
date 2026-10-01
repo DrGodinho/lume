@@ -22,6 +22,7 @@ const TAB_TITLES: Record<CrmTab, string> = {
   extratos: 'Extratos Mensais',
   agenda: 'Agenda & Follow-up',
   settings: 'Configuracoes do CRM',
+  peliculas: 'Tabela de Películas',
 };
 
 function formatRelativeSync(iso: string | null, now: number): string {

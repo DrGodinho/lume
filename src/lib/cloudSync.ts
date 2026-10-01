@@ -1,4 +1,10 @@
 import { createScopedLogger } from './logger';
+import {
+  DEFAULT_FILM_TYPES,
+  FilmCatalogItem,
+  normalizeFilmCatalog,
+  normalizeFilmTypes,
+} from './films';
 
 const logger = createScopedLogger('cloud-sync');
 
@@ -202,7 +208,7 @@ export async function deleteHistoryItemFromCloud(id: string): Promise<boolean> {
   }
 }
 
-interface ConfigData {
+export interface ConfigData {
   rollW: number;
   price: number;
   margin: number;
@@ -215,49 +221,21 @@ interface ConfigData {
   filmTypes: Record<string, number>;
   selectedFilm: string;
   draftExpiration?: number;
+  filmCatalog?: Record<string, FilmCatalogItem>;
 }
-
-const DEFAULT_FILM_TYPES: Record<string, number> = {
-  carbono_g5: 90,
-  carbono_g20: 90,
-  refletiva: 110,
-  dupla_camada: 140,
-  nano_ceramica: 240,
-  nano_ceramica_g20: 180,
-  jateado: 99,
-  window_blue_75: 300,
-  window_blue_05: 220,
-  window_blue_20: 220,
-  nano_carbon_20: 110,
-  nano_carbon_05: 110,
-  personalizado: 100,
-};
 
 const normalizeSelectedFilm = (value: unknown) => {
   if (value === 'carbono') return 'carbono_g20';
   return typeof value === 'string' && value ? value : 'carbono_g20';
 };
 
-const normalizeFilmTypes = (value: unknown): Record<string, number> => {
-  const next = { ...DEFAULT_FILM_TYPES };
-  if (!value || typeof value !== 'object') return next;
-
-  const source = value as Record<string, unknown>;
-  const legacyCarbono = Number(source.carbono);
-  if (Number.isFinite(legacyCarbono)) {
-    next.carbono_g5 = legacyCarbono;
-    next.carbono_g20 = legacyCarbono;
+export async function saveConfigToCloud(config: ConfigData): Promise<boolean> {
+  const normalizedTypes = normalizeFilmTypes(config.filmTypes);
+  const filmTypesPayload: Record<string, unknown> = { ...normalizedTypes };
+  if (config.filmCatalog) {
+    filmTypesPayload.__catalog = config.filmCatalog;
   }
 
-  Object.keys(DEFAULT_FILM_TYPES).forEach((key) => {
-    const price = Number(source[key]);
-    if (Number.isFinite(price)) next[key] = price;
-  });
-
-  return next;
-};
-
-export async function saveConfigToCloud(config: ConfigData): Promise<boolean> {
   const row = {
     roll_w: config.rollW,
     price: config.price,
@@ -268,7 +246,8 @@ export async function saveConfigToCloud(config: ConfigData): Promise<boolean> {
     perdas_fixas: config.perdasFixas,
     modo_cor_config: config.modoCorConfig,
     agressividade_corte: config.agressividadeCorte,
-    film_types: normalizeFilmTypes(config.filmTypes),
+    film_types: filmTypesPayload,
+    film_catalog: config.filmCatalog,
     selected_film: normalizeSelectedFilm(config.selectedFilm),
     draft_expiration: config.draftExpiration,
   };
@@ -307,6 +286,17 @@ export async function loadConfigFromCloud(): Promise<ConfigData | null> {
     const data = result?.config;
     if (!data) return null;
 
+    const rawCatalog = data.film_catalog || (data.film_types as Record<string, unknown>)?.__catalog;
+    const filmTypes = normalizeFilmTypes(data.film_types);
+    const filmCatalog = normalizeFilmCatalog(rawCatalog, filmTypes);
+
+    // Garante sincronizacao bidirecional: os precos de venda do catalogo atualizam filmTypes
+    Object.entries(filmCatalog).forEach(([key, item]) => {
+      if (item && Number.isFinite(item.priceSale) && item.priceSale > 0) {
+        filmTypes[key as keyof typeof filmTypes] = item.priceSale;
+      }
+    });
+
     return {
       rollW: data.roll_w,
       price: data.price,
@@ -317,7 +307,8 @@ export async function loadConfigFromCloud(): Promise<ConfigData | null> {
       perdasFixas: data.perdas_fixas ?? 20,
       modoCorConfig: data.modo_cor_config ?? 'tamanho',
       agressividadeCorte: data.agressividade_corte ?? 35,
-      filmTypes: normalizeFilmTypes(data.film_types),
+      filmTypes,
+      filmCatalog,
       selectedFilm: normalizeSelectedFilm(data.selected_film),
       draftExpiration: data.draft_expiration,
     };

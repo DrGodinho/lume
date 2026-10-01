@@ -9,6 +9,7 @@ const CONFIG_OPTIONAL_COLUMNS = [
   'modo_cor_config',
   'agressividade_corte',
   'film_types',
+  'film_catalog',
   'selected_film',
   'draft_expiration',
 ] as const;

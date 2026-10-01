@@ -11,6 +11,7 @@ import {
 import { ptBR } from 'date-fns/locale';
 import { AgendaLeadCard } from './AgendaLeadCard';
 import { ServiceCheckInBanner } from './ServiceCheckInBanner';
+import { CompleteServiceModal } from './CompleteServiceModal';
 import { AgendaFilters } from './AgendaFilters';
 import { AgendaWeekStrip } from './AgendaWeekStrip';
 import { AgendaMonthCalendar } from './AgendaMonthCalendar';
@@ -38,10 +39,14 @@ interface AgendaSectionProps {
   onMarcarFeito?: (leadId: string) => Promise<void>;
   onSetDormant?: (leadId: string, dormant: boolean) => Promise<void>;
   onUpdateServiceStatus?: (leadId: string, serviceStatus: ServiceStatus) => Promise<void>;
-  onCompleteService?: (leadId: string) => Promise<void>;
+  onCompleteService?: (
+    leadId: string,
+    expenses?: { custoAjudante: number; outrasDespesas: number; note: string }
+  ) => Promise<void>;
   onRescheduleService?: (leadId: string, newDate: string) => Promise<void>;
   onMarkLost?: (lead: Lead) => Promise<void> | void;
   onAbrirLead?: (lead: Lead) => void;
+  onDeleteLead?: (leadId: string) => Promise<void>;
   onRestoreFromArchive?: (lead: Lead) => Promise<void>;
   isClosedLead?: (status: Lead['status']) => boolean;
   getLeadFollowUpDate?: (lead: Lead) => Date | null;
@@ -68,6 +73,7 @@ export function AgendaSection(props: AgendaSectionProps = {}) {
   const onRescheduleService = props.onRescheduleService ?? crm.handleRescheduleService;
   const onMarkLost = props.onMarkLost ?? crm.handleMarkLeadLost;
   const onAbrirLead = props.onAbrirLead ?? crm.setLeadDetail;
+  const onDeleteLead = props.onDeleteLead ?? crm.handleDeleteLead;
   const onRestoreFromArchive = props.onRestoreFromArchive ?? crm.handleRestoreFromArchive;
   const isClosedLead = props.isClosedLead ?? defaultIsClosedLead;
   const getLeadFollowUpDate = props.getLeadFollowUpDate ?? defaultGetLeadFollowUpDate;
@@ -83,6 +89,7 @@ export function AgendaSection(props: AgendaSectionProps = {}) {
   const [diaSelecionado, setDiaSelecionado] = useState<Date | null>(null);
   const [agendaView, setAgendaView] = useState<AgendaView>('hoje');
   const [mesVisivel, setMesVisivel] = useState(() => startOfMonth(new Date()));
+  const [completingLead, setCompletingLead] = useState<Lead | null>(null);
 
   useEffect(() => {
     setAgendaView(initialView);
@@ -168,7 +175,9 @@ export function AgendaSection(props: AgendaSectionProps = {}) {
       onSetDormant={onSetDormant}
       onUpdateServiceStatus={onUpdateServiceStatus}
       onCompleteService={onCompleteService}
+      onPromptCompleteService={(l) => setCompletingLead(l)}
       onAbrirLead={onAbrirLead}
+      onDeleteLead={onDeleteLead}
       onRestoreFromArchive={onRestoreFromArchive}
       getLeadFollowUpDate={getLeadFollowUpDate}
       getLeadServiceDate={getLeadServiceDate}
@@ -259,6 +268,7 @@ export function AgendaSection(props: AgendaSectionProps = {}) {
         <ServiceCheckInBanner
           pendingServices={servicosAguardandoConfirmacao}
           onCompleteService={onCompleteService}
+          onPromptCompleteService={(lead) => setCompletingLead(lead)}
           onRescheduleService={onRescheduleService}
           onMarkLost={onMarkLost}
           onAbrirLead={onAbrirLead}
@@ -375,6 +385,16 @@ export function AgendaSection(props: AgendaSectionProps = {}) {
           <p className="mt-2 text-sm text-white/55">Nenhum contato pendente para hoje, proximos dias ou leads parados.</p>
         </div>
       )}
+
+      <CompleteServiceModal
+        lead={completingLead}
+        isOpen={completingLead !== null}
+        onClose={() => setCompletingLead(null)}
+        onConfirm={async (leadId, expenses) => {
+          await onCompleteService(leadId, expenses);
+        }}
+        formatCurrencyBRL={formatCurrencyBRL}
+      />
     </div>
   );
 }

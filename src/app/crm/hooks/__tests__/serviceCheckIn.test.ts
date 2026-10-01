@@ -24,6 +24,9 @@ describe('Service Check-in & Confirmation', () => {
   };
 
   it('includes today and past services in servicosAguardandoConfirmacao until marked Concluido', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-09-22T12:00:00'));
+
     const todayService = { ...baseLead, id: 'today_1', dataServico: '2026-09-22', serviceStatus: 'Marcado' as const };
     const pastService = { ...baseLead, id: 'past_1', dataServico: '2026-09-20', serviceStatus: 'Marcado' as const };
     const completedService = { ...baseLead, id: 'comp_1', dataServico: '2026-09-22', serviceStatus: 'Concluido' as const };
@@ -52,6 +55,7 @@ describe('Service Check-in & Confirmation', () => {
     expect(pendingIds).not.toContain('comp_1'); // Concluded
     expect(pendingIds).not.toContain('fut_1'); // Future
     expect(pendingIds).not.toContain('closed_1'); // Already closed
+    vi.useRealTimers();
   });
 
   it('handleCompleteService sets serviceStatus to Concluido and status to Fechado', async () => {
@@ -76,6 +80,54 @@ describe('Service Check-in & Confirmation', () => {
       serviceStatus: 'Concluido',
       status: 'Fechado',
       dormant: false,
+    }));
+    expect(toast.success).toHaveBeenCalledWith('Serviço concluído e venda fechada!');
+  });
+
+  it('handleCompleteService records helper expenses and notes when provided', async () => {
+    const patchLeadStatusInfo = vi.fn().mockResolvedValue({ synced: true, lead: baseLead });
+    const toast = { success: vi.fn(), error: vi.fn() };
+    const { mergeExpensesIntoNotes } = await import('../../utils/expenses');
+
+    const handleCompleteService = async (
+      leadId: string,
+      expenses?: { custoAjudante?: number; outrasDespesas?: number; note?: string }
+    ) => {
+      const today = new Date().toISOString().split('T')[0];
+      const custoAjudante = expenses?.custoAjudante ?? 0;
+      const outrasDespesas = expenses?.outrasDespesas ?? 0;
+      const updatedNotes = expenses
+        ? mergeExpensesIntoNotes('', custoAjudante, outrasDespesas, expenses.note)
+        : '';
+
+      const { synced } = await patchLeadStatusInfo(leadId, {
+        serviceStatus: 'Concluido',
+        status: 'Fechado',
+        statusChangedAt: today,
+        notes: updatedNotes,
+        custoAjudante,
+        outrasDespesas,
+        dormant: false,
+      });
+      if (synced) toast.success('Serviço concluído e venda fechada!');
+      else toast.error('Erro');
+    };
+
+    await handleCompleteService('lead_1', {
+      custoAjudante: 150,
+      outrasDespesas: 30,
+      note: 'Instalação impecável',
+    });
+
+    expect(patchLeadStatusInfo).toHaveBeenCalledWith('lead_1', expect.objectContaining({
+      serviceStatus: 'Concluido',
+      status: 'Fechado',
+      custoAjudante: 150,
+      outrasDespesas: 30,
+      notes: expect.stringContaining('[Despesas: Ajudante R$ 150,00 | Extras R$ 30,00]'),
+    }));
+    expect(patchLeadStatusInfo).toHaveBeenCalledWith('lead_1', expect.objectContaining({
+      notes: expect.stringContaining('Instalação impecável'),
     }));
     expect(toast.success).toHaveBeenCalledWith('Serviço concluído e venda fechada!');
   });

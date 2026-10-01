@@ -1,4 +1,4 @@
-export type CrmTab = 'dashboard' | 'leads' | 'trash' | 'historico' | 'extratos' | 'agenda' | 'settings' | 'archive';
+export type CrmTab = 'dashboard' | 'leads' | 'trash' | 'historico' | 'extratos' | 'agenda' | 'settings' | 'archive' | 'peliculas';
 
 import type { LeadStatus } from './constants/stages';
 
@@ -70,6 +70,8 @@ export interface LeadStatusInfo {
   archived?: boolean;
   updatedAt?: string;
   deletedAt?: string | null;
+  custoAjudante?: number;
+  outrasDespesas?: number;
 }
 
 /**
@@ -127,6 +129,7 @@ export interface CommercialActionDraft {
   action: CommercialActionType;
   followUpDate: string;
   serviceDate: string;
+  serviceTime?: string;
   note: string;
 }
 

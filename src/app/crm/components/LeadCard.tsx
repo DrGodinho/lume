@@ -1,7 +1,7 @@
 'use client';
 
 import { format, isPast, isToday } from 'date-fns';
-import { AlertTriangle, CheckCircle2, RefreshCw, Star } from 'lucide-react';
+import { AlertTriangle, Archive, CheckCircle2, RefreshCw, Star } from 'lucide-react';
 import { memo, type CSSProperties } from 'react';
 import type { Lead, LeadSyncStatus } from '../types';
 
@@ -16,6 +16,7 @@ interface LeadCardProps {
   onOpenDetail: (lead: Lead) => void;
   onOpenEdit: (lead: Lead) => void;
   onDelete: (leadId: string) => void;
+  onArchive?: (leadId: string) => void;
   onTogglePin: (leadId: string) => void;
   onMoveLeft: (leadId: string) => void;
   onMoveRight: (leadId: string) => void;
@@ -40,6 +41,7 @@ export const LeadCard = memo(function LeadCard({
   onOpenDetail,
   onOpenEdit,
   onDelete,
+  onArchive,
   onTogglePin,
   onMoveLeft,
   onMoveRight,
@@ -53,10 +55,16 @@ export const LeadCard = memo(function LeadCard({
   disableMoveRight,
 }: LeadCardProps) {
   const serviceDate = getLeadServiceDate(lead);
+  const hasServiceTime = Boolean(serviceDate && (serviceDate.getHours() !== 0 || serviceDate.getMinutes() !== 0));
   const followUpDate = getLeadFollowUpDate(lead);
   const followUpOverdue = !!followUpDate && isPast(followUpDate) && !isToday(followUpDate);
   const nextAction = serviceDate
-    ? { label: `Serviço ${format(serviceDate, 'dd/MM')}`, className: 'font-semibold text-sky-300/80' }
+    ? {
+        label: hasServiceTime
+          ? `Serviço ${format(serviceDate, 'dd/MM')} às ${format(serviceDate, 'HH:mm')}`
+          : `Serviço ${format(serviceDate, 'dd/MM')}`,
+        className: 'font-semibold text-sky-300/80',
+      }
     : followUpDate
       ? followUpOverdue
         ? { label: `Em atraso — retorno ${format(followUpDate, 'dd/MM')}`, className: 'font-semibold text-red-300' }
@@ -207,20 +215,36 @@ export const LeadCard = memo(function LeadCard({
               &larr;
             </button>
 
-            <button
-              type="button"
-              onClick={(event) => {
-                event.stopPropagation();
-                onDelete(lead.id);
-              }}
-              onDoubleClick={(event) => event.stopPropagation()}
-              className="text-white/30 hover:text-red-400"
-              title="Excluir"
-            >
-              <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-            </button>
+            {lead.status === 'Fechado' && onArchive ? (
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onArchive(lead.id);
+                }}
+                onDoubleClick={(event) => event.stopPropagation()}
+                className="rounded p-0.5 text-[#c9a227]/70 transition hover:bg-[#c9a227]/10 hover:text-[#f5d77a]"
+                title="Arquivar lead fechado"
+                aria-label="Arquivar lead fechado"
+              >
+                <Archive className="h-3 w-3" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onDelete(lead.id);
+                }}
+                onDoubleClick={(event) => event.stopPropagation()}
+                className="text-white/30 hover:text-red-400"
+                title="Excluir"
+              >
+                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            )}
 
             <button
               type="button"

@@ -4,6 +4,7 @@ import { fetchWithTimeout } from '@/lib/fetchWithTimeout';
 import { useCallback, type Dispatch, type FormEvent, type SetStateAction } from 'react';
 import { getCrmApiErrorMessage, getCrmApiHeaders, hasLeadNextAction, mapLeadRow, normalizeLeadAmounts, requiresLeadNextAction } from '../utils';
 import { applyFollowUpPlaybook } from '../utils/playbooks';
+import { mergeExpensesIntoNotes } from '../utils/expenses';
 import { leadFormSchema, normalizeLeadPhoneInput } from '../schemas/leadSchema';
 import type { CrmSyncState, FollowUpPlaybookRule, Lead, LeadFormValues, LeadStatusInfoUpdate, LeadSyncStatus, ServiceStatus } from '../types';
 
@@ -43,7 +44,10 @@ export interface UseLeadMutationsReturn {
   handleRestoreFromArchive: (lead: Lead) => Promise<void>;
   handleAgendaSchedule: (leadId: string, date: string) => Promise<void>;
   handleServiceStatusChange: (leadId: string, serviceStatus: ServiceStatus) => Promise<void>;
-  handleCompleteService: (leadId: string) => Promise<void>;
+  handleCompleteService: (
+    leadId: string,
+    expenses?: { custoAjudante?: number; outrasDespesas?: number; note?: string }
+  ) => Promise<void>;
   handleRescheduleService: (leadId: string, newDate: string) => Promise<void>;
   handleAgendaMarkDone: (leadId: string) => Promise<void>;
   handleDormantStateChange: (leadId: string, dormant: boolean) => Promise<void>;
@@ -106,8 +110,15 @@ export const useLeadMutations = ({
       return false;
     }
 
+    const custoAjudante = leadForm.custoAjudante ?? 0;
+    const outrasDespesas = leadForm.outrasDespesas ?? 0;
+    const mergedNotes = mergeExpensesIntoNotes(leadForm.notes || '', custoAjudante, outrasDespesas);
+
     const normalizedForm = {
       ...leadForm,
+      notes: mergedNotes,
+      custoAjudante,
+      outrasDespesas,
       phone: normalizeLeadPhoneInput(leadForm.phone),
     };
 
@@ -251,12 +262,26 @@ export const useLeadMutations = ({
     }
   }, [leads, patchLeadStatusInfo, toast]);
 
-  const handleCompleteService = useCallback(async (leadId: string) => {
+  const handleCompleteService = useCallback(async (
+    leadId: string,
+    expenses?: { custoAjudante?: number; outrasDespesas?: number; note?: string }
+  ) => {
     const today = new Date().toISOString().split('T')[0];
+    const currentLead = leads.find((lead) => lead.id === leadId);
+    const currentNotes = currentLead?.notes || '';
+    const custoAjudante = expenses?.custoAjudante ?? currentLead?.custoAjudante ?? 0;
+    const outrasDespesas = expenses?.outrasDespesas ?? currentLead?.outrasDespesas ?? 0;
+    const updatedNotes = expenses
+      ? mergeExpensesIntoNotes(currentNotes, custoAjudante, outrasDespesas, expenses.note)
+      : currentNotes;
+
     const { synced } = await patchLeadStatusInfo(leadId, {
       serviceStatus: 'Concluido',
       status: 'Fechado',
       statusChangedAt: today,
+      notes: updatedNotes,
+      custoAjudante,
+      outrasDespesas,
       dormant: false,
     });
     if (synced) {
@@ -264,7 +289,7 @@ export const useLeadMutations = ({
     } else {
       toast.error('Não foi possível concluir o serviço no Supabase.');
     }
-  }, [patchLeadStatusInfo, toast]);
+  }, [leads, patchLeadStatusInfo, toast]);
 
   const handleRescheduleService = useCallback(async (leadId: string, newDate: string) => {
     const { synced } = await patchLeadStatusInfo(leadId, {

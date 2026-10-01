@@ -1,7 +1,7 @@
 'use client';
 
 import { format } from 'date-fns';
-import { AlertTriangle, Copy, FileText, X } from 'lucide-react';
+import { AlertTriangle, Archive, Copy, FileText, X } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import type { ZodIssue } from 'zod';
 import { ConfirmDialog } from './ConfirmDialog';
@@ -10,6 +10,7 @@ import { DiscardChangesDialog } from './DiscardChangesDialog';
 import { WhatsAppTemplateMenu } from './WhatsAppTemplateMenu';
 import { useDirtyFormGuard } from '../hooks/useDirtyFormGuard';
 import { useLeadNotes } from '../hooks/useLeadNotes';
+import { formatServiceDateTimeValue, parseLeadServiceTime, syncServiceTimeInNotes } from '../hooks/useAgenda';
 import { leadFormSchema } from '../schemas/leadSchema';
 import { getHistoryFilmLabel, hasLeadNextAction, requiresLeadNextAction, findDuplicateLead } from '../utils';
 import type { CalculatorHistoryRow, CommercialActionDraft, Lead, LeadFormValues, LeadStatusHistoryEntry } from '../types';
@@ -362,14 +363,43 @@ export function LeadFormModal({
                 <option value="Perdido">Perdido</option>
               </select>
             </div>
-            <div>
-              <label className="mb-1 block text-[10px] font-semibold uppercase tracking-widest text-white/50">Data do Serviço</label>
-              <DateFieldWithPicker
-                ariaLabel="Abrir calendário para data do serviço"
-                value={formatDateInputValue(leadForm.dataServico)}
-                onChange={(value) => setLeadForm({ ...leadForm, dataServico: value || null })}
-                className="w-full rounded-2xl border border-white/5 bg-[#04080f] px-4 py-3 text-sm text-white focus:border-[#c9a227]/40 focus:outline-none"
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="mb-1 block text-[10px] font-semibold uppercase tracking-widest text-white/50">Data do Serviço</label>
+                <DateFieldWithPicker
+                  ariaLabel="Abrir calendário para data do serviço"
+                  value={formatDateInputValue(leadForm.dataServico)}
+                  onChange={(value) => {
+                    const time = parseLeadServiceTime(leadForm.dataServico, leadForm.notes);
+                    const newDateTime = formatServiceDateTimeValue(value, time);
+                    setLeadForm({ ...leadForm, dataServico: newDateTime });
+                  }}
+                  className="w-full rounded-2xl border border-white/5 bg-[#04080f] px-4 py-3 text-sm text-white focus:border-[#c9a227]/40 focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="mb-1 flex items-center justify-between text-[10px] font-semibold uppercase tracking-widest text-white/50">
+                  <span>Horário da Instalação</span>
+                  <span className="text-[9px] text-white/30 lowercase font-normal">(opcional)</span>
+                </label>
+                <input
+                  type="time"
+                  aria-label="Horário da instalação"
+                  value={parseLeadServiceTime(leadForm.dataServico, leadForm.notes)}
+                  onChange={(event) => {
+                    const newTime = event.target.value;
+                    const date = formatDateInputValue(leadForm.dataServico) || new Date().toISOString().split('T')[0];
+                    const newDateTime = formatServiceDateTimeValue(date, newTime);
+                    const updatedNotes = syncServiceTimeInNotes(leadForm.notes, newTime);
+                    setLeadForm({
+                      ...leadForm,
+                      dataServico: newDateTime,
+                      notes: updatedNotes,
+                    });
+                  }}
+                  className="w-full rounded-2xl border border-white/5 bg-[#04080f] px-4 py-3 text-sm text-white focus:border-[#c9a227]/40 focus:outline-none [color-scheme:dark]"
+                />
+              </div>
             </div>
             <div>
               <label className="mb-1 block text-[10px] font-semibold uppercase tracking-widest text-white/50">Próximo Contato</label>
@@ -393,6 +423,58 @@ export function LeadFormModal({
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+
+          {/* Despesas da Instalação / Ajudante */}
+          <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-3.5 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#f5d77a]">
+                Despesas da Instalação (Opcional)
+              </span>
+              <span className="text-[10px] text-white/40">Abatem do faturamento</span>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <label className="mb-1 block text-[10px] font-semibold uppercase tracking-widest text-white/50">
+                  Gasto com Ajudante / Diária (R$)
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  inputMode="decimal"
+                  placeholder="0,00"
+                  value={leadForm.custoAjudante || ''}
+                  onChange={(event) =>
+                    setLeadForm({
+                      ...leadForm,
+                      custoAjudante: Math.max(0, parseFloat(event.target.value) || 0),
+                    })
+                  }
+                  className="w-full rounded-2xl border border-white/5 bg-[#04080f] px-4 py-2.5 text-sm text-white placeholder:text-white/20 focus:border-[#c9a227]/40 focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-[10px] font-semibold uppercase tracking-widest text-white/50">
+                  Outras Despesas / Extras (R$)
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  inputMode="decimal"
+                  placeholder="0,00"
+                  value={leadForm.outrasDespesas || ''}
+                  onChange={(event) =>
+                    setLeadForm({
+                      ...leadForm,
+                      outrasDespesas: Math.max(0, parseFloat(event.target.value) || 0),
+                    })
+                  }
+                  className="w-full rounded-2xl border border-white/5 bg-[#04080f] px-4 py-2.5 text-sm text-white placeholder:text-white/20 focus:border-[#c9a227]/40 focus:outline-none"
+                />
+              </div>
             </div>
           </div>
 
@@ -468,6 +550,7 @@ interface LeadDetailModalProps {
   onOpenCommercialAction: (lead: Lead, action: CommercialActionDraft['action']) => void;
   onMarkLost?: (lead: Lead) => void;
   onOpenHistory: () => void;
+  onArchiveLead?: (lead: Lead) => Promise<void> | void;
 }
 
 export function LeadDetailModal({
@@ -487,6 +570,7 @@ export function LeadDetailModal({
   onOpenCommercialAction,
   onMarkLost,
   onOpenHistory,
+  onArchiveLead,
 }: LeadDetailModalProps) {
   const { notes: leadNotes, loading: loadingLeadNotes, adding: addingLeadNote, error: leadNotesError, addNote } =
     useLeadNotes(leadDetail?.id ?? '');
@@ -535,7 +619,12 @@ export function LeadDetailModal({
           <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
             <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-white/50">Serviço</span>
             <span className="text-sm font-bold text-sky-300">
-              {getLeadServiceDate(leadDetail) ? format(getLeadServiceDate(leadDetail)!, 'dd/MM/yyyy') : 'Sem data'}
+              {(() => {
+                const sDate = getLeadServiceDate(leadDetail);
+                if (!sDate) return 'Sem data';
+                const hasTime = sDate.getHours() !== 0 || sDate.getMinutes() !== 0;
+                return hasTime ? `${format(sDate, 'dd/MM/yyyy')} às ${format(sDate, 'HH:mm')}` : format(sDate, 'dd/MM/yyyy');
+              })()}
             </span>
           </div>
           <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
@@ -729,9 +818,21 @@ export function LeadDetailModal({
           <button type="button" onClick={() => onOpenCommercialAction(leadDetail, 'servico')} className="rounded-xl border border-sky-500/20 bg-sky-500/10 px-3 py-2.5 text-xs font-bold text-sky-300 transition hover:bg-sky-500/15">
             Agendar Serviço
           </button>
-          <button type="button" onClick={() => onOpenCommercialAction(leadDetail, 'fechado')} className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2.5 text-xs font-bold text-emerald-300 transition hover:bg-emerald-500/15">
-            Fechar Venda
-          </button>
+          {leadDetail.status === 'Fechado' && onArchiveLead ? (
+            <button
+              type="button"
+              onClick={() => onArchiveLead(leadDetail)}
+              className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#c9a227]/30 bg-[#c9a227]/15 px-3 py-2.5 text-xs font-bold text-[#f5d77a] shadow-lg shadow-[#c9a227]/10 transition hover:bg-[#c9a227]/25"
+              title="Mover lead fechado para o Arquivo"
+            >
+              <Archive className="h-3.5 w-3.5" />
+              Arquivar Lead
+            </button>
+          ) : (
+            <button type="button" onClick={() => onOpenCommercialAction(leadDetail, 'fechado')} className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2.5 text-xs font-bold text-emerald-300 transition hover:bg-emerald-500/15">
+              Fechar Venda
+            </button>
+          )}
           <button
             type="button"
             onClick={() => {
@@ -818,15 +919,30 @@ export function CommercialActionModal({
           )}
 
           {commercialAction.action === 'servico' && (
-            <div>
-              <label className="mb-1 block text-[10px] font-semibold uppercase tracking-widest text-white/50">Data do serviço</label>
-              <DateFieldWithPicker
-                ariaLabel="Abrir calendário para data do serviço"
-                required
-                value={commercialAction.serviceDate}
-                onChange={(value) => setCommercialAction({ ...commercialAction, serviceDate: value })}
-                className="w-full rounded-2xl border border-white/5 bg-[#04080f] px-4 py-3 text-sm text-white focus:border-sky-400/40 focus:outline-none"
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="mb-1 block text-[10px] font-semibold uppercase tracking-widest text-white/50">Data do serviço</label>
+                <DateFieldWithPicker
+                  ariaLabel="Abrir calendário para data do serviço"
+                  required
+                  value={commercialAction.serviceDate}
+                  onChange={(value) => setCommercialAction({ ...commercialAction, serviceDate: value })}
+                  className="w-full rounded-2xl border border-white/5 bg-[#04080f] px-4 py-3 text-sm text-white focus:border-sky-400/40 focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="mb-1 flex items-center justify-between text-[10px] font-semibold uppercase tracking-widest text-white/50">
+                  <span>Horário</span>
+                  <span className="text-[9px] text-white/30 lowercase font-normal">(opcional)</span>
+                </label>
+                <input
+                  type="time"
+                  aria-label="Horário da instalação"
+                  value={commercialAction.serviceTime || ''}
+                  onChange={(event) => setCommercialAction({ ...commercialAction, serviceTime: event.target.value })}
+                  className="w-full rounded-2xl border border-white/5 bg-[#04080f] px-4 py-3 text-sm text-white focus:border-sky-400/40 focus:outline-none [color-scheme:dark]"
+                />
+              </div>
             </div>
           )}
 

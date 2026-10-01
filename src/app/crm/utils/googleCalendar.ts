@@ -48,10 +48,13 @@ export const buildGoogleCalendarUrl = (
   options: BuildGoogleCalendarUrlOptions = {},
 ): string => {
   const durationHours = options.durationHours ?? DEFAULT_DURATION_HOURS;
-  const startHourLocal = options.startHourLocal ?? DEFAULT_START_HOUR;
+  const hasSpecificTime = serviceDate.getHours() !== 0 || serviceDate.getMinutes() !== 0;
 
   const startDate = new Date(serviceDate);
-  startDate.setHours(startHourLocal, 0, 0, 0);
+  if (!hasSpecificTime) {
+    const startHourLocal = options.startHourLocal ?? DEFAULT_START_HOUR;
+    startDate.setHours(startHourLocal, 0, 0, 0);
+  }
   const endDate = new Date(startDate);
   endDate.setHours(endDate.getHours() + durationHours);
 

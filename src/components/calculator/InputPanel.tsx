@@ -3,7 +3,7 @@
 import React from 'react';
 import { Smartphone, Save, FolderOpen, Layers, X, Plus } from 'lucide-react';
 import { formatNumber2 } from '../../lib/money';
-import type { FilmTypeKey } from '../../lib/films';
+import type { FilmCatalogItem, FilmTypeKey } from '../../lib/films';
 import { FILM_TYPE_LABELS } from '../../lib/films';
 import { RJ_NEIGHBORHOODS } from '@/app/crm/constants';
 
@@ -26,6 +26,7 @@ export interface RoloProps {
     customFilmName?: string;
     margin: number;
     price: number;
+    filmCatalog?: Record<string, FilmCatalogItem>;
     onRollWChange: (v: number) => void;
     onSelectedFilmChange: (v: FilmTypeKey) => void;
     onCustomFilmNameChange?: (v: string) => void;
@@ -81,7 +82,7 @@ export function InputPanel({
         onImportarZap, onSalvarProjeto, fileInputRef, onAbrirProjeto,
     } = clienteProps;
     const {
-        rollW, selectedFilm, customFilmName, margin, price,
+        rollW, selectedFilm, customFilmName, margin, price, filmCatalog,
         onRollWChange, onSelectedFilmChange, onCustomFilmNameChange, onMarginChange, onPriceChange,
     } = roloProps;
     const {
@@ -152,9 +153,15 @@ export function InputPanel({
                     <div>
                         <label className="block text-[10px] text-gray-400 mb-1 text-center font-bold uppercase">Película</label>
                         <select value={selectedFilm} onChange={(e) => onSelectedFilmChange(e.target.value as FilmTypeKey)} className="w-full bg-[#040811] border border-white/10 rounded-lg p-3 text-sm text-center font-bold appearance-none cursor-pointer">
-                            {(Object.keys(FILM_TYPE_LABELS) as FilmTypeKey[]).map((key) => (
-                                <option key={key} value={key}>{FILM_TYPE_LABELS[key]}</option>
-                            ))}
+                            {(Object.keys(FILM_TYPE_LABELS) as FilmTypeKey[]).map((key) => {
+                                const item = filmCatalog?.[key];
+                                const priceTag = item && key !== 'personalizado' ? ` (R$ ${item.priceSale})` : '';
+                                return (
+                                    <option key={key} value={key}>
+                                        {item?.name || FILM_TYPE_LABELS[key]}{priceTag}
+                                    </option>
+                                );
+                            })}
                         </select>
                     </div>
                     <div>

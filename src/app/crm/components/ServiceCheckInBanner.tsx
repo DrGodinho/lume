@@ -8,7 +8,11 @@ import type { Lead, ServiceStatus } from '../types';
 
 export interface ServiceCheckInBannerProps {
   pendingServices: Lead[];
-  onCompleteService: (leadId: string) => Promise<void>;
+  onCompleteService: (
+    leadId: string,
+    expenses?: { custoAjudante: number; outrasDespesas: number; note: string }
+  ) => Promise<void>;
+  onPromptCompleteService?: (lead: Lead) => void;
   onRescheduleService: (leadId: string, newDate: string) => Promise<void>;
   onMarkLost: (lead: Lead) => Promise<void> | void;
   onAbrirLead: (lead: Lead) => void;
@@ -21,6 +25,7 @@ export interface ServiceCheckInBannerProps {
 export function ServiceCheckInBanner({
   pendingServices,
   onCompleteService,
+  onPromptCompleteService,
   onRescheduleService,
   onMarkLost,
   onAbrirLead,
@@ -193,13 +198,19 @@ export function ServiceCheckInBanner({
                   </div>
                 ) : (
                   <div className="flex flex-wrap items-center gap-2">
-                    {/* Concluir Serviço (1-clique) */}
+                    {/* Concluir Serviço */}
                     <button
                       type="button"
                       disabled={isLoadingThis}
-                      onClick={() => handleComplete(lead.id)}
+                      onClick={() => {
+                        if (onPromptCompleteService) {
+                          onPromptCompleteService(lead);
+                        } else {
+                          void handleComplete(lead.id);
+                        }
+                      }}
                       className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-3 py-2 text-xs font-bold text-white shadow-md shadow-emerald-500/20 transition hover:brightness-110 disabled:opacity-50"
-                      title="Marcar serviço como concluído e fechar venda"
+                      title="Marcar serviço como concluído e lançar despesas"
                     >
                       <CheckCircle2 className="h-3.5 w-3.5" />
                       Concluir

@@ -27,6 +27,9 @@ const ArchivedLeadsView = dynamic(() => import('./ArchivedLeadsView').then((m) =
 const ExtratosMensaisSupabase = dynamic(() => import('../ExtratosMensaisSupabase').then((m) => m.ExtratosMensaisSupabase), {
   loading: () => <TabSkeleton />,
 });
+const CatalogoPeliculas = dynamic(() => import('./CatalogoPeliculas').then((m) => m.CatalogoPeliculas), {
+  loading: () => <TabSkeleton />,
+});
 
 function TabSkeleton() {
   return (
@@ -116,6 +119,14 @@ export function CrmTabRouter({ activeTab, onSelectTab, searchInputRef }: CrmTabR
     return (
       <TabErrorBoundary fallbackTitle="Agenda & Follow-up">
         <AgendaSection />
+      </TabErrorBoundary>
+    );
+  }
+
+  if (activeTab === 'peliculas') {
+    return (
+      <TabErrorBoundary fallbackTitle="Tabela de Películas">
+        <CatalogoPeliculas />
       </TabErrorBoundary>
     );
   }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useMemo, useState } from 'react';
-import { Archive, BarChart3, Calculator, CalendarClock, Database, LogOut, Plus, ReceiptText, Settings, Trash2, UsersRound, type LucideIcon } from 'lucide-react';
+import { Archive, BarChart3, Calculator, CalendarClock, Database, Layers, LogOut, Plus, ReceiptText, Settings, Trash2, UsersRound, type LucideIcon } from 'lucide-react';
 import type { CrmTab } from '../types';
 import { TargetGoalCard } from './TargetGoalCard';
 import { useCrm } from '../context/CrmContext';
@@ -50,6 +50,7 @@ const CRM_NAV_SECTIONS: Array<{ label: string; items: CrmNavItem[] }> = [
     label: 'Dados',
     items: [
       { id: 'historico', label: 'Orçamentos', description: 'Calculadora Supabase', icon: Database, tone: 'gold' },
+      { id: 'peliculas', label: 'Tabela de Películas', description: 'Custos e preços de venda', icon: Layers, tone: 'gold' },
       { id: 'extratos', label: 'Extratos Mensais', description: 'Metas e fechamentos', icon: ReceiptText, tone: 'slate' },
       { id: 'settings', label: 'Playbook', description: 'Automação de regras', icon: Settings, tone: 'slate' },
       { id: 'archive', label: 'Arquivo', description: 'Leads fechados antigos', icon: Archive, tone: 'gold' },

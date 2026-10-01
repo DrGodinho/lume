@@ -1,6 +1,7 @@
 import { buildCalculatorStorageKey } from './calculatorScope';
 import {
   DEFAULT_CONFIG,
+  normalizeFilmCatalog,
   normalizeFilmTypeKey,
   normalizeFilmTypes,
 } from './films';
@@ -12,10 +13,18 @@ export function loadConfig(scopeKey?: string): AppConfig {
         const saved = localStorage.getItem(scopeKey ? buildCalculatorStorageKey('lume_config', scopeKey) : 'lume_config');
         if (saved) {
           const parsed = JSON.parse(saved);
+          const filmTypes = normalizeFilmTypes(parsed.filmTypes);
+          const filmCatalog = normalizeFilmCatalog(parsed.filmCatalog, filmTypes);
+          Object.entries(filmCatalog).forEach(([key, item]) => {
+            if (item && Number.isFinite(item.priceSale) && item.priceSale > 0) {
+              filmTypes[key as keyof typeof filmTypes] = item.priceSale;
+            }
+          });
           return {
             ...DEFAULT_CONFIG,
             ...parsed,
-            filmTypes: normalizeFilmTypes(parsed.filmTypes),
+            filmTypes,
+            filmCatalog,
             selectedFilm: normalizeFilmTypeKey(parsed.selectedFilm),
           };
         }

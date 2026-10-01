@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabase';
 import { roundCurrency, roundMeasure } from '@/lib/numberPrecision';
 import { CRM_COLLAPSED_CARDS_STORAGE_KEY, CRM_FILM_TYPE_LABELS } from './constants';
 import { normalizeLeadStatus, normalizeServiceStatus } from './hooks/useAgenda';
+import { parseLeadExpenses } from './utils/expenses';
 import type { Lead, CalculatorHistoryRow } from './types';
 
 type LeadRow = Record<string, unknown> & { film_type?: string };
@@ -20,38 +21,49 @@ export const getFilmTypeLabel = (value: string) => {
     .join(' ');
 };
 
-export const mapLeadRow = (row: LeadRow): Lead => ({
-  id: asString(row.id, 'lead_sem_id'),
-  name: asString(row.name),
-  phone: asString(row.phone),
-  email: asString(row.email),
-  address: asString(row.address),
-  neighborhood: asString(row.neighborhood, 'Barra da Tijuca'),
-  filmType: asString(row.film_type, 'Nano Ceramica'),
-  sqm: roundMeasure(row.sqm),
-  value: roundCurrency(row.value),
-  status: normalizeLeadStatus(row.status),
-  createdAt: asString(row.created_at, new Date().toISOString().split('T')[0]),
-  statusChangedAt: asString(row.status_changed_at, asString(row.created_at, new Date().toISOString().split('T')[0])),
-  notes: asString(row.notes),
-  proximoContato: asNullableString(row.proximo_contato),
-  dataServico: asNullableString(row.data_servico),
-  serviceStatus: normalizeServiceStatus(row.service_status),
-  dormant: typeof row.dormant === 'boolean' ? row.dormant : false,
-  pinned: typeof row.pinned === 'boolean' ? row.pinned : false,
-  updatedAt: asString(row.updated_at, asString(row.status_changed_at, asString(row.created_at, new Date().toISOString()))),
-  deletedAt: asNullableString(row.deleted_at),
-});
+export const mapLeadRow = (row: LeadRow): Lead => {
+  const notesStr = asString(row.notes);
+  const expenses = parseLeadExpenses(notesStr);
+  return {
+    id: asString(row.id, 'lead_sem_id'),
+    name: asString(row.name),
+    phone: asString(row.phone),
+    email: asString(row.email),
+    address: asString(row.address),
+    neighborhood: asString(row.neighborhood, 'Barra da Tijuca'),
+    filmType: asString(row.film_type, 'Nano Ceramica'),
+    sqm: roundMeasure(row.sqm),
+    value: roundCurrency(row.value),
+    status: normalizeLeadStatus(row.status),
+    createdAt: asString(row.created_at, new Date().toISOString().split('T')[0]),
+    statusChangedAt: asString(row.status_changed_at, asString(row.created_at, new Date().toISOString().split('T')[0])),
+    notes: notesStr,
+    proximoContato: asNullableString(row.proximo_contato),
+    dataServico: asNullableString(row.data_servico),
+    serviceStatus: normalizeServiceStatus(row.service_status),
+    dormant: typeof row.dormant === 'boolean' ? row.dormant : false,
+    pinned: typeof row.pinned === 'boolean' ? row.pinned : false,
+    updatedAt: asString(row.updated_at, asString(row.status_changed_at, asString(row.created_at, new Date().toISOString()))),
+    deletedAt: asNullableString(row.deleted_at),
+    custoAjudante: typeof row.custo_ajudante === 'number' ? row.custo_ajudante : expenses.custoAjudante,
+    outrasDespesas: typeof row.outras_despesas === 'number' ? row.outras_despesas : expenses.outrasDespesas,
+  };
+};
 
-export const normalizeLeadAmounts = (lead: Lead): Lead => ({
-  ...lead,
-  sqm: roundMeasure(lead.sqm),
-  value: roundCurrency(lead.value),
-  status: normalizeLeadStatus(lead.status),
-  serviceStatus: normalizeServiceStatus(lead.serviceStatus) || (lead.dataServico ? 'Marcado' : null),
-  dormant: Boolean(lead.dormant),
-  pinned: Boolean(lead.pinned),
-});
+export const normalizeLeadAmounts = (lead: Lead): Lead => {
+  const expenses = parseLeadExpenses(lead.notes);
+  return {
+    ...lead,
+    sqm: roundMeasure(lead.sqm),
+    value: roundCurrency(lead.value),
+    status: normalizeLeadStatus(lead.status),
+    serviceStatus: normalizeServiceStatus(lead.serviceStatus) || (lead.dataServico ? 'Marcado' : null),
+    dormant: Boolean(lead.dormant),
+    pinned: Boolean(lead.pinned),
+    custoAjudante: lead.custoAjudante ?? expenses.custoAjudante,
+    outrasDespesas: lead.outrasDespesas ?? expenses.outrasDespesas,
+  };
+};
 
 export const requiresLeadNextAction = (status: Lead['status']) => status === 'Agendado' || status === 'Em Contato';
 

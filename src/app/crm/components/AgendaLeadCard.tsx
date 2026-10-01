@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { differenceInDays, format, isPast, isToday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { CalendarPlus, CheckCircle2 } from 'lucide-react';
+import { CalendarPlus, CheckCircle2, Trash2 } from 'lucide-react';
 import { WhatsAppTemplateMenu, type WhatsAppTemplateType } from './WhatsAppTemplateMenu';
 import { buildGoogleCalendarUrl } from '../utils/googleCalendar';
 import type { Lead, LeadCardKind, ServiceStatus, ServiceStatusMeta } from '../types';
@@ -16,7 +16,9 @@ interface AgendaLeadCardProps {
   onSetDormant: (leadId: string, dormant: boolean) => Promise<void>;
   onUpdateServiceStatus: (leadId: string, serviceStatus: ServiceStatus) => Promise<void>;
   onCompleteService?: (leadId: string) => Promise<void>;
+  onPromptCompleteService?: (lead: Lead) => void;
   onAbrirLead: (lead: Lead) => void;
+  onDeleteLead?: (leadId: string) => Promise<void>;
   onRestoreFromArchive?: (lead: Lead) => Promise<void>;
   getLeadFollowUpDate: (lead: Lead) => Date | null;
   getLeadServiceDate: (lead: Lead) => Date | null;
@@ -36,7 +38,9 @@ export function AgendaLeadCard({
   onSetDormant,
   onUpdateServiceStatus,
   onCompleteService,
+  onPromptCompleteService,
   onAbrirLead,
+  onDeleteLead,
   onRestoreFromArchive,
   getLeadFollowUpDate,
   getLeadServiceDate,
@@ -61,20 +65,25 @@ export function AgendaLeadCard({
   const isIdleCard = kind === 'idle';
   const isDormantCard = kind === 'dormant';
   const serviceStatus = getLeadServiceStatus(lead);
-  const serviceMeta = serviceStatusMeta[serviceStatus];
+  const serviceMeta = serviceStatusMeta[serviceStatus] ?? serviceStatusMeta.Marcado;
 
   const isFiveYearsCompleted = serviceDate ? differenceInDays(new Date(), serviceDate) >= 1826 : false;
   const isServiceToday = isServiceCard && !!serviceDate && isToday(serviceDate);
   const isServiceOverdue = isServiceCard && !!serviceDate && isPast(serviceDate) && !isToday(serviceDate) && serviceStatus !== 'Concluido';
+  const hasServiceTime = Boolean(serviceDate && (serviceDate.getHours() !== 0 || serviceDate.getMinutes() !== 0));
 
   const cardLabel = isFiveYearsCompleted && lead.archived
     ? 'Ciclo 5 Anos'
     : isServiceToday
-      ? 'Serviço • Hoje'
+      ? hasServiceTime && serviceDate
+        ? `Serviço • Hoje às ${format(serviceDate, 'HH:mm')}`
+        : 'Serviço • Hoje'
       : isServiceOverdue
         ? 'Serviço • Pendente'
         : isServiceCard
-          ? 'Serviço'
+          ? hasServiceTime && serviceDate
+            ? `Serviço às ${format(serviceDate, 'HH:mm')}`
+            : 'Serviço'
           : isDormantCard
             ? 'Dormente'
             : isIdleCard
@@ -173,7 +182,16 @@ export function AgendaLeadCard({
         )}
         {serviceDate && (
           <span className="rounded-full border border-sky-500/20 bg-sky-500/10 px-2.5 py-1 text-sky-300">
-            Servico {format(serviceDate, "d 'de' MMM", { locale: ptBR })}
+            {hasServiceTime
+              ? `Serviço ${format(serviceDate, "d 'de' MMM", { locale: ptBR })} às ${format(serviceDate, 'HH:mm')}`
+              : `Serviço ${format(serviceDate, "d 'de' MMM", { locale: ptBR })}`}
+          </span>
+        )}
+        {((lead.custoAjudante || 0) > 0 || (lead.outrasDespesas || 0) > 0) && (
+          <span className="rounded-full border border-[#c9a227]/30 bg-[#c9a227]/10 px-2.5 py-1 text-[#f5d77a]">
+            {(lead.custoAjudante || 0) > 0 ? `Ajudante R$ ${lead.custoAjudante}` : ''}
+            {(lead.custoAjudante || 0) > 0 && (lead.outrasDespesas || 0) > 0 ? ' · ' : ''}
+            {(lead.outrasDespesas || 0) > 0 ? `Extras R$ ${lead.outrasDespesas}` : ''}
           </span>
         )}
       </div>
@@ -267,9 +285,15 @@ export function AgendaLeadCard({
               {lead.dormant ? 'Reativar lead' : 'Marcar dormente'}
             </button>
           )}
-          {isServiceCard && onCompleteService && serviceStatus !== 'Concluido' && (
+          {isServiceCard && (onPromptCompleteService || onCompleteService) && serviceStatus !== 'Concluido' && (
             <button
-              onClick={() => onCompleteService(lead.id)}
+              onClick={() => {
+                if (onPromptCompleteService) {
+                  onPromptCompleteService(lead);
+                } else if (onCompleteService) {
+                  void onCompleteService(lead.id);
+                }
+              }}
               className="inline-flex items-center gap-1.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-3.5 py-2 text-xs font-bold text-white shadow-md shadow-emerald-500/20 transition hover:brightness-110"
               title="Concluir serviço e fechar venda"
             >
@@ -314,6 +338,17 @@ export function AgendaLeadCard({
           >
             Abrir
           </button>
+          {(isIdleCard || isDormantCard) && onDeleteLead && (
+            <button
+              type="button"
+              onClick={() => void onDeleteLead(lead.id)}
+              className="inline-flex items-center gap-1.5 rounded-2xl border border-red-500/20 bg-red-500/5 px-3 py-2 text-xs font-semibold text-red-300/80 transition hover:border-red-500/40 hover:bg-red-500/15 hover:text-red-200"
+              title="Deletar este lead"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              Deletar lead
+            </button>
+          )}
         </div>
       )}
 
