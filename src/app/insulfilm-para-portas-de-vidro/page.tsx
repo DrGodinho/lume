@@ -98,7 +98,7 @@ const serviceJsonLd = {
     worstRating: '1',
   },
   additionalProperty: [
-    { '@type': 'PropertyValue', name: 'Garantia', value: '2 anos' },
+    { '@type': 'PropertyValue', name: 'Garantia', value: 'Até 10 anos' },
     { '@type': 'PropertyValue', name: 'Proteção UV', value: 'Até 99%' },
     { '@type': 'PropertyValue', name: 'Rejeição de Calor', value: 'Até 82%' },
     { '@type': 'PropertyValue', name: 'Aplicação', value: 'Residencial e comercial' },

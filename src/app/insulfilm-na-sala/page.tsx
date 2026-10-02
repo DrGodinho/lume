@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Insulfilm para Sala no RJ | Zero Reflexo na TV e Conforto Térmico',
     description:
-      'Assista TV sem reflexo, reduza até 82% do calor e valorize sua sala de estar. Instalação profissional com garantia de 2 anos a partir de R$ 280. Orçamento rápido pelo WhatsApp.',
+      'Assista TV sem reflexo, reduza até 82% do calor e valorize sua sala de estar. Instalação profissional com garantia de até 10 anos a partir de R$ 280. Orçamento rápido pelo WhatsApp.',
     url: 'https://lumecontrolesolar.com.br/insulfilm-na-sala/',
     type: 'website',
     siteName: 'LUME Controle Solar',
@@ -52,7 +52,7 @@ const jsonLd = {
       name: 'Instalação de Insulfilm para Salas de Estar',
       alternateName: 'Película de Controle Solar e Térmico para Sala',
       description:
-        'Instalação profissional de películas de alta performance em salas residenciais no Rio de Janeiro. Ideal para eliminar reflexo na Smart TV, diminuir o calor solar, proteger móveis e pisos contra raios UV e garantir privacidade. Opções em Nano Cerâmica, Carbono e Refletiva com garantia de 2 anos.',
+        'Instalação profissional de películas de alta performance em salas residenciais no Rio de Janeiro. Ideal para eliminar reflexo na Smart TV, diminuir o calor solar, proteger móveis e pisos contra raios UV e garantir privacidade. Opções em Nano Cerâmica, Carbono e Refletiva com garantia de até 10 anos.',
       url: 'https://lumecontrolesolar.com.br/insulfilm-na-sala/',
       image: 'https://lumecontrolesolar.com.br/og-image.jpg',
       provider: {
@@ -95,7 +95,7 @@ const jsonLd = {
         { '@type': 'PropertyValue', name: 'Rejeição de Calor Infravermelho', value: 'Até 82%' },
         { '@type': 'PropertyValue', name: 'Bloqueio de Raios UV', value: '99%' },
         { '@type': 'PropertyValue', name: 'Tempo Médio de Instalação', value: '1h30 a 3h' },
-        { '@type': 'PropertyValue', name: 'Garantia', value: '2 Anos' },
+        { '@type': 'PropertyValue', name: 'Garantia', value: 'Até 10 Anos' },
       ],
     },
     {

@@ -3,7 +3,7 @@ import { ScrollReveal } from '../components/ScrollReveal';
 
 const differentiators = [
   'Trabalhamos apenas com películas de alta qualidade',
-  'Garantia de 2 anos em todas as películas',
+  'Garantia de até 10 anos (conforme a película)',
   'Atendimento personalizado na sua casa',
   'Mais de 500 residências atendidas',
 ];
@@ -11,7 +11,7 @@ const differentiators = [
 const stats = [
   { icon: Calendar, value: '8+', label: 'Anos de Experiência' },
   { icon: Users, value: '500+', label: 'Residências Atendidas' },
-  { icon: Shield, value: '5', label: 'Anos de Garantia' },
+  { icon: Shield, value: 'Até 10', label: 'Anos de Garantia' },
   { icon: Award, value: '100%', label: 'Clientes Satisfeitos' },
 ];
 

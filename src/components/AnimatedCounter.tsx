@@ -6,14 +6,53 @@ import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 interface AnimatedCounterProps {
   target: string;
   suffix?: string;
+  prefix?: string;
 }
 
-export function AnimatedCounter({ target, suffix = '' }: AnimatedCounterProps) {
+export function AnimatedCounter({ target, suffix = '', prefix = '' }: AnimatedCounterProps) {
   const [count, setCount] = useState(0);
   const counterRef = useRef<HTMLSpanElement>(null);
   const hasAnimated = useRef(false);
   const prefersReducedMotion = usePrefersReducedMotion();
-  const numTarget = useMemo(() => parseInt(target.replace(/\D/g, '')), [target]);
+
+  const parsed = useMemo(() => {
+    let cleanPrefix = prefix;
+    let cleanSuffix = suffix;
+
+    // Handle legacy suffix that accidentally contains 'Até' (e.g. from regex replace)
+    if (!cleanPrefix && cleanSuffix && /^\s*até\s*/i.test(cleanSuffix)) {
+      const match = cleanSuffix.match(/^\s*até\s*/i);
+      if (match) {
+        cleanPrefix = match[0];
+        cleanSuffix = cleanSuffix.replace(/^\s*até\s*/i, ' ');
+      }
+    }
+
+    const matchTarget = target.match(/^([^\d-]*)(-?\d+)(.*)$/);
+    if (matchTarget) {
+      if (!cleanPrefix && matchTarget[1].trim()) {
+        cleanPrefix = matchTarget[1];
+      }
+      if (!cleanSuffix && matchTarget[3].trim()) {
+        cleanSuffix = matchTarget[3];
+      }
+      return {
+        prefix: cleanPrefix,
+        num: parseInt(matchTarget[2].replace(/\D/g, '')) || 0,
+        isNegative: matchTarget[2].startsWith('-'),
+        suffix: cleanSuffix
+      };
+    }
+
+    return {
+      prefix: cleanPrefix,
+      num: parseInt(target.replace(/\D/g, '')) || 0,
+      isNegative: target.startsWith('-'),
+      suffix: cleanSuffix
+    };
+  }, [target, suffix, prefix]);
+
+  const numTarget = parsed.num;
 
   useEffect(() => {
     if (!numTarget) return;
@@ -60,11 +99,11 @@ export function AnimatedCounter({ target, suffix = '' }: AnimatedCounterProps) {
   }, [numTarget, prefersReducedMotion]);
 
   const resolvedCount = prefersReducedMotion ? numTarget : count;
-  const displayValue = target.startsWith('-') ? `-${resolvedCount}` : `${resolvedCount}`;
+  const displayValue = parsed.isNegative ? `-${resolvedCount}` : `${resolvedCount}`;
 
   return (
     <span ref={counterRef}>
-      {displayValue}{suffix}
+      {parsed.prefix}{displayValue}{parsed.suffix}
     </span>
   );
 }

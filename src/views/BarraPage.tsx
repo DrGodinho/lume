@@ -74,7 +74,7 @@ export function BarraPage({ faqs }: { faqs: { q: string; a: string }[] }) {
                         <div className="flex items-center gap-2"><Thermometer size={16} className="text-[#c9a227]" /> Até 80% de Rejeição de Calor</div>
                         <div className="flex items-center gap-2"><Sun size={16} className="text-[#c9a227]" /> 99% Bloqueio Anti-UV</div>
                         <div className="flex items-center gap-2"><CheckCircle size={16} className="text-[#c9a227]" /> Orçamento Gratuito no Local</div>
-                        <div className="flex items-center gap-2"><Shield size={16} className="text-[#c9a227]" /> Garantia de 2 Anos Lume</div>
+                        <div className="flex items-center gap-2"><Shield size={16} className="text-[#c9a227]" /> Garantia de até 10 Anos Lume</div>
                     </div>
                 </div>
             </section>
@@ -247,7 +247,7 @@ export function BarraPage({ faqs }: { faqs: { q: string; a: string }[] }) {
                                 desc: "Reduza significativamente o custo mensal com ar-condicionado em apartamentos amplos e lojas."
                             },
                             {
-                                icon: Lock, title: "Garantia Lume", stat: "2 Anos", label: "De Tranquilidade",
+                                icon: Lock, title: "Garantia Lume", stat: "Até 10 Anos", label: "De Tranquilidade",
                                 desc: "Materiais de procedência mundial que não criam bolhas nem perdem a cor sob o sol do Rio de Janeiro."
                             }
                         ].map((benefit, idx) => (

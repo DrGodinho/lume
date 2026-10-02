@@ -26,6 +26,6 @@ export const portasVidroFaqs: PortasVidroFaq[] = [
   },
   {
     q: "A instalação de insulfilm em portas de vidro faz sujeira ou exige obra?",
-    a: "Não há nenhuma obra, poeira ou quebra-quebra. A aplicação é feita diretamente sobre o vidro existente com água e solução neutra, que é completamente recolhida durante o acabamento. A porta fica pronta para uso no mesmo dia com garantia de 2 anos LUME."
+    a: "Não há nenhuma obra, poeira ou quebra-quebra. A aplicação é feita diretamente sobre o vidro existente com água e solução neutra, que é completamente recolhida durante o acabamento. A porta fica pronta para uso no mesmo dia com garantia de até 10 anos (conforme a película escolhida) LUME."
   }
 ];

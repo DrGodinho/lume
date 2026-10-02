@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Insulfilm para Banheiro no RJ | Privacidade 24h com Luz Acesa',
     description:
-      'Privacidade total em básculas e boxes sem perder a claridade natural. Película jateada à prova de vapor com garantia de 2 anos. Orçamento rápido pelo WhatsApp.',
+      'Privacidade total em básculas e boxes sem perder a claridade natural. Película jateada à prova de vapor com garantia de até 10 anos. Orçamento rápido pelo WhatsApp.',
     url: 'https://lumecontrolesolar.com.br/insulfilm-no-banheiro/',
     type: 'website',
     siteName: 'LUME Controle Solar',
@@ -51,7 +51,7 @@ const jsonLd = {
       name: 'Instalação de Insulfilm Jateado para Banheiros',
       alternateName: 'Película Jateada e Fosca para Básculas e Boxes',
       description:
-        'Instalação profissional de películas jateadas e foscas para básculas, janelas e boxes de vidro temperado em banheiros no Rio de Janeiro. Garante privacidade total 24 horas por dia mesmo com a lâmpada acesa, mantém a passagem de luz natural e resiste perfeitamente ao vapor quente do chuveiro. Garantia oficial de 2 anos.',
+        'Instalação profissional de películas jateadas e foscas para básculas, janelas e boxes de vidro temperado em banheiros no Rio de Janeiro. Garante privacidade total 24 horas por dia mesmo com a lâmpada acesa, mantém a passagem de luz natural e resiste perfeitamente ao vapor quente do chuveiro. Garantia oficial de até 10 anos.',
       url: 'https://lumecontrolesolar.com.br/insulfilm-no-banheiro/',
       image: 'https://lumecontrolesolar.com.br/og-image.jpg',
       provider: {
@@ -94,7 +94,7 @@ const jsonLd = {
         { '@type': 'PropertyValue', name: 'Passagem de Luz Natural', value: 'Até 80%' },
         { '@type': 'PropertyValue', name: 'Resistência ao Vapor', value: '100% Impermeável' },
         { '@type': 'PropertyValue', name: 'Tempo Médio de Aplicação', value: '40min a 1h30' },
-        { '@type': 'PropertyValue', name: 'Garantia', value: '2 Anos' },
+        { '@type': 'PropertyValue', name: 'Garantia', value: 'Até 10 Anos' },
       ],
     },
     {

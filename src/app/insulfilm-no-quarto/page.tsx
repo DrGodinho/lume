@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Insulfilm para Quarto no RJ | Escurecimento Total e Conforto Térmico',
     description:
-      'Durma em paz! Bloqueie 99% da luz solar matinal e o calor da tarde com películas profissionais. Instalações para quartos a partir de R$ 280 com garantia de 2 anos.',
+      'Durma em paz! Bloqueie 99% da luz solar matinal e o calor da tarde com películas profissionais. Instalações para quartos a partir de R$ 280 com garantia de até 10 anos.',
     url: 'https://lumecontrolesolar.com.br/insulfilm-no-quarto/',
     type: 'website',
     siteName: 'LUME Controle Solar',
@@ -52,7 +52,7 @@ const jsonLd = {
       name: 'Instalação de Insulfilm para Quartos e Dormitórios',
       alternateName: 'Película Blackout e Controle Térmico para Quarto',
       description:
-        'Instalação profissional de películas de alto poder de escurecimento e isolamento térmico em quartos residenciais no Rio de Janeiro. Ideal para quem trabalha em turnos, precisa de escuridão total para dormir de dia, quer proteger bebês e crianças do sol forte ou eliminar o calor acumulado da tarde. Películas Dupla Camada G5 e Carbono G5 com 2 anos de garantia.',
+        'Instalação profissional de películas de alto poder de escurecimento e isolamento térmico em quartos residenciais no Rio de Janeiro. Ideal para quem trabalha em turnos, precisa de escuridão total para dormir de dia, quer proteger bebês e crianças do sol forte ou eliminar o calor acumulado da tarde. Películas Dupla Camada G5 e Carbono G5 com até 10 anos de garantia.',
       url: 'https://lumecontrolesolar.com.br/insulfilm-no-quarto/',
       image: 'https://lumecontrolesolar.com.br/og-image.jpg',
       provider: {
@@ -96,7 +96,7 @@ const jsonLd = {
         { '@type': 'PropertyValue', name: 'Bloqueio UV', value: '99%' },
         { '@type': 'PropertyValue', name: 'Privacidade', value: 'Total 24h' },
         { '@type': 'PropertyValue', name: 'Tempo Médio de Instalação', value: '1h a 1h30' },
-        { '@type': 'PropertyValue', name: 'Garantia', value: '2 Anos' },
+        { '@type': 'PropertyValue', name: 'Garantia', value: 'Até 10 Anos' },
       ],
     },
     {

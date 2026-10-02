@@ -26,6 +26,6 @@ export const quartoFaqs: QuartoFaq[] = [
   },
   {
     q: "Como funciona a instalação no quarto e quanto tempo leva?",
-    a: "A aplicação em uma janela padrão de quarto leva entre 1 hora e 1h30. Nossa equipe utiliza mantas impermeáveis para proteger a cama, o piso e móveis próximos. O procedimento é totalmente limpo, silencioso, sem poeira ou obras, e conta com 2 anos de garantia formal da LUME Controle Solar."
+    a: "A aplicação em uma janela padrão de quarto leva entre 1 hora e 1h30. Nossa equipe utiliza mantas impermeáveis para proteger a cama, o piso e móveis próximos. O procedimento é totalmente limpo, silencioso, sem poeira ou obras, e conta com até 10 anos de garantia formal (conforme a película escolhida) da LUME Controle Solar."
   }
 ];

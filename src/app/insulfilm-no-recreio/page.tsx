@@ -5,7 +5,7 @@ import { buildBreadcrumbSchema } from '@/lib/schema/breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Insulfilm no Recreio RJ | Preço, Instalação e Garantia - LUME',
-  description: 'Aplicação profissional de insulfilm no Recreio dos Bandeirantes, Rio de Janeiro. Películas a partir de R$ 90/m²: redução de calor, privacidade e proteção UV com garantia de 2 anos. Orçamento grátis no local e pelo WhatsApp.',
+  description: 'Aplicação profissional de insulfilm no Recreio dos Bandeirantes, Rio de Janeiro. Películas a partir de R$ 90/m²: redução de calor, privacidade e proteção UV com garantia de até 10 anos. Orçamento grátis no local e pelo WhatsApp.',
   keywords: [
     'insulfilm recreio',
     'insulfilm recreio rj',
@@ -55,7 +55,7 @@ const recreioFaqs = [
   },
   {
     q: 'Qual o tempo de garantia do serviço?',
-    a: 'Oferecemos garantia contratual de 2 anos em todos os nossos serviços de aplicação. Isso cobre bolhas, delaminação e defeitos de instalação, garantindo sua total tranquilidade.',
+    a: 'Oferecemos garantia contratual de até 10 anos (conforme a película escolhida) em nossos serviços de aplicação. Isso cobre bolhas, delaminação e defeitos de instalação, garantindo sua total tranquilidade.',
   },
   {
     q: 'Posso instalar insulfilm em vidro temperado?',

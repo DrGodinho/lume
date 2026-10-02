@@ -5,7 +5,7 @@ import { buildBreadcrumbSchema } from '@/lib/schema/breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Insulfilm em Jacarepaguá RJ | Preço, Instalação e Garantia - LUME',
-  description: 'Aplicação profissional de insulfilm em Jacarepaguá e região, Rio de Janeiro. Películas a partir de R$ 90/m²: redução de calor, privacidade e proteção UV com garantia de 2 anos. Orçamento grátis no local e pelo WhatsApp.',
+  description: 'Aplicação profissional de insulfilm em Jacarepaguá e região, Rio de Janeiro. Películas a partir de R$ 90/m²: redução de calor, privacidade e proteção UV com garantia de até 10 anos. Orçamento grátis no local e pelo WhatsApp.',
   keywords: [
     'insulfilm em jacarepaguá',
     'insulfilm jacarepaguá rj',
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://lumecontrolesolar.com.br/insulfilm-em-jacarepagua/' },
   openGraph: {
     title: 'Insulfilm em Jacarepaguá RJ | LUME Controle Solar',
-    description: 'Películas de controle solar em Jacarepaguá. Redução de até 80% do calor e proteção UV 99%. Orçamento rápido e garantia de 2 anos.',
+    description: 'Películas de controle solar em Jacarepaguá. Redução de até 80% do calor e proteção UV 99%. Orçamento rápido e garantia de até 10 anos.',
     url: 'https://lumecontrolesolar.com.br/insulfilm-em-jacarepagua/',
     type: 'website',
     siteName: 'LUME Controle Solar',
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Insulfilm em Jacarepaguá RJ | LUME Controle Solar',
-    description: 'Redução de até 80% do calor em Jacarepaguá. Proteção UV 99% e garantia de 2 anos.',
+    description: 'Redução de até 80% do calor em Jacarepaguá. Proteção UV 99% e garantia de até 10 anos.',
     images: ['https://lumecontrolesolar.com.br/jacarepagua_hero_bg.webp'],
   },
 };
@@ -55,7 +55,7 @@ const jacarepaguaFaqs = [
   },
   {
     q: 'Qual a garantia oferecida em Jacarepaguá?',
-    a: 'Você recebe nossa garantia oficial de 2 anos cobrindo qualquer defeito de material ou falha na aplicação. Sua satisfação é nossa prioridade absoluta.',
+    a: 'Você recebe nossa garantia oficial de até 10 anos (conforme a película escolhida) cobrindo qualquer defeito de material ou falha na aplicação. Sua satisfação é nossa prioridade absoluta.',
   },
   {
     q: 'Posso instalar insulfilm em vidro temperado?',

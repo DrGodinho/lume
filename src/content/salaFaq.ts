@@ -26,6 +26,6 @@ export const salaFaqs: SalaFaq[] = [
   },
   {
     q: "Quanto tempo dura a instalação e qual a garantia?",
-    a: "A instalação de uma sala padrão (janelas e porta balcão) leva em média de 1h30 a 3 horas. Todos os nossos serviços contam com 2 anos de garantia formal com emissão de termo de instalação pela LUME Controle Solar."
+    a: "A instalação de uma sala padrão (janelas e porta balcão) leva em média de 1h30 a 3 horas. Todos os nossos serviços contam com até 10 anos de garantia formal (conforme a película escolhida) com emissão de termo de instalação pela LUME Controle Solar."
   }
 ];

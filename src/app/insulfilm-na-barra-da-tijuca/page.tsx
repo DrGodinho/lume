@@ -5,7 +5,7 @@ import { buildBreadcrumbSchema } from '@/lib/schema/breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Insulfilm na Barra da Tijuca RJ | Preço, Instalação e Garantia - LUME',
-  description: 'Aplicação profissional de insulfilm na Barra da Tijuca, Rio de Janeiro. Películas a partir de R$ 90/m²: redução de calor, privacidade e proteção UV com garantia de 2 anos. Orçamento grátis no local e pelo WhatsApp.',
+  description: 'Aplicação profissional de insulfilm na Barra da Tijuca, Rio de Janeiro. Películas a partir de R$ 90/m²: redução de calor, privacidade e proteção UV com garantia de até 10 anos. Orçamento grátis no local e pelo WhatsApp.',
   keywords: [
     'insulfilm barra da tijuca',
     'insulfilm barra rj',
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://lumecontrolesolar.com.br/insulfilm-na-barra-da-tijuca/' },
   openGraph: {
     title: 'Insulfilm na Barra da Tijuca RJ | LUME Controle Solar',
-    description: 'Películas de alta performance na Barra da Tijuca. Nano cerâmica, carbono e espelhadas. Instalação profissional com garantia de 2 anos.',
+    description: 'Películas de alta performance na Barra da Tijuca. Nano cerâmica, carbono e espelhadas. Instalação profissional com garantia de até 10 anos.',
     url: 'https://lumecontrolesolar.com.br/insulfilm-na-barra-da-tijuca/',
     type: 'website',
     siteName: 'LUME Controle Solar',
@@ -55,7 +55,7 @@ const barraFaqs = [
   },
   {
     q: 'Qual o tempo de garantia do serviço?',
-    a: 'Oferecemos garantia contratual de 2 anos em todos os nossos serviços de aplicação. Isso cobre bolhas, delaminação e defeitos de instalação, garantindo sua total tranquilidade.',
+    a: 'Oferecemos garantia contratual de até 10 anos (conforme a película escolhida) em nossos serviços de aplicação. Isso cobre bolhas, delaminação e defeitos de instalação, garantindo sua total tranquilidade.',
   },
   {
     q: 'Posso instalar insulfilm em vidro temperado?',

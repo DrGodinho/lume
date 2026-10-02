@@ -5,15 +5,44 @@ import { Sun, Droplets, Zap, ShieldCheck, Layers, ArrowRight } from 'lucide-reac
 import { ContactCTA } from '../sections/ContactCTA';
 import { SpecTooltip } from '../components/SpecTooltip';
 import { NavigationBreadcrumbs } from '../components/NavigationBreadcrumbs';
+import { ScrollReveal } from '../components/ScrollReveal';
+import { HeroEntrance } from '../components/HeroEntrance';
+import { Particles } from '../components/Particles';
+import { AnimatedCounter } from '../components/AnimatedCounter';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Image from 'next/image';
 
 export function DuplaCamadaPage() {
     useEffect(() => {
-        // Entrance Animation
-        gsap.fromTo('.page-entrance',
-            { opacity: 0, y: 20 },
-            { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out', stagger: 0.1 }
-        );
+        gsap.registerPlugin(ScrollTrigger);
+
+        const ctx = gsap.context(() => {
+            const perfRows = gsap.utils.toArray('.perf-row') as Element[];
+            if (perfRows.length > 0) {
+                perfRows.forEach((row) => {
+                    const bar = row.querySelector('.perf-bar-fill');
+                    if (bar) {
+                        const targetWidth = bar.getAttribute('data-width') ?? undefined;
+                        gsap.fromTo(bar,
+                            { width: '0%' },
+                            {
+                                width: targetWidth,
+                                duration: 1.5,
+                                ease: 'power3.out',
+                                delay: 0.2,
+                                scrollTrigger: {
+                                    trigger: row,
+                                    start: 'top 85%',
+                                }
+                            }
+                        );
+                    }
+                });
+            }
+        });
+
+        return () => ctx.revert();
     }, []);
 
     return (
@@ -22,11 +51,26 @@ export function DuplaCamadaPage() {
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden px-4">
                 <div className="absolute inset-0 z-0">
-                    <div className="w-full h-full bg-gradient-to-br from-[#0c182c] to-[#040912]" />
-                    <div className="absolute inset-0 bg-black/50" />
+                    <Image
+                        src="/product-smoke.webp"
+                        alt="Aplicação de Insulfilm Dupla Camada LUME - Rio de Janeiro"
+                        fill
+                        sizes="100vw"
+                        priority
+                        className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/30" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
                 </div>
 
-                <div className="container-lume relative z-10 page-entrance text-center md:text-left">
+                {/* Particles */}
+                <Particles />
+
+                {/* Floating gold accent */}
+                <div className="absolute top-1/4 right-10 w-32 h-32 rounded-full bg-[#c9a227]/5 blur-3xl animate-float pointer-events-none" />
+                <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-[#c9a227]/10 blur-3xl animate-float pointer-events-none" style={{ animationDelay: '2s' }} />
+
+                <div className="container-lume relative z-10 text-center md:text-left">
                     <NavigationBreadcrumbs
                         showVisualTrail={false}
                         items={[
@@ -34,243 +78,276 @@ export function DuplaCamadaPage() {
                             { label: 'Dupla Camada' }
                         ]}
                     />
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#c9a227]/10 border border-[#c9a227]/30 mb-6 font-semibold uppercase tracking-wider text-[#c9a227] text-xs md:text-sm">
-                        Resistência Extrema ao Sol do Rio 🌞
-                    </div>
+                    <HeroEntrance className="max-w-3xl mx-auto md:mx-0">
+                        <div className="animate-hero opacity-0 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#c9a227]/10 border border-[#c9a227]/30 mb-6 font-semibold uppercase tracking-wider text-[#c9a227] text-xs md:text-sm">
+                            Resistência Extrema ao Sol do Rio 🌞
+                        </div>
 
-                    <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-montserrat mb-6 leading-tight">
-                        Insulfilm <span className="text-gradient-gold">Dupla Camada</span> <br className="hidden lg:block" />(G5 e G20)
-                    </h1>
+                        <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-montserrat mb-6 leading-tight">
+                            <span className="word opacity-0 inline-block">Insulfilm</span>{' '}
+                            <span className="word opacity-0 inline-block text-gradient-gold">Dupla</span>{' '}
+                            <span className="word opacity-0 inline-block text-gradient-gold">Camada</span>{' '}
+                            <br className="hidden lg:block" />
+                            <span className="word opacity-0 inline-block">(G5</span>{' '}
+                            <span className="word opacity-0 inline-block">e</span>{' '}
+                            <span className="word opacity-0 inline-block">G20)</span>
+                        </h1>
 
-                    <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto md:mx-0 mb-10 leading-relaxed">
-                        A união impecável de <strong>Privacidade, Estética Premium e Escudo Térmico</strong>. Construída com metais nobres interligados para rejeitar agressivamente o forte calor carioca direto da sua janela.
-                    </p>
+                        <p className="animate-hero opacity-0 text-lg md:text-xl text-gray-300 max-w-2xl mx-auto md:mx-0 mb-10 leading-relaxed">
+                            A união impecável de <strong>Privacidade, Estética Premium e Escudo Térmico</strong>. Construída com metais nobres interligados para rejeitar agressivamente o forte calor carioca direto da sua janela.
+                        </p>
 
-                    <a
-                        href="https://wa.me/5521965140612?text=Olá! Quero proteger minha casa com Filme Dupla Camada contra o sol."
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn-primary inline-flex items-center justify-center gap-3 text-lg py-4 px-8"
-                    >
-                        Pedir Orçamento sem Compromisso <ArrowRight size={20} />
-                    </a>
+                        <div className="animate-hero opacity-0">
+                            <a
+                                href="https://wa.me/5521965140612?text=Olá! Quero proteger minha casa com Filme Dupla Camada contra o sol."
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn-primary inline-flex items-center justify-center gap-3 text-lg py-4 px-8"
+                            >
+                                Pedir Orçamento sem Compromisso <ArrowRight size={20} />
+                            </a>
+                        </div>
+                    </HeroEntrance>
                 </div>
+
+                {/* Decorative bottom fade */}
+                <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#04080f] to-transparent z-10 pointer-events-none" />
             </section>
 
             {/* Como reduz a conta de luz? (SEO focado em RJ/Bangu) */}
             <section className="py-20 bg-[#04080f] border-b border-white/5 px-4">
-                <div className="container-lume page-entrance">
-                    <div className="max-w-4xl mx-auto text-center">
-                        <div className="flex items-center justify-center gap-4 mb-4">
+                <div className="container-lume">
+                    <ScrollReveal animation="slide-up" className="max-w-4xl mx-auto text-center">
+                        <div className="animate-item flex items-center justify-center gap-4 mb-4">
                             <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
                             <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
                                 Economia de Energia
                             </span>
                             <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
                         </div>
-                        <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-8 text-white">O Fim da Conta de Luz nas Alturas na Zona Oeste</h2>
-                        <p className="text-gray-400 leading-relaxed mb-6 text-lg">
+                        <h2 className="animate-item text-3xl lg:text-4xl font-bold font-montserrat mb-8 text-white">O Fim da Conta de Luz nas Alturas na Zona Oeste</h2>
+                        <p className="animate-item text-gray-400 leading-relaxed mb-6 text-lg">
                             Se você mora ou possui comércio em <strong>Bangu, Campo Grande, Realengo ou adjacências</strong>, sabe que as temperaturas de verão não são uma mera inconveniência; elas são um dreno financeiro maciço na sua conta de energia por causa dos aparelhos de Ar Condicionado ligados no 16ºC, operando em pico durante o dia todo.
                         </p>
-                        <p className="text-gray-400 leading-relaxed text-lg">
+                        <p className="animate-item text-gray-400 leading-relaxed text-lg">
                             O <strong>Insulfilm Dupla Camada</strong> é projetado especificamente para barrar esse ciclo destrutivo. Ao instalar esse material nas suas janelas de vidro ou varandas fechadas, a película rejeita brutalmente a radiação solar térmica *antes* mesmo dela aquecer o ar da sua sala. Quando a temperatura interna é estabilizada pela película, o seu Inverter gela o ambiente com <strong>metade do esforço</strong>. O retorno do investimento dessa película (A partir de R$ 110/m²) se paga mês a mês reduzindo sua tarifa de energia elétrica.
                         </p>
-                    </div>
+                    </ScrollReveal>
                 </div>
             </section>
 
             {/* Arquitetura Técnica */}
             <section className="py-20 relative px-4">
-                <div className="container-lume page-entrance text-center mb-16">
-                    <div className="flex items-center justify-center gap-4 mb-4">
-                        <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
-                        <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
-                            Tecnologia
-                        </span>
-                        <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
-                    </div>
-                    <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-4 text-[#c9a227]">A Ciência da Super Rejeição Térmica</h2>
-                    <p className="text-gray-400 max-w-2xl mx-auto text-lg mb-12">Por que ela é muito superior a filmes básicos do mercado?</p>
+                <div className="container-lume">
+                    <ScrollReveal animation="slide-up" className="text-center mb-16">
+                        <div className="animate-item flex items-center justify-center gap-4 mb-4">
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
+                            <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
+                                Tecnologia
+                            </span>
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
+                        </div>
+                        <h2 className="animate-item text-3xl lg:text-4xl font-bold font-montserrat mb-4 text-[#c9a227]">A Ciência da Super Rejeição Térmica</h2>
+                        <p className="animate-item text-gray-400 max-w-2xl mx-auto text-lg mb-12">Por que ela é muito superior a filmes básicos do mercado?</p>
 
-                    <div className="max-w-4xl mx-auto text-left">
-                        <div className="glass-card p-8 md:p-10 rounded-3xl border border-white/5 bg-white/[0.02] relative overflow-hidden">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-[#c9a227]/5 blur-3xl rounded-full pointer-events-none"></div>
+                        <div className="animate-item max-w-4xl mx-auto text-left">
+                            <div className="glass-card p-8 md:p-10 rounded-3xl border border-white/5 bg-white/[0.02] relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-[#c9a227]/5 blur-3xl rounded-full pointer-events-none"></div>
 
-                            <h3 className="text-2xl font-bold mb-6 text-white font-montserrat">O que é a Tecnologia de Dupla Camada?</h3>
-                            <p className="text-gray-300 leading-relaxed mb-10 text-lg">
-                                Tecnicamente, trata-se de um processo de fabricação onde uma camada de <strong>Sputtering de Alumínio</strong> (altamente refletiva) é fundida a uma camada de <strong>Poliéster Pigmentado ou Carbono</strong> (fumê).
-                            </p>
+                                <h3 className="text-2xl font-bold mb-6 text-white font-montserrat">O que é a Tecnologia de Dupla Camada?</h3>
+                                <p className="text-gray-300 leading-relaxed mb-10 text-lg">
+                                    Tecnicamente, trata-se de um processo de fabricação onde uma camada de <strong>Sputtering de Alumínio</strong> (altamente refletiva) é fundida a uma camada de <strong>Poliéster Pigmentado ou Carbono</strong> (fumê).
+                                </p>
 
-                            <div className="grid md:grid-cols-2 gap-10">
-                                <div className="relative pl-6 border-l-2 border-[#c9a227]/30 hover:border-[#c9a227] transition-colors">
-                                    <h4 className="text-white font-bold mb-3 flex items-center gap-2">
-                                        <span className="text-[#c9a227]">01.</span> A Camada Externa (Prata)
-                                    </h4>
-                                    <p className="text-gray-400 leading-relaxed">
-                                        Fica voltada para o vidro e tem a função de agir como um escudo, refletindo a radiação infravermelha antes mesmo de ela atravessar o vidro.
-                                    </p>
-                                </div>
-                                <div className="relative pl-6 border-l-2 border-[#c9a227]/30 hover:border-[#c9a227] transition-colors">
-                                    <h4 className="text-white font-bold mb-3 flex items-center gap-2">
-                                        <span className="text-[#c9a227]">02.</span> A Camada Interna (Fumê)
-                                    </h4>
-                                    <p className="text-gray-400 leading-relaxed">
-                                        Fica voltada para o ambiente interno. Sua função é neutralizar o brilho metálico e garantir que, quem está dentro de casa, tenha uma visão natural, nítida e sem o incômodo "efeito espelho" durante a noite.
-                                    </p>
+                                <div className="grid md:grid-cols-2 gap-10">
+                                    <div className="relative pl-6 border-l-2 border-[#c9a227]/30 hover:border-[#c9a227] transition-colors">
+                                        <h4 className="text-white font-bold mb-3 flex items-center gap-2">
+                                            <span className="text-[#c9a227]">01.</span> A Camada Externa (Prata)
+                                        </h4>
+                                        <p className="text-gray-400 leading-relaxed">
+                                            Fica voltada para o vidro e tem a função de agir como um escudo, refletindo a radiação infravermelha antes mesmo de ela atravessar o vidro.
+                                        </p>
+                                    </div>
+                                    <div className="relative pl-6 border-l-2 border-[#c9a227]/30 hover:border-[#c9a227] transition-colors">
+                                        <h4 className="text-white font-bold mb-3 flex items-center gap-2">
+                                            <span className="text-[#c9a227]">02.</span> A Camada Interna (Fumê)
+                                        </h4>
+                                        <p className="text-gray-400 leading-relaxed">
+                                            Fica voltada para o ambiente interno. Sua função é neutralizar o brilho metálico e garantir que, quem está dentro de casa, tenha uma visão natural, nítida e sem o incômodo "efeito espelho" durante a noite.
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
+                    </ScrollReveal>
 
-                <div className="container-lume grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {[
-                        { icon: Layers, title: "Dual Poliéster", desc: "Estrutura composta por duas lâminas ópticas ultrarresistentes garantindo opacidade perfeita que não descasca." },
-                        { icon: ShieldCheck, title: "Deposição Metálica", desc: "No processo a vácuo, recebe nano partículas de alumínio ou titânio, transformando o vidro num espelho emissor de calor." },
-                        { icon: Sun, title: "Adesivo Bloqueador UV", desc: "Revestimento colante premium com inibidores que barram 99% da degradação nos seus móveis finos e pele." },
-                        { icon: Droplets, title: "Anti-Risco Superior", desc: "Top Coat (revestimento superior) em acrílico resistente a abrasão da poeira e tecidos da limpeza doméstica." },
-                    ].map((feature, idx) => (
-                        <div key={idx} className="glass-card p-6 md:p-8 rounded-2xl border border-white/5 hover:border-[#c9a227]/30 transition-colors page-entrance text-center sm:text-left">
-                            <div className="w-14 h-14 mx-auto sm:mx-0 rounded-xl bg-[#c9a227]/10 flex items-center justify-center mb-6 text-[#c9a227]">
-                                <feature.icon size={28} />
+                    <ScrollReveal animation="slide-up" className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+                        {[
+                            { icon: Layers, title: "Dual Poliéster", desc: "Estrutura composta por duas lâminas ópticas ultrarresistentes garantindo opacidade perfeita que não descasca." },
+                            { icon: ShieldCheck, title: "Deposição Metálica", desc: "No processo a vácuo, recebe nano partículas de alumínio ou titânio, transformando o vidro num espelho emissor de calor." },
+                            { icon: Sun, title: "Adesivo Bloqueador UV", desc: "Revestimento colante premium com inibidores que barram 99% da degradação nos seus móveis finos e pele." },
+                            { icon: Droplets, title: "Anti-Risco Superior", desc: "Top Coat (revestimento superior) em acrílico resistente a abrasão da poeira e tecidos da limpeza doméstica." },
+                        ].map((feature, idx) => (
+                            <div key={idx} className="animate-item glass-card p-6 md:p-8 rounded-2xl border border-white/5 hover:border-[#c9a227]/30 transition-all duration-300 hover:-translate-y-1 text-center sm:text-left">
+                                <div className="w-14 h-14 mx-auto sm:mx-0 rounded-xl bg-[#c9a227]/10 flex items-center justify-center mb-6 text-[#c9a227]">
+                                    <feature.icon size={28} />
+                                </div>
+                                <h3 className="text-xl font-bold mb-3 text-white">{feature.title}</h3>
+                                <p className="text-gray-400 leading-relaxed">{feature.desc}</p>
                             </div>
-                            <h3 className="text-xl font-bold mb-3 text-white">{feature.title}</h3>
-                            <p className="text-gray-400 leading-relaxed">{feature.desc}</p>
-                        </div>
-                    ))}
+                        ))}
+                    </ScrollReveal>
                 </div>
             </section>
 
 
             {/* Matriz Comparativa G5 vs G20 */}
             <section className="py-24 relative px-4 bg-[#050A11]">
-                <div className="container-lume page-entrance text-center mb-16">
-                    <div className="flex items-center justify-center gap-4 mb-4">
-                        <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
-                        <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
-                            Especificações
-                        </span>
-                        <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
-                    </div>
-                    <div className="inline-flex flex-col items-center">
-                        <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-2 text-white">Escolha sua Dupla Camada</h2>
-                        <span className="text-[#c9a227] font-semibold tracking-wide bg-[#c9a227]/10 px-4 py-1 rounded-full text-sm">Apenas R$ 110/m² Instalado</span>
-                    </div>
-                </div>
-
-                <div className="container-lume grid lg:grid-cols-2 gap-8 md:gap-12 max-w-5xl mx-auto">
-
-                    {/* G5 Card */}
-                    <div className="glass-card rounded-3xl border border-white/5 hover:border-[#c9a227]/50 transition-all duration-300 page-entrance overflow-hidden flex flex-col relative group">
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#c9a227]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        <div className="h-32 bg-[#020508] border-b border-white/10 flex items-center justify-center relative">
-                            <div className="absolute inset-0 bg-gradient-to-b from-black to-transparent opacity-90 z-10"></div>
-                            <h3 className="text-5xl font-black text-white/90 z-20 font-montserrat tracking-tighter">G5</h3>
-                            <span className="absolute bottom-4 right-4 text-xs font-bold bg-[#c9a227] text-black px-2 py-1 rounded shadow-lg">MÁXIMA PERFORMANCE</span>
+                <div className="container-lume">
+                    <ScrollReveal animation="slide-up" className="text-center mb-16">
+                        <div className="animate-item flex items-center justify-center gap-4 mb-4">
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
+                            <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
+                                Especificações
+                            </span>
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
                         </div>
-                        <div className="p-8 md:p-10 pb-12 flex-grow relative z-10">
-                            <p className="text-gray-300 mb-8 leading-relaxed">
-                                A couraça impenetrável do calor. Recomendamos avidamente o G5 Dupla Camada para <strong>Salas de TV</strong> e <strong>Quartos</strong> muito ensolarados, onde você necessita barrar 100% da visão dos vizinhos (efeito diurno) garantindo uma densa redução térmica e luminosidade controlada extrema para assistir telas.
-                            </p>
+                        <div className="animate-item inline-flex flex-col items-center">
+                            <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-2 text-white">Escolha sua Dupla Camada</h2>
+                            <span className="text-[#c9a227] font-semibold tracking-wide bg-[#c9a227]/10 px-4 py-1 rounded-full text-sm">Apenas R$ 110/m² Instalado</span>
+                        </div>
+                    </ScrollReveal>
 
-                            <div className="space-y-6">
-                                <div>
-                                    <div className="flex justify-between text-sm mb-1">
-                                        <SpecTooltip term="VLT"><span className="text-gray-400 flex items-center gap-1">VLT <span className="text-xs text-gray-600">(Luz)</span></span></SpecTooltip>
-                                        <span className="font-bold text-[#c9a227]">5% a 8%</span>
+                    <ScrollReveal animation="slide-up" className="grid lg:grid-cols-2 gap-8 md:gap-12 max-w-5xl mx-auto">
+
+                        {/* G5 Card */}
+                        <div className="animate-item glass-card rounded-3xl border border-white/5 hover:border-[#c9a227]/50 transition-all duration-300 overflow-hidden flex flex-col relative group">
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#c9a227]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <div className="h-32 bg-[#020508] border-b border-white/10 flex items-center justify-center relative">
+                                <div className="absolute inset-0 bg-gradient-to-b from-black to-transparent opacity-90 z-10"></div>
+                                <h3 className="text-5xl font-black text-white/90 z-20 font-montserrat tracking-tighter">G5</h3>
+                                <span className="absolute bottom-4 right-4 text-xs font-bold bg-[#c9a227] text-black px-2 py-1 rounded shadow-lg">MÁXIMA PERFORMANCE</span>
+                            </div>
+                            <div className="p-8 md:p-10 pb-12 flex-grow relative z-10">
+                                <p className="text-gray-300 mb-8 leading-relaxed">
+                                    A couraça impenetrável do calor. Recomendamos avidamente o G5 Dupla Camada para <strong>Salas de TV</strong> e <strong>Quartos</strong> muito ensolarados, onde você necessita barrar 100% da visão dos vizinhos (efeito diurno) garantindo uma densa redução térmica e luminosidade controlada extrema para assistir telas.
+                                </p>
+
+                                <div className="space-y-6">
+                                    <div className="perf-row">
+                                        <div className="flex justify-between text-sm mb-1">
+                                            <SpecTooltip term="VLT"><span className="text-gray-400 flex items-center gap-1">VLT <span className="text-xs text-gray-600">(Luz)</span></span></SpecTooltip>
+                                            <span className="font-bold text-[#c9a227]">
+                                                <AnimatedCounter target="5" suffix="% a " /><AnimatedCounter target="8" suffix="%" />
+                                            </span>
+                                        </div>
+                                        <div className="w-full bg-gray-800 rounded h-1.5"><div className="perf-bar-fill bg-[#c9a227]/80 shadow-[0_0_10px_rgba(201,162,39,0.3)] h-1.5 rounded" data-width="8%" style={{ width: '0%' }}></div></div>
                                     </div>
-                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227]/80 shadow-[0_0_10px_rgba(201,162,39,0.3)] h-1.5 rounded" style={{ width: '8%' }}></div></div>
-                                </div>
-                                <div>
-                                    <div className="flex justify-between text-sm mb-1">
-                                        <SpecTooltip term="UVR"><span className="text-gray-400 flex items-center gap-1">Proteção UV</span></SpecTooltip>
-                                        <span className="font-bold text-[#c9a227]">99%</span>
+                                    <div className="perf-row">
+                                        <div className="flex justify-between text-sm mb-1">
+                                            <SpecTooltip term="UVR"><span className="text-gray-400 flex items-center gap-1">Proteção UV</span></SpecTooltip>
+                                            <span className="font-bold text-[#c9a227]">
+                                                <AnimatedCounter target="99" suffix="%" />
+                                            </span>
+                                        </div>
+                                        <div className="w-full bg-gray-800 rounded h-1.5"><div className="perf-bar-fill bg-[#c9a227] shadow-[0_0_10px_rgba(201,162,39,0.5)] h-1.5 rounded" data-width="99%" style={{ width: '0%' }}></div></div>
                                     </div>
-                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227] shadow-[0_0_10px_rgba(201,162,39,0.5)] h-1.5 rounded" style={{ width: '99%' }}></div></div>
-                                </div>
-                                <div>
-                                    <div className="flex justify-between text-sm mb-1">
-                                        <SpecTooltip term="IRR"><span className="text-gray-400 flex items-center gap-1">Rejeição de Calor (IRR)</span></SpecTooltip>
-                                        <span className="font-bold text-[#c9a227]">Arrasadores 95%</span>
+                                    <div className="perf-row">
+                                        <div className="flex justify-between text-sm mb-1">
+                                            <SpecTooltip term="IRR"><span className="text-gray-400 flex items-center gap-1">Rejeição de Calor (IRR)</span></SpecTooltip>
+                                            <span className="font-bold text-[#c9a227]">
+                                                Arrasadores <AnimatedCounter target="95" suffix="%" />
+                                            </span>
+                                        </div>
+                                        <div className="w-full bg-gray-800 rounded h-1.5"><div className="perf-bar-fill bg-[#c9a227] shadow-[0_0_10px_rgba(201,162,39,0.5)] h-1.5 rounded" data-width="95%" style={{ width: '0%' }}></div></div>
                                     </div>
-                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227] shadow-[0_0_10px_rgba(201,162,39,0.5)] h-1.5 rounded" style={{ width: '95%' }}></div></div>
-                                </div>
-                                <div>
-                                    <div className="flex justify-between text-sm mb-1 pt-2 border-t border-white/5">
-                                        <SpecTooltip term="TSER"><span className="text-gray-400 flex items-center gap-1"><Zap size={14} className="text-[#c9a227]" /> TSER Térmico Total</span></SpecTooltip>
-                                        <span className="font-bold text-white">Até 75%</span>
+                                    <div className="perf-row">
+                                        <div className="flex justify-between text-sm mb-1 pt-2 border-t border-white/5">
+                                            <SpecTooltip term="TSER"><span className="text-gray-400 flex items-center gap-1"><Zap size={14} className="text-[#c9a227]" /> TSER Térmico Total</span></SpecTooltip>
+                                            <span className="font-bold text-white">
+                                                Até <AnimatedCounter target="75" suffix="%" />
+                                            </span>
+                                        </div>
+                                        <div className="w-full bg-gray-800 rounded h-1.5"><div className="perf-bar-fill bg-[#c9a227] h-1.5 rounded opacity-50" data-width="75%" style={{ width: '0%' }}></div></div>
                                     </div>
-                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227] h-1.5 rounded opacity-50" style={{ width: '75%' }}></div></div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    {/* G20 Card */}
-                    <div className="glass-card rounded-3xl border border-white/5 hover:border-[#c9a227]/30 transition-all duration-300 page-entrance overflow-hidden flex flex-col relative group">
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#c9a227]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        <div className="h-32 bg-[#121b2b] border-b border-white/10 flex items-center justify-center relative">
-                            <div className="absolute inset-0 bg-gradient-to-b from-[#0a101a] to-transparent opacity-80 z-10"></div>
-                            <h3 className="text-5xl font-black text-white/90 z-20 font-montserrat tracking-tighter">G20</h3>
-                            <span className="absolute bottom-4 left-4 text-xs font-bold border border-[#c9a227]/50 text-[#c9a227]/90 px-2 py-1 rounded bg-[#c9a227]/10 backdrop-blur-sm">LUZ NATURAL + CONFORTO</span>
-                        </div>
-                        <div className="p-8 md:p-10 pb-12 flex-grow relative z-10">
-                            <p className="text-gray-300 mb-8 leading-relaxed">
-                                A tonalidade clássica de altíssima busca para <strong>Fechamento Completo de Varandas</strong> Gourmet e salas envidraçadas onde a vista externa da praia, piscina ou horizonte não pode ser estrangulada, porém a radiação solar ardida da tarde é aniquilada pelos metais internos antes de queimar você.
-                            </p>
+                        {/* G20 Card */}
+                        <div className="animate-item glass-card rounded-3xl border border-white/5 hover:border-[#c9a227]/30 transition-all duration-300 overflow-hidden flex flex-col relative group">
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#c9a227]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <div className="h-32 bg-[#121b2b] border-b border-white/10 flex items-center justify-center relative">
+                                <div className="absolute inset-0 bg-gradient-to-b from-[#0a101a] to-transparent opacity-80 z-10"></div>
+                                <h3 className="text-5xl font-black text-white/90 z-20 font-montserrat tracking-tighter">G20</h3>
+                                <span className="absolute bottom-4 left-4 text-xs font-bold border border-[#c9a227]/50 text-[#c9a227]/90 px-2 py-1 rounded bg-[#c9a227]/10 backdrop-blur-sm">LUZ NATURAL + CONFORTO</span>
+                            </div>
+                            <div className="p-8 md:p-10 pb-12 flex-grow relative z-10">
+                                <p className="text-gray-300 mb-8 leading-relaxed">
+                                    A tonalidade clássica de altíssima busca para <strong>Fechamento Completo de Varandas</strong> Gourmet e salas envidraçadas onde a vista externa da praia, piscina ou horizonte não pode ser estrangulada, porém a radiação solar ardida da tarde é aniquilada pelos metais internos antes de queimar você.
+                                </p>
 
-                            <div className="space-y-6">
-                                <div>
-                                    <div className="flex justify-between text-sm mb-1">
-                                        <SpecTooltip term="VLT"><span className="text-gray-400 flex items-center gap-1">VLT <span className="text-xs text-gray-600">(Luz)</span></span></SpecTooltip>
-                                        <span className="font-bold text-[#c9a227]">18% a 25%</span>
+                                <div className="space-y-6">
+                                    <div className="perf-row">
+                                        <div className="flex justify-between text-sm mb-1">
+                                            <SpecTooltip term="VLT"><span className="text-gray-400 flex items-center gap-1">VLT <span className="text-xs text-gray-600">(Luz)</span></span></SpecTooltip>
+                                            <span className="font-bold text-[#c9a227]">
+                                                <AnimatedCounter target="18" suffix="% a " /><AnimatedCounter target="25" suffix="%" />
+                                            </span>
+                                        </div>
+                                        <div className="w-full bg-gray-800 rounded h-1.5"><div className="perf-bar-fill bg-[#c9a227]/80 shadow-[0_0_10px_rgba(201,162,39,0.3)] h-1.5 rounded" data-width="25%" style={{ width: '0%' }}></div></div>
                                     </div>
-                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227]/80 shadow-[0_0_10px_rgba(201,162,39,0.3)] h-1.5 rounded" style={{ width: '25%' }}></div></div>
-                                </div>
-                                <div>
-                                    <div className="flex justify-between text-sm mb-1">
-                                        <SpecTooltip term="UVR"><span className="text-gray-400 flex items-center gap-1">Proteção UV</span></SpecTooltip>
-                                        <span className="font-bold text-[#c9a227]">99%</span>
+                                    <div className="perf-row">
+                                        <div className="flex justify-between text-sm mb-1">
+                                            <SpecTooltip term="UVR"><span className="text-gray-400 flex items-center gap-1">Proteção UV</span></SpecTooltip>
+                                            <span className="font-bold text-[#c9a227]">
+                                                <AnimatedCounter target="99" suffix="%" />
+                                            </span>
+                                        </div>
+                                        <div className="w-full bg-gray-800 rounded h-1.5"><div className="perf-bar-fill bg-[#c9a227]/80 h-1.5 rounded shadow-[0_0_10px_rgba(201,162,39,0.3)]" data-width="99%" style={{ width: '0%' }}></div></div>
                                     </div>
-                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227]/80 h-1.5 rounded shadow-[0_0_10px_rgba(201,162,39,0.3)]" style={{ width: '99%' }}></div></div>
-                                </div>
-                                <div>
-                                    <div className="flex justify-between text-sm mb-1">
-                                        <SpecTooltip term="IRR"><span className="text-gray-400 flex items-center gap-1">Rejeição de Calor (IRR)</span></SpecTooltip>
-                                        <span className="font-bold text-[#c9a227]">Poderosos 90%</span>
+                                    <div className="perf-row">
+                                        <div className="flex justify-between text-sm mb-1">
+                                            <SpecTooltip term="IRR"><span className="text-gray-400 flex items-center gap-1">Rejeição de Calor (IRR)</span></SpecTooltip>
+                                            <span className="font-bold text-[#c9a227]">
+                                                Poderosos <AnimatedCounter target="90" suffix="%" />
+                                            </span>
+                                        </div>
+                                        <div className="w-full bg-gray-800 rounded h-1.5"><div className="perf-bar-fill bg-[#c9a227]/80 shadow-[0_0_10px_rgba(201,162,39,0.3)] h-1.5 rounded" data-width="90%" style={{ width: '0%' }}></div></div>
                                     </div>
-                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227]/80 shadow-[0_0_10px_rgba(201,162,39,0.3)] h-1.5 rounded" style={{ width: '90%' }}></div></div>
-                                </div>
-                                <div>
-                                    <div className="flex justify-between text-sm mb-1 pt-2 border-t border-white/5">
-                                        <SpecTooltip term="TSER"><span className="text-gray-400 flex items-center gap-1"><Zap size={14} className="text-[#c9a227]" /> TSER Térmico Total</span></SpecTooltip>
-                                        <span className="font-bold text-white">Até 65%</span>
+                                    <div className="perf-row">
+                                        <div className="flex justify-between text-sm mb-1 pt-2 border-t border-white/5">
+                                            <SpecTooltip term="TSER"><span className="text-gray-400 flex items-center gap-1"><Zap size={14} className="text-[#c9a227]" /> TSER Térmico Total</span></SpecTooltip>
+                                            <span className="font-bold text-white">
+                                                Até <AnimatedCounter target="65" suffix="%" />
+                                            </span>
+                                        </div>
+                                        <div className="w-full bg-gray-800 rounded h-1.5"><div className="perf-bar-fill bg-[#c9a227] h-1.5 rounded opacity-50" data-width="65%" style={{ width: '0%' }}></div></div>
                                     </div>
-                                    <div className="w-full bg-gray-800 rounded h-1.5"><div className="bg-[#c9a227] h-1.5 rounded opacity-50" style={{ width: '65%' }}></div></div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
+                    </ScrollReveal>
                 </div>
             </section>
 
             {/* FAQ Section */}
             <section className="py-20 relative px-4 bg-[#04080f] border-t border-white/5">
-                <div className="container-lume page-entrance max-w-4xl mx-auto">
-                    <div className="text-center mb-12">
-                        <div className="flex items-center justify-center gap-4 mb-4">
+                <div className="container-lume max-w-4xl mx-auto">
+                    <ScrollReveal animation="slide-up" className="text-center mb-12">
+                        <div className="animate-item flex items-center justify-center gap-4 mb-4">
                             <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
                             <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
                                 FAQ
                             </span>
                             <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
                         </div>
-                        <h2 className="text-3xl font-bold font-montserrat mb-4 text-[#c9a227]">Respostas Rápidas e Claras</h2>
-                        <p className="text-gray-400 text-lg">Tudo sobre a instalação da linha Dupla Camada.</p>
-                    </div>
+                        <h2 className="animate-item text-3xl font-bold font-montserrat mb-4 text-[#c9a227]">Respostas Rápidas e Claras</h2>
+                        <p className="animate-item text-gray-400 text-lg">Tudo sobre a instalação da linha Dupla Camada.</p>
+                    </ScrollReveal>
 
-                    <div className="space-y-4">
+                    <ScrollReveal animation="slide-up" className="space-y-4">
                         {[
                             {
                                 q: "Qual a durabilidade desta película contra o forte sol do Rio de Janeiro?",
@@ -285,7 +362,7 @@ export function DuplaCamadaPage() {
                                 a: "Perfeitamente. A película Dupla Camada é um verdadeiro escudo de batalha com custo espetacular para vastos envidraçamentos. Apenas certifique-se da regra do seu condomínio com o efeito levemente metalizado que essa película gera para a vista exterior."
                             }
                         ].map((faq, idx) => (
-                            <details key={idx} className="group glass-card border flex-col rounded-xl overflow-hidden cursor-pointer">
+                            <details key={idx} className="animate-item group glass-card border flex-col rounded-xl overflow-hidden cursor-pointer">
                                 <summary className="font-bold text-lg p-6 bg-white/[0.02] hover:bg-white/[0.05] transition-colors outline-none flex justify-between items-center list-none text-white">
                                     <span className="pr-4">{faq.q}</span>
                                     <span className="text-[#c9a227] group-open:rotate-45 transition-transform text-2xl font-light leading-none flex-shrink-0">+</span>
@@ -295,7 +372,7 @@ export function DuplaCamadaPage() {
                                 </div>
                             </details>
                         ))}
-                    </div>
+                    </ScrollReveal>
                 </div>
             </section>
 

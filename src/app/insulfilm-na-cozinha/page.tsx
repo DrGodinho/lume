@@ -50,7 +50,7 @@ const jsonLd = {
       name: 'Instalação de Insulfilm para Cozinhas e Áreas de Serviço',
       alternateName: 'Película Térmica e Jateada para Cozinha',
       description:
-        'Instalação profissional de películas de controle solar de alta transparência (Nano Cerâmica) e películas decorativas jateadas em cozinhas residenciais e divisórias de lavanderia no Rio de Janeiro. Reduz o calor extremo, protege armários planejados contra raios UV e esconde varais de roupas com elegância. Garantia de 2 anos.',
+        'Instalação profissional de películas de controle solar de alta transparência (Nano Cerâmica) e películas decorativas jateadas em cozinhas residenciais e divisórias de lavanderia no Rio de Janeiro. Reduz o calor extremo, protege armários planejados contra raios UV e esconde varais de roupas com elegância. Garantia de até 10 anos.',
       url: 'https://lumecontrolesolar.com.br/insulfilm-na-cozinha/',
       image: 'https://lumecontrolesolar.com.br/og-image.jpg',
       provider: {
@@ -93,7 +93,7 @@ const jsonLd = {
         { '@type': 'PropertyValue', name: 'Bloqueio de Raios UV', value: '99%' },
         { '@type': 'PropertyValue', name: 'Transparência Visual', value: 'Alta (sem escurecer)' },
         { '@type': 'PropertyValue', name: 'Tempo Médio de Aplicação', value: '1h a 2h' },
-        { '@type': 'PropertyValue', name: 'Garantia', value: '2 Anos' },
+        { '@type': 'PropertyValue', name: 'Garantia', value: 'Até 10 Anos' },
       ],
     },
     {

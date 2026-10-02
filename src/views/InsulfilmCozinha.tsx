@@ -117,7 +117,7 @@ export function InsulfilmCozinha() {
             </div>
             <div className="flex items-center justify-center gap-2 text-xs md:text-sm text-gray-300 font-medium">
               <Shield size={18} className="text-[#c9a227] flex-shrink-0" />
-              <span>Garantia de 2 Anos LUME</span>
+              <span>Garantia de até 10 Anos LUME</span>
             </div>
           </div>
         </div>
@@ -307,7 +307,7 @@ export function InsulfilmCozinha() {
                   </div>
                   <div className="flex items-start gap-2">
                     <Check size={16} className="text-[#c9a227] mt-0.5 flex-shrink-0" />
-                    <span>Garantia oficial de 2 anos LUME</span>
+                    <span>Garantia oficial de até 10 anos LUME</span>
                   </div>
                 </div>
               </div>

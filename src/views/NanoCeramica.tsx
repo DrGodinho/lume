@@ -6,6 +6,9 @@ import { ContactCTA } from '../sections/ContactCTA';
 import { SpecTooltip } from '../components/SpecTooltip';
 import { NavigationBreadcrumbs } from '../components/NavigationBreadcrumbs';
 import { AnimatedCounter } from '../components/AnimatedCounter';
+import { ScrollReveal } from '../components/ScrollReveal';
+import { HeroEntrance } from '../components/HeroEntrance';
+import { Particles } from '../components/Particles';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Image from 'next/image';
@@ -15,12 +18,6 @@ export function NanoCeramicaPage() {
         gsap.registerPlugin(ScrollTrigger);
         
         const ctx = gsap.context(() => {
-            // Entrance Animation
-            gsap.fromTo('.page-entrance',
-                { opacity: 0, y: 20 },
-                { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out', stagger: 0.1 }
-            );
-
             // Performance Table Animation
             const perfRows = gsap.utils.toArray('.perf-row') as Element[];
             if (perfRows.length > 0) {
@@ -68,11 +65,19 @@ export function NanoCeramicaPage() {
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden px-4">
                 <div className="absolute inset-0 z-0">
-                    <Image src="/nano-ceramica-hero.webp" alt="Varanda gourmet com Insulfilm Nano Cerâmica Premium LUME - Rio de Janeiro" fill sizes="(max-width: 768px) 100vw, 100vw" priority className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-black/50" />
+                    <Image src="/nano-ceramica-hero.webp" alt="Varanda gourmet com Insulfilm Nano Cerâmica Premium LUME - Rio de Janeiro" fill sizes="100vw" priority className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/30" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
                 </div>
 
-                <div className="container-lume relative z-10 page-entrance text-center md:text-left">
+                {/* Particles */}
+                <Particles />
+
+                {/* Floating gold accent */}
+                <div className="absolute top-1/4 right-10 w-32 h-32 rounded-full bg-[#c9a227]/5 blur-3xl animate-float pointer-events-none" />
+                <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-[#c9a227]/10 blur-3xl animate-float pointer-events-none" style={{ animationDelay: '2s' }} />
+
+                <div className="container-lume relative z-10 text-center md:text-left">
                     <NavigationBreadcrumbs 
                         showVisualTrail={false}
                         items={[
@@ -80,88 +85,100 @@ export function NanoCeramicaPage() {
                             { label: 'Nano Cerâmica' }
                         ]}
                     />
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#c9a227]/10 border border-[#c9a227]/30 mb-6">
-                        <span className="text-[#c9a227] text-sm font-bold uppercase tracking-wider">A Escolha de Luxo no RJ</span>
-                    </div>
+                    <HeroEntrance className="max-w-3xl mx-auto md:mx-0">
+                        <div className="animate-hero opacity-0 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#c9a227]/10 border border-[#c9a227]/30 mb-6">
+                            <span className="text-[#c9a227] text-sm font-bold uppercase tracking-wider">A Escolha de Luxo no RJ</span>
+                        </div>
 
-                    <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-montserrat mb-6 leading-tight">
-                        Insulfilm <span className="text-gradient-gold">Nano Cerâmica</span> Premium
-                    </h1>
+                        <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-montserrat mb-6 leading-tight">
+                            <span className="word opacity-0 inline-block">Insulfilm</span>{' '}
+                            <span className="word opacity-0 inline-block text-gradient-gold">Nano</span>{' '}
+                            <span className="word opacity-0 inline-block text-gradient-gold">Cerâmica</span>{' '}
+                            <span className="word opacity-0 inline-block">Premium</span>
+                        </h1>
 
-                    <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto md:mx-0 mb-10 leading-relaxed">
-                        A evolução do controle solar. Reduza drasticamente o calor intenso do Rio de Janeiro sem escurecer os vidros ou alterar a fachada do seu imóvel.
-                    </p>
+                        <p className="animate-hero opacity-0 text-lg md:text-xl text-gray-300 max-w-2xl mx-auto md:mx-0 mb-10 leading-relaxed">
+                            A evolução do controle solar. Reduza drasticamente o calor intenso do Rio de Janeiro sem escurecer os vidros ou alterar a fachada do seu imóvel.
+                        </p>
 
-                    <a
-                        href="https://wa.me/5521965140612?text=Olá! Quero um orçamento para Insulfilm Nano Cerâmica no meu imóvel."
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn-primary inline-flex items-center justify-center gap-3 text-lg py-4 px-8"
-                    >
-                        Solicitar Orçamento Grátis <ArrowRight size={20} />
-                    </a>
+                        <div className="animate-hero opacity-0">
+                            <a
+                                href="https://wa.me/5521965140612?text=Olá! Quero um orçamento para Insulfilm Nano Cerâmica no meu imóvel."
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn-primary inline-flex items-center justify-center gap-3 text-lg py-4 px-8"
+                            >
+                                Solicitar Orçamento Grátis <ArrowRight size={20} />
+                            </a>
+                        </div>
+                    </HeroEntrance>
                 </div>
+
+                {/* Decorative bottom fade */}
+                <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#04080f] to-transparent z-10 pointer-events-none" />
             </section>
 
             {/* Introduction & SEO Hook */}
             <section className="py-20 bg-[#070f1a] border-b border-white/5">
-                <div className="container-lume page-entrance">
-                    <div className="max-w-4xl mx-auto text-center">
-                        <div className="flex items-center justify-center gap-4 mb-4">
+                <div className="container-lume">
+                    <ScrollReveal animation="slide-up" className="max-w-4xl mx-auto text-center">
+                        <div className="animate-item flex items-center justify-center gap-4 mb-4">
                             <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
                             <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
                                 Conforto Térmico
                             </span>
                             <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
                         </div>
-                        <h2 className="text-3xl font-bold font-montserrat mb-8 text-white">Por que a Nano Cerâmica é a melhor escolha para a Zona Oeste?</h2>
-                        <p className="text-gray-400 leading-relaxed mb-6 text-lg">
+                        <h2 className="animate-item text-3xl font-bold font-montserrat mb-8 text-white">Por que a Nano Cerâmica é a melhor escolha para a Zona Oeste?</h2>
+                        <p className="animate-item text-gray-400 leading-relaxed mb-6 text-lg">
                             Morar no Rio de Janeiro, especialmente em bairros como <strong>Bangu, Campo Grande, Barra e Recreio</strong>, significa enfrentar temperaturas extremas em grande parte do ano. O insulfilm residencial comum não é mais suficiente. Se você tem uma varanda gourmet, uma sala com amplos vidros ou uma fachada moderna, encontrar uma película que neutralize o calor sem transformar sua casa em uma "caverna escura" sempre foi um desafio.
                         </p>
-                        <p className="text-gray-400 leading-relaxed text-lg">
+                        <p className="animate-item text-gray-400 leading-relaxed text-lg">
                             É aqui que a tecnologia da nossa <strong>Película Nano Cerâmica Premium</strong> brilha. Através da nanotecnologia, esta película atua diretamente nos raios infravermelhos (os reais causadores do abafamento), criando um escudo invisível de extremo conforto térmico e bloqueio UV, enquanto mantém 100% da identidade arquitetônica do seu ambiente livre de distorções.
                         </p>
-                    </div>
+                    </ScrollReveal>
                 </div>
             </section>
 
             {/* Diferenciais Técnicos */}
             <section className="py-20 relative px-4">
-                <div className="container-lume page-entrance text-center mb-16">
-                    <div className="flex items-center justify-center gap-4 mb-4">
-                        <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
-                        <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
-                            Diferenciais
-                        </span>
-                        <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
-                    </div>
-                    <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-4 text-[#c9a227]">Diferenciais Tecnológicos</h2>
-                    <p className="text-gray-400 max-w-2xl mx-auto">Muito além de um filme escurecedor. Proteção avançada e durabilidade incomparável para seu lar.</p>
-                </div>
-
-                <div className="container-lume grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {[
-                        { icon: Wifi, title: "Tecnologia Não-Metálica", desc: "Diferente das películas refletivas, a cerâmica não contém metais em sua liga. Isso garante ZERO interferência nos sinais de Wi-Fi, 5G ou GPS da sua residência." },
-                        { icon: Shield, title: "Estabilidade de Cor Permanente", desc: "Avançada proteção contra desbotamento. Sem chances da sua película ficar roxa ou descascar com a alta exposição agressiva do sol carioca." },
-                        { icon: Sun, title: "Alta Claridade Natural", desc: "Alta rejeição dos raios infravermelhos (IR) mantendo a mais alta entrada de luz (VLT). Proteja-se do calor invisivelmente." },
-                    ].map((feature, idx) => (
-                        <div key={idx} className="glass-card p-8 rounded-2xl border border-white/5 hover:border-[#c9a227]/30 transition-colors page-entrance">
-                            <div className="w-14 h-14 rounded-xl bg-[#c9a227]/10 flex items-center justify-center mb-6 text-[#c9a227]">
-                                <feature.icon size={28} />
-                            </div>
-                            <h3 className="text-xl font-bold mb-4 text-white">{feature.title}</h3>
-                            <p className="text-gray-400 leading-relaxed">{feature.desc}</p>
+                <div className="container-lume">
+                    <ScrollReveal animation="slide-up" className="text-center mb-16">
+                        <div className="animate-item flex items-center justify-center gap-4 mb-4">
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
+                            <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
+                                Diferenciais
+                            </span>
+                            <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
                         </div>
-                    ))}
+                        <h2 className="animate-item text-3xl lg:text-4xl font-bold font-montserrat mb-4 text-[#c9a227]">Diferenciais Tecnológicos</h2>
+                        <p className="animate-item text-gray-400 max-w-2xl mx-auto">Muito além de um filme escurecedor. Proteção avançada e durabilidade incomparável para seu lar.</p>
+                    </ScrollReveal>
+
+                    <ScrollReveal animation="slide-up" className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {[
+                            { icon: Wifi, title: "Tecnologia Não-Metálica", desc: "Diferente das películas refletivas, a cerâmica não contém metais em sua liga. Isso garante ZERO interferência nos sinais de Wi-Fi, 5G ou GPS da sua residência." },
+                            { icon: Shield, title: "Estabilidade de Cor Permanente", desc: "Avançada proteção contra desbotamento. Sem chances da sua película ficar roxa ou descascar com a alta exposição agressiva do sol carioca." },
+                            { icon: Sun, title: "Alta Claridade Natural", desc: "Alta rejeição dos raios infravermelhos (IR) mantendo a mais alta entrada de luz (VLT). Proteja-se do calor invisivelmente." },
+                        ].map((feature, idx) => (
+                            <div key={idx} className="animate-item glass-card p-8 rounded-2xl border border-white/5 hover:border-[#c9a227]/30 transition-all duration-300 hover:-translate-y-1">
+                                <div className="w-14 h-14 rounded-xl bg-[#c9a227]/10 flex items-center justify-center mb-6 text-[#c9a227]">
+                                    <feature.icon size={28} />
+                                </div>
+                                <h3 className="text-xl font-bold mb-4 text-white">{feature.title}</h3>
+                                <p className="text-gray-400 leading-relaxed">{feature.desc}</p>
+                            </div>
+                        ))}
+                    </ScrollReveal>
                 </div>
             </section>
 
             {/* Composição Detalhada & Tabela de Performance */}
             <section className="py-20 bg-[#070f1a]">
-                <div className="container-lume page-entrance">
+                <div className="container-lume">
                     <div className="grid lg:grid-cols-2 gap-16 items-center">
 
-                        <div>
+                        <ScrollReveal animation="slide-up">
                             <div className="relative pl-4 sm:pl-6 border-l-2 border-[#c9a227] mb-6">
                                 <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">Composição</span>
                                 <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mt-2">A Engenharia por trás da Nano Cerâmica</h2>
@@ -177,7 +194,7 @@ export function NanoCeramicaPage() {
                                     { title: "Adesão Poliéster Premium", desc: "Material óptico de alta definição que gruda ao vidro sem rugas, assegurando extrema segurança em caso de estilhaçamento." },
                                     { title: "Revestimento Anti-Risco", desc: "Finalização acrílica de máxima durabilidade que protege o filme na rotina diária de limpeza em sua casa." },
                                 ].map((item, idx) => (
-                                    <div key={idx} className="flex gap-4">
+                                    <div key={idx} className="animate-item flex gap-4">
                                         <div className="mt-1"><CheckCircle className="text-[#c9a227]" size={20} /></div>
                                         <div>
                                             <h4 className="font-bold text-white mb-1">{item.title}</h4>
@@ -186,81 +203,83 @@ export function NanoCeramicaPage() {
                                     </div>
                                 ))}
                             </div>
-                        </div>
+                        </ScrollReveal>
 
-                        <div className="glass-card p-8 sm:p-10 rounded-3xl border border-[#c9a227]/20 relative overflow-hidden">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-[#c9a227] blur-[100px] opacity-20" />
+                        <ScrollReveal animation="slide-up">
+                            <div className="glass-card p-8 sm:p-10 rounded-3xl border border-[#c9a227]/20 relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-[#c9a227] blur-[100px] opacity-20" />
 
-                            <h3 className="text-2xl font-bold font-montserrat text-white mb-2 border-b border-white/10 pb-4">Tabela de Performance</h3>
-                            <div className="mb-8 text-[#c9a227] font-bold text-xl uppercase tracking-wider">A partir de R$ 200/m² instalado</div>
+                                <h3 className="text-2xl font-bold font-montserrat text-white mb-2 border-b border-white/10 pb-4">Tabela de Performance</h3>
+                                <div className="mb-8 text-[#c9a227] font-bold text-xl uppercase tracking-wider">A partir de R$ 200/m² instalado</div>
 
-                            <div className="space-y-6">
-                                <div className="perf-row opacity-0">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <span className="text-gray-300 font-medium flex items-center gap-2">
-                                            <Sun size={18} className="text-[#c9a227]" />
-                                            <SpecTooltip term="VLT">VLT (Transmissão de Luz)</SpecTooltip>
-                                        </span>
-                                        <span className="font-bold text-white text-lg">
-                                            <AnimatedCounter target="70" suffix="%" />
-                                        </span>
+                                <div className="space-y-6">
+                                    <div className="perf-row opacity-0">
+                                        <div className="flex justify-between items-center mb-2">
+                                            <span className="text-gray-300 font-medium flex items-center gap-2">
+                                                <Sun size={18} className="text-[#c9a227]" />
+                                                <SpecTooltip term="VLT">VLT (Transmissão de Luz)</SpecTooltip>
+                                            </span>
+                                            <span className="font-bold text-white text-lg">
+                                                <AnimatedCounter target="70" suffix="%" />
+                                            </span>
+                                        </div>
+                                        <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+                                            <div className="perf-bar-fill bg-[#c9a227] h-2 rounded-full" data-width="70%" style={{ width: '0%' }}></div>
+                                        </div>
+                                        <p className="text-xs text-gray-500 mt-2">Ambiente iluminado com visão cristalina do Rio.</p>
                                     </div>
-                                    <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
-                                        <div className="perf-bar-fill bg-[#c9a227] h-2 rounded-full" data-width="70%" style={{ width: '0%' }}></div>
-                                    </div>
-                                    <p className="text-xs text-gray-500 mt-2">Ambiente iluminado com visão cristalina do Rio.</p>
-                                </div>
 
-                                <div className="perf-row opacity-0">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <span className="text-gray-300 font-medium flex items-center gap-2">
-                                            <Shield size={18} className="text-[#c9a227]" />
-                                            <SpecTooltip term="UVR">Bloqueio UV (UltraVioleta)</SpecTooltip>
-                                        </span>
-                                        <span className="font-bold text-white text-lg">
-                                            <AnimatedCounter target="99" suffix=",9%" />
-                                        </span>
+                                    <div className="perf-row opacity-0">
+                                        <div className="flex justify-between items-center mb-2">
+                                            <span className="text-gray-300 font-medium flex items-center gap-2">
+                                                <Shield size={18} className="text-[#c9a227]" />
+                                                <SpecTooltip term="UVR">Bloqueio UV (UltraVioleta)</SpecTooltip>
+                                            </span>
+                                            <span className="font-bold text-white text-lg">
+                                                <AnimatedCounter target="99" suffix=",9%" />
+                                            </span>
+                                        </div>
+                                        <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+                                            <div className="perf-bar-fill bg-[#c9a227] h-2 rounded-full" data-width="99.9%" style={{ width: '0%' }}></div>
+                                        </div>
+                                        <p className="text-xs text-gray-500 mt-2">Proteção total p/ móveis, pisos de madeira e tecidos.</p>
                                     </div>
-                                    <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
-                                        <div className="perf-bar-fill bg-[#c9a227] h-2 rounded-full" data-width="99.9%" style={{ width: '0%' }}></div>
-                                    </div>
-                                    <p className="text-xs text-gray-500 mt-2">Proteção total p/ móveis, pisos de madeira e tecidos.</p>
-                                </div>
 
-                                <div className="perf-row opacity-0">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <span className="text-gray-300 font-medium flex items-center gap-2">
-                                            <Thermometer size={18} className="text-[#c9a227]" />
-                                            <SpecTooltip term="IRR">Rejeição de Calor (IRR)</SpecTooltip>
-                                        </span>
-                                        <span className="font-bold text-white text-lg">
-                                            Até <AnimatedCounter target="95" suffix="%" />
-                                        </span>
+                                    <div className="perf-row opacity-0">
+                                        <div className="flex justify-between items-center mb-2">
+                                            <span className="text-gray-300 font-medium flex items-center gap-2">
+                                                <Thermometer size={18} className="text-[#c9a227]" />
+                                                <SpecTooltip term="IRR">Rejeição de Calor (IRR)</SpecTooltip>
+                                            </span>
+                                            <span className="font-bold text-white text-lg">
+                                                Até <AnimatedCounter target="95" suffix="%" />
+                                            </span>
+                                        </div>
+                                        <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+                                            <div className="perf-bar-fill bg-[#c9a227] h-2 rounded-full" data-width="95%" style={{ width: '0%' }}></div>
+                                        </div>
+                                        <p className="text-xs text-gray-500 mt-2">O verdadeiro choque térmico que você sente na pele e no ambiente.</p>
                                     </div>
-                                    <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
-                                        <div className="perf-bar-fill bg-[#c9a227] h-2 rounded-full" data-width="95%" style={{ width: '0%' }}></div>
-                                    </div>
-                                    <p className="text-xs text-gray-500 mt-2">O verdadeiro choque térmico que você sente na pele e no ambiente.</p>
-                                </div>
 
-                                <div className="perf-row opacity-0">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <span className="text-gray-300 font-medium flex items-center gap-2">
-                                            <Zap size={18} className="text-[#c9a227]" />
-                                            <SpecTooltip term="TSER">TSER (Energia Rejeitada)</SpecTooltip>
-                                        </span>
-                                        <span className="font-bold text-white text-lg">
-                                            <AnimatedCounter target="55" suffix="% a " />
-                                            <AnimatedCounter target="65" suffix="%" />
-                                        </span>
+                                    <div className="perf-row opacity-0">
+                                        <div className="flex justify-between items-center mb-2">
+                                            <span className="text-gray-300 font-medium flex items-center gap-2">
+                                                <Zap size={18} className="text-[#c9a227]" />
+                                                <SpecTooltip term="TSER">TSER (Energia Rejeitada)</SpecTooltip>
+                                            </span>
+                                            <span className="font-bold text-white text-lg">
+                                                <AnimatedCounter target="55" suffix="% a " />
+                                                <AnimatedCounter target="65" suffix="%" />
+                                            </span>
+                                        </div>
+                                        <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+                                            <div className="perf-bar-fill bg-[#c9a227] h-2 rounded-full" data-width="65%" style={{ width: '0%' }}></div>
+                                        </div>
+                                        <p className="text-xs text-gray-500 mt-2">Medida global do total de energia solar barrada pela janela.</p>
                                     </div>
-                                    <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
-                                        <div className="perf-bar-fill bg-[#c9a227] h-2 rounded-full" data-width="65%" style={{ width: '0%' }}></div>
-                                    </div>
-                                    <p className="text-xs text-gray-500 mt-2">Medida global do total de energia solar barrada pela janela.</p>
                                 </div>
                             </div>
-                        </div>
+                        </ScrollReveal>
 
                     </div>
                 </div>
@@ -268,20 +287,20 @@ export function NanoCeramicaPage() {
 
             {/* FAQ Section */}
             <section className="py-20 relative px-4">
-                <div className="container-lume page-entrance max-w-4xl mx-auto">
-                    <div className="text-center mb-12">
-                        <div className="flex items-center justify-center gap-4 mb-4">
+                <div className="container-lume max-w-4xl mx-auto">
+                    <ScrollReveal animation="slide-up" className="text-center mb-12">
+                        <div className="animate-item flex items-center justify-center gap-4 mb-4">
                             <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#c9a227]" />
                             <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-medium">
                                 FAQ
                             </span>
                             <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
                         </div>
-                        <h2 className="text-3xl font-bold font-montserrat mb-4">Dúvidas Frequentes (FAQ)</h2>
-                        <p className="text-gray-400">Respostas rápidas sobre a Instalação da Nano Cerâmica</p>
-                    </div>
+                        <h2 className="animate-item text-3xl font-bold font-montserrat mb-4">Dúvidas Frequentes (FAQ)</h2>
+                        <p className="animate-item text-gray-400">Respostas rápidas sobre a Instalação da Nano Cerâmica</p>
+                    </ScrollReveal>
 
-                    <div className="space-y-4">
+                    <ScrollReveal animation="slide-up" className="space-y-4">
                         {[
                             {
                                 q: "O Insulfilm Nano Cerâmica pode ser instalado em apartamentos e condomínios?",
@@ -296,7 +315,7 @@ export function NanoCeramicaPage() {
                                 a: "Absolutamente. Com uma altíssima rejeição de calor por infravermelho, o ambiente interno da sua residência ou empresa esfria muito mais rápido mantendo a climatização estável, reduzindo drasticamente o esforço e o tempo de ativação do compressor do seu ar-condicionado. Em locais muito intensos de calor como em Bangu e toda a Zona Oeste, nossos clientes relatam incríveis economias e maior conforto."
                             }
                         ].map((faq, idx) => (
-                            <details key={idx} className="group glass-card border flex-col rounded-xl overflow-hidden cursor-pointer">
+                            <details key={idx} className="animate-item group glass-card border flex-col rounded-xl overflow-hidden cursor-pointer">
                                 <summary className="font-bold text-lg p-6 bg-white/[0.02] hover:bg-white/[0.04] transition-colors outline-none flex justify-between items-center list-none">
                                     {faq.q}
                                     <span className="text-[#c9a227] group-open:rotate-45 transition-transform text-2xl font-light leading-none">+</span>
@@ -306,7 +325,7 @@ export function NanoCeramicaPage() {
                                 </div>
                             </details>
                         ))}
-                    </div>
+                    </ScrollReveal>
                 </div>
             </section>
 

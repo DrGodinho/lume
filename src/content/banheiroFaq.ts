@@ -26,6 +26,6 @@ export const banheiroFaqs: BanheiroFaq[] = [
   },
   {
     q: "Quanto tempo dura a instalação e qual a garantia?",
-    a: "A aplicação em uma janela ou box de banheiro leva em média de 40 minutos a 1h30. Não faz sujeira pesada nem barulho. O serviço acompanha garantia oficial de 2 anos da LUME Controle Solar contra descolamento e defeitos de aplicação."
+    a: "A aplicação em uma janela ou box de banheiro leva em média de 40 minutos a 1h30. Não faz sujeira pesada nem barulho. O serviço acompanha garantia oficial de até 10 anos (conforme a película escolhida) da LUME Controle Solar contra descolamento e defeitos de aplicação."
   }
 ];

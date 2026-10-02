@@ -5,7 +5,7 @@ import { buildBreadcrumbSchema } from '@/lib/schema/breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Insulfilm em Campo Grande RJ | Preço, Instalação e Garantia - LUME',
-  description: 'Aplicação profissional de insulfilm em Campo Grande, Rio de Janeiro. Películas a partir de R$ 90/m²: redução de calor, privacidade e proteção UV com garantia de 2 anos. Orçamento grátis no local e pelo WhatsApp.',
+  description: 'Aplicação profissional de insulfilm em Campo Grande, Rio de Janeiro. Películas a partir de R$ 90/m²: redução de calor, privacidade e proteção UV com garantia de até 10 anos. Orçamento grátis no local e pelo WhatsApp.',
   keywords: [
     'insulfilm em campo grande rj',
     'insulfilm campo grande rj',
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://lumecontrolesolar.com.br/insulfilm-em-campo-grande/' },
   openGraph: {
     title: 'Insulfilm em Campo Grande RJ | LUME Controle Solar',
-    description: 'Especialistas em insulfilm em Campo Grande. Proteção contra o calor carioca com garantia de 2 anos. Orçamento grátis no local.',
+    description: 'Especialistas em insulfilm em Campo Grande. Proteção contra o calor carioca com garantia de até 10 anos. Orçamento grátis no local.',
     url: 'https://lumecontrolesolar.com.br/insulfilm-em-campo-grande/',
     type: 'website',
     siteName: 'LUME Controle Solar',
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Insulfilm em Campo Grande RJ | LUME Controle Solar',
-    description: 'Proteção contra calor e privacidade total em Campo Grande. Garantia de 2 anos. Orçamento grátis.',
+    description: 'Proteção contra calor e privacidade total em Campo Grande. Garantia de até 10 anos. Orçamento grátis.',
     images: ['https://lumecontrolesolar.com.br/campogrande_hero_bg.webp'],
   },
 };
@@ -53,7 +53,7 @@ const campoGrandeFaqs = [
   },
   {
     q: 'Qual o tempo de garantia do serviço?',
-    a: 'Oferecemos garantia contratual de 2 anos em todos os nossos serviços de aplicação. Isso cobre bolhas, delaminação e defeitos de instalação, garantindo sua total tranquilidade.',
+    a: 'Oferecemos garantia contratual de até 10 anos (conforme a película escolhida) em nossos serviços de aplicação. Isso cobre bolhas, delaminação e defeitos de instalação, garantindo sua total tranquilidade.',
   },
   {
     q: 'Posso instalar insulfilm em vidro temperado?',

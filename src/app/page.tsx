@@ -57,7 +57,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'LUME Controle Solar | Insulfilm Residencial e Comercial no Rio de Janeiro',
-    description: 'Insulfilm residencial de alta performance no Rio, com instalação profissional, garantia de 2 anos e opção de privacidade 24h com jateado.',
+    description: 'Insulfilm residencial de alta performance no Rio, com instalação profissional, garantia de até 10 anos e opção de privacidade 24h com jateado.',
     url: 'https://lumecontrolesolar.com.br/',
     siteName: 'LUME Controle Solar',
     images: [

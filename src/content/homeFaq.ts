@@ -19,7 +19,7 @@ export const homeFaqs: HomeFaq[] = [
   },
   {
     q: 'O insulfilm tem garantia?',
-    a: 'Sim. A LUME dá 2 anos de garantia contra descolamento, bolhas e desbotamento precoce, além da garantia do fabricante da película.',
+    a: 'Sim. A LUME dá até 10 anos de garantia (conforme a película escolhida) contra descolamento, bolhas e desbotamento precoce, além da garantia do fabricante da película.',
   },
   {
     q: 'Existe película com privacidade à noite?',
