@@ -8,3 +8,5 @@ export function formatNumber2(value: number): string {
   if (!Number.isFinite(value)) return '0,00';
   return value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
+
+export { roundCurrency } from './numberPrecision';

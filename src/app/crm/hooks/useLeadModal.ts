@@ -43,6 +43,7 @@ const buildEmptyLeadForm = (filmType: string): LeadFormValues => ({
   dormant: false,
   pinned: false,
   notes: '',
+  custoMaterial: undefined,
   custoAjudante: 0,
   outrasDespesas: 0,
 });
@@ -136,6 +137,7 @@ export const useLeadModal = (
       dormant: lead.dormant,
       pinned: Boolean(lead.pinned),
       notes: lead.notes,
+      custoMaterial: lead.custoMaterial,
       custoAjudante: lead.custoAjudante ?? 0,
       outrasDespesas: lead.outrasDespesas ?? 0,
     };

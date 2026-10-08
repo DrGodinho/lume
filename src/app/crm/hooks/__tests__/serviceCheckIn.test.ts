@@ -58,6 +58,62 @@ describe('Service Check-in & Confirmation', () => {
     vi.useRealTimers();
   });
 
+  it('excludes lead with scheduled service from contactarHoje, dormentes, and parados', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-09-22T12:00:00'));
+
+    // Lead that used to be dormant and had an old past proximoContato, but is now scheduled
+    const scheduledFormerDormantLead: Lead = {
+      ...baseLead,
+      id: 'scheduled_dormant_1',
+      proximoContato: '2026-09-10', // old overdue follow up
+      dataServico: '2026-09-25', // future scheduled service
+      dormant: true, // was marked dormant previously
+      status: 'Agendado',
+    };
+
+    const regularOverdueLead: Lead = {
+      ...baseLead,
+      id: 'overdue_1',
+      status: 'Em Contato',
+      proximoContato: '2026-09-15',
+      dataServico: null,
+      dormant: false,
+    };
+
+    const leads: Lead[] = [scheduledFormerDormantLead, regularOverdueLead];
+
+    const { result } = renderHook(() =>
+      useAgendaLists({
+        leads,
+        diaSelecionado: null,
+        mesVisivel: new Date(2026, 8, 1),
+        isClosedLead: (status) => status === 'Fechado' || status === 'Perdido',
+        getLeadFollowUpDate: (l) => (l.proximoContato ? new Date(l.proximoContato) : null),
+        getLeadServiceDate: (l) => (l.dataServico ? new Date(l.dataServico + 'T12:00:00') : null),
+        getLeadActivityDate: (l) => new Date(l.statusChangedAt),
+        getLeadServiceStatus: (l) => l.serviceStatus || 'Marcado',
+      }),
+    );
+
+    // Should NOT appear in contactarHoje (urgent red card)
+    const contactarHojeIds = result.current.contactarHoje.map((l) => l.id);
+    expect(contactarHojeIds).not.toContain('scheduled_dormant_1');
+    expect(contactarHojeIds).toContain('overdue_1');
+
+    // Should NOT appear in dormentes or parados
+    const dormenteIds = result.current.dormentes.map((l) => l.id);
+    expect(dormenteIds).not.toContain('scheduled_dormant_1');
+    const paradosIds = result.current.parados.map((l) => l.id);
+    expect(paradosIds).not.toContain('scheduled_dormant_1');
+
+    // MUST appear in servicosAgendados
+    const servicosAgendadosIds = result.current.servicosAgendados.map((l) => l.id);
+    expect(servicosAgendadosIds).toContain('scheduled_dormant_1');
+
+    vi.useRealTimers();
+  });
+
   it('handleCompleteService sets serviceStatus to Concluido and status to Fechado', async () => {
     const patchLeadStatusInfo = vi.fn().mockResolvedValue({ synced: true, lead: baseLead });
     const toast = { success: vi.fn(), error: vi.fn() };

@@ -18,6 +18,8 @@ import {
   BarChart3,
   Calendar,
   Layers,
+  Calculator,
+  ExternalLink,
 } from 'lucide-react';
 
 type CrmStatus =
@@ -284,6 +286,17 @@ function EditModal({
               {formatCurrency(orc.valor)}
             </span>
           </div>
+
+          <a
+            href={`/admin/?orcamentoId=${encodeURIComponent(orc.id)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full py-2.5 px-4 rounded-xl bg-[#c9a227]/10 hover:bg-[#c9a227]/20 border border-[#c9a227]/30 text-[#c9a227] text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition shadow-sm group"
+          >
+            <Calculator className="w-4 h-4 text-[#c9a227]" />
+            <span>Abrir na Calculadora</span>
+            <ExternalLink className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 transition" />
+          </a>
 
           <div className="flex gap-3">
             {orc.qtd > 0 && (

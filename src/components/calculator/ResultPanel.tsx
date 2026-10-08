@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Camera, FileText, History, Scissors, Eye, EyeOff, TrendingUp, Check, X, DollarSign } from 'lucide-react';
 import type { LucroCalculadoraResult } from '../../lib/pricing';
 
@@ -61,6 +61,28 @@ export function ResultPanel({
     const [mostrarLucro, setMostrarLucro] = useState(false);
     const holdTimerRef = useRef<NodeJS.Timeout | null>(null);
     const didTriggerLongPressRef = useRef(false);
+    const popoverRef = useRef<HTMLDivElement | null>(null);
+    const triggerRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        if (!mostrarLucro) return;
+        const handleOutsideClick = (e: MouseEvent | TouchEvent) => {
+            if (
+                popoverRef.current &&
+                !popoverRef.current.contains(e.target as Node) &&
+                triggerRef.current &&
+                !triggerRef.current.contains(e.target as Node)
+            ) {
+                setMostrarLucro(false);
+            }
+        };
+        document.addEventListener('mousedown', handleOutsideClick);
+        document.addEventListener('touchstart', handleOutsideClick);
+        return () => {
+            document.removeEventListener('mousedown', handleOutsideClick);
+            document.removeEventListener('touchstart', handleOutsideClick);
+        };
+    }, [mostrarLucro]);
 
     const handlePointerDown = () => {
         didTriggerLongPressRef.current = false;
@@ -88,11 +110,15 @@ export function ResultPanel({
     };
 
     return (
-        <div className="admin-entrance bg-gradient-to-br from-[#111e33] to-[#04080f] border-2 border-[#c9a227]/40 rounded-2xl p-5 shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/5 blur-3xl rounded-full pointer-events-none" />
+        <div className="admin-entrance bg-gradient-to-br from-[#111e33] to-[#04080f] border-2 border-[#c9a227]/40 rounded-2xl p-5 shadow-2xl relative z-20">
+            {/* Efeito de luz ambiente contido sem cortar popovers filhos */}
+            <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/5 blur-3xl rounded-full" />
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                 <div className="relative">
                     <div
+                        ref={triggerRef}
                         onPointerDown={handlePointerDown}
                         onPointerUp={handlePointerUp}
                         onPointerLeave={handlePointerUp}
@@ -115,7 +141,10 @@ export function ResultPanel({
 
                     {/* POPOVER DISCRETO: LUCRO E CUSTO REAL */}
                     {mostrarLucro && lucroInfo && (
-                        <div className="absolute top-full left-0 mt-2 z-50 w-72 sm:w-80 bg-[#0a101d]/95 backdrop-blur-xl border border-[#c9a227]/50 rounded-2xl p-4 shadow-[0_10px_40px_rgba(0,0,0,0.8)] animate-in fade-in zoom-in-95 duration-200">
+                        <div
+                            ref={popoverRef}
+                            className="absolute top-full left-0 mt-2 z-50 w-72 sm:w-80 max-w-[calc(100vw-2.5rem)] bg-[#0a101d]/95 backdrop-blur-xl border border-[#c9a227]/50 rounded-2xl p-4 shadow-[0_10px_40px_rgba(0,0,0,0.8)] animate-in fade-in zoom-in-95 duration-200"
+                        >
                             <div className="flex items-center justify-between pb-2 mb-3 border-b border-white/10">
                                 <div className="flex items-center gap-1.5 text-xs font-bold text-[#c9a227] uppercase tracking-wider">
                                     <TrendingUp size={14} /> Lucratividade Real

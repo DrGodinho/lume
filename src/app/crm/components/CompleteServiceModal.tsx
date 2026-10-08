@@ -1,9 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { CheckCircle2, DollarSign, Loader2, Sparkles, UserCheck, X } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { CheckCircle2, DollarSign, Layers, Loader2, Sparkles, UserCheck, X } from 'lucide-react';
 import type { Lead } from '../types';
 import { parseBrazilianNumber } from '../utils/expenses';
+import { getFilmCatalogItemFromLabel } from '../../../lib/films';
+import { roundCurrency } from '../../../lib/money';
 
 export interface CompleteServiceModalProps {
   lead: Lead | null;
@@ -11,7 +13,7 @@ export interface CompleteServiceModalProps {
   onClose: () => void;
   onConfirm: (
     leadId: string,
-    expenses: { custoAjudante: number; outrasDespesas: number; note: string }
+    expenses: { custoMaterial?: number; custoAjudante: number; outrasDespesas: number; note: string }
   ) => Promise<void>;
   formatCurrencyBRL?: (val: number) => string;
 }
@@ -24,13 +26,19 @@ export function CompleteServiceModal({
   formatCurrencyBRL = (val) =>
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 2 }).format(val),
 }: CompleteServiceModalProps) {
+  const [custoMaterial, setCustoMaterial] = useState<number | undefined>(undefined);
   const [custoAjudante, setCustoAjudante] = useState<number>(0);
   const [outrasDespesas, setOutrasDespesas] = useState<number>(0);
   const [note, setNote] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
+  const catalogItem = useMemo(() => {
+    return lead?.filmType ? getFilmCatalogItemFromLabel(lead.filmType) : null;
+  }, [lead?.filmType]);
+
   useEffect(() => {
     if (lead && isOpen) {
+      setCustoMaterial(lead.custoMaterial);
       setCustoAjudante(lead.custoAjudante || 0);
       setOutrasDespesas(lead.outrasDespesas || 0);
       setNote('');
@@ -41,7 +49,7 @@ export function CompleteServiceModal({
   if (!isOpen || !lead) return null;
 
   const valorServico = Math.max(0, lead.value || 0);
-  const totalDespesas = custoAjudante + outrasDespesas;
+  const totalDespesas = (custoMaterial ?? 0) + custoAjudante + outrasDespesas;
   const lucroEstimado = Math.max(0, valorServico - totalDespesas);
   const margemPercentual = valorServico > 0 ? (lucroEstimado / valorServico) * 100 : 0;
 
@@ -52,6 +60,7 @@ export function CompleteServiceModal({
     setIsSubmitting(true);
     try {
       await onConfirm(lead.id, {
+        custoMaterial,
         custoAjudante,
         outrasDespesas,
         note,
@@ -124,6 +133,122 @@ export function CompleteServiceModal({
 
         {/* Formulário de Custos */}
         <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+          {/* Campo: Custo com Película / Material */}
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-white/80">
+                <Layers className="h-3.5 w-3.5 text-[#c9a227]" />
+                Custo de Película / Material (R$)
+              </label>
+              {custoMaterial === 0 ? (
+                <span className="text-[10px] font-bold text-emerald-400">Sobra (R$ 0,00)</span>
+              ) : (
+                <span className="text-[10px] text-white/40">Sobra, fracionado ou bobina</span>
+              )}
+            </div>
+
+            {/* Quick Presets de Material */}
+            <div className="mb-2 flex flex-wrap gap-1.5">
+              <button
+                type="button"
+                onClick={() => setCustoMaterial(0)}
+                className={`rounded-xl px-2.5 py-1 text-[11px] font-bold transition ${
+                  custoMaterial === 0
+                    ? 'border border-emerald-500/60 bg-emerald-500/20 text-emerald-300 shadow-[0_0_8px_rgba(16,185,129,0.2)]'
+                    : 'border border-white/10 bg-white/[0.03] text-white/60 hover:border-emerald-500/30 hover:text-emerald-300'
+                }`}
+              >
+                🌿 Sobra (R$ 0)
+              </button>
+
+              {catalogItem?.purchaseType === 'bloco_7_5m' && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setCustoMaterial(catalogItem.priceCost)}
+                    className={`rounded-xl px-2.5 py-1 text-[11px] font-bold transition ${
+                      custoMaterial === catalogItem.priceCost
+                        ? 'border border-[#c9a227]/60 bg-[#c9a227]/20 text-[#f5d77a]'
+                        : 'border border-white/10 bg-white/[0.03] text-white/60 hover:border-[#c9a227]/30 hover:text-[#f5d77a]'
+                    }`}
+                  >
+                    1/4 Rolo (R$ {catalogItem.priceCost.toFixed(2).replace('.', ',')})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCustoMaterial(catalogItem.priceCost * 2)}
+                    className={`rounded-xl px-2.5 py-1 text-[11px] font-bold transition ${
+                      custoMaterial === catalogItem.priceCost * 2
+                        ? 'border border-[#c9a227]/60 bg-[#c9a227]/20 text-[#f5d77a]'
+                        : 'border border-white/10 bg-white/[0.03] text-white/60 hover:border-[#c9a227]/30 hover:text-[#f5d77a]'
+                    }`}
+                  >
+                    1/2 Rolo (R$ {(catalogItem.priceCost * 2).toFixed(2).replace('.', ',')})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCustoMaterial(catalogItem.priceCost * 4)}
+                    className={`rounded-xl px-2.5 py-1 text-[11px] font-bold transition ${
+                      custoMaterial === catalogItem.priceCost * 4
+                        ? 'border border-[#c9a227]/60 bg-[#c9a227]/20 text-[#f5d77a]'
+                        : 'border border-white/10 bg-white/[0.03] text-white/60 hover:border-[#c9a227]/30 hover:text-[#f5d77a]'
+                    }`}
+                  >
+                    1 Rolo (R$ {(catalogItem.priceCost * 4).toFixed(2).replace('.', ',')})
+                  </button>
+                </>
+              )}
+
+              {catalogItem?.purchaseType === 'metro' && (
+                <>
+                  {lead.sqm > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setCustoMaterial(roundCurrency(((lead.sqm || 0) / 1.52) * catalogItem.priceCost))}
+                      className={`rounded-xl px-2.5 py-1 text-[11px] font-bold transition ${
+                        custoMaterial === roundCurrency(((lead.sqm || 0) / 1.52) * catalogItem.priceCost)
+                          ? 'border border-[#c9a227]/60 bg-[#c9a227]/20 text-[#f5d77a]'
+                          : 'border border-white/10 bg-white/[0.03] text-white/60 hover:border-[#c9a227]/30 hover:text-[#f5d77a]'
+                      }`}
+                    >
+                      {lead.sqm}m² (R$ {roundCurrency(((lead.sqm || 0) / 1.52) * catalogItem.priceCost).toFixed(2).replace('.', ',')})
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setCustoMaterial(catalogItem.priceCost)}
+                    className={`rounded-xl px-2.5 py-1 text-[11px] font-bold transition ${
+                      custoMaterial === catalogItem.priceCost
+                        ? 'border border-[#c9a227]/60 bg-[#c9a227]/20 text-[#f5d77a]'
+                        : 'border border-white/10 bg-white/[0.03] text-white/60 hover:border-[#c9a227]/30 hover:text-[#f5d77a]'
+                    }`}
+                  >
+                    1 Metro (R$ {catalogItem.priceCost.toFixed(2).replace('.', ',')})
+                  </button>
+                </>
+              )}
+            </div>
+
+            <div className="relative">
+              <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-white/40">
+                R$
+              </span>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                inputMode="decimal"
+                value={custoMaterial === undefined ? '' : custoMaterial}
+                onChange={(e) => {
+                  const val = e.target.value === '' ? undefined : parseBrazilianNumber(e.target.value);
+                  setCustoMaterial(val);
+                }}
+                placeholder="0,00"
+                className="w-full rounded-2xl border border-white/10 bg-[#04080f] py-2.5 pl-10 pr-4 text-sm font-semibold text-white placeholder:text-white/20 focus:border-[#c9a227]/50 focus:outline-none"
+              />
+            </div>
+          </div>
+
           {/* Campo: Custo com Ajudante */}
           <div>
             <div className="flex items-center justify-between mb-1.5">

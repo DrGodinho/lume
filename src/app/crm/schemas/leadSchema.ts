@@ -58,6 +58,7 @@ export const leadFormSchema = z.object({
   dormant: z.boolean(),
   pinned: z.boolean().optional(),
   archived: z.boolean().optional(),
+  custoMaterial: z.number().min(0).optional(),
   custoAjudante: z.number().min(0).optional(),
   outrasDespesas: z.number().min(0).optional(),
 });

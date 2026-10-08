@@ -52,7 +52,50 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ id, meta_valor: data?.meta_valor ?? null });
+  if (data?.meta_valor !== null && data?.meta_valor !== undefined) {
+    return NextResponse.json({ id, meta_valor: data.meta_valor });
+  }
+
+  // Se for consulta de meta mensal e este mês ainda não possuir meta específica gravada,
+  // herda a meta mais recente configurada (<= mês solicitado) ou a meta 'default'
+  if (id.startsWith('crm_goal_')) {
+    const { data: previousGoal } = await supabaseAdmin
+      .from('configuracoes')
+      .select('meta_valor')
+      .like('id', 'crm_goal_%')
+      .lte('id', id)
+      .order('id', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (previousGoal?.meta_valor !== null && previousGoal?.meta_valor !== undefined) {
+      return NextResponse.json({ id, meta_valor: previousGoal.meta_valor });
+    }
+
+    const { data: anyGoal } = await supabaseAdmin
+      .from('configuracoes')
+      .select('meta_valor')
+      .like('id', 'crm_goal_%')
+      .order('id', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (anyGoal?.meta_valor !== null && anyGoal?.meta_valor !== undefined) {
+      return NextResponse.json({ id, meta_valor: anyGoal.meta_valor });
+    }
+
+    const { data: defaultGoal } = await supabaseAdmin
+      .from('configuracoes')
+      .select('meta_valor')
+      .eq('id', 'default')
+      .maybeSingle();
+
+    if (defaultGoal?.meta_valor !== null && defaultGoal?.meta_valor !== undefined) {
+      return NextResponse.json({ id, meta_valor: defaultGoal.meta_valor });
+    }
+  }
+
+  return NextResponse.json({ id, meta_valor: null });
 }
 
 export async function PUT(request: NextRequest) {
@@ -90,6 +133,18 @@ export async function PUT(request: NextRequest) {
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  // Ao salvar a meta de um mês, sincroniza também 'default' para garantir
+  // continuidade automática nos meses subsequentes
+  if (typeof body.id === 'string' && body.id.startsWith('crm_goal_')) {
+    try {
+      await supabaseAdmin
+        .from('configuracoes')
+        .upsert({ id: 'default', meta_valor: numericValue }, { onConflict: 'id' });
+    } catch {
+      // Falha silenciosa na sincronização secundária para não travar a resposta principal
+    }
   }
 
   return NextResponse.json({ id: body.id, meta_valor: numericValue });

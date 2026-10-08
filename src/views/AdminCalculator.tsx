@@ -829,7 +829,7 @@ export function AdminCalculator() {
           await saveHistoryItemToCloud(itemToSave);
           const atualizado = existing
             ? historico.map(h => h.id === existing.id ? itemToSave : h)
-            : [itemToSave, ...historico].slice(0, 100);
+            : [itemToSave, ...historico].slice(0, 500);
           setHistorico(atualizado);
           resolveCalculatorScopeKey().then((scopeKey) => {
             localStorage.setItem(buildCalculatorStorageKey('lume_historico', scopeKey), JSON.stringify(atualizado));
@@ -845,7 +845,7 @@ export function AdminCalculator() {
     }, [cliente, phone, neighborhood, vidros, selectedFilm, finalPrice, rollW, price, margin, desconto, modoOtimizacao, currentLeadId, compensarPerdas, modoPerdas, perdasFixas, historico, setHistorico, showToast]);
 
 // C1: abrir passa pelo schema do hook; aqui só a aplicação na sessão.
-const carregarDoHistorico = (orc: OrcamentoSalvo) => {
+const carregarDoHistorico = useCallback((orc: OrcamentoSalvo) => {
     carregarDoHistoricoHook(orc, (valid) => {
     setCliente(valid.cliente);
     setPhone(valid.phone || '');
@@ -875,7 +875,86 @@ const carregarDoHistorico = (orc: OrcamentoSalvo) => {
         setPerdasFixas(savedPerdasFixas);
     }
     });
-    };
+}, [carregarDoHistoricoHook, setCliente, setPhone, setNeighborhood, setRollW, setPrice, setMargin, setDesconto, setDescontoInput, setModoOtimizacao, setSelectedFilm, setCurrentLeadId, setVidros, setCompensarPerdas, setModoPerdas, setPerdasFixas]);
+
+    // Carregar orçamento via parâmetro da URL (ex: vindo do CRM via /admin/?orcamentoId=123)
+    const orcamentoCarregadoRef = useRef(false);
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        if (orcamentoCarregadoRef.current) return;
+
+        const params = new URLSearchParams(window.location.search);
+        const rawTargetId = params.get('orcamentoId') || params.get('id');
+        if (!rawTargetId) return;
+        const targetId: string = rawTargetId;
+
+        orcamentoCarregadoRef.current = true;
+
+        // Limpa suavemente o parâmetro da URL para não recarregar em F5
+        const currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.delete('orcamentoId');
+        currentUrl.searchParams.delete('id');
+        window.history.replaceState({}, '', currentUrl.pathname + (currentUrl.search ? currentUrl.search : ''));
+
+        let isCancelled = false;
+
+        async function carregarOrcamentoUrl() {
+            try {
+                const res = await fetch(`/api/calculator/history?id=${encodeURIComponent(targetId)}`, {
+                    credentials: 'include',
+                    cache: 'no-store',
+                });
+                if (!res.ok) {
+                    showToast('Orçamento não encontrado.', 'error');
+                    return;
+                }
+                const data = await res.json();
+                const row = data?.item ?? data?.items?.[0];
+                if (!row) {
+                    showToast('Orçamento não encontrado.', 'error');
+                    return;
+                }
+                if (!isCancelled) {
+                    const cfgObj = (row.config as Record<string, unknown>) ?? {};
+                    const orcObj: OrcamentoSalvo = {
+                        id: String(row.id),
+                        cliente: String(row.cliente ?? ''),
+                        phone: row.phone ? String(row.phone) : undefined,
+                        neighborhood: row.neighborhood ? String(row.neighborhood) : undefined,
+                        data: String(row.data ?? ''),
+                        valor: Number(row.valor) || 0,
+                        qtd: Number(row.qtd) || 0,
+                        vidros: (row.vidros as GlassItem[]) ?? [],
+                        config: {
+                            rollW: Number(cfgObj.rollW) || 152,
+                            price: Number(cfgObj.price) || 80,
+                            margin: Number(cfgObj.margin) || 0,
+                            compensarPerdas: typeof cfgObj.compensarPerdas === 'boolean' ? cfgObj.compensarPerdas : undefined,
+                            modoPerdas: isLossMode(cfgObj.modoPerdas) ? cfgObj.modoPerdas : undefined,
+                            perdasFixas: typeof cfgObj.perdasFixas === 'number' ? cfgObj.perdasFixas : undefined,
+                        },
+                        desconto: Number(row.desconto) || 0,
+                        modoOtimizacao: isOptimizationMode(row.modo_otimizacao) ? row.modo_otimizacao : 'densidade',
+                        selectedFilm: row.selected_film ? String(row.selected_film) : undefined,
+                        leadId: row.lead_id ? String(row.lead_id) : null,
+                        compensarPerdas: typeof cfgObj.compensarPerdas === 'boolean' ? cfgObj.compensarPerdas : undefined,
+                        modoPerdas: isLossMode(cfgObj.modoPerdas) ? cfgObj.modoPerdas : undefined,
+                        perdasFixas: typeof cfgObj.perdasFixas === 'number' ? cfgObj.perdasFixas : undefined,
+                    };
+                    carregarDoHistorico(orcObj);
+                    showToast(`Orçamento de ${orcObj.cliente || 'Cliente'} carregado na calculadora!`, 'success');
+                }
+            } catch {
+                showToast('Erro ao carregar orçamento.', 'error');
+            }
+        }
+
+        void carregarOrcamentoUrl();
+
+        return () => {
+            isCancelled = true;
+        };
+    }, [carregarDoHistorico, showToast]);
 
     // ─── IMPORTAR / SALVAR / ABRIR ─────────────────────────────────────────────
 

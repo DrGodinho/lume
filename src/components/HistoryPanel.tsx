@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { History, X, Clock, ChevronRight, Trash2, ChevronDown } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { History, X, Clock, ChevronRight, Trash2, ChevronDown, Search } from 'lucide-react';
 import type { OrcamentoSalvo } from '../lib/films';
 
 
@@ -22,14 +22,25 @@ export const HistoryPanel: React.FC<HistoryPanelProps> = ({
     onCarregar,
     onDeletar
 }) => {
+    const [search, setSearch] = useState('');
     const [visible, setVisible] = useState(PAGE_SIZE);
 
     useEffect(() => {
         if (aberto) setVisible(PAGE_SIZE);
     }, [aberto, historico.length]);
 
-    const visiveis = historico.slice(0, visible);
-    const temMais = visible < historico.length;
+    const filtrados = useMemo(() => {
+        if (!search.trim()) return historico;
+        const q = search.toLowerCase().trim();
+        return historico.filter(orc =>
+            orc.cliente.toLowerCase().includes(q) ||
+            (orc.neighborhood && orc.neighborhood.toLowerCase().includes(q)) ||
+            (orc.data && orc.data.includes(q))
+        );
+    }, [historico, search]);
+
+    const visiveis = filtrados.slice(0, visible);
+    const temMais = visible < filtrados.length;
 
     return (
         <>
@@ -46,12 +57,43 @@ export const HistoryPanel: React.FC<HistoryPanelProps> = ({
                         <X size={18} />
                     </button>
                 </div>
+
+                {historico.length > 0 && (
+                    <div className="p-3 border-b border-white/5">
+                        <div className="relative">
+                            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                            <input
+                                type="text"
+                                value={search}
+                                onChange={(e) => {
+                                    setSearch(e.target.value);
+                                    setVisible(PAGE_SIZE);
+                                }}
+                                placeholder="Buscar por cliente, bairro..."
+                                className="w-full bg-[#04080f] border border-white/10 rounded-xl pl-8 pr-8 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-[#c9a227] transition-colors"
+                            />
+                            {search && (
+                                <button
+                                    onClick={() => { setSearch(''); setVisible(PAGE_SIZE); }}
+                                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                                >
+                                    <X size={12} />
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                )}
+
                 <div className="flex-1 overflow-y-auto p-3 space-y-2">
                     {historico.length === 0 ? (
                         <div className="flex flex-col items-center justify-center h-48 text-gray-600 text-sm text-center px-4">
                             <Clock size={32} className="mb-3 opacity-30" />
                             <p>Nenhum orçamento salvo ainda.</p>
                             <p className="text-xs mt-1 opacity-60">Clique em "Salvar no Histórico" após calcular.</p>
+                        </div>
+                    ) : filtrados.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center h-40 text-gray-500 text-xs text-center px-4">
+                            <p>Nenhum orçamento encontrado para "{search}".</p>
                         </div>
                     ) : (
                         <>
@@ -90,7 +132,7 @@ export const HistoryPanel: React.FC<HistoryPanelProps> = ({
                                     onClick={() => setVisible(v => v + PAGE_SIZE)}
                                     className="w-full flex items-center justify-center gap-1.5 text-[11px] font-bold text-gray-400 hover:text-[#c9a227] py-2 rounded-lg border border-white/5 hover:border-[#c9a227]/30 transition-colors"
                                 >
-                                    <ChevronDown size={14} /> Carregar mais ({historico.length - visible})
+                                    <ChevronDown size={14} /> Carregar mais ({filtrados.length - visible})
                                 </button>
                             )}
                         </>

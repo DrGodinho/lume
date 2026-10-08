@@ -118,7 +118,7 @@ export function useCalculatorHistory({ authRefreshKey, notify }: HistoryHooksPar
       notify('Orçamento inválido, não foi salvo.', 'error');
       return;
     }
-    persistLocal([valid, ...historico].slice(0, 100));
+    persistLocal([valid, ...historico].slice(0, 500));
     saveHistoryItemToCloud(valid);
     notify('Orçamento salvo no histórico!', 'success');
   }, [historico, persistLocal, notify]);

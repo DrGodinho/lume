@@ -310,9 +310,17 @@ const applyServerPlaybookToLead = async (
   sellerId: string | null,
   options: { overwriteExisting?: boolean } = {},
 ) => {
+  if (lead.dataServico) {
+    return {
+      ...lead,
+      dormant: false,
+      proximoContato: null,
+    };
+  }
   const rules = await loadSellerPlaybookRules(supabaseClient, sellerId);
   return {
     ...lead,
+    dormant: lead.status === 'Agendado' ? false : lead.dormant,
     proximoContato: getPlaybookFollowUpDate(
       lead.status,
       lead.proximoContato,
@@ -446,10 +454,10 @@ export async function POST(request: NextRequest) {
     notes: body.notes || '',
     createdAt: body.createdAt || new Date().toISOString().split('T')[0],
     statusChangedAt: body.statusChangedAt || body.createdAt || new Date().toISOString().split('T')[0],
-    proximoContato: body.proximoContato || null,
+    proximoContato: body.dataServico ? null : (body.proximoContato || null),
     dataServico: body.dataServico || null,
     serviceStatus: normalizeServiceStatus(body.serviceStatus) || (body.dataServico ? 'Marcado' : null),
-    dormant: body.dormant === true,
+    dormant: (body.dataServico || normalizeLeadStatus(body.status) === 'Agendado') ? false : (body.dormant === true),
     pinned: body.pinned === true,
     archived: body.archived === true,
     updatedAt: body.updatedAt || new Date().toISOString(),
@@ -537,10 +545,10 @@ export async function PUT(request: NextRequest) {
     notes: body.notes || '',
     createdAt: body.createdAt || new Date().toISOString().split('T')[0],
     statusChangedAt: body.statusChangedAt || body.createdAt || new Date().toISOString().split('T')[0],
-    proximoContato: body.proximoContato || null,
+    proximoContato: body.dataServico ? null : (body.proximoContato || null),
     dataServico: body.dataServico || null,
     serviceStatus: normalizeServiceStatus(body.serviceStatus) || (body.dataServico ? 'Marcado' : null),
-    dormant: body.dormant === true,
+    dormant: (body.dataServico || normalizeLeadStatus(body.status) === 'Agendado') ? false : (body.dormant === true),
     pinned: body.pinned === true,
     archived: body.archived === true,
     updatedAt: body.updatedAt || new Date().toISOString(),
@@ -681,6 +689,14 @@ const buildStatusInfoUpdate = (body: Record<string, unknown>) => {
   if ('serviceStatus' in body) update.service_status = body.serviceStatus;
   if ('updatedAt' in body) update.updated_at = body.updatedAt;
   if ('archived' in body) update.archived = body.archived;
+  if ('dormant' in body) update.dormant = body.dormant;
+
+  const isScheduled = Boolean(update.data_servico || update.status === 'Agendado' || body.status === 'Agendado');
+  if (isScheduled) {
+    update.dormant = false;
+    update.proximo_contato = null;
+  }
+
   return update;
 };
 
@@ -782,7 +798,11 @@ export async function PATCH(request: NextRequest) {
     statusInfoPatch.status = nextStatus;
   }
 
-  if (existingLead && nextStatus !== previousStatus && !('proximo_contato' in statusInfoPatch)) {
+  const isScheduled = Boolean(statusInfoPatch.data_servico || nextStatus === 'Agendado');
+  if (isScheduled) {
+    statusInfoPatch.dormant = false;
+    statusInfoPatch.proximo_contato = null;
+  } else if (existingLead && nextStatus !== previousStatus && !('proximo_contato' in statusInfoPatch)) {
     const changedBy = await resolveActor(request);
     const rules = await loadSellerPlaybookRules(supabaseClient, changedBy);
     statusInfoPatch.proximo_contato = getPlaybookFollowUpDate(

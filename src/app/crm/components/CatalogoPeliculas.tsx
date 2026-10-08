@@ -8,16 +8,12 @@ import {
   RefreshCw,
   RotateCcw,
   Trash2,
-  Check,
   Search,
-  DollarSign,
-  TrendingUp,
-  HelpCircle,
   CheckCircle2,
   AlertCircle,
-  Package,
-  SlidersHorizontal,
-  Info,
+  ChevronUp,
+  ChevronDown,
+  ArrowUpDown,
 } from 'lucide-react';
 import {
   DEFAULT_FILM_CATALOG,
@@ -28,6 +24,9 @@ import {
 import { loadConfigFromCloud, saveConfigToCloud, ConfigData } from '../../../lib/cloudSync';
 import { formatBRL } from '../../../lib/money';
 
+type SortField = 'name' | 'priceSale' | 'priceCost' | 'purchaseType' | 'margem' | 'active';
+type SortDirection = 'asc' | 'desc';
+
 export function CatalogoPeliculas() {
   const [config, setConfig] = useState<ConfigData | null>(null);
   const [catalog, setCatalog] = useState<Record<string, FilmCatalogItem>>(DEFAULT_FILM_CATALOG);
@@ -36,6 +35,8 @@ export function CatalogoPeliculas() {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [searchFilter, setSearchFilter] = useState('');
+  const [sortField, setSortField] = useState<SortField>('name');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
   // Modal / Form para nova película
   const [showAddModal, setShowAddModal] = useState(false);
@@ -80,6 +81,20 @@ export function CatalogoPeliculas() {
         },
       };
     });
+  };
+
+  // Alternar ordenação por coluna
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortField(field);
+      if (field === 'priceSale' || field === 'margem') {
+        setSortDirection('desc');
+      } else {
+        setSortDirection('asc');
+      }
+    }
   };
 
   // Restaurar padrões
@@ -205,39 +220,103 @@ export function CatalogoPeliculas() {
     }
   };
 
-  // Lista ordenada e filtrada
+  // Lista ordenada e filtrada (padrão: ordem alfabética por nome)
   const catalogList = useMemo(() => {
     const list = Object.values(catalog);
-    if (!searchFilter.trim()) return list;
-    const term = searchFilter.toLowerCase();
-    return list.filter((item) => item.name.toLowerCase().includes(term) || item.id.toLowerCase().includes(term));
-  }, [catalog, searchFilter]);
+    const filtered = !searchFilter.trim()
+      ? list
+      : list.filter((item) => {
+          const term = searchFilter.toLowerCase();
+          return item.name.toLowerCase().includes(term) || item.id.toLowerCase().includes(term);
+        });
 
-  // Estatísticas do Catálogo
-  const stats = useMemo(() => {
-    const list = Object.values(catalog);
-    const total = list.length;
-    const ativas = list.filter((f) => f.active !== false).length;
-    const porMetro = list.filter((f) => f.purchaseType === 'metro').length;
-    const porBloco = list.filter((f) => f.purchaseType === 'bloco_7_5m').length;
+    return [...filtered].sort((a, b) => {
+      let comparison = 0;
+      switch (sortField) {
+        case 'name':
+          comparison = a.name.localeCompare(b.name, 'pt-BR', { sensitivity: 'base' });
+          break;
+        case 'priceSale':
+          comparison = (a.priceSale || 0) - (b.priceSale || 0);
+          break;
+        case 'priceCost': {
+          const areaA = a.purchaseType === 'bloco_7_5m' ? 7.5 * 1.52 : 1.52;
+          const custoM2A = (a.priceCost || 0) / areaA;
+          const areaB = b.purchaseType === 'bloco_7_5m' ? 7.5 * 1.52 : 1.52;
+          const custoM2B = (b.priceCost || 0) / areaB;
+          comparison = custoM2A - custoM2B;
+          break;
+        }
+        case 'purchaseType':
+          comparison = (a.purchaseType || '').localeCompare(b.purchaseType || '', 'pt-BR');
+          break;
+        case 'margem': {
+          const areaA = a.purchaseType === 'bloco_7_5m' ? 7.5 * 1.52 : 1.52;
+          const custoM2A = (a.priceCost || 0) / areaA;
+          const margemA = a.priceSale > 0 ? ((a.priceSale - custoM2A) / a.priceSale) * 100 : 0;
 
-    let somaMargem = 0;
-    let countMargem = 0;
+          const areaB = b.purchaseType === 'bloco_7_5m' ? 7.5 * 1.52 : 1.52;
+          const custoM2B = (b.priceCost || 0) / areaB;
+          const margemB = b.priceSale > 0 ? ((b.priceSale - custoM2B) / b.priceSale) * 100 : 0;
 
-    list.forEach((item) => {
-      if (item.priceSale > 0) {
-        const areaPorUnidade = item.purchaseType === 'bloco_7_5m' ? 7.5 * 1.52 : 1.52;
-        const custoM2 = item.priceCost / areaPorUnidade;
-        const margem = ((item.priceSale - custoM2) / item.priceSale) * 100;
-        somaMargem += margem;
-        countMargem += 1;
+          comparison = margemA - margemB;
+          break;
+        }
+        case 'active': {
+          const activeA = a.active !== false ? 1 : 0;
+          const activeB = b.active !== false ? 1 : 0;
+          comparison = activeA - activeB;
+          break;
+        }
+        default:
+          comparison = a.name.localeCompare(b.name, 'pt-BR', { sensitivity: 'base' });
       }
+
+      // Critério de desempate estável
+      if (comparison === 0) {
+        comparison = a.name.localeCompare(b.name, 'pt-BR', { sensitivity: 'base' });
+      }
+
+      return sortDirection === 'asc' ? comparison : -comparison;
     });
+  }, [catalog, searchFilter, sortField, sortDirection]);
 
-    const margemMedia = countMargem > 0 ? Math.round(somaMargem / countMargem) : 0;
 
-    return { total, ativas, porMetro, porBloco, margemMedia };
-  }, [catalog]);
+  const renderSortHeader = (
+    field: SortField,
+    label: string,
+    align: 'left' | 'center' | 'right' = 'left'
+  ) => {
+    const isCurrent = sortField === field;
+    return (
+      <th
+        onClick={() => handleSort(field)}
+        className={`py-3 px-4 cursor-pointer select-none transition-colors group ${
+          align === 'center' ? 'text-center' : align === 'right' ? 'text-right' : 'text-left'
+        } ${isCurrent ? 'text-[#f5d77a] bg-white/[0.04]' : 'hover:text-white hover:bg-white/[0.02]'}`}
+        title={`Clique para ordenar por ${label} (${isCurrent && sortDirection === 'asc' ? 'inverter para decrescente' : 'crescente'})`}
+      >
+        <div
+          className={`inline-flex items-center gap-1.5 ${
+            align === 'center' ? 'justify-center' : align === 'right' ? 'justify-end' : 'justify-start'
+          }`}
+        >
+          <span>{label}</span>
+          <span className="shrink-0">
+            {isCurrent ? (
+              sortDirection === 'asc' ? (
+                <ChevronUp className="h-3.5 w-3.5 text-[#f5d77a]" />
+              ) : (
+                <ChevronDown className="h-3.5 w-3.5 text-[#f5d77a]" />
+              )
+            ) : (
+              <ArrowUpDown className="h-3 w-3 text-white/20 group-hover:text-white/60 transition" />
+            )}
+          </span>
+        </div>
+      </th>
+    );
+  };
 
   return (
     <section className="overflow-hidden rounded-[2rem] border border-white/[0.08] bg-[linear-gradient(180deg,#0a1320_0%,#050a11_100%)] p-5 shadow-2xl shadow-black/25 sm:p-7 space-y-6">
@@ -315,62 +394,9 @@ export function CatalogoPeliculas() {
         </div>
       )}
 
-      {/* KPI STATS CARDS */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4">
-          <div className="flex items-center justify-between text-white/50 mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider">Total Películas</span>
-            <Package className="h-4 w-4 text-[#c9a227]" />
-          </div>
-          <p className="text-2xl font-black text-white">{stats.total}</p>
-          <p className="text-[11px] text-emerald-400 mt-1">{stats.ativas} ativas no catálogo</p>
-        </div>
-
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4">
-          <div className="flex items-center justify-between text-white/50 mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider">Margem Média</span>
-            <TrendingUp className="h-4 w-4 text-emerald-400" />
-          </div>
-          <p className="text-2xl font-black text-emerald-400">{stats.margemMedia}%</p>
-          <p className="text-[11px] text-white/40 mt-1">Margem bruta média estimada</p>
-        </div>
-
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4">
-          <div className="flex items-center justify-between text-white/50 mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider">Compra ao Metro</span>
-            <span className="text-xs font-bold text-[#f5d77a]">m²</span>
-          </div>
-          <p className="text-2xl font-black text-white">{stats.porMetro}</p>
-          <p className="text-[11px] text-white/40 mt-1">Nano Cerâmica / Especiais</p>
-        </div>
-
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4">
-          <div className="flex items-center justify-between text-white/50 mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider">Bloco 7,5m</span>
-            <span className="text-xs font-bold text-sky-400">1/4 rolo</span>
-          </div>
-          <p className="text-2xl font-black text-white">{stats.porBloco}</p>
-          <p className="text-[11px] text-white/40 mt-1">Nano Carbono / Refletiva</p>
-        </div>
-      </div>
-
-      {/* DICA DE USO & MODO DISCRETO */}
-      <div className="rounded-2xl border border-[#c9a227]/20 bg-[#c9a227]/[0.04] p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs text-white/70">
-        <div className="flex items-start gap-3">
-          <div className="p-2 rounded-xl bg-[#c9a227]/10 text-[#f5d77a] shrink-0 mt-0.5 md:mt-0">
-            <Info className="h-4 w-4" />
-          </div>
-          <div>
-            <span className="font-bold text-white">Como funciona o Modo Discreto na Calculadora:</span>
-            <p className="text-white/60 mt-0.5">
-              Ao orçar na frente do cliente, os custos e o lucro ficam ocultos. Basta <strong>pressionar e segurar</strong> (ou dar um clique longo) sobre o card <span className="text-[#f5d77a] font-semibold">Total Cliente</span> para abrir a lâmina confidencial de margem, custo de ajudante e opção de sobra.
-            </p>
-          </div>
-        </div>
-      </div>
 
       {/* BARRA DE PESQUISA & FILTROS */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2">
         <div className="relative w-full sm:w-80">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
           <input
@@ -381,9 +407,34 @@ export function CatalogoPeliculas() {
             className="w-full rounded-xl border border-white/10 bg-white/[0.04] pl-10 pr-4 py-2 text-xs text-white placeholder-white/40 outline-none transition focus:border-[#c9a227]/50 focus:bg-white/[0.08]"
           />
         </div>
-        <span className="text-xs text-white/40">
-          Exibindo {catalogList.length} de {Object.keys(catalog).length} películas
-        </span>
+        <div className="flex flex-wrap items-center gap-2 text-xs text-white/40">
+          <span>
+            Exibindo {catalogList.length} de {Object.keys(catalog).length} películas
+          </span>
+          <span className="text-white/20">•</span>
+          <span className="text-white/50">
+            Ordem: <span className="text-[#f5d77a] font-medium">{
+              sortField === 'name' ? 'Alfabética' :
+              sortField === 'priceSale' ? 'Preço de Venda' :
+              sortField === 'priceCost' ? 'Custo de Aquisição' :
+              sortField === 'purchaseType' ? 'Modalidade' :
+              sortField === 'margem' ? 'Margem' : 'Status'
+            } ({sortDirection === 'asc' ? (sortField === 'name' ? 'A-Z' : 'Crescente') : (sortField === 'name' ? 'Z-A' : 'Decrescente')})</span>
+          </span>
+          {(sortField !== 'name' || sortDirection !== 'asc') && (
+            <button
+              type="button"
+              onClick={() => {
+                setSortField('name');
+                setSortDirection('asc');
+              }}
+              className="ml-1 text-[11px] text-[#f5d77a]/70 hover:text-[#f5d77a] underline transition"
+              title="Voltar para a ordenação padrão por ordem alfabética"
+            >
+              (redefinir A-Z)
+            </button>
+          )}
+        </div>
       </div>
 
       {/* TABELA DE PELÍCULAS */}
@@ -391,12 +442,12 @@ export function CatalogoPeliculas() {
         <table className="w-full text-left border-collapse min-w-[700px]">
           <thead>
             <tr className="border-b border-white/10 bg-white/[0.03] text-[10px] font-black uppercase tracking-[0.14em] text-white/50">
-              <th className="py-3 px-4">Nome da Película</th>
-              <th className="py-3 px-4">Venda (R$/m²)</th>
-              <th className="py-3 px-4">Custo Aquisição (R$)</th>
-              <th className="py-3 px-4">Modalidade de Compra</th>
-              <th className="py-3 px-4">Margem Est.</th>
-              <th className="py-3 px-4 text-center">Status</th>
+              {renderSortHeader('name', 'Nome da Película')}
+              {renderSortHeader('priceSale', 'Venda (R$/m²)')}
+              {renderSortHeader('priceCost', 'Custo Aquisição (R$)')}
+              {renderSortHeader('purchaseType', 'Modalidade de Compra')}
+              {renderSortHeader('margem', 'Margem Est.')}
+              {renderSortHeader('active', 'Status', 'center')}
               <th className="py-3 px-4 text-right">Ação</th>
             </tr>
           </thead>

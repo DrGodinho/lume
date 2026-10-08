@@ -59,9 +59,10 @@ export function AgendaLeadCard({
   const serviceDate = getLeadServiceDate(lead);
   const activityDate = getLeadActivityDate(lead);
   const inactivityDays = activityDate ? differenceInDays(new Date(), activityDate) : null;
-  const atrasado = !!followUpDate && isPast(followUpDate) && !isToday(followUpDate);
-  const hasFollowUp = !!followUpDate;
   const isServiceCard = kind === 'service';
+  const hasScheduledService = isServiceCard || Boolean(lead.dataServico || lead.status === 'Agendado');
+  const atrasado = !hasScheduledService && !!followUpDate && isPast(followUpDate) && !isToday(followUpDate);
+  const hasFollowUp = !hasScheduledService && !!followUpDate;
   const isIdleCard = kind === 'idle';
   const isDormantCard = kind === 'dormant';
   const serviceStatus = getLeadServiceStatus(lead);
@@ -165,12 +166,12 @@ export function AgendaLeadCard({
             Atrasado
           </span>
         )}
-        {!hasFollowUp && inactivityDays !== null && inactivityDays >= 3 && (
+        {!hasFollowUp && !hasScheduledService && inactivityDays !== null && inactivityDays >= 3 && (
           <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-white/50">
             Parado ha {inactivityDays}d
           </span>
         )}
-        {lead.dormant && (
+        {lead.dormant && !hasScheduledService && (
           <span className="rounded-full border border-slate-500/20 bg-slate-500/10 px-2.5 py-1 text-slate-300">
             Dormente
           </span>
@@ -187,11 +188,25 @@ export function AgendaLeadCard({
               : `Serviço ${format(serviceDate, "d 'de' MMM", { locale: ptBR })}`}
           </span>
         )}
-        {((lead.custoAjudante || 0) > 0 || (lead.outrasDespesas || 0) > 0) && (
-          <span className="rounded-full border border-[#c9a227]/30 bg-[#c9a227]/10 px-2.5 py-1 text-[#f5d77a]">
-            {(lead.custoAjudante || 0) > 0 ? `Ajudante R$ ${lead.custoAjudante}` : ''}
-            {(lead.custoAjudante || 0) > 0 && (lead.outrasDespesas || 0) > 0 ? ' · ' : ''}
-            {(lead.outrasDespesas || 0) > 0 ? `Extras R$ ${lead.outrasDespesas}` : ''}
+        {(typeof lead.custoMaterial === 'number' || (lead.custoAjudante || 0) > 0 || (lead.outrasDespesas || 0) > 0) && (
+          <span
+            className={`rounded-full border px-2.5 py-1 ${
+              lead.custoMaterial === 0 && !(lead.custoAjudante || 0) && !(lead.outrasDespesas || 0)
+                ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300'
+                : 'border-[#c9a227]/30 bg-[#c9a227]/10 text-[#f5d77a]'
+            }`}
+          >
+            {[
+              typeof lead.custoMaterial === 'number'
+                ? lead.custoMaterial === 0
+                  ? 'Filme R$ 0 (Sobra)'
+                  : `Filme R$ ${lead.custoMaterial}`
+                : null,
+              (lead.custoAjudante || 0) > 0 ? `Ajudante R$ ${lead.custoAjudante}` : null,
+              (lead.outrasDespesas || 0) > 0 ? `Extras R$ ${lead.outrasDespesas}` : null,
+            ]
+              .filter(Boolean)
+              .join(' · ')}
           </span>
         )}
       </div>

@@ -70,6 +70,7 @@ export interface LeadStatusInfo {
   archived?: boolean;
   updatedAt?: string;
   deletedAt?: string | null;
+  custoMaterial?: number;
   custoAjudante?: number;
   outrasDespesas?: number;
 }

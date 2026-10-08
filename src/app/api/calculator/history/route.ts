@@ -18,6 +18,21 @@ export async function GET(request: NextRequest) {
   const scope = params.get('scope');
   const isAdminWide = scope === 'all';
 
+  // Busca individual por ID específico
+  const singleId = params.get('id');
+  if (singleId) {
+    const { data: item, error: singleError } = await supabaseAdmin
+      .from('calculator_history')
+      .select('*')
+      .eq('id', singleId)
+      .maybeSingle();
+
+    if (singleError || !item) {
+      return NextResponse.json({ error: 'Orçamento não encontrado', items: [] }, { status: 404 });
+    }
+    return NextResponse.json({ item, items: [item] });
+  }
+
   // Busca por lead/ cliente (usada para vinculacao de orcamentos ao CRM).
   // Eh admin-wide: ignora o owner_key, pois leads nao sao segmentados por usuario.
   const leadId = params.get('leadId');
@@ -48,7 +63,7 @@ export async function GET(request: NextRequest) {
 
     const { data, error } = await query
       .order('created_at', { ascending: false })
-      .limit(100);
+      .limit(500);
 
     if (error || !data) {
       return NextResponse.json({ items: [] });
@@ -56,11 +71,14 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ items: data });
   }
 
+  const limitParam = params.get('limit');
+  const maxLimit = limitParam ? Math.min(parseInt(limitParam, 10) || 500, 1000) : 500;
+
   let { data, error } = await supabaseAdmin
     .from('calculator_history')
     .select('*')
     .order('created_at', { ascending: false })
-    .limit(isAdminWide ? 100 : 20);
+    .limit(maxLimit);
 
   if (!isAdminWide) {
     const ownerRes = await supabaseAdmin
@@ -68,7 +86,7 @@ export async function GET(request: NextRequest) {
       .select('*')
       .eq('owner_key', ownerKey)
       .order('created_at', { ascending: false })
-      .limit(20);
+      .limit(maxLimit);
     data = ownerRes.data;
     error = ownerRes.error;
 
@@ -78,7 +96,7 @@ export async function GET(request: NextRequest) {
         .select('*')
         .eq('owner_key', DEFAULT_OWNER_KEY)
         .order('created_at', { ascending: false })
-        .limit(20);
+        .limit(maxLimit);
       if (!fallbackRes.error && fallbackRes.data && fallbackRes.data.length > 0) {
         data = fallbackRes.data;
         error = null;

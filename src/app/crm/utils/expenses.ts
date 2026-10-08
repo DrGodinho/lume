@@ -1,6 +1,7 @@
 import { format } from 'date-fns';
 
 export interface LeadExpenses {
+  custoMaterial?: number;
   custoAjudante: number;
   outrasDespesas: number;
 }
@@ -25,21 +26,26 @@ export const parseBrazilianNumber = (val: string | number | undefined | null): n
 };
 
 /**
- * Extrai os custos de ajudante e outras despesas das observações do lead.
- * Suporta a tag padrão `[Despesas: Ajudante R$ 150,00 | Extras R$ 50,00]` e tags legadas.
+ * Extrai os custos de material, ajudante e outras despesas das observações do lead.
+ * Suporta a tag padrão `[Despesas: Material R$ 93,75 | Ajudante R$ 150,00 | Extras R$ 50,00]` e tags legadas.
  */
 export const parseLeadExpenses = (notes?: string | null): LeadExpenses => {
   if (!notes || typeof notes !== 'string') {
     return { custoAjudante: 0, outrasDespesas: 0 };
   }
 
+  let custoMaterial: number | undefined = undefined;
   let custoAjudante = 0;
   let outrasDespesas = 0;
 
-  // 1. Tag padrão composta: [Despesas: Ajudante R$ 150,00 | Extras R$ 50,00]
+  // 1. Tag padrão composta: [Despesas: Material R$ 93,75 | Ajudante R$ 150,00 | Extras R$ 50,00]
   const despesasMatch = notes.match(/\[Despesas:([^\]]+)\]/i);
   if (despesasMatch && despesasMatch[1]) {
     const content = despesasMatch[1];
+    const materialMatch = content.match(/Material\s*R?\$?\s*([\d.,]+)/i);
+    if (materialMatch) {
+      custoMaterial = parseBrazilianNumber(materialMatch[1]);
+    }
     const ajudanteMatch = content.match(/Ajudante\s*R?\$?\s*([\d.,]+)/i);
     if (ajudanteMatch) {
       custoAjudante = parseBrazilianNumber(ajudanteMatch[1]);
@@ -48,10 +54,17 @@ export const parseLeadExpenses = (notes?: string | null): LeadExpenses => {
     if (extrasMatch) {
       outrasDespesas = parseBrazilianNumber(extrasMatch[1]);
     }
-    return { custoAjudante, outrasDespesas };
+    const res: LeadExpenses = { custoAjudante, outrasDespesas };
+    if (custoMaterial !== undefined) res.custoMaterial = custoMaterial;
+    return res;
   }
 
-  // 2. Tags individuais avulsas (ex: [Ajudante: R$ 150,00] ou [Extras: R$ 50,00])
+  // 2. Tags individuais avulsas
+  const singleMaterial = notes.match(/\[(?:Custo\s*)?Material:\s*R?\$?\s*([\d.,]+)\]/i);
+  if (singleMaterial) {
+    custoMaterial = parseBrazilianNumber(singleMaterial[1]);
+  }
+
   const singleAjudante = notes.match(/\[(?:Custo\s*)?Ajudante:\s*R?\$?\s*([\d.,]+)\]/i);
   if (singleAjudante) {
     custoAjudante = parseBrazilianNumber(singleAjudante[1]);
@@ -62,14 +75,24 @@ export const parseLeadExpenses = (notes?: string | null): LeadExpenses => {
     outrasDespesas = parseBrazilianNumber(singleExtras[1]);
   }
 
-  return { custoAjudante, outrasDespesas };
+  const res: LeadExpenses = { custoAjudante, outrasDespesas };
+  if (custoMaterial !== undefined) res.custoMaterial = custoMaterial;
+  return res;
 };
 
 /**
  * Formata a tag padronizada de despesas para gravação em notas.
  */
-export const formatExpensesTag = (custoAjudante: number, outrasDespesas: number): string => {
+export const formatExpensesTag = (
+  custoAjudante: number = 0,
+  outrasDespesas: number = 0,
+  custoMaterial?: number
+): string => {
   const parts: string[] = [];
+  if (custoMaterial !== undefined) {
+    const mat = Math.max(0, Number(custoMaterial) || 0);
+    parts.push(`Material R$ ${mat.toFixed(2).replace('.', ',')}`);
+  }
   const ajudante = Math.max(0, Number(custoAjudante) || 0);
   const extras = Math.max(0, Number(outrasDespesas) || 0);
 
@@ -92,13 +115,14 @@ export const mergeExpensesIntoNotes = (
   currentNotes: string = '',
   custoAjudante: number = 0,
   outrasDespesas: number = 0,
-  completionNote?: string
+  completionNote?: string,
+  custoMaterial?: number,
 ): string => {
   let notes = (currentNotes || '')
     .replace(/\[Despesas:[^\]]*\]/gi, '')
-    .replace(/\[Ajudante:[^\]]*\]/gi, '')
+    .replace(/\[(?:Custo\s*)?Material:[^\]]*\]/gi, '')
+    .replace(/\[(?:Custo\s*)?Ajudante:[^\]]*\]/gi, '')
     .replace(/\[Extras:[^\]]*\]/gi, '')
-    .replace(/\[Custo Ajudante:[^\]]*\]/gi, '')
     .trim();
 
   if (completionNote && completionNote.trim()) {
@@ -107,7 +131,7 @@ export const mergeExpensesIntoNotes = (
     notes = notes ? `${notes}\n${compEntry}` : compEntry;
   }
 
-  const tag = formatExpensesTag(custoAjudante, outrasDespesas);
+  const tag = formatExpensesTag(custoAjudante, outrasDespesas, custoMaterial);
   if (tag) {
     notes = notes ? `${notes}\n${tag}` : tag;
   }

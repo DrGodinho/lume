@@ -89,6 +89,7 @@ export const useLeadCommercialAction = (
           dataServico: nextService,
           serviceStatus: currentLead.serviceStatus === 'Reagendar' ? 'Reagendar' : 'Marcado',
           proximoContato: null,
+          dormant: false,
         };
       }
 

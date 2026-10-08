@@ -88,4 +88,26 @@ describe('useLeadList', () => {
 
     expect(result.current.filmTypeOptions).toEqual(expect.arrayContaining(['Carbono G20', 'Refletiva']));
   });
+
+  it('restores cached target goal from localStorage', () => {
+    localStorage.setItem('lume_crm_last_target_goal', '25000');
+    const { result } = renderHook(() => useLeadList('dashboard', toast));
+
+    expect(result.current.targetGoal).toBe(25000);
+    expect(result.current.targetInput).toBe('25000');
+    localStorage.removeItem('lume_crm_last_target_goal');
+  });
+
+  it('updates targetGoal and caches to localStorage when saveTargetGoal is called', async () => {
+    const { result } = renderHook(() => useLeadList('dashboard', toast));
+
+    await act(async () => {
+      await result.current.saveTargetGoal(35000);
+    });
+
+    expect(result.current.targetGoal).toBe(35000);
+    expect(result.current.targetInput).toBe('35000');
+    expect(localStorage.getItem('lume_crm_last_target_goal')).toBe('35000');
+    localStorage.removeItem('lume_crm_last_target_goal');
+  });
 });

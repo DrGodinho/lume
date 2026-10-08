@@ -173,6 +173,32 @@ export const normalizeFilmCatalog = (
   return result;
 };
 
+export const getFilmCatalogItemFromLabel = (
+  labelOrKey: string,
+  catalog?: Record<string, FilmCatalogItem>
+): FilmCatalogItem | null => {
+  const cat = catalog || DEFAULT_FILM_CATALOG;
+  const normalized = (labelOrKey || '').toLowerCase().trim();
+  if (!normalized) return null;
+
+  if (cat[normalized]) return cat[normalized];
+
+  for (const item of Object.values(cat)) {
+    const itemName = item.name.toLowerCase().trim();
+    const itemId = item.id.toLowerCase().trim();
+    if (
+      itemId === normalized ||
+      itemName === normalized ||
+      normalized.includes(itemName) ||
+      itemName.includes(normalized)
+    ) {
+      return item;
+    }
+  }
+
+  return null;
+};
+
 export const DEFAULT_CONFIG: AppConfig = {
   rollW: 152,
   price: 80,

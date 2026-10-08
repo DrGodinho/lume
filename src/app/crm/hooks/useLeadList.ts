@@ -3,7 +3,6 @@
 import { fetchWithTimeout } from '@/lib/fetchWithTimeout';
 import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from 'react';
 import { format } from 'date-fns';
-import { supabase } from '@/lib/supabase';
 import { loadConfigFromCloud } from '@/lib/cloudSync';
 import { DEFAULT_CRM_FILM_OPTIONS, DEFAULT_CRM_TARGET_GOAL } from '../constants';
 import { getCrmApiErrorMessage, getCrmApiHeaders, getFilmTypeLabel, mapLeadRow, normalizeLeadAmounts } from '../utils';
@@ -71,6 +70,21 @@ const fetchArchiveLeadsSnapshot = async (): Promise<TrashSnapshotResult> => {
   return { ok: true, leads: payload.map(mapLeadRow) };
 };
 
+export const CRM_LAST_TARGET_GOAL_STORAGE_KEY = 'lume_crm_last_target_goal';
+
+const getInitialTargetGoal = (): number => {
+  if (typeof window !== 'undefined') {
+    try {
+      const stored = window.localStorage.getItem(CRM_LAST_TARGET_GOAL_STORAGE_KEY);
+      if (stored) {
+        const parsed = Number(stored);
+        if (Number.isFinite(parsed) && parsed > 0) return parsed;
+      }
+    } catch {}
+  }
+  return DEFAULT_CRM_TARGET_GOAL;
+};
+
 const getMonthlyTargetConfigId = () => `crm_goal_${format(new Date(), 'yyyy-MM')}`;
 
 export const useLeadList = (
@@ -84,9 +98,9 @@ export const useLeadList = (
   const [loadingArchivedLeads, setLoadingArchivedLeads] = useState(false);
   const [filmTypeOptions, setFilmTypeOptions] = useState<string[]>(DEFAULT_CRM_FILM_OPTIONS);
   const [defaultLeadFilmType, setDefaultLeadFilmType] = useState(DEFAULT_CRM_FILM_OPTIONS[0] || 'Outro');
-  const [targetGoal, setTargetGoal] = useState<number | null>(DEFAULT_CRM_TARGET_GOAL);
+  const [targetGoal, setTargetGoal] = useState<number | null>(getInitialTargetGoal);
   const [editingTarget, setEditingTarget] = useState(false);
-  const [targetInput, setTargetInput] = useState(String(DEFAULT_CRM_TARGET_GOAL));
+  const [targetInput, setTargetInput] = useState<string>(() => String(getInitialTargetGoal()));
 
   useEffect(() => {
     const loadCalculatorConfig = async () => {
@@ -119,6 +133,11 @@ export const useLeadList = (
         if (Number.isFinite(monthlyGoal) && monthlyGoal > 0) {
           setTargetGoal(monthlyGoal);
           setTargetInput(String(monthlyGoal));
+          if (typeof window !== 'undefined') {
+            try {
+              window.localStorage.setItem(CRM_LAST_TARGET_GOAL_STORAGE_KEY, String(monthlyGoal));
+            } catch {}
+          }
         }
       })
       .catch(() => {});
@@ -128,7 +147,11 @@ export const useLeadList = (
     setTargetGoal(value);
     setTargetInput(String(value));
     setEditingTarget(false);
-    if (!supabase) return;
+    if (typeof window !== 'undefined') {
+      try {
+        window.localStorage.setItem(CRM_LAST_TARGET_GOAL_STORAGE_KEY, String(value));
+      } catch {}
+    }
     await fetchWithTimeout('/api/crm/settings', {
       method: 'PUT',
       credentials: 'include',

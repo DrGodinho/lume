@@ -46,7 +46,7 @@ export interface UseLeadMutationsReturn {
   handleServiceStatusChange: (leadId: string, serviceStatus: ServiceStatus) => Promise<void>;
   handleCompleteService: (
     leadId: string,
-    expenses?: { custoAjudante?: number; outrasDespesas?: number; note?: string }
+    expenses?: { custoMaterial?: number; custoAjudante?: number; outrasDespesas?: number; note?: string }
   ) => Promise<void>;
   handleRescheduleService: (leadId: string, newDate: string) => Promise<void>;
   handleAgendaMarkDone: (leadId: string) => Promise<void>;
@@ -110,13 +110,15 @@ export const useLeadMutations = ({
       return false;
     }
 
+    const custoMaterial = leadForm.custoMaterial;
     const custoAjudante = leadForm.custoAjudante ?? 0;
     const outrasDespesas = leadForm.outrasDespesas ?? 0;
-    const mergedNotes = mergeExpensesIntoNotes(leadForm.notes || '', custoAjudante, outrasDespesas);
+    const mergedNotes = mergeExpensesIntoNotes(leadForm.notes || '', custoAjudante, outrasDespesas, undefined, custoMaterial);
 
     const normalizedForm = {
       ...leadForm,
       notes: mergedNotes,
+      custoMaterial,
       custoAjudante,
       outrasDespesas,
       phone: normalizeLeadPhoneInput(leadForm.phone),
@@ -126,8 +128,16 @@ export const useLeadMutations = ({
     let isCreate = false;
 
     if (selectedLead) {
-      const baseLead = normalizeLeadAmounts({ ...selectedLead, ...normalizedForm, updatedAt: new Date().toISOString() });
-      const updatedLead = selectedLead.status === baseLead.status
+      const hasService = Boolean(normalizedForm.dataServico);
+      const isScheduled = hasService || normalizedForm.status === 'Agendado';
+      const baseLead = normalizeLeadAmounts({
+        ...selectedLead,
+        ...normalizedForm,
+        ...(hasService ? { proximoContato: null } : {}),
+        ...(isScheduled ? { dormant: false } : {}),
+        updatedAt: new Date().toISOString(),
+      });
+      const updatedLead = selectedLead.status === baseLead.status || hasService
         ? baseLead
         : applyFollowUpPlaybook(baseLead, playbookRules, { overwriteExisting: true });
       upsertLeadInState(updatedLead);
@@ -140,13 +150,17 @@ export const useLeadMutations = ({
       resultLead = updatedLead;
     } else {
       isCreate = true;
+      const hasService = Boolean(normalizedForm.dataServico);
+      const isScheduled = hasService || normalizedForm.status === 'Agendado';
       const baseLead = normalizeLeadAmounts({
         id: `lead_${Date.now()}`,
         ...normalizedForm,
+        ...(hasService ? { proximoContato: null } : {}),
+        ...(isScheduled ? { dormant: false } : {}),
         createdAt: new Date().toISOString().split('T')[0],
         updatedAt: new Date().toISOString(),
       });
-      const newLead = applyFollowUpPlaybook(baseLead, playbookRules);
+      const newLead = hasService ? baseLead : applyFollowUpPlaybook(baseLead, playbookRules);
       upsertLeadInState(newLead);
       const synced = await syncLeadToCloud(newLead, 'POST');
       if (!synced) {
@@ -264,15 +278,16 @@ export const useLeadMutations = ({
 
   const handleCompleteService = useCallback(async (
     leadId: string,
-    expenses?: { custoAjudante?: number; outrasDespesas?: number; note?: string }
+    expenses?: { custoMaterial?: number; custoAjudante?: number; outrasDespesas?: number; note?: string }
   ) => {
     const today = new Date().toISOString().split('T')[0];
     const currentLead = leads.find((lead) => lead.id === leadId);
     const currentNotes = currentLead?.notes || '';
+    const custoMaterial = expenses?.custoMaterial ?? currentLead?.custoMaterial;
     const custoAjudante = expenses?.custoAjudante ?? currentLead?.custoAjudante ?? 0;
     const outrasDespesas = expenses?.outrasDespesas ?? currentLead?.outrasDespesas ?? 0;
     const updatedNotes = expenses
-      ? mergeExpensesIntoNotes(currentNotes, custoAjudante, outrasDespesas, expenses.note)
+      ? mergeExpensesIntoNotes(currentNotes, custoAjudante, outrasDespesas, expenses.note, custoMaterial)
       : currentNotes;
 
     const { synced } = await patchLeadStatusInfo(leadId, {
@@ -280,6 +295,7 @@ export const useLeadMutations = ({
       status: 'Fechado',
       statusChangedAt: today,
       notes: updatedNotes,
+      custoMaterial,
       custoAjudante,
       outrasDespesas,
       dormant: false,
@@ -297,6 +313,7 @@ export const useLeadMutations = ({
       serviceStatus: 'Reagendar',
       status: 'Agendado',
       dormant: false,
+      proximoContato: null,
     });
     if (synced) {
       toast.success(`Serviço reagendado com sucesso.`);

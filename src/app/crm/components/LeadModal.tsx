@@ -1,9 +1,11 @@
 'use client';
 
 import { format } from 'date-fns';
-import { AlertTriangle, Archive, Copy, FileText, X } from 'lucide-react';
+import { AlertTriangle, Archive, Calculator, Copy, ExternalLink, FileText, Layers, X } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import type { ZodIssue } from 'zod';
+import { getFilmCatalogItemFromLabel } from '../../../lib/films';
+import { roundCurrency } from '../../../lib/money';
 import { ConfirmDialog } from './ConfirmDialog';
 import { DateFieldWithPicker } from './DateFieldWithPicker';
 import { DiscardChangesDialog } from './DiscardChangesDialog';
@@ -71,6 +73,10 @@ export function LeadFormModal({
     () => findDuplicateLead(leads, leadForm.phone, leadForm.email, selectedLead?.id),
     [leads, leadForm.phone, leadForm.email, selectedLead?.id],
   );
+
+  const filmCatalogItem = useMemo(() => {
+    return leadForm.filmType ? getFilmCatalogItemFromLabel(leadForm.filmType) : null;
+  }, [leadForm.filmType]);
 
   const requestClose = useCallback(() => {
     if (isDirty) {
@@ -212,9 +218,25 @@ export function LeadFormModal({
                   </div>
                 </div>
               )}
-              <button type="button" onClick={onOpenHistory} className="mt-2 w-full text-xs font-semibold text-[#c9a227] hover:underline">
-                Ver todos os orçamentos no Histórico →
-              </button>
+              <div className="mt-3 flex items-center gap-2">
+                <a
+                  href={`/admin/?orcamentoId=${encodeURIComponent(linkedOrcamento.id)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#c9a227]/10 hover:bg-[#c9a227]/20 border border-[#c9a227]/30 py-2 text-xs font-bold uppercase tracking-wider text-[#c9a227] transition shadow-sm group"
+                >
+                  <Calculator className="h-3.5 w-3.5 text-[#c9a227]" />
+                  <span>Abrir na Calculadora</span>
+                  <ExternalLink className="h-3 w-3 opacity-60 group-hover:opacity-100 transition" />
+                </a>
+                <button
+                  type="button"
+                  onClick={onOpenHistory}
+                  className="rounded-xl border border-white/5 bg-white/[0.02] px-3 py-2 text-xs font-semibold text-white/60 hover:text-white hover:bg-white/5 transition"
+                >
+                  Histórico →
+                </button>
+              </div>
             </div>
           )}
 
@@ -426,14 +448,143 @@ export function LeadFormModal({
             </div>
           </div>
 
-          {/* Despesas da Instalação / Ajudante */}
+          {/* Despesas da Instalação / Película, Ajudante & Extras */}
           <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-3.5 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-bold uppercase tracking-widest text-[#f5d77a]">
-                Despesas da Instalação (Opcional)
+                Despesas & Custos do Serviço (Opcional)
               </span>
               <span className="text-[10px] text-white/40">Abatem do faturamento</span>
             </div>
+
+            {/* Custo com Película / Material */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-white/50">
+                  <Layers className="h-3 w-3 text-[#c9a227]" />
+                  Gasto com Película / Material (R$)
+                </label>
+                {leadForm.custoMaterial === 0 ? (
+                  <span className="text-[10px] font-bold text-emerald-400">🌿 Sobra (R$ 0,00)</span>
+                ) : typeof leadForm.custoMaterial === 'number' ? (
+                  <button
+                    type="button"
+                    onClick={() => setLeadForm({ ...leadForm, custoMaterial: undefined })}
+                    className="text-[10px] text-white/40 hover:text-white/70 underline"
+                  >
+                    Resetar estimativa
+                  </button>
+                ) : (
+                  <span className="text-[10px] text-white/30">Padrão: calculado por m²</span>
+                )}
+              </div>
+
+              {/* Botões de Atalho / Presets */}
+              <div className="mb-2 flex flex-wrap gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setLeadForm({ ...leadForm, custoMaterial: 0 })}
+                  className={`rounded-xl px-2.5 py-1 text-[11px] font-bold transition ${
+                    leadForm.custoMaterial === 0
+                      ? 'border border-emerald-500/60 bg-emerald-500/20 text-emerald-300 shadow-[0_0_8px_rgba(16,185,129,0.2)]'
+                      : 'border border-white/10 bg-white/[0.03] text-white/60 hover:border-emerald-500/30 hover:text-emerald-300'
+                  }`}
+                >
+                  🌿 Sobra (R$ 0)
+                </button>
+
+                {filmCatalogItem?.purchaseType === 'bloco_7_5m' && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setLeadForm({ ...leadForm, custoMaterial: filmCatalogItem.priceCost })}
+                      className={`rounded-xl px-2.5 py-1 text-[11px] font-bold transition ${
+                        leadForm.custoMaterial === filmCatalogItem.priceCost
+                          ? 'border border-[#c9a227]/60 bg-[#c9a227]/20 text-[#f5d77a]'
+                          : 'border border-white/10 bg-white/[0.03] text-white/60 hover:border-[#c9a227]/30 hover:text-[#f5d77a]'
+                      }`}
+                    >
+                      1/4 Rolo (R$ {filmCatalogItem.priceCost.toFixed(2).replace('.', ',')})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setLeadForm({ ...leadForm, custoMaterial: filmCatalogItem.priceCost * 2 })}
+                      className={`rounded-xl px-2.5 py-1 text-[11px] font-bold transition ${
+                        leadForm.custoMaterial === filmCatalogItem.priceCost * 2
+                          ? 'border border-[#c9a227]/60 bg-[#c9a227]/20 text-[#f5d77a]'
+                          : 'border border-white/10 bg-white/[0.03] text-white/60 hover:border-[#c9a227]/30 hover:text-[#f5d77a]'
+                      }`}
+                    >
+                      1/2 Rolo (R$ {(filmCatalogItem.priceCost * 2).toFixed(2).replace('.', ',')})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setLeadForm({ ...leadForm, custoMaterial: filmCatalogItem.priceCost * 4 })}
+                      className={`rounded-xl px-2.5 py-1 text-[11px] font-bold transition ${
+                        leadForm.custoMaterial === filmCatalogItem.priceCost * 4
+                          ? 'border border-[#c9a227]/60 bg-[#c9a227]/20 text-[#f5d77a]'
+                          : 'border border-white/10 bg-white/[0.03] text-white/60 hover:border-[#c9a227]/30 hover:text-[#f5d77a]'
+                      }`}
+                    >
+                      1 Rolo (R$ {(filmCatalogItem.priceCost * 4).toFixed(2).replace('.', ',')})
+                    </button>
+                  </>
+                )}
+
+                {filmCatalogItem?.purchaseType === 'metro' && (
+                  <>
+                    {leadForm.sqm > 0 && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setLeadForm({
+                            ...leadForm,
+                            custoMaterial: roundCurrency(((leadForm.sqm || 0) / 1.52) * filmCatalogItem.priceCost),
+                          })
+                        }
+                        className={`rounded-xl px-2.5 py-1 text-[11px] font-bold transition ${
+                          leadForm.custoMaterial ===
+                          roundCurrency(((leadForm.sqm || 0) / 1.52) * filmCatalogItem.priceCost)
+                            ? 'border border-[#c9a227]/60 bg-[#c9a227]/20 text-[#f5d77a]'
+                            : 'border border-white/10 bg-white/[0.03] text-white/60 hover:border-[#c9a227]/30 hover:text-[#f5d77a]'
+                        }`}
+                      >
+                        {leadForm.sqm}m² (R$ {roundCurrency(((leadForm.sqm || 0) / 1.52) * filmCatalogItem.priceCost).toFixed(2).replace('.', ',')})
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setLeadForm({ ...leadForm, custoMaterial: filmCatalogItem.priceCost })}
+                      className={`rounded-xl px-2.5 py-1 text-[11px] font-bold transition ${
+                        leadForm.custoMaterial === filmCatalogItem.priceCost
+                          ? 'border border-[#c9a227]/60 bg-[#c9a227]/20 text-[#f5d77a]'
+                          : 'border border-white/10 bg-white/[0.03] text-white/60 hover:border-[#c9a227]/30 hover:text-[#f5d77a]'
+                      }`}
+                    >
+                      1 Metro (R$ {filmCatalogItem.priceCost.toFixed(2).replace('.', ',')})
+                    </button>
+                  </>
+                )}
+              </div>
+
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                inputMode="decimal"
+                placeholder="0,00 (ou selecione acima)"
+                value={typeof leadForm.custoMaterial === 'number' ? leadForm.custoMaterial : ''}
+                onChange={(event) => {
+                  const val = event.target.value.trim();
+                  setLeadForm({
+                    ...leadForm,
+                    custoMaterial: val === '' ? undefined : Math.max(0, parseFloat(val) || 0),
+                  });
+                }}
+                className="w-full rounded-2xl border border-white/5 bg-[#04080f] px-4 py-2.5 text-sm text-white placeholder:text-white/20 focus:border-[#c9a227]/40 focus:outline-none"
+              />
+            </div>
+
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
                 <label className="mb-1 block text-[10px] font-semibold uppercase tracking-widest text-white/50">
@@ -476,6 +627,34 @@ export function LeadFormModal({
                 />
               </div>
             </div>
+
+            {/* Resumo Dinâmico de Despesas e Lucro */}
+            {(typeof leadForm.custoMaterial === 'number' || leadForm.custoAjudante || leadForm.outrasDespesas) && (
+              <div className="flex items-center justify-between border-t border-white/5 pt-2 text-[11px]">
+                <span className="text-white/40">
+                  Total Despesas: R${' '}
+                  {(
+                    (leadForm.custoMaterial || 0) +
+                    (leadForm.custoAjudante || 0) +
+                    (leadForm.outrasDespesas || 0)
+                  )
+                    .toFixed(2)
+                    .replace('.', ',')}
+                </span>
+                <span className="font-bold text-emerald-400">
+                  Lucro Est.: R${' '}
+                  {Math.max(
+                    0,
+                    (leadForm.value || 0) -
+                      ((leadForm.custoMaterial || 0) +
+                        (leadForm.custoAjudante || 0) +
+                        (leadForm.outrasDespesas || 0))
+                  )
+                    .toFixed(2)
+                    .replace('.', ',')}
+                </span>
+              </div>
+            )}
           </div>
 
           <div>
@@ -651,6 +830,43 @@ export function LeadDetailModal({
           </div>
         </div>
 
+        {(typeof leadDetail.custoMaterial === 'number' || (leadDetail.custoAjudante || 0) > 0 || (leadDetail.outrasDespesas || 0) > 0) && (
+          <div className="mt-3 rounded-xl border border-white/5 bg-white/[0.02] p-3">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#f5d77a]">
+                Custos e Despesas do Serviço
+              </span>
+              <span className="text-[10px] text-emerald-400 font-bold">
+                Lucro Líquido: R$ {formatCurrency(Math.max(0, leadDetail.value - ((leadDetail.custoMaterial || 0) + (leadDetail.custoAjudante || 0) + (leadDetail.outrasDespesas || 0))))}
+              </span>
+            </div>
+            <div className="grid grid-cols-3 gap-2 text-xs">
+              <div>
+                <span className="block text-[9px] uppercase tracking-wider text-white/40">Película</span>
+                <span className="font-semibold text-white">
+                  {typeof leadDetail.custoMaterial === 'number'
+                    ? leadDetail.custoMaterial === 0
+                      ? 'R$ 0,00 (Sobra)'
+                      : `R$ ${formatCurrency(leadDetail.custoMaterial)}`
+                    : 'Estimado m²'}
+                </span>
+              </div>
+              <div>
+                <span className="block text-[9px] uppercase tracking-wider text-white/40">Ajudante</span>
+                <span className="font-semibold text-white">
+                  {leadDetail.custoAjudante ? `R$ ${formatCurrency(leadDetail.custoAjudante)}` : 'R$ 0,00'}
+                </span>
+              </div>
+              <div>
+                <span className="block text-[9px] uppercase tracking-wider text-white/40">Extras</span>
+                <span className="font-semibold text-white">
+                  {leadDetail.outrasDespesas ? `R$ ${formatCurrency(leadDetail.outrasDespesas)}` : 'R$ 0,00'}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
         {linkedOrcamento && (
           <div className="mt-3 rounded-xl border border-[#c9a227]/20 bg-[#c9a227]/5 p-3">
             <div className="mb-2 flex items-center justify-between">
@@ -700,13 +916,25 @@ export function LeadDetailModal({
                 </div>
               )}
             </div>
-            <button
-              type="button"
-              onClick={onOpenHistory}
-              className="mt-2 w-full text-[11px] font-semibold text-[#c9a227] hover:underline"
-            >
-              Ver histórico completo →
-            </button>
+            <div className="mt-3 flex items-center gap-2">
+              <a
+                href={`/admin/?orcamentoId=${encodeURIComponent(linkedOrcamento.id)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#c9a227]/10 hover:bg-[#c9a227]/20 border border-[#c9a227]/30 py-2 text-xs font-bold uppercase tracking-wider text-[#c9a227] transition shadow-sm group"
+              >
+                <Calculator className="h-3.5 w-3.5 text-[#c9a227]" />
+                <span>Abrir na Calculadora</span>
+                <ExternalLink className="h-3 w-3 opacity-60 group-hover:opacity-100 transition" />
+              </a>
+              <button
+                type="button"
+                onClick={onOpenHistory}
+                className="rounded-xl border border-white/5 bg-white/[0.02] px-3 py-2 text-xs font-semibold text-white/60 hover:text-white hover:bg-white/5 transition"
+              >
+                Histórico →
+              </button>
+            </div>
           </div>
         )}
 

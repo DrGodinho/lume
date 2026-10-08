@@ -57,7 +57,10 @@ export function useAgendaLists({
   const fimGradeMes = endOfWeek(endOfMonth(mesVisivel), { weekStartsOn: 1 });
   const diasMes = eachDayOfInterval({ start: inicioGradeMes, end: fimGradeMes });
   const leadsAtivos = useMemo(() => leads.filter((lead) => !isClosedLead(lead.status)), [isClosedLead, leads]);
-  const leadsComRetorno = useMemo(() => leadsAtivos.filter((lead) => !!lead.proximoContato), [leadsAtivos]);
+  const leadsComRetorno = useMemo(
+    () => leadsAtivos.filter((lead) => !!lead.proximoContato && !lead.dataServico && lead.status !== 'Agendado'),
+    [leadsAtivos]
+  );
   const leadsComServico = useMemo(() => leadsAtivos.filter((lead) => !!lead.dataServico), [leadsAtivos]);
 
   const leadsCincoAnos = useMemo(() => {
@@ -71,6 +74,7 @@ export function useAgendaLists({
 
   const contactarHoje = useMemo(() => {
     return leadsAtivos.filter((lead) => {
+      if (lead.dataServico || lead.status === 'Agendado') return false;
       const followUpDate = getLeadFollowUpDate(lead);
       if (!followUpDate) return false;
       if (diaSelecionado) {
@@ -85,6 +89,7 @@ export function useAgendaLists({
 
   const proximos7Dias = useMemo(() => {
     return leadsAtivos.filter((lead) => {
+      if (lead.dataServico || lead.status === 'Agendado') return false;
       const followUpDate = getLeadFollowUpDate(lead);
       if (!followUpDate) return false;
 
@@ -102,7 +107,7 @@ export function useAgendaLists({
   const parados = useMemo(() => {
     return leadsAtivos.filter((lead) => {
       if (lead.dormant) return false;
-      if (lead.proximoContato || lead.dataServico) return false;
+      if (lead.proximoContato || lead.dataServico || lead.status === 'Agendado') return false;
       const activityDate = getLeadActivityDate(lead);
       if (!activityDate) return false;
       return differenceInDays(hoje, activityDate) >= 3;
@@ -111,7 +116,7 @@ export function useAgendaLists({
 
   const dormentes = useMemo(() => {
     return leadsAtivos
-      .filter((lead) => lead.dormant)
+      .filter((lead) => lead.dormant && !lead.dataServico && lead.status !== 'Agendado')
       .sort((a, b) => {
         const aDate = getLeadActivityDate(a)?.getTime() || 0;
         const bDate = getLeadActivityDate(b)?.getTime() || 0;
@@ -217,6 +222,7 @@ export function useAgendaLists({
   const monthlyFollowUps = useMemo(() => {
     return leadsAtivos
       .filter((lead) => {
+        if (lead.dataServico || lead.status === 'Agendado') return false;
         const followUpDate = getLeadFollowUpDate(lead);
         if (!followUpDate || !isSameMonth(followUpDate, mesVisivel)) return false;
         return diaSelecionado ? isSameDay(followUpDate, diaSelecionado) : true;
@@ -246,7 +252,8 @@ export function useAgendaLists({
     const uniqueIds = new Set(
       leadsAtivos
         .filter((lead) => {
-          const followUpDate = getLeadFollowUpDate(lead);
+          const isScheduled = !!lead.dataServico || lead.status === 'Agendado';
+          const followUpDate = isScheduled ? null : getLeadFollowUpDate(lead);
           const serviceDate = getLeadServiceDate(lead);
           return (followUpDate && isSameMonth(followUpDate, mesVisivel)) || (serviceDate && isSameMonth(serviceDate, mesVisivel));
         })

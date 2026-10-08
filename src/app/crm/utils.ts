@@ -45,6 +45,7 @@ export const mapLeadRow = (row: LeadRow): Lead => {
     pinned: typeof row.pinned === 'boolean' ? row.pinned : false,
     updatedAt: asString(row.updated_at, asString(row.status_changed_at, asString(row.created_at, new Date().toISOString()))),
     deletedAt: asNullableString(row.deleted_at),
+    custoMaterial: typeof row.custo_material === 'number' ? row.custo_material : expenses.custoMaterial,
     custoAjudante: typeof row.custo_ajudante === 'number' ? row.custo_ajudante : expenses.custoAjudante,
     outrasDespesas: typeof row.outras_despesas === 'number' ? row.outras_despesas : expenses.outrasDespesas,
   };
@@ -60,6 +61,7 @@ export const normalizeLeadAmounts = (lead: Lead): Lead => {
     serviceStatus: normalizeServiceStatus(lead.serviceStatus) || (lead.dataServico ? 'Marcado' : null),
     dormant: Boolean(lead.dormant),
     pinned: Boolean(lead.pinned),
+    custoMaterial: lead.custoMaterial ?? expenses.custoMaterial,
     custoAjudante: lead.custoAjudante ?? expenses.custoAjudante,
     outrasDespesas: lead.outrasDespesas ?? expenses.outrasDespesas,
   };
@@ -130,6 +132,9 @@ const getLeadComparisonSnapshot = (lead: Lead) => {
     serviceStatus: normalized.serviceStatus ?? null,
     dormant: normalized.dormant,
     pinned: normalized.pinned,
+    custoMaterial: normalized.custoMaterial ?? null,
+    custoAjudante: normalized.custoAjudante ?? null,
+    outrasDespesas: normalized.outrasDespesas ?? null,
     notes: normalized.notes,
     updatedAt: normalized.updatedAt ?? null,
     createdAt: normalized.createdAt,

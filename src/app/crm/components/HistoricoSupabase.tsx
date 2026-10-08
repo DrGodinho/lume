@@ -2,6 +2,7 @@
 
 import { fetchWithTimeout } from '@/lib/fetchWithTimeout';
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Calculator, ExternalLink } from 'lucide-react';
 import { roundCurrency, roundMeasure } from '@/lib/numberPrecision';
 import { useCrm } from '../context/CrmContext';
 import { getHistoryFilmLabel } from '../utils';
@@ -413,7 +414,17 @@ export function HistoricoSupabase(props: HistoricoSupabaseProps = {}) {
                           {item.created_at ? new Date(item.created_at).toLocaleDateString('pt-BR') : '—'}
                         </td>
                         <td className="py-3.5 text-right">
-                          <div className="flex justify-end gap-3">
+                          <div className="flex justify-end items-center gap-3">
+                            <a
+                              href={`/admin/?orcamentoId=${encodeURIComponent(item.id)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(event) => event.stopPropagation()}
+                              className="text-[#c9a227]/70 hover:text-[#c9a227] transition"
+                              title="Abrir na Calculadora (nova aba)"
+                            >
+                              <Calculator className="h-4 w-4" />
+                            </a>
                             <button type="button" onClick={(event) => {
                               event.stopPropagation();
                               setSelectedOrcamento(item);
@@ -567,24 +578,37 @@ export function HistoricoSupabase(props: HistoricoSupabaseProps = {}) {
               </div>
             )}
 
-            <div className="mt-4 flex gap-3 border-t border-white/5 pt-3">
-              <button onClick={() => setSelectedOrcamento(null)} className="flex-1 rounded-xl border border-white/5 bg-white/[0.01] py-2.5 text-sm font-semibold text-white/60 transition hover:bg-white/5">
-                Fechar
-              </button>
-<button
-  onClick={() => {
-    const orc = selectedOrcamento;
-    setSelectedOrcamento(null);
-    // Use setTimeout to ensure modal closing is processed before opening lead creation modal
-    setTimeout(() => {
-      convertToLead(orc);
-    }, 0);
-  }}
-  disabled={!!selectedOrcamento.lead_id}
-  className="flex-1 rounded-xl bg-gradient-to-r from-[#c9a227] to-[#d4ad30] py-2.5 text-sm font-bold text-[#04080f] shadow-lg shadow-[#c9a227]/10 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
->
-  {selectedOrcamento.lead_id ? 'Lead já vinculado' : 'Converter em Lead'}
-</button>
+            <div className="mt-4 flex flex-col gap-2.5 border-t border-white/5 pt-3">
+              <a
+                href={`/admin/?orcamentoId=${encodeURIComponent(selectedOrcamento.id)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#c9a227]/10 hover:bg-[#c9a227]/20 border border-[#c9a227]/30 py-2.5 text-xs font-bold uppercase tracking-wider text-[#c9a227] transition shadow-sm group"
+              >
+                <Calculator className="h-4 w-4 text-[#c9a227]" />
+                <span>Abrir na Calculadora</span>
+                <ExternalLink className="h-3.5 w-3.5 opacity-60 group-hover:opacity-100 transition" />
+              </a>
+
+              <div className="flex gap-3">
+                <button onClick={() => setSelectedOrcamento(null)} className="flex-1 rounded-xl border border-white/5 bg-white/[0.01] py-2.5 text-sm font-semibold text-white/60 transition hover:bg-white/5">
+                  Fechar
+                </button>
+                <button
+                  onClick={() => {
+                    const orc = selectedOrcamento;
+                    setSelectedOrcamento(null);
+                    // Use setTimeout to ensure modal closing is processed before opening lead creation modal
+                    setTimeout(() => {
+                      convertToLead(orc);
+                    }, 0);
+                  }}
+                  disabled={!!selectedOrcamento.lead_id}
+                  className="flex-1 rounded-xl bg-gradient-to-r from-[#c9a227] to-[#d4ad30] py-2.5 text-sm font-bold text-[#04080f] shadow-lg shadow-[#c9a227]/10 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {selectedOrcamento.lead_id ? 'Lead já vinculado' : 'Converter em Lead'}
+                </button>
+              </div>
             </div>
           </div>
         </div>
