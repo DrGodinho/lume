@@ -129,7 +129,7 @@ export function NanoCeramicaPage() {
                             </span>
                             <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
                         </div>
-                        <h2 className="animate-item text-3xl font-bold font-montserrat mb-8 text-white">Por que a Nano Cerâmica é a melhor escolha para a Zona Oeste?</h2>
+                        <h2 className="animate-item text-3xl font-bold font-montserrat mb-8 text-white">Por que a Nano Cerâmica é a melhor escolha para o Rio de Janeiro?</h2>
                         <p className="animate-item text-gray-400 leading-relaxed mb-6 text-lg">
                             Morar no Rio de Janeiro, especialmente em bairros como <strong>Bangu, Campo Grande, Barra e Recreio</strong>, significa enfrentar temperaturas extremas em grande parte do ano. O insulfilm residencial comum não é mais suficiente. Se você tem uma varanda gourmet, uma sala com amplos vidros ou uma fachada moderna, encontrar uma película que neutralize o calor sem transformar sua casa em uma "caverna escura" sempre foi um desafio.
                         </p>
@@ -312,7 +312,7 @@ export function NanoCeramicaPage() {
                             },
                             {
                                 q: "É possível economizar luz na conta usando película térmica?",
-                                a: "Absolutamente. Com uma altíssima rejeição de calor por infravermelho, o ambiente interno da sua residência ou empresa esfria muito mais rápido mantendo a climatização estável, reduzindo drasticamente o esforço e o tempo de ativação do compressor do seu ar-condicionado. Em locais muito intensos de calor como em Bangu e toda a Zona Oeste, nossos clientes relatam incríveis economias e maior conforto."
+                                a: "Absolutamente. Com uma altíssima rejeição de calor por infravermelho, o ambiente interno da sua residência ou empresa esfria muito mais rápido mantendo a climatização estável, reduzindo drasticamente o esforço e o tempo de ativação do compressor do seu ar-condicionado. Em todo o Rio de Janeiro, com o calor intenso e forte insolação, nossos clientes relatam incríveis economias e maior conforto."
                             }
                         ].map((faq, idx) => (
                             <details key={idx} className="animate-item group glass-card border flex-col rounded-xl overflow-hidden cursor-pointer">

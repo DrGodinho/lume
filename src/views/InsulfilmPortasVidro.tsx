@@ -311,7 +311,7 @@ export function InsulfilmPortasVidro() {
               </a>
             </div>
             <div className="animate-hero opacity-0 mt-8 grid gap-3 sm:mt-10 sm:grid-cols-2 lg:grid-cols-4">
-              {['Garantia de até 10 anos', 'Zona Oeste do Rio', 'Instalação limpa', 'Orçamento gratuito'].map((item) => (
+              {['Garantia de até 10 anos', 'Todo o Rio de Janeiro', 'Instalação limpa', 'Orçamento gratuito'].map((item) => (
                 <div key={item} className="flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-3 text-xs text-gray-200 backdrop-blur sm:justify-start sm:px-4 sm:text-sm">
                   <CheckCircle size={16} className="shrink-0 text-[#c9a227]" />
                   {item}
@@ -545,7 +545,7 @@ export function InsulfilmPortasVidro() {
               '8 anos de experiência',
               'Mais de 500 residências atendidas',
               'Garantia de até 10 anos',
-              'Atendimento na Zona Oeste',
+              'Atendimento em todo o Rio de Janeiro',
               'Orçamento gratuito',
               'Instalação limpa e cuidadosa',
             ].map((item) => (
@@ -562,11 +562,11 @@ export function InsulfilmPortasVidro() {
         <div className="container-lume">
           <SectionHeader
             eyebrow="Regiões atendidas"
-            title="Instalação de insulfilm para portas de vidro na Zona Oeste do Rio"
+            title="Instalação de insulfilm para portas de vidro no Rio de Janeiro"
             text="Atendemos residências, apartamentos, lojas, escritórios e comércios em diversos bairros do Rio de Janeiro."
           />
           <div className="mx-auto flex max-w-5xl flex-wrap justify-center gap-3 page-entrance">
-            {['Bangu', 'Campo Grande', 'Realengo', 'Padre Miguel', 'Sulacap', 'Jacarepaguá', 'Barra da Tijuca', 'Recreio', 'Vargem Grande', 'Vargem Pequena', 'Guaratiba', 'Santa Cruz', 'Regiões próximas'].map((area) => (
+            {['Santo Cristo', 'Porto Maravilha', 'Centro', 'Barra da Tijuca', 'Recreio', 'Jacarepaguá', 'Campo Grande', 'Bangu', 'Realengo', 'Padre Miguel', 'Sulacap', 'Regiões próximas'].map((area) => (
               <span key={area} className="animated-card inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.035] px-4 py-3 text-sm font-semibold text-gray-300 transition hover:-translate-y-1 hover:border-[#c9a227]/40">
                 <MapPin size={16} className="text-[#c9a227]" />
                 {area}

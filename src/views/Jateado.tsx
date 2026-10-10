@@ -132,7 +132,7 @@ export function JateadoPage() {
                             </div>
                             <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-8 text-white">Privacidade Sem Escuridão</h2>
                             <p className="text-gray-400 leading-relaxed mb-6 text-lg">
-                                Diferente das linhas térmicas (como G5 ou Refletivo Prata) cujo principal alvo é espancar o sol da Zona Oeste do Rio, a Linha <strong>Jateada</strong> atua no conforto ocular interno, na arquitetura e na privacidade direcional.
+                                Diferente das linhas térmicas (como G5 ou Refletivo Prata) cujo principal alvo é espancar o sol forte do Rio de Janeiro, a Linha <strong>Jateada</strong> atua no conforto ocular interno, na arquitetura e na privacidade direcional.
                             </p>
                             <p className="text-gray-400 leading-relaxed text-lg">
                                 Ela foi aclamada mundialmente por um motivo simples: <strong>ninguém consegue ver através dela (nem de dia, nem de noite)</strong>, contudo, a luz do sol cruza o material facilmente iluminando toda sua casa ou escritório de forma difusa e macia, sem sombras e sem escurecer a sala. É o adeus definitivo às persianas barulhentas acumuladoras de poeira e cortinas pesadas.

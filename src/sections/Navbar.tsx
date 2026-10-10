@@ -1,14 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, MessageCircle } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 
 const navLinks = [
   { name: 'Produtos', href: '#produtos' },
+  { name: 'Simulador', href: '/simulador' },
   { name: 'Portas de Vidro', href: '/insulfilm-para-portas-de-vidro' },
+  { name: 'Guia', href: '/guia-insulfilm' },
   { name: 'Blog', href: '/blog' },
-  { name: 'Beneficios', href: '#beneficios' },
   { name: 'Contato', href: '#contato' },
 ];
 
@@ -51,7 +52,7 @@ export function Navbar() {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled ? 'glass-effect border-b border-[#c9a227]/20' : 'bg-transparent'
+        isScrolled ? 'glass-effect border-b border-[#c9a227]/20 bg-[#04080f]/90 backdrop-blur-md' : 'bg-transparent'
       }`}
     >
       <div className="container-lume">
@@ -61,13 +62,13 @@ export function Navbar() {
               LU<span className="text-gradient-gold">ME</span>
             </span>
             <span className="hidden sm:block text-xs text-gray-400 uppercase tracking-widest border-l border-gray-600 pl-2">
-              Peliculas de
+              Películas de
               <br />
               Controle Solar
             </span>
           </a>
 
-          <div className="hidden lg:flex items-center gap-8">
+          <div className="hidden lg:flex items-center gap-7">
             {navLinks.map((link) => (
               link.href.startsWith('#') ? (
                 <a
@@ -95,12 +96,15 @@ export function Navbar() {
             ))}
           </div>
 
-          <div className="hidden lg:flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-3">
             <a
-              href="/calculadora-economia-energia-insulfilm/"
-              className="btn-secondary flex items-center gap-2 text-xs py-2 px-4 transition-transform hover:scale-105 active:scale-95"
+              href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20solicitar%20um%20or%C3%A7amento%20de%20insulfilm."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary flex items-center gap-2 text-xs py-2.5 px-5 transition-transform hover:scale-105 active:scale-95 shadow-[0_4px_15px_rgba(201,162,39,0.25)]"
             >
-              Economia de Energia
+              <MessageCircle size={15} />
+              Pedir Orçamento
             </a>
           </div>
 
@@ -114,13 +118,14 @@ export function Navbar() {
         </div>
       </div>
 
+      {/* Mobile Menu */}
       <div
-        className={`lg:hidden absolute top-full left-0 right-0 glass-effect border-b border-[#c9a227]/20 transition-all duration-300 ${
-          isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+        className={`lg:hidden absolute top-full left-0 right-0 glass-effect border-b border-[#c9a227]/20 bg-[#04080f]/95 backdrop-blur-xl transition-all duration-300 ${
+          isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
         }`}
       >
         <div className="container-lume py-6">
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3">
             {navLinks.map((link) => (
               link.href.startsWith('#') ? (
                 <a
@@ -130,7 +135,7 @@ export function Navbar() {
                     e.preventDefault();
                     handleNavClick(link.href);
                   }}
-                  className="text-left text-lg font-medium text-gray-300 hover:text-[#c9a227] transition-colors py-2"
+                  className="text-left text-base font-medium text-gray-300 hover:text-[#c9a227] transition-colors py-2 border-b border-white/5"
                 >
                   {link.name}
                 </a>
@@ -139,18 +144,21 @@ export function Navbar() {
                   key={link.name}
                   href={link.href + (link.href === '/' ? '' : '/')}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-lg font-medium text-gray-300 hover:text-[#c9a227] transition-colors py-2"
+                  className="text-base font-medium text-gray-300 hover:text-[#c9a227] transition-colors py-2 border-b border-white/5"
                 >
                   {link.name}
                 </a>
               )
             ))}
             <a
-              href="/calculadora-economia-energia-insulfilm/"
-              className="btn-secondary flex items-center justify-center gap-2 mt-2"
+              href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20solicitar%20um%20or%C3%A7amento%20de%20insulfilm."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary flex items-center justify-center gap-2 mt-4 py-3 text-sm"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Economia de Energia
+              <MessageCircle size={18} />
+              Pedir Orçamento no WhatsApp
             </a>
           </div>
         </div>

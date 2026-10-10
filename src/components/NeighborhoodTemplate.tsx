@@ -270,7 +270,7 @@ export function NeighborhoodTemplate({ data }: Props) {
             <div className="page-entrance order-1 lg:order-2">
               <h3 className="text-2xl font-bold text-[#c9a227] mb-6 uppercase tracking-widest">Onde estamos</h3>
               <p className="text-gray-400 mb-8 leading-relaxed">
-                Além de {data.neighborName}, a LUME Controle Solar possui unidades volantes que atendem toda a Zona Oeste e Zona Sul do Rio de Janeiro.
+                Além de {data.neighborName}, a LUME Controle Solar possui unidades volantes que atendem todo o Rio de Janeiro com medição técnica e instalação ágil.
               </p>
               <div className="space-y-6">
                 {[

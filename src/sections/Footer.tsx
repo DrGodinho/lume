@@ -8,9 +8,10 @@ const quickLinks = [
   { name: 'Início', href: '/' },
   { name: 'Produtos', href: '#produtos' },
   { name: 'Blog', href: '/blog' },
-  { name: 'Benefícios', href: '#beneficios' },
-  { name: 'Guia: Tudo sobre Insulfilm', href: '/guia-insulfilm' },
+  { name: 'Guia de Insulfilm', href: '/guia-insulfilm' },
   { name: 'Simulador Online', href: '/simulador' },
+  { name: 'Calculadora de Economia', href: '/calculadora-economia-energia-insulfilm' },
+  { name: 'Portas de Vidro', href: '/insulfilm-para-portas-de-vidro' },
   { name: 'Contato', href: '#contato' },
 ];
 
@@ -20,6 +21,8 @@ const products = [
   { name: 'Dupla Camada', href: '/dupla-camada' },
   { name: 'Refletiva Clássica', href: '/refletiva' },
   { name: 'Linha Jateada', href: '/jateado' },
+  { name: 'Insulfilm para Sala', href: '/insulfilm-na-sala' },
+  { name: 'Insulfilm para Quarto', href: '/insulfilm-no-quarto' },
 ];
 
 const contactInfo = [
@@ -47,9 +50,7 @@ export function Footer() {
   };
 
   return (
-    <footer
-      className="relative bg-[#04080f] pt-12 pb-6 overflow-hidden"
-    >
+    <footer className="relative bg-[#04080f] pt-12 pb-6 overflow-hidden">
       {/* Grid pattern overlay */}
       <div
         className="absolute inset-0 opacity-30"
@@ -63,9 +64,7 @@ export function Footer() {
       />
 
       <div className="container-lume relative z-10">
-        <div
-          className="grid grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-8 sm:gap-10 mb-10 sm:mb-16"
-        >
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-8 sm:gap-10 mb-10 sm:mb-16">
           {/* Column 1: Logo & About */}
           <div className="footer-col col-span-2 lg:col-span-1">
             <a href="/" className="inline-block mb-3 sm:mb-4">
@@ -77,8 +76,7 @@ export function Footer() {
               Películas de Controle Solar
             </p>
             <p className="text-gray-400 text-xs sm:text-sm leading-relaxed mb-4 sm:mb-6">
-              Especialistas em insulfilm residencial na Zona Oeste do Rio.
-              8 anos de experiência, garantia de até 10 anos.
+              Especialistas em películas de alta tecnologia no Rio de Janeiro. 8 anos de experiência e garantia de até 10 anos. Atendimento expresso com medição gratuita em todo o Rio de Janeiro (Porto Maravilha, Centro, Barra e Zona Oeste).
             </p>
             {/* Social Links */}
             <div className="flex gap-2 sm:gap-3">
@@ -146,7 +144,7 @@ export function Footer() {
           {/* Column 3: Products */}
           <div className="footer-col col-span-1">
             <h4 className="text-white font-semibold mb-4 sm:mb-6 text-sm sm:text-base font-montserrat">
-              Nossos Produtos
+              Películas & Soluções
             </h4>
             <ul className="space-y-2 sm:space-y-3">
               {products.map((product) => (
@@ -190,20 +188,26 @@ export function Footer() {
 
           {/* SEO Neighborhood Links */}
           <div className="text-gray-600 text-[10px] sm:text-xs text-center md:text-right max-w-2xl">
-            <p className="mb-2 uppercase tracking-widest text-[9px] text-gray-500">Regiões Atendidas na Zona Oeste:</p>
+            <p className="mb-2 uppercase tracking-widest text-[9px] text-gray-500">Regiões Atendidas no Rio de Janeiro:</p>
             <div className="flex flex-wrap justify-center md:justify-end gap-x-3 gap-y-1">
               {[
-                { name: 'Bangu', href: '/insulfilm-em-bangu' },
-                { name: 'Campo Grande', href: '/insulfilm-em-campo-grande' },
-                { name: 'Realengo', href: '/insulfilm-em-realengo' },
+                { name: 'Santo Cristo (Porto Maravilha)', href: '/insulfilm-em-santo-cristo', highlight: true },
                 { name: 'Barra da Tijuca', href: '/insulfilm-na-barra-da-tijuca' },
                 { name: 'Recreio', href: '/insulfilm-no-recreio' },
-                { name: 'Jacarepaguá', href: '/insulfilm-em-jacarepagua' }
+                { name: 'Jacarepaguá', href: '/insulfilm-em-jacarepagua' },
+                { name: 'Campo Grande', href: '/insulfilm-em-campo-grande' },
+                { name: 'Bangu', href: '/insulfilm-em-bangu' },
+                { name: 'Realengo', href: '/insulfilm-em-realengo' },
+                { name: 'Sulacap', href: '/insulfilm-em-sulacap' },
               ].map((loc, i) => (
                 <a 
                   key={i} 
                   href={loc.href + '/'} 
-                  className="hover:text-[#c9a227] transition-colors duration-300 underline underline-offset-4 decoration-white/5 hover:decoration-[#c9a227]/50"
+                  className={`transition-colors duration-300 underline underline-offset-4 ${
+                    loc.highlight 
+                      ? 'text-[#c9a227] font-semibold decoration-[#c9a227]/50 hover:text-white' 
+                      : 'hover:text-[#c9a227] decoration-white/5 hover:decoration-[#c9a227]/50'
+                  }`}
                 >
                   {loc.name}
                 </a>

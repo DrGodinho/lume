@@ -125,7 +125,7 @@ export function DuplaCamadaPage() {
                             </span>
                             <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
                         </div>
-                        <h2 className="animate-item text-3xl lg:text-4xl font-bold font-montserrat mb-8 text-white">O Fim da Conta de Luz nas Alturas na Zona Oeste</h2>
+                        <h2 className="animate-item text-3xl lg:text-4xl font-bold font-montserrat mb-8 text-white">O Fim da Conta de Luz nas Alturas no Rio de Janeiro</h2>
                         <p className="animate-item text-gray-400 leading-relaxed mb-6 text-lg">
                             Se você mora ou possui comércio em <strong>Bangu, Campo Grande, Realengo ou adjacências</strong>, sabe que as temperaturas de verão não são uma mera inconveniência; elas são um dreno financeiro maciço na sua conta de energia por causa dos aparelhos de Ar Condicionado ligados no 16ºC, operando em pico durante o dia todo.
                         </p>

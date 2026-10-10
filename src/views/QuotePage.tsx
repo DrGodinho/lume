@@ -204,7 +204,7 @@ export function QuotePage() {
                                     type="text"
                                     value={bairro}
                                     onChange={(e) => setBairro(e.target.value)}
-                                    placeholder="Ex: Bangu, Zona Oeste"
+                                    placeholder="Ex: Santo Cristo, Barra, Bangu, Centro..."
                                     className="w-full bg-[#04080f] border border-white/10 rounded-xl pl-11 pr-4 py-3.5 focus:border-[#c9a227] focus:ring-1 focus:ring-[#c9a227] transition-all outline-none"
                                 />
                             </div>

@@ -40,7 +40,7 @@ const ContactCTA = dynamic(
 export const metadata: Metadata = {
   title: 'LUME Controle Solar | Insulfilm Residencial e Comercial no Rio de Janeiro',
   description:
-    'Insulfilm residencial e comercial no RJ com redução de calor, proteção UV e privacidade 24h com jateado. Bangu, Barra, Recreio e Zona Oeste.',
+    'Insulfilm residencial e comercial no RJ com redução de calor, proteção UV e privacidade 24h com jateado. Atendimento em todo o Rio de Janeiro: Porto Maravilha, Centro, Barra e Zona Oeste.',
   keywords: [
     'insulfilm residencial rj',
     'insulfilm comercial rj',

@@ -98,7 +98,7 @@ const quickAnswers = [
   {
     question: 'Quais bairros a LUME atende?',
     answer:
-      'Atendemos Bangu, Realengo, Campo Grande, Jacarepaguá, Barra da Tijuca, Recreio, Sulacap e outras regiões da Zona Oeste do Rio de Janeiro.',
+      'Atendemos Santo Cristo, Porto Maravilha, Centro, Barra da Tijuca, Recreio, Jacarepaguá, Campo Grande, Bangu, Realengo, Sulacap e todo o Rio de Janeiro com medição técnica gratuita.',
   },
 ];
 

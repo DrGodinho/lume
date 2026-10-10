@@ -133,7 +133,7 @@ export const neighborhoods: Record<string, NeighborhoodData> = {
     heroSubtitle: 'Conforto e sofisticação para apartamentos e casas em Jacarepaguá. Atendimento especializado na Freguesia, Taquara, Anil e toda a região.',
     neighborName: 'Jacarepaguá',
     metaTitle: 'Insulfilm em Jacarepaguá | Residenciais e Comerciais - LUME',
-    metaDescription: 'Aplicação de insulfilm em Jacarepaguá, Freguesia e Taquara. Películas de alta performance para controle solar e privacidade. Atendimento profissional na Zona Oeste.',
+    metaDescription: 'Aplicação de insulfilm em Jacarepaguá, Freguesia e Taquara. Películas de alta performance para controle solar e privacidade. Atendimento profissional no Rio de Janeiro.',
     canonical: 'https://lumecontrolesolar.com.br/insulfilm-em-jacarepagua',
     whatsappMessage: 'Olá! Quero um orçamento de insulfilm em Jacarepaguá.',
     heroButtonText: 'Pedir Orçamento Agora',

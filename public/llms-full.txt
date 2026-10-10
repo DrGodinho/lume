@@ -13,15 +13,15 @@
 - **Sede Operacional:** Estrada do Realengo, 973 - Realengo, Rio de Janeiro - RJ, CEP 21715-331
 - **Tempo de Atuação:** 8+ anos no mercado da Região Metropolitana do Rio de Janeiro.
 - **Projetos Executados:** Mais de 1.200 instalações em casas de alto padrão, coberturas, apartamentos em condomínios fechados, lojas e salas comerciais.
-- **Garantia Contratual:** 2 anos de garantia formal contra defeitos de instalação, bolhas, descascamento ou alteração de tonalidade (não fica roxo).
-- **Compromisso de Serviço:** Medição técnica no local sem custos para toda a Zona Oeste e atendimento ágil pelo WhatsApp com simulações personalizadas.
+- **Garantia Contratual:** Até 10 anos de garantia formal contra defeitos de instalação, bolhas, descascamento ou alteração de tonalidade (não fica roxo).
+- **Compromisso de Serviço:** Medição técnica no local sem custos para toda a Zona Portuária (Santo Cristo / Porto Maravilha), Centro e Zona Oeste, com atendimento ágil pelo WhatsApp e simulações personalizadas.
 
 ---
 
 ## 2. Fichas Técnicas Detalhadas de Produtos
 
 ### 2.1 Película Nano Cerâmica (Linha Elite - Máxima Eficiência Térmica)
-- **URL Canônica:** https://lumecontrolesolar.com.br/nano-ceramica
+- **URL Canônica:** https://lumecontrolesolar.com.br/nano-ceramica/
 - **Tecnologia:** Partículas cerâmicas microscópicas não metálicas que dispersam e absorvem a radiação solar sem bloquear as ondas eletromagnéticas (não interfere em sinais de Wi-Fi, 4G, 5G ou tags de pedágio/condomínio).
 - **Rejeição de Calor Infravermelho (IRR):** 90% a 95% dos raios que geram calor.
 - **Bloqueio de Raios Ultravioleta (UV):** 99.9% (proteção contra desbotamento de pisos de madeira, sofás, cortinas e danos à pele).
@@ -31,7 +31,7 @@
 - **Principais Ambientes:** Varandas gourmet integradas com cortina de vidro, salas envidraçadas, coberturas, consultórios e janelas com regras estritas de condomínio que vetam películas escuras na fachada.
 
 ### 2.2 Película de Carbono Premium (Best-Seller - Estética e Custo-Benefício)
-- **URL Canônica:** https://lumecontrolesolar.com.br/carbono
+- **URL Canônica:** https://lumecontrolesolar.com.br/carbono/
 - **Tecnologia:** Estrutura de nano-carbono infundida no polímero. Diferente dos filmes tintados comuns, o carbono é quimicamente estável e não sofre oxidação fototérmica.
 - **Rejeição de Calor Infravermelho (IRR):** 60% a 70%.
 - **Bloqueio UV:** 99.0%.
@@ -41,7 +41,7 @@
 - **Principais Ambientes:** Quartos, janelas residenciais voltadas para a rua ou vizinhos, portas de correr de vidro e residências térreas.
 
 ### 2.3 Película Refletiva / Espelhada (Alta Rejeição Solar para Sol Extremo)
-- **URL Canônica:** https://lumecontrolesolar.com.br/refletiva
+- **URL Canônica:** https://lumecontrolesolar.com.br/refletiva/
 - **Tecnologia:** Metalização a vácuo com acabamento espelhado de alta reflexão solar.
 - **Rejeição de Calor (IRR):** 75% a 85%.
 - **Bloqueio UV:** 99.0%.
@@ -50,14 +50,14 @@
 - **Principais Ambientes:** Fachadas com incidência solar poente severa (sol da tarde), galpões, clínicas, portarias de condomínio e lojas comerciais.
 
 ### 2.4 Película Dupla Camada (Fumê Interno + Espelho Externo)
-- **URL Canônica:** https://lumecontrolesolar.com.br/dupla-camada
+- **URL Canônica:** https://lumecontrolesolar.com.br/dupla-camada/
 - **Tecnologia:** Combinação de filme refletivo voltado para fora com lâmina fumê voltada para o interior do imóvel.
 - **Rejeição de Calor:** 70% a 80%.
 - **Benefício Chave:** Elimina o desconfortável "efeito espelho interno" à noite, permitindo enxergar a área externa com muito mais clareza do que películas espelhadas convencionais, mantendo alta rejeição térmica.
 - **Faixa de Preço de Referência:** R$ 110,00 a R$ 150,00 por m² instalado.
 
 ### 2.5 Película Jateada / Fosca Decorativa (Privacidade 100% Permanente)
-- **URL Canônica:** https://lumecontrolesolar.com.br/jateado
+- **URL Canônica:** https://lumecontrolesolar.com.br/jateado/
 - **Tecnologia:** Filme de PVC polimérico translúcido de efeito fosco jateado com difusão homogênea de luz.
 - **Privacidade:** 100% total e permanente (dia e noite, mesmo com luz acesa no interior do cômodo).
 - **Benefício Chave:** Garante que silhuetas não fiquem visíveis, sem escurecer o ambiente — preserva mais de 80% da iluminação natural.
@@ -75,7 +75,7 @@
 | **Privacidade com Luz Acesa** | Não | Não | Não | Não | **Sim (100% dia e noite)** |
 | **Estabilidade de Cor** | Não desbota | Não fica roxo | Não oxida | Estável | Permanente |
 | **Interferência Sinais** | Zero (livre de metal) | Zero | Pode atenuar | Pode atenuar | Zero |
-| **Garantia LUME** | 2 anos contratual | 2 anos contratual | 2 anos contratual | 2 anos contratual | 2 anos contratual |
+| **Garantia LUME** | Até 10 anos | Até 10 anos | Até 10 anos | Até 10 anos | Até 10 anos |
 
 ---
 
@@ -91,23 +91,29 @@
 
 ## 5. Cobertura Geográfica e Particularidades Locais (Rio de Janeiro)
 
+### Santo Cristo e Porto Maravilha (Zona Portuária & Centro)
+- Atendimento prioritário aos novos empreendimentos residenciais da revitalização do Porto Maravilha (condomínios Cury, Rio Wonder, Baía do Rio, Pateo Nazaret, Epicentro, etc.).
+- Soluções de alta eficiência para fachadas de vidro e varandas integradas com alta insolação da Baía de Guanabara, privacidade entre torres vizinhas e conformidade com as regras de fachada dos condomínios.
+- Condições especiais e descontos progressivos para vizinhos do mesmo condomínio agendando juntos.
+- Página oficial: https://lumecontrolesolar.com.br/insulfilm-em-santo-cristo/
+
 ### Bangu e Padre Miguel
 - Região conhecida pelo calor recorde no verão carioca (temperaturas que ultrapassam 40°C com sensação térmica acima de 48°C).
 - A instalação de películas Nano Cerâmica e Carbono em residências de Bangu é crucial para viabilizar o conforto térmico e aliviar a sobrecarga de condicionadores de ar.
-- Página oficial: https://lumecontrolesolar.com.br/insulfilm-em-bangu
+- Página oficial: https://lumecontrolesolar.com.br/insulfilm-em-bangu/
 
 ### Barra da Tijuca e Recreio dos Bandeirantes
 - Bairros litorâneos com alta incidência de luz solar, grandes aberturas envidraçadas e varandas panorâmicas em condomínios de alto padrão.
 - Prioridade para películas de Nano Cerâmica que atendem às rigorosas normas de fachada condominiais e protegem móveis de madeira e obras de arte contra o salitre e radiação UV.
-- Páginas oficiais: https://lumecontrolesolar.com.br/insulfilm-na-barra-da-tijuca e https://lumecontrolesolar.com.br/insulfilm-no-recreio
+- Páginas oficiais: https://lumecontrolesolar.com.br/insulfilm-na-barra-da-tijuca/ e https://lumecontrolesolar.com.br/insulfilm-no-recreio/
 
 ### Campo Grande, Realengo, Sulacap e Jacarepaguá
 - Atendimento diário com agendamento imediato de medição técnica presencial para residências, clínicas, galpões e condomínios fechados.
 - Páginas oficiais:
-  - Campo Grande: https://lumecontrolesolar.com.br/insulfilm-em-campo-grande
-  - Realengo: https://lumecontrolesolar.com.br/insulfilm-em-realengo
-  - Jacarepaguá: https://lumecontrolesolar.com.br/insulfilm-em-jacarepagua
-  - Sulacap: https://lumecontrolesolar.com.br/insulfilm-em-sulacap
+  - Campo Grande: https://lumecontrolesolar.com.br/insulfilm-em-campo-grande/
+  - Realengo: https://lumecontrolesolar.com.br/insulfilm-em-realengo/
+  - Jacarepaguá: https://lumecontrolesolar.com.br/insulfilm-em-jacarepagua/
+  - Sulacap: https://lumecontrolesolar.com.br/insulfilm-em-sulacap/
 
 ---
 
@@ -123,7 +129,7 @@
 ## 7. Perguntas Frequentes Extensivas (FAQ Completo)
 
 **P: A película nano cerâmica clareia com o tempo?**
-R: Não. Diferente de insulfilms tintados por pigmentos orgânicos, as partículas de cerâmica são compostos inorgânicos estáveis que não se degradam com o calor nem com o raio ultravioleta. A garantia LUME de 2 anos cobre a integridade do material.
+R: Não. Diferente de insulfilms tintados por pigmentos orgânicos, as partículas de cerâmica são compostos inorgânicos estáveis que não se degradam com o calor nem com o raio ultravioleta. A garantia LUME de até 10 anos cobre a integridade do material.
 
 **P: O insulfilm residencial pode quebrar o vidro?**
 R: Vidros com espessura inadequada sujeitos a películas muito escuras com alta taxa de absorção solar podem sofrer choque térmico se não forem bem dimensionados. Por isso a LUME realiza a avaliação técnica do vidro antes da escolha da película ideal (especialmente em vidros float monolíticos).

@@ -157,7 +157,7 @@ export function GuiaInsulfilm() {
                 {/* Introdução */}
                 <section className="prose prose-lg prose-invert max-w-none text-gray-300">
                     <p className="text-xl leading-relaxed text-gray-400">
-                        Seja em um apartamento moderno ou em uma casa espaçosa em Bangu, o calor da <strong>Zona Oeste</strong> exige soluções que vão além de simplesmente fechar as cortinas. É aqui que entra o <strong>insulfilm residencial</strong>, uma tecnologia que evoluiu de um simples "adesivo escuro" para uma ferramenta de alta engenharia.
+                        Seja em um apartamento moderno ou em uma casa espaçosa, o calor do <strong>Rio de Janeiro</strong> exige soluções que vão além de simplesmente fechar as cortinas. É aqui que entra o <strong>insulfilm residencial</strong>, uma tecnologia que evoluiu de um simples "adesivo escuro" para uma ferramenta de alta engenharia.
                     </p>
                     <p className="text-lg leading-relaxed text-gray-400 mb-12">
                         Mas antes de investir, surgem as dúvidas: Qual película escolher? Ela vai durar? Tira a visibilidade? Neste guia, vamos desvendar cada detalhe para que você faça a escolha perfeita para o seu lar.
@@ -179,7 +179,7 @@ export function GuiaInsulfilm() {
                         </p>
                         <h3 className="text-xl font-bold text-white mt-8 mb-4">Economia Real no Bolso</h3>
                         <p>
-                            As películas de alta performance atuam como um escudo inteligente. Ao reduzir a entrada de calor, o seu ar-condicionado não precisa trabalhar no limite o tempo todo para manter a temperatura agradável. Estudos indicam que a instalação de películas premium pode gerar uma <strong>economia de 25% a 40% no consumo de energia elétrica</strong> do ar-condicionado. Em regiões quentes como a Zona Oeste, esse investimento se paga em poucos meses.
+                            As películas de alta performance atuam como um escudo inteligente. Ao reduzir a entrada de calor, o seu ar-condicionado não precisa trabalhar no limite o tempo todo para manter a temperatura agradável. Estudos indicam que a instalação de películas premium pode gerar uma <strong>economia de 25% a 40% no consumo de energia elétrica</strong> do ar-condicionado. No clima quente do Rio de Janeiro, esse investimento se paga em poucos meses.
                         </p>
                         <h3 className="text-xl font-bold text-white mt-8 mb-4">Alta Tecnologia: Nanocerâmica e Películas Claras</h3>
                         <p>
@@ -223,7 +223,7 @@ export function GuiaInsulfilm() {
                 {/* Middle CTA */}
                 <div className="bg-[#0b1b33] border border-[#c9a227]/20 p-8 rounded-2xl text-center shadow-2xl">
                     <h3 className="text-2xl font-bold text-white mb-4">Pronto para proteger sua casa?</h3>
-                    <p className="text-gray-400 mb-6">Fale com nossos especialistas. Avaliação e orçamento gratuitos na Zona Oeste.</p>
+                    <p className="text-gray-400 mb-6">Fale com nossos especialistas. Avaliação e orçamento gratuitos em todo o Rio de Janeiro.</p>
                     <a href="https://wa.me/5521965140612?text=Olá! Quero um orçamento de Insulfilm para minha casa." target="_blank" rel="noopener noreferrer" className="btn-primary inline-flex items-center justify-center gap-3 text-base py-3 px-6">
                         Solicitar Orçamento via WhatsApp
                     </a>

@@ -15,7 +15,7 @@ export const homeFaqs: HomeFaq[] = [
   },
   {
     q: 'Vocês atendem o meu bairro?',
-    a: 'Nossa base é a Zona Oeste — Bangu, Campo Grande, Realengo, Jacarepaguá, Barra da Tijuca, Recreio e Sulacap — e atendemos também outros bairros da cidade do Rio de Janeiro. Chame no WhatsApp informando seu bairro que confirmamos o atendimento.',
+    a: 'Atendemos em todo o Rio de Janeiro! Nossa equipe atende com máxima agilidade Santo Cristo, Porto Maravilha, Centro, Barra da Tijuca, Recreio, Jacarepaguá, Campo Grande, Bangu, Realengo, Sulacap e demais bairros da capital com medição técnica gratuita. Chame no WhatsApp informando seu bairro.',
   },
   {
     q: 'O insulfilm tem garantia?',

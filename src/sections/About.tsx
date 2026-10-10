@@ -51,7 +51,7 @@ export function About() {
 
             <p className="animate-item text-gray-300 text-sm sm:text-base lg:text-lg leading-relaxed mb-6 sm:mb-8">
               A Lume Controle Solar nasceu da paixão por transformar ambientes. Há 8 anos,
-              trazemos conforto térmico e proteção UV para famílias da Zona Oeste do Rio de Janeiro.
+              trazemos conforto térmico e proteção UV para famílias em todo o Rio de Janeiro.
               Nossa missão é simples: oferecer produtos premium com instalação impecável e garantia real.
             </p>
 

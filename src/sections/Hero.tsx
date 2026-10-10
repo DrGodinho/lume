@@ -49,7 +49,7 @@ export function Hero() {
 
           {/* Subheadline */}
           <p className="animate-hero opacity-0 text-base sm:text-lg md:text-xl text-gray-300 mb-6 sm:mb-8 leading-relaxed max-w-2xl">
-            Controle solar para casas, apartamentos e portas de vidro na Zona Oeste.
+            Controle solar para casas, apartamentos e portas de vidro no Rio de Janeiro.
             Reduza calor, proteja móveis e escolha a privacidade certa com garantia de até 10 anos.
           </p>
 
@@ -79,7 +79,7 @@ export function Hero() {
           <div className="animate-hero opacity-0 flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-400">
             <div className="flex items-center gap-2">
               <Check className="w-3 h-3 sm:w-4 sm:h-4 text-[#c9a227] flex-shrink-0" />
-              <span>Atendimento em toda Zona Oeste</span>
+              <span>Atendimento em todo o Rio de Janeiro</span>
             </div>
             <div className="hidden sm:block w-px h-4 bg-gray-600" />
             <div className="flex items-center gap-2">

@@ -2,31 +2,37 @@ import { MapPin, Navigation } from 'lucide-react';
 import { ScrollReveal } from '../components/ScrollReveal';
 import { businessInfo } from '@/lib/businessInfo';
 
-const locations = [
-  { name: 'Bangu', active: true },
-  { name: 'Campo Grande', active: true },
-  { name: 'Realengo', active: true },
-  { name: 'Jacarepaguá', active: true },
+interface LocationItem {
+  name: string;
+  active: boolean;
+  isNew?: boolean;
+}
+
+const locations: LocationItem[] = [
+  { name: 'Santo Cristo (Porto Maravilha)', active: true, isNew: true },
   { name: 'Barra da Tijuca', active: true },
   { name: 'Recreio', active: true },
+  { name: 'Jacarepaguá', active: true },
+  { name: 'Campo Grande', active: true },
+  { name: 'Bangu', active: true },
+  { name: 'Realengo', active: true },
   { name: 'Sulacap', active: true },
 ];
 
 const urlMap: Record<string, string> = {
+  'Santo Cristo (Porto Maravilha)': '/insulfilm-em-santo-cristo',
   'Bangu': '/insulfilm-em-bangu',
   'Realengo': '/insulfilm-em-realengo',
   'Campo Grande': '/insulfilm-em-campo-grande',
   'Jacarepaguá': '/insulfilm-em-jacarepagua',
   'Barra da Tijuca': '/insulfilm-na-barra-da-tijuca',
   'Recreio': '/insulfilm-no-recreio',
-  'Sulacap': '/insulfilm-em-sulacap'
+  'Sulacap': '/insulfilm-em-sulacap',
 };
 
 export function Coverage() {
   return (
-    <section
-      className="relative section-padding bg-[#04080f] overflow-hidden"
-    >
+    <section className="relative section-padding bg-[#04080f] overflow-hidden">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#04080f]/50 to-transparent" />
 
@@ -54,13 +60,8 @@ export function Coverage() {
             </div>
 
             <h2 className="animate-item text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6 font-montserrat">
-              Atendimento em Toda a{' '}
-              <a 
-                href="/insulfilm-em-bangu/" 
-                className="text-gradient-gold hover:opacity-80 transition-opacity"
-              >
-                Zona Oeste
-              </a> do Rio
+              Atendimento em Todo o{' '}
+              <span className="text-gradient-gold">Rio de Janeiro</span>
             </h2>
 
             {/* Address Card */}
@@ -69,9 +70,9 @@ export function Coverage() {
                 <Navigation className="w-4 h-4 sm:w-5 sm:h-5 text-[#c9a227]" />
               </div>
               <div className="text-left">
-                <p className="text-white text-sm sm:text-base font-medium">Nossa Sede</p>
+                <p className="text-white text-sm sm:text-base font-medium">Nossa Sede & Base Operacional</p>
                 <p className="text-gray-400 text-xs sm:text-sm">
-                  {businessInfo.address.display}
+                  {businessInfo.address.display} · Atendimento com Medição Gratuita no Local
                 </p>
               </div>
             </div>
@@ -86,10 +87,19 @@ export function Coverage() {
                   <a
                     key={index}
                     href={url + '/'}
-                    className="stat-card location-tag group px-3 sm:px-5 py-2 sm:py-3 rounded-full border transition-all duration-300 hover:-translate-y-1 text-xs sm:text-base flex items-center gap-1.5 sm:gap-2 shadow-[0_10px_30px_rgba(201,162,39,0.1)] bg-[#1a3a5c]/30 border-[#1a3a5c]/50 text-gray-300 hover:bg-[#c9a227] hover:border-[#c9a227] hover:text-[#04080f]"
+                    className={`stat-card location-tag group px-3 sm:px-5 py-2 sm:py-3 rounded-full border transition-all duration-300 hover:-translate-y-1 text-xs sm:text-base flex items-center gap-1.5 sm:gap-2 shadow-[0_10px_30px_rgba(201,162,39,0.1)] ${
+                      location.isNew
+                        ? 'bg-[#c9a227]/20 border-[#c9a227] text-white hover:bg-[#c9a227] hover:text-[#04080f]'
+                        : 'bg-[#1a3a5c]/30 border-[#1a3a5c]/50 text-gray-300 hover:bg-[#c9a227] hover:border-[#c9a227] hover:text-[#04080f]'
+                    }`}
                   >
-                    <MapPin className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-[#c9a227] group-hover:text-inherit" />
                     {location.name}
+                    {location.isNew && (
+                      <span className="text-[10px] font-bold uppercase tracking-wider bg-[#c9a227] text-[#04080f] px-1.5 py-0.5 rounded-full ml-1">
+                        Novo
+                      </span>
+                    )}
                   </a>
                 );
               }

@@ -134,7 +134,7 @@ export function CarbonoPage() {
                             </span>
                             <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
                         </div>
-                        <h2 className="animate-item text-3xl font-bold font-montserrat mb-8 text-white">Por que o Insulfilm Carbono é o queridinho da Zona Oeste?</h2>
+                        <h2 className="animate-item text-3xl font-bold font-montserrat mb-8 text-white">Por que o Insulfilm Carbono é o queridinho no Rio de Janeiro?</h2>
                         <p className="animate-item text-gray-400 leading-relaxed mb-6 text-lg">
                             Nas residências e comércios do Rio de Janeiro, especialmente em bairros onde o sol é inclemente como <strong>Bangu, Campo Grande, Senador Camará e Realengo</strong>, a insolação intensa não apenas eleva as contas de luz ao extremo usando os ares-condicionados, como destrói tapetes, cortinas e estofados da noite para o dia.
                         </p>
