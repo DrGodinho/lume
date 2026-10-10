@@ -191,6 +191,7 @@ export function Footer() {
             <p className="mb-2 uppercase tracking-widest text-[9px] text-gray-500">Regiões Atendidas no Rio de Janeiro:</p>
             <div className="flex flex-wrap justify-center md:justify-end gap-x-3 gap-y-1">
               {[
+                { name: 'Centro do Rio', href: '/insulfilm-no-centro-do-rio', highlight: true },
                 { name: 'Santo Cristo (Porto Maravilha)', href: '/insulfilm-em-santo-cristo', highlight: true },
                 { name: 'Barra da Tijuca', href: '/insulfilm-na-barra-da-tijuca' },
                 { name: 'Recreio', href: '/insulfilm-no-recreio' },

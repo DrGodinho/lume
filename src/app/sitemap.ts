@@ -12,6 +12,7 @@ type StaticSitemapRoute = {
 const staticRoutes = [
   { path: '/', priority: 1, changeFrequency: 'monthly', lastModified: '2026-07-29' },
   { path: '/insulfilm-em-santo-cristo/', priority: 0.85, changeFrequency: 'weekly', lastModified: '2026-10-09' },
+  { path: '/insulfilm-no-centro-do-rio/', priority: 0.85, changeFrequency: 'weekly', lastModified: '2026-10-10' },
   { path: '/simulador/', priority: 0.8, changeFrequency: 'monthly', lastModified: '2026-04-27' },
   { path: '/guia-insulfilm/', priority: 0.8, changeFrequency: 'monthly', lastModified: '2026-07-29' },
   { path: '/blog/', priority: 0.9, changeFrequency: 'weekly', lastModified: '2026-07-08' },

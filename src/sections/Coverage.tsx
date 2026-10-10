@@ -9,6 +9,7 @@ interface LocationItem {
 }
 
 const locations: LocationItem[] = [
+  { name: 'Centro do Rio', active: true, isNew: true },
   { name: 'Santo Cristo (Porto Maravilha)', active: true, isNew: true },
   { name: 'Barra da Tijuca', active: true },
   { name: 'Recreio', active: true },
@@ -20,6 +21,7 @@ const locations: LocationItem[] = [
 ];
 
 const urlMap: Record<string, string> = {
+  'Centro do Rio': '/insulfilm-no-centro-do-rio',
   'Santo Cristo (Porto Maravilha)': '/insulfilm-em-santo-cristo',
   'Bangu': '/insulfilm-em-bangu',
   'Realengo': '/insulfilm-em-realengo',

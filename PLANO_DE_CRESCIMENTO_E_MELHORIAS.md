@@ -83,16 +83,16 @@ graph TD
 ### 🟢 SPRINT 1: Aquisição Imediata & Onda Santo Cristo (Semana 1)
 > **Objetivo:** Posicionar o site no Google para novos moradores do Porto Maravilha/Centro e transformar visitantes em conversas no WhatsApp.
 
-1. **Criação da Landing Page de Santo Cristo (`/insulfilm-em-santo-cristo/`)**:
+1. **Criação da Landing Page de Santo Cristo (`/insulfilm-em-santo-cristo/`)** `[CONCLUÍDO]`:
    - **Foco:** Empreendimentos residenciais novos do Porto Maravilha, proteção térmica para grandes painéis de vidro, privacidade entre torres e conformidade com regras de condomínio.
    - **Design:** Seguir rigorosamente o padrão LUME Elite (Dark & Gold, `<HeroEntrance>` com `.word`, `<ScrollReveal>`, `<AnimatedCounter>`, `Particles`, `GoogleReviews`).
    - **Schema:** `LocalBusiness`, `Service` e `FAQPage` geo-localizados nas coordenadas de Santo Cristo.
    - **Inclusão:** Inserir em `sitemap.ts`, `robots.txt` e links internos do Footer e Home.
 
-2. **Criação da Landing Page do Centro (`/insulfilm-no-centro-do-rio/`)**:
+2. **Criação da Landing Page do Centro (`/insulfilm-no-centro-do-rio/`)** `[CONCLUÍDO]`:
    - **Foco:** Novos residenciais do Reviver Centro, coberturas, salas comerciais e escritórios.
 
-3. **Revolução na Navegação (`Navbar` & `Footer`)**:
+3. **Revolução na Navegação (`Navbar` & `Footer`)** `[CONCLUÍDO]`:
    - Atualizar a `Navbar`:
      - Adicionar dropdown ou links diretos para **Simulador**, **Calculadora** e **Guia**.
      - Substituir o botão secundário pelo botão de alta conversão: `[Pedir Orçamento Grátis]` direcionando para o WhatsApp com mensagem contextual.
