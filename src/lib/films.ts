@@ -21,10 +21,12 @@ export type FilmTypeKey =
 export type OptimizationMode = 'densidade' | 'facilidade' | 'facilidade_v2';
 export type LossMode = 'dinamico' | 'fixo';
 export type ColorMode = 'ambiente' | 'tamanho';
+export type DiscountMode = 'real' | 'porcentagem';
 
 export const OPTIMIZATION_MODES: OptimizationMode[] = ['densidade', 'facilidade', 'facilidade_v2'];
 export const LOSS_MODES: LossMode[] = ['dinamico', 'fixo'];
 export const COLOR_MODES: ColorMode[] = ['ambiente', 'tamanho'];
+export const DISCOUNT_MODES: DiscountMode[] = ['real', 'porcentagem'];
 export const STANDARD_FILM_TYPE_KEYS: FilmTypeKey[] = [
   'carbono_g5',
   'carbono_g20',
@@ -84,6 +86,7 @@ export interface AppConfig {
   filmTypes: Record<FilmTypeKey, number>;
   selectedFilm: FilmTypeKey;
   draftExpiration: number;
+  modoDesconto?: DiscountMode;
   filmCatalog?: Record<string, FilmCatalogItem>;
 }
 
@@ -213,6 +216,7 @@ export const DEFAULT_CONFIG: AppConfig = {
   filmCatalog: { ...DEFAULT_FILM_CATALOG },
   selectedFilm: 'carbono_g20',
   draftExpiration: 15,
+  modoDesconto: 'real',
 };
 
 export const DEFAULT_ROOM_COLORS: Record<string, string> = {};
@@ -387,8 +391,10 @@ export interface OrcamentoSalvo {
     compensarPerdas?: boolean;
     modoPerdas?: LossMode;
     perdasFixas?: number;
+    modoDesconto?: DiscountMode;
   };
   desconto: number;
+  modoDesconto?: DiscountMode;
   modoOtimizacao: OptimizationMode;
   selectedFilm?: string;
   customFilmName?: string;

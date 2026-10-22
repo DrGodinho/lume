@@ -4,7 +4,7 @@
  * continua chamando-as dentro dos mesmos useMemo.
  */
 import { roundCurrency } from './numberPrecision';
-import type { FilmPurchaseType, LossMode } from './films';
+import type { DiscountMode, FilmPurchaseType, LossMode } from './films';
 
 export interface VidroMedida {
   ow: number;
@@ -55,6 +55,47 @@ export function calcCompensacaoPerda({
 /** Preço final = bruto + perdas − desconto (arredondado em centavos). */
 export function calcFinalPrice(subtotalBruto: number, compensacaoPerda: number, desconto: number): number {
   return roundCurrency(subtotalBruto + compensacaoPerda - desconto);
+}
+
+/**
+ * Calcula o valor absoluto do desconto em reais (R$), arredondado em centavos.
+ * - Modo 'real': retorna o próprio valor informado (limitado entre 0 e baseCalculo).
+ * - Modo 'porcentagem': calcula percentual sobre a base (ex: 10% sobre R$ 1.500,00 = R$ 150,00).
+ */
+export function calcDescontoEmReais(
+  modo: DiscountMode,
+  valorInput: number,
+  baseCalculo: number
+): number {
+  if (!Number.isFinite(valorInput) || valorInput <= 0 || !Number.isFinite(baseCalculo) || baseCalculo <= 0) {
+    return 0;
+  }
+  if (modo === 'porcentagem') {
+    const pct = Math.min(Math.max(valorInput, 0), 100);
+    return roundCurrency(baseCalculo * (pct / 100));
+  }
+  return roundCurrency(Math.min(valorInput, baseCalculo));
+}
+
+/**
+ * Converte o valor de desconto ao alternar entre modos ('real' <-> 'porcentagem').
+ * Retorna o valor numérico que deve alimentar o novo estado/input.
+ */
+export function converterDescontoEntreModos(
+  novoModo: DiscountMode,
+  valorAtual: number,
+  baseCalculo: number
+): number {
+  if (!Number.isFinite(valorAtual) || valorAtual <= 0 || !Number.isFinite(baseCalculo) || baseCalculo <= 0) {
+    return 0;
+  }
+  if (novoModo === 'porcentagem') {
+    const pct = (valorAtual / baseCalculo) * 100;
+    return Math.min(100, Math.round(pct * 10) / 10);
+  } else {
+    const pct = Math.min(Math.max(valorAtual, 0), 100);
+    return roundCurrency(baseCalculo * (pct / 100));
+  }
 }
 
 /** Valor prático por m² de vidro (0 quando sem área). */

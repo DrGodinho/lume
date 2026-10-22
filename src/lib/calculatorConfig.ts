@@ -26,6 +26,7 @@ export function loadConfig(scopeKey?: string): AppConfig {
             filmTypes,
             filmCatalog,
             selectedFilm: normalizeFilmTypeKey(parsed.selectedFilm),
+            modoDesconto: parsed.modoDesconto === 'porcentagem' ? 'porcentagem' : 'real',
           };
         }
     } catch {

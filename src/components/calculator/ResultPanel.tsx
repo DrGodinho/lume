@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Camera, FileText, History, Scissors, Eye, EyeOff, TrendingUp, Check, X, DollarSign } from 'lucide-react';
+import { Camera, FileText, History, Scissors, TrendingUp, Check, X } from 'lucide-react';
 import type { LucroCalculadoraResult } from '../../lib/pricing';
+import type { DiscountMode } from '../../lib/films';
 
 interface ResultPanelProps {
     // As 3 perguntas: quanto custa? quanto comprar? está eficiente?
@@ -14,6 +15,9 @@ interface ResultPanelProps {
     // Desconto + perdas
     displayDesconto: string;
     onDescontoChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    modoDesconto?: DiscountMode;
+    onToggleModoDesconto?: () => void;
+    descontoEmReais?: number;
     compensarPerdas: boolean;
     onTogglePerdas: () => void;
     modoPerdas: string;
@@ -44,6 +48,9 @@ export function ResultPanel({
     eficiencia,
     displayDesconto,
     onDescontoChange,
+    modoDesconto = 'real',
+    onToggleModoDesconto,
+    descontoEmReais,
     compensarPerdas,
     onTogglePerdas,
     modoPerdas,
@@ -236,32 +243,94 @@ export function ResultPanel({
                 </div>
             </div>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-4 pt-4 border-t border-white/5">
-                <div className="flex items-center justify-center sm:justify-start gap-3 w-full sm:w-auto">
-                    <p className="text-[10px] uppercase text-red-300 font-bold">Desconto R$:</p>
-                    <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-red-400 font-bold">R$</span>
-                        <input
-                            type="text"
-                            inputMode="numeric"
-                            value={displayDesconto}
-                            onChange={onDescontoChange}
-                            onFocus={(e) => e.target.select()}
-                            onClick={(e) => e.currentTarget.select()}
-                            onKeyDown={(e) => {
-                                if (!/[0-9]/.test(e.key) &&
-                                    e.key !== 'Backspace' &&
-                                    e.key !== 'Tab' &&
-                                    e.key !== 'Enter' &&
-                                    e.key !== 'Delete' &&
-                                    e.key !== 'ArrowLeft' &&
-                                    e.key !== 'ArrowRight' &&
-                                    !(e.ctrlKey || e.metaKey)) {
-                                    e.preventDefault();
-                                }
-                            }}
-                            className="w-28 bg-[#040811] text-red-400 border border-red-500/30 rounded-lg pl-8 pr-2 py-1.5 text-sm text-right font-bold outline-none"
-                        />
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 w-full sm:w-auto">
+                    <div className="flex items-center gap-1.5">
+                        <p className="text-[10px] uppercase text-red-300 font-bold whitespace-nowrap">Desconto:</p>
+                        {onToggleModoDesconto && (
+                            <div className="flex bg-[#040811] border border-white/10 rounded-lg p-0.5" title="Alternar modo de desconto (R$ ou %)">
+                                <button
+                                    type="button"
+                                    onClick={() => modoDesconto !== 'real' && onToggleModoDesconto()}
+                                    className={`px-1.5 py-0.5 rounded text-[9px] font-black transition-all ${
+                                        modoDesconto !== 'porcentagem'
+                                            ? 'bg-[#c9a227] text-black shadow-sm'
+                                            : 'text-gray-400 hover:text-white'
+                                    }`}
+                                >
+                                    R$
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => modoDesconto !== 'porcentagem' && onToggleModoDesconto()}
+                                    className={`px-1.5 py-0.5 rounded text-[9px] font-black transition-all ${
+                                        modoDesconto === 'porcentagem'
+                                            ? 'bg-[#c9a227] text-black shadow-sm'
+                                            : 'text-gray-400 hover:text-white'
+                                    }`}
+                                >
+                                    %
+                                </button>
+                            </div>
+                        )}
                     </div>
+                    <div className="relative">
+                        {modoDesconto === 'porcentagem' ? (
+                            <>
+                                <input
+                                    type="text"
+                                    inputMode="decimal"
+                                    value={displayDesconto}
+                                    onChange={onDescontoChange}
+                                    onFocus={(e) => e.target.select()}
+                                    onClick={(e) => e.currentTarget.select()}
+                                    onKeyDown={(e) => {
+                                        if (!/[0-9.,]/.test(e.key) &&
+                                            e.key !== 'Backspace' &&
+                                            e.key !== 'Tab' &&
+                                            e.key !== 'Enter' &&
+                                            e.key !== 'Delete' &&
+                                            e.key !== 'ArrowLeft' &&
+                                            e.key !== 'ArrowRight' &&
+                                            !(e.ctrlKey || e.metaKey)) {
+                                            e.preventDefault();
+                                        }
+                                    }}
+                                    className="w-20 bg-[#040811] text-red-400 border border-red-500/30 rounded-lg pl-3 pr-6 py-1.5 text-sm text-right font-bold outline-none"
+                                />
+                                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-sm text-red-400 font-bold">%</span>
+                            </>
+                        ) : (
+                            <>
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-red-400 font-bold">R$</span>
+                                <input
+                                    type="text"
+                                    inputMode="numeric"
+                                    value={displayDesconto}
+                                    onChange={onDescontoChange}
+                                    onFocus={(e) => e.target.select()}
+                                    onClick={(e) => e.currentTarget.select()}
+                                    onKeyDown={(e) => {
+                                        if (!/[0-9]/.test(e.key) &&
+                                            e.key !== 'Backspace' &&
+                                            e.key !== 'Tab' &&
+                                            e.key !== 'Enter' &&
+                                            e.key !== 'Delete' &&
+                                            e.key !== 'ArrowLeft' &&
+                                            e.key !== 'ArrowRight' &&
+                                            !(e.ctrlKey || e.metaKey)) {
+                                            e.preventDefault();
+                                        }
+                                    }}
+                                    className="w-28 bg-[#040811] text-red-400 border border-red-500/30 rounded-lg pl-8 pr-2 py-1.5 text-sm text-right font-bold outline-none"
+                                />
+                            </>
+                        )}
+                    </div>
+                    {modoDesconto === 'porcentagem' && descontoEmReais !== undefined && descontoEmReais > 0 && (
+                        <span className="text-[10px] font-bold text-red-300 bg-red-500/10 border border-red-500/20 px-2 py-1 rounded-md whitespace-nowrap">
+                            -{formatBRL(descontoEmReais)}
+                        </span>
+                    )}
                     <button
                         onClick={onTogglePerdas}
                         className={`p-2 rounded-lg border transition-all flex items-center gap-1.5 h-[34px] ${compensarPerdas ? 'bg-green-500/20 border-green-500/50 text-green-400' : 'bg-white/5 border-white/10 text-gray-500 hover:text-white'}`}

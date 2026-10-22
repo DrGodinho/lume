@@ -12,6 +12,7 @@ const CONFIG_OPTIONAL_COLUMNS = [
   'film_catalog',
   'selected_film',
   'draft_expiration',
+  'modo_desconto',
 ] as const;
 
 export async function GET(request: NextRequest) {

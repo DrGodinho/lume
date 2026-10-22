@@ -8,7 +8,7 @@ import {
   loadConfigFromCloud,
 } from '../lib/cloudSync';
 import { DEFAULT_CONFIG, isLegacyDefaultRoomColors, isOptimizationMode, normalizeFilmTypeKey } from '../lib/films';
-import type { FilmTypeKey, GlassItem, OptimizationMode } from '../lib/films';
+import type { DiscountMode, FilmTypeKey, GlassItem, OptimizationMode } from '../lib/films';
 import { createScopedLogger } from '../lib/logger';
 import type { SetVidros } from './useCalculatorState';
 
@@ -23,6 +23,7 @@ interface DraftValues {
   vidros: GlassItem[];
   desconto: number;
   descontoInput: string;
+  modoDesconto?: DiscountMode;
   rollW: number;
   price: number;
   margin: number;
@@ -41,6 +42,7 @@ interface DraftActions {
   setNeighborhood: (v: string) => void;
   setDesconto: (v: number) => void;
   setDescontoInput: (v: string) => void;
+  setModoDesconto?: (v: DiscountMode) => void;
   setRollW: (v: number) => void;
   setPrice: (v: number) => void;
   setMargin: (v: number) => void;
@@ -71,7 +73,7 @@ export function useDraftSync(
   });
 
   const {
-    cliente, phone, neighborhood, vidros, desconto, descontoInput,
+    cliente, phone, neighborhood, vidros, desconto, descontoInput, modoDesconto,
     rollW, price, margin, modoOtimizacao, userName, selectedFilm, customFilmName,
     roomColors, isCutMode,
   } = values;
@@ -90,6 +92,7 @@ export function useDraftSync(
       vidros,
       desconto,
       descontoInput,
+      modoDesconto,
       rollW,
       price,
       margin,
@@ -115,6 +118,7 @@ export function useDraftSync(
       user_name: userName,
       selected_film: selectedFilm,
       custom_film_name: customFilmName,
+      modo_desconto: modoDesconto,
       last_saved: now,
     };
     pendingDraftPayloadRef.current = cloudPayload;
@@ -145,7 +149,7 @@ export function useDraftSync(
     return () => {
       if (cloudTimerRef.current) clearTimeout(cloudTimerRef.current);
     };
-  }, [draftRestored, isCutMode, cliente, phone, neighborhood, vidros, desconto, descontoInput, rollW, price, margin, modoOtimizacao, userName, selectedFilm, customFilmName, roomColors]);
+  }, [draftRestored, isCutMode, cliente, phone, neighborhood, vidros, desconto, descontoInput, modoDesconto, rollW, price, margin, modoOtimizacao, userName, selectedFilm, customFilmName, roomColors]);
 
   // Flush do rascunho pendente no descarregamento da página
   useEffect(() => {
@@ -209,6 +213,8 @@ export function useDraftSync(
           if (typeof d.desconto === 'number') actionsRef.current.setDesconto(d.desconto);
           const descInput = d.desconto_input ?? d.descontoInput;
           if (descInput !== undefined) actionsRef.current.setDescontoInput(String(descInput));
+          const modoDesc = (d.modo_desconto ?? d.modoDesconto) as DiscountMode | undefined;
+          if (modoDesc === 'porcentagem' || modoDesc === 'real') actionsRef.current.setModoDesconto?.(modoDesc);
           const rollWVal = (d.roll_w ?? d.rollW) as number | undefined;
           if (rollWVal) actionsRef.current.setRollW(rollWVal);
           if (typeof d.price === 'number') actionsRef.current.setPrice(d.price);

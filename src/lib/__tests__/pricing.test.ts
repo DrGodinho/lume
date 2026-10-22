@@ -8,6 +8,8 @@ import {
   calcTotalAreaM2,
   calcValorPraticoM2,
   calcValorSelecionados,
+  calcDescontoEmReais,
+  converterDescontoEntreModos,
 } from '../pricing';
 
 describe('calcTotalAreaM2', () => {
@@ -148,4 +150,47 @@ describe('calcValorSelecionados', () => {
     })).toBe(200);
   });
 });
+
+describe('calcDescontoEmReais', () => {
+  it('retorna 0 para inputs zerados, negativos ou bases inválidas', () => {
+    expect(calcDescontoEmReais('real', 0, 1000)).toBe(0);
+    expect(calcDescontoEmReais('real', -50, 1000)).toBe(0);
+    expect(calcDescontoEmReais('porcentagem', 0, 1000)).toBe(0);
+    expect(calcDescontoEmReais('porcentagem', 10, 0)).toBe(0);
+  });
+
+  it('no modo real, limita o desconto à base total', () => {
+    expect(calcDescontoEmReais('real', 150, 1000)).toBe(150);
+    expect(calcDescontoEmReais('real', 1200, 1000)).toBe(1000);
+  });
+
+  it('no modo porcentagem, calcula percentual correto sobre a base com perdas', () => {
+    // 10% de R$ 1500 = R$ 150
+    expect(calcDescontoEmReais('porcentagem', 10, 1500)).toBe(150);
+    // 5.5% de R$ 2000 = R$ 110
+    expect(calcDescontoEmReais('porcentagem', 5.5, 2000)).toBe(110);
+    // Limita a 100%
+    expect(calcDescontoEmReais('porcentagem', 120, 1000)).toBe(1000);
+  });
+});
+
+describe('converterDescontoEntreModos', () => {
+  it('converte de R$ para % corretamente', () => {
+    // R$ 150 de R$ 1500 = 10%
+    expect(converterDescontoEntreModos('porcentagem', 150, 1500)).toBe(10);
+    // R$ 250 de R$ 1000 = 25%
+    expect(converterDescontoEntreModos('porcentagem', 250, 1000)).toBe(25);
+  });
+
+  it('converte de % para R$ corretamente', () => {
+    // 10% de R$ 1500 = R$ 150
+    expect(converterDescontoEntreModos('real', 10, 1500)).toBe(150);
+  });
+
+  it('retorna 0 se base for 0', () => {
+    expect(converterDescontoEntreModos('porcentagem', 100, 0)).toBe(0);
+    expect(converterDescontoEntreModos('real', 10, 0)).toBe(0);
+  });
+});
+
 

@@ -1,6 +1,5 @@
 import { createScopedLogger } from './logger';
 import {
-  DEFAULT_FILM_TYPES,
   FilmCatalogItem,
   normalizeFilmCatalog,
   normalizeFilmTypes,
@@ -221,6 +220,7 @@ export interface ConfigData {
   filmTypes: Record<string, number>;
   selectedFilm: string;
   draftExpiration?: number;
+  modoDesconto?: 'real' | 'porcentagem';
   filmCatalog?: Record<string, FilmCatalogItem>;
 }
 
@@ -250,6 +250,7 @@ export async function saveConfigToCloud(config: ConfigData): Promise<boolean> {
     film_catalog: config.filmCatalog,
     selected_film: normalizeSelectedFilm(config.selectedFilm),
     draft_expiration: config.draftExpiration,
+    modo_desconto: config.modoDesconto ?? 'real',
   };
 
   try {
@@ -311,6 +312,7 @@ export async function loadConfigFromCloud(): Promise<ConfigData | null> {
       filmCatalog,
       selectedFilm: normalizeSelectedFilm(data.selected_film),
       draftExpiration: data.draft_expiration,
+      modoDesconto: data.modo_desconto === 'porcentagem' ? 'porcentagem' : 'real',
     };
   } catch {
     return null;

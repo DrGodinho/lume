@@ -9,6 +9,7 @@ import {
 } from '../lib/films';
 import type {
   AppConfig,
+  DiscountMode,
   FilmCatalogItem,
   FilmTypeKey,
   GlassItem,
@@ -105,6 +106,7 @@ export function useCalculatorState(cfg: AppConfig) {
   const [userName, setUserName] = useState(cfg.userName);
   const [desconto, setDesconto] = useState(0);
   const [descontoInput, setDescontoInput] = useState('0');
+  const [modoDesconto, setModoDesconto] = useState<DiscountMode>(cfg.modoDesconto || 'real');
   const [modoOtimizacao, setModoOtimizacao] = useState<OptimizationMode>(cfg.modoOtimizacao);
   const [configAberto, setConfigAberto] = useState(false);
   const [compensarPerdas, setCompensarPerdas] = useState(false);
@@ -168,6 +170,7 @@ export function useCalculatorState(cfg: AppConfig) {
     filmCatalog,
     selectedFilm,
     draftExpiration,
+    modoDesconto,
   }), [
     rollW,
     price,
@@ -182,6 +185,7 @@ export function useCalculatorState(cfg: AppConfig) {
     filmCatalog,
     selectedFilm,
     draftExpiration,
+    modoDesconto,
   ]);
 
   return {
@@ -194,6 +198,7 @@ export function useCalculatorState(cfg: AppConfig) {
     userName, setUserName,
     desconto, setDesconto,
     descontoInput, setDescontoInput,
+    modoDesconto, setModoDesconto,
     modoOtimizacao, setModoOtimizacao,
     configAberto, setConfigAberto,
     compensarPerdas, setCompensarPerdas,

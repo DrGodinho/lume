@@ -257,6 +257,21 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
               </HelpText>
             </div>
 
+            <div className="rounded-2xl border border-[#c9a227]/20 bg-[#c9a227]/[0.04] p-4">
+              <FieldLabel>Modo Padrão do Desconto</FieldLabel>
+              <SegmentGroup
+                value={config.modoDesconto || 'real'}
+                onChange={(value) => onUpdate('modoDesconto', value)}
+                options={[
+                  { label: 'Valor em Reais (R$)', value: 'real' },
+                  { label: 'Porcentagem (%)', value: 'porcentagem' },
+                ]}
+              />
+              <HelpText>
+                Define a unidade padrão ao abrir orçamentos. Você também pode alternar entre R$ e % a qualquer momento direto na calculadora.
+              </HelpText>
+            </div>
+
             <div>
               <div className="flex items-center justify-between gap-3 mb-2">
                 <FieldLabel>Tempo de Auto-Save (min)</FieldLabel>

@@ -37,6 +37,8 @@ import {
   calcValorPraticoM2,
   calcValorSelecionados,
   calcLucroCalculadora,
+  calcDescontoEmReais,
+  converterDescontoEntreModos,
 } from '../lib/pricing';
 import { formatBRL, formatNumber2 } from '../lib/money';
 import { groupByAmbiente } from '../lib/grouping';
@@ -64,6 +66,7 @@ import {
   DEFAULT_CONFIG,
   DEFAULT_FILM_CATALOG,
   DEFAULT_FILM_TYPES,
+  DiscountMode,
   FilmCatalogItem,
   FILM_TYPE_LABELS,
   FilmTypeKey,
@@ -117,6 +120,7 @@ interface SavedProjectPayload {
     customFilmName?: string;
     compensarPerdas?: boolean;
     desconto?: number;
+    modoDesconto?: DiscountMode;
   };
   vidros?: ImportedGlass[];
 }
@@ -139,6 +143,7 @@ export function AdminCalculator() {
     userName, setUserName,
     desconto, setDesconto,
     descontoInput, setDescontoInput,
+    modoDesconto, setModoDesconto,
     modoOtimizacao, setModoOtimizacao,
     configAberto, setConfigAberto,
     compensarPerdas, setCompensarPerdas,
@@ -336,28 +341,41 @@ export function AdminCalculator() {
     // (formatBRL/formatNumber2 canônicos em lib/money.ts)
 
     const handleDescontoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const valor = e.target.value.replace(/\D/g, '');
-        setDescontoInput(valor);
-        setDesconto(parseInt(valor, 10) / 100 || 0);
+        if (modoDesconto === 'porcentagem') {
+            const raw = e.target.value.replace(/[^0-9,.]/g, '').replace('.', ',');
+            const parts = raw.split(',');
+            const formatted = parts.length > 1 ? `${parts[0]},${parts.slice(1).join('')}` : parts[0];
+            const num = parseFloat(formatted.replace(',', '.')) || 0;
+            const cappedNum = Math.min(100, Math.max(0, num));
+            setDescontoInput(formatted);
+            setDesconto(cappedNum);
+        } else {
+            const valor = e.target.value.replace(/\D/g, '');
+            setDescontoInput(valor);
+            setDesconto(parseInt(valor, 10) / 100 || 0);
+        }
     };
 
     const displayDesconto = useMemo(() => {
+        if (modoDesconto === 'porcentagem') {
+            return descontoInput;
+        }
         const num = parseInt(descontoInput, 10) / 100 || 0;
         return formatNumber2(num);
-    }, [descontoInput]);
+    }, [modoDesconto, descontoInput]);
 
 // ─── AUTO-SAVE DRAFT ──────────────────────────────────────────────────
   // C1: rascunho extraído (autosave local+nuvem + restore) — ver useDraftSync.
   useDraftSync(
     {
-      cliente, phone, neighborhood, vidros, desconto, descontoInput,
+      cliente, phone, neighborhood, vidros, desconto, descontoInput, modoDesconto,
       rollW, price, margin, modoOtimizacao, userName, selectedFilm, customFilmName,
       roomColors, isCutMode,
     },
     {
       setVidros,
       setCliente, setPhone, setNeighborhood,
-      setDesconto, setDescontoInput,
+      setDesconto, setDescontoInput, setModoDesconto,
       setRollW, setPrice, setMargin,
       setModoOtimizacao, setUserName, setSelectedFilm, setCustomFilmName,
       setRoomColors, setCloudStatus,
@@ -418,6 +436,7 @@ export function AdminCalculator() {
         }
 
         if (source.draftExpiration !== undefined) setDraftExpiration(source.draftExpiration);
+        if (source.modoDesconto) setModoDesconto(source.modoDesconto);
 
         if (cloud) {
           saveConfig({
@@ -429,6 +448,7 @@ export function AdminCalculator() {
             selectedFilm: currentFilm,
             filmTypes: normalizedTypes,
             filmCatalog: catalog,
+            modoDesconto: source.modoDesconto || DEFAULT_CONFIG.modoDesconto,
           }, scopeKey);
         }
       } finally {
@@ -436,7 +456,7 @@ export function AdminCalculator() {
       }
     };
     restoreConfig();
-  }, [authRefreshKey, setRollW, setPrice, setMargin, setModoOtimizacao, setUserName, setModoPerdas, setPerdasFixas, setUsarCoresPorAmbiente, setAgressividadeCorte, setFilmTypes, setFilmCatalog, setSelectedFilm, setDraftExpiration, setConfigRestored]);
+  }, [authRefreshKey, setRollW, setPrice, setMargin, setModoOtimizacao, setUserName, setModoPerdas, setPerdasFixas, setUsarCoresPorAmbiente, setAgressividadeCorte, setFilmTypes, setFilmCatalog, setSelectedFilm, setDraftExpiration, setModoDesconto, setConfigRestored]);
 
   // C1: restore do rascunho movido para useDraftSync (nuvem primeiro, local como fallback).
 
@@ -730,7 +750,37 @@ export function AdminCalculator() {
         return calcCompensacaoPerda({ compensarPerdas, modoPerdas, perdasFixas, eficiencia, subtotalBruto });
     }, [compensarPerdas, modoPerdas, perdasFixas, eficiencia, subtotalBruto]);
 
-    const finalPrice = calcFinalPrice(subtotalBruto, compensacaoPerda, desconto);
+    const baseParaDesconto = useMemo(() => {
+        return subtotalBruto + (compensarPerdas ? compensacaoPerda : 0);
+    }, [subtotalBruto, compensarPerdas, compensacaoPerda]);
+
+    const descontoEmReais = useMemo(() => {
+        return calcDescontoEmReais(modoDesconto, desconto, baseParaDesconto);
+    }, [modoDesconto, desconto, baseParaDesconto]);
+
+    const finalPrice = useMemo(() => {
+        return calcFinalPrice(subtotalBruto, compensacaoPerda, descontoEmReais);
+    }, [subtotalBruto, compensacaoPerda, descontoEmReais]);
+
+    const handleToggleModoDesconto = useCallback(() => {
+        const novoModo: DiscountMode = modoDesconto === 'real' ? 'porcentagem' : 'real';
+        setModoDesconto(novoModo);
+        const base = subtotalBruto + (compensarPerdas ? compensacaoPerda : 0);
+        if (desconto > 0 && base > 0) {
+            if (novoModo === 'porcentagem') {
+                const novoPct = converterDescontoEntreModos('porcentagem', desconto, base);
+                setDesconto(novoPct);
+                setDescontoInput(String(novoPct).replace('.', ','));
+            } else {
+                const novoReais = converterDescontoEntreModos('real', desconto, base);
+                setDesconto(novoReais);
+                setDescontoInput(Math.round(novoReais * 100).toString());
+            }
+        } else {
+            setDesconto(0);
+            setDescontoInput('0');
+        }
+    }, [modoDesconto, setModoDesconto, subtotalBruto, compensarPerdas, compensacaoPerda, desconto, setDesconto, setDescontoInput]);
 
     // C1: persistência no hook (com schema); aqui só o snapshot da sessão.
     const salvarNoHistorico = useCallback(() => {
@@ -748,8 +798,9 @@ export function AdminCalculator() {
             valor: finalPrice,
             qtd: vidros.length,
             vidros: [...vidros],
-            config: { rollW, price, margin, compensarPerdas, modoPerdas, perdasFixas },
-            desconto,
+            config: { rollW, price, margin, compensarPerdas, modoPerdas, perdasFixas, modoDesconto },
+            desconto: descontoEmReais,
+            modoDesconto,
             modoOtimizacao,
             selectedFilm,
             leadId: currentLeadId ?? undefined,
@@ -757,7 +808,7 @@ export function AdminCalculator() {
             modoPerdas,
             perdasFixas,
         });
-    }, [vidros, cliente, phone, neighborhood, finalPrice, rollW, price, margin, desconto, modoOtimizacao, selectedFilm, currentLeadId, compensarPerdas, modoPerdas, perdasFixas, salvarNoHistoricoHook]);
+    }, [vidros, cliente, phone, neighborhood, finalPrice, rollW, price, margin, descontoEmReais, modoDesconto, modoOtimizacao, selectedFilm, currentLeadId, compensarPerdas, modoPerdas, perdasFixas, salvarNoHistoricoHook]);
 
     const criarLead = useCallback(async () => {
       let finalPhone = phone.trim();
@@ -786,7 +837,7 @@ export function AdminCalculator() {
           sqm: totalM2,
           value: finalPrice,
           status: 'Novo',
-          notes: `Película: ${selectedFilm === 'personalizado' ? (customFilmName || 'Personalizado') : (FILM_TYPE_LABELS[selectedFilm] || 'Nano Cerâmica 75')}.${desconto > 0 ? ` | Desconto aplicado: ${formatBRL(desconto)}` : ''}`,
+          notes: `Película: ${selectedFilm === 'personalizado' ? (customFilmName || 'Personalizado') : (FILM_TYPE_LABELS[selectedFilm] || 'Nano Cerâmica 75')}.${descontoEmReais > 0 ? ` | Desconto aplicado: ${modoDesconto === 'porcentagem' ? `${descontoInput}% (${formatBRL(descontoEmReais)})` : formatBRL(descontoEmReais)}` : ''}`,
         }),
       });
       if (res.ok) {
@@ -817,8 +868,9 @@ export function AdminCalculator() {
             valor: finalPrice,
             qtd: vidros.length,
             vidros: snapshotVidros,
-            config: { rollW, price, margin, compensarPerdas, modoPerdas, perdasFixas },
-            desconto,
+            config: { rollW, price, margin, compensarPerdas, modoPerdas, perdasFixas, modoDesconto },
+            desconto: descontoEmReais,
+            modoDesconto,
             modoOtimizacao,
             selectedFilm,
             leadId,
@@ -842,7 +894,7 @@ export function AdminCalculator() {
         const details = [err.error, err.details, err.hint].filter(Boolean).join(' - ');
         showToast('Erro ao criar lead: ' + (details || 'desconhecido'), 'error');
       }
-    }, [cliente, phone, neighborhood, vidros, selectedFilm, finalPrice, rollW, price, margin, desconto, modoOtimizacao, currentLeadId, compensarPerdas, modoPerdas, perdasFixas, historico, setHistorico, showToast]);
+    }, [cliente, phone, neighborhood, vidros, selectedFilm, customFilmName, finalPrice, rollW, price, margin, descontoEmReais, modoDesconto, descontoInput, modoOtimizacao, currentLeadId, compensarPerdas, modoPerdas, perdasFixas, historico, setHistorico, showToast]);
 
 // C1: abrir passa pelo schema do hook; aqui só a aplicação na sessão.
 const carregarDoHistorico = useCallback((orc: OrcamentoSalvo) => {
@@ -854,6 +906,13 @@ const carregarDoHistorico = useCallback((orc: OrcamentoSalvo) => {
         setPrice(valid.config.price);
         setMargin(valid.config.margin);
         const desc = typeof valid.desconto === 'number' && !isNaN(valid.desconto) ? valid.desconto : 0;
+        const cfgObj = valid.config as { compensarPerdas?: boolean; modoPerdas?: LossMode; perdasFixas?: number; modoDesconto?: DiscountMode };
+        const savedModoDesc = valid.modoDesconto || cfgObj?.modoDesconto;
+        if (savedModoDesc === 'porcentagem' || savedModoDesc === 'real') {
+            setModoDesconto(savedModoDesc);
+        } else {
+            setModoDesconto('real');
+        }
         setDesconto(desc);
         setDescontoInput(Math.round(desc * 100).toString());
   if (isOptimizationMode(valid.modoOtimizacao)) setModoOtimizacao(valid.modoOtimizacao);
@@ -861,7 +920,6 @@ const carregarDoHistorico = useCallback((orc: OrcamentoSalvo) => {
     if (valid.leadId) setCurrentLeadId(valid.leadId);
     setVidros(valid.vidros);
 
-    const cfgObj = valid.config as { compensarPerdas?: boolean; modoPerdas?: LossMode; perdasFixas?: number };
     const savedCompensar = valid.compensarPerdas !== undefined ? valid.compensarPerdas : cfgObj?.compensarPerdas;
     if (savedCompensar !== undefined) {
         setCompensarPerdas(Boolean(savedCompensar));
@@ -875,7 +933,7 @@ const carregarDoHistorico = useCallback((orc: OrcamentoSalvo) => {
         setPerdasFixas(savedPerdasFixas);
     }
     });
-}, [carregarDoHistoricoHook, setCliente, setPhone, setNeighborhood, setRollW, setPrice, setMargin, setDesconto, setDescontoInput, setModoOtimizacao, setSelectedFilm, setCurrentLeadId, setVidros, setCompensarPerdas, setModoPerdas, setPerdasFixas]);
+}, [carregarDoHistoricoHook, setCliente, setPhone, setNeighborhood, setRollW, setPrice, setMargin, setDesconto, setDescontoInput, setModoDesconto, setModoOtimizacao, setSelectedFilm, setCurrentLeadId, setVidros, setCompensarPerdas, setModoPerdas, setPerdasFixas]);
 
     // Carregar orçamento via parâmetro da URL (ex: vindo do CRM via /admin/?orcamentoId=123)
     const orcamentoCarregadoRef = useRef(false);
@@ -990,7 +1048,7 @@ const carregarDoHistorico = useCallback((orc: OrcamentoSalvo) => {
 
     const salvarProjeto = () => {
         const dados = {
-            config: { cliente, phone, neighborhood, rolo: rollW, preco: price, selectedFilm, customFilmName, compensarPerdas, desconto },
+            config: { cliente, phone, neighborhood, rolo: rollW, preco: price, selectedFilm, customFilmName, compensarPerdas, desconto: descontoEmReais, modoDesconto },
             vidros: [...vidros],
         };
         const blob = new Blob([JSON.stringify(dados)], { type: 'application/json' });
@@ -1019,6 +1077,11 @@ const carregarDoHistorico = useCallback((orc: OrcamentoSalvo) => {
                 setVidros((d.vidros || []).map((v) => ({ ...v, oh: v.oh ?? v.h ?? 0, ow: v.ow ?? v.w ?? 0 })) as GlassItem[]);
                 if (d.config?.compensarPerdas !== undefined) {
                     setCompensarPerdas(Boolean(d.config.compensarPerdas));
+                }
+                if (d.config?.modoDesconto === 'porcentagem' || d.config?.modoDesconto === 'real') {
+                    setModoDesconto(d.config.modoDesconto);
+                } else {
+                    setModoDesconto('real');
                 }
                 const desc = typeof d.config?.desconto === 'number' && !isNaN(d.config.desconto) ? d.config.desconto : 0;
                 setDesconto(desc);
@@ -1100,7 +1163,7 @@ const carregarDoHistorico = useCallback((orc: OrcamentoSalvo) => {
                     eficiencia={eficiencia}
                     finalPrice={finalPrice}
                     descontoInput={descontoInput}
-                    desconto={desconto}
+                    desconto={descontoEmReais}
                     filmName={selectedFilm === 'personalizado' ? (customFilmName || 'Personalizado') : FILM_TYPE_LABELS[selectedFilm]}
                 />
             ).toBlob();
@@ -1193,12 +1256,15 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
         case 'draftExpiration':
           setDraftExpiration(Math.max(0, value as number));
           break;
+        case 'modoDesconto':
+          setModoDesconto(value as DiscountMode);
+          break;
       }
     }
     const normalizedValue = key === 'perdasFixas' ? Math.min(100, Math.max(0, value as number)) : value;
     const updated = { ...currentConfig, [key]: normalizedValue };
     resolveCalculatorScopeKey().then((scopeKey) => saveConfig(updated, scopeKey)).catch(() => saveConfig(updated));
-  }, [currentConfig, getColorForItem, setVidros, setUsarCoresPorAmbiente, setRollW, setPrice, setMargin, setModoOtimizacao, setUserName, setModoPerdas, setPerdasFixas, setAgressividadeCorte, setFilmTypes, setSelectedFilm, setDraftExpiration]);
+  }, [currentConfig, getColorForItem, setVidros, setUsarCoresPorAmbiente, setRollW, setPrice, setMargin, setModoOtimizacao, setUserName, setModoPerdas, setPerdasFixas, setAgressividadeCorte, setFilmTypes, setSelectedFilm, setDraftExpiration, setModoDesconto]);
 
   const handleLogout = useCallback(async () => {
     if (isLoggingOut) return;
@@ -1347,7 +1413,7 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
       <ConfigPanel
         aberto={configAberto}
         setAberto={setConfigAberto}
-        config={{ rollW, price, margin, modoOtimizacao, userName, modoPerdas, perdasFixas, modoCorConfig: usarCoresPorAmbiente ? 'ambiente' : 'tamanho', agressividadeCorte, filmTypes, selectedFilm, draftExpiration }}
+        config={{ rollW, price, margin, modoOtimizacao, userName, modoPerdas, perdasFixas, modoCorConfig: usarCoresPorAmbiente ? 'ambiente' : 'tamanho', agressividadeCorte, filmTypes, selectedFilm, draftExpiration, modoDesconto }}
         onUpdate={atualizarConfig}
         onLogout={handleLogout}
         loggingOut={isLoggingOut}
@@ -1583,6 +1649,9 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
                                 eficiencia={eficiencia}
                                 displayDesconto={displayDesconto}
                                 onDescontoChange={handleDescontoChange}
+                                modoDesconto={modoDesconto}
+                                onToggleModoDesconto={handleToggleModoDesconto}
+                                descontoEmReais={descontoEmReais}
                                 compensarPerdas={compensarPerdas}
                                 onTogglePerdas={() => setCompensarPerdas(!compensarPerdas)}
                                 modoPerdas={modoPerdas}
@@ -1648,7 +1717,7 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
                 totalAreaM2={totalAreaM2}
                 finalPrice={finalPrice}
                 subtotalBruto={subtotalBruto}
-                desconto={desconto}
+                desconto={descontoEmReais}
                 perdas={compensacaoPerda}
                 formatBRL={formatBRL}
                 filmName={selectedFilm === 'personalizado' ? (customFilmName || 'Personalizado') : FILM_TYPE_LABELS[selectedFilm]}
