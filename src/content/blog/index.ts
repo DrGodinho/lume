@@ -1,3 +1,4 @@
+import { insulfilmCortinaDeVidroFechamentoSacada } from './posts/insulfilm-cortina-de-vidro-fechamento-sacada';
 import { precoInsulfilmResidencialRioDeJaneiro } from './posts/preco-insulfilm-residencial-rio-de-janeiro';
 import { comoProtegerMoveisDanosSol } from './posts/como-proteger-moveis-danos-sol';
 import { guiaInsulfilmResidencial } from './posts/guia-insulfilm-residencial';
@@ -8,6 +9,7 @@ import { insulfilmPrivacidadeNoturnaLuzAcesa } from './posts/insulfilm-privacida
 import type { BlogPost } from '@/lib/blog';
 
 export const blogPosts = [
+  insulfilmCortinaDeVidroFechamentoSacada,
   insulfilmPrivacidadeNoturnaLuzAcesa,
   elNino2026CasasMaisQuentesArCondicionado,
   cortinaPersianaOuInsulfilm,

@@ -18,9 +18,9 @@ export const insulfilmPrivacidadeNoturnaLuzAcesa: BlogPost = {
     'insulfilm blackout',
     'dual reflective',
   ],
-  coverImageUrl: '/hero-bg.webp',
+  coverImageUrl: '/blog/insulfilm-privacidade-noturna-luz-acesa.webp',
   coverImageAlt:
-    'Janela panorâmica residencial à noite com vista para a cidade iluminada e teste de privacidade com insulfilm de alta performance',
+    'Comparativo arquitetônico de privacidade em janela panorâmica no Rio de Janeiro: efeito espelho de dia versus transparência à noite com luz acesa',
   authorName: 'Marcos Paulo Godinho',
   publishedAt: '2026-09-11T12:00:00.000Z',
   updatedAt: '2026-09-11T12:00:00.000Z',
@@ -46,6 +46,12 @@ export const insulfilmPrivacidadeNoturnaLuzAcesa: BlogPost = {
     {
       type: 'paragraph',
       text: 'Isso acontece devido ao princípio físico do diferencial de luminosidade. As películas de controle solar não são espelhos mágicos unilaterais: o lado que reflete é sempre o lado onde há maior intensidade de luz.',
+    },
+    {
+      type: 'image',
+      url: '/blog/infografico-privacidade-noturna-dia-vs-noite.webp',
+      alt: 'Infográfico comparativo da física da luz no insulfilm: Dia com reflexo externo espelhado versus Noite com luz acesa e efeito aquário',
+      caption: 'Infográfico explicativo: O lado com maior intensidade de luz dita o reflexo. À noite, a luz interna inverte a ótica e anula a privacidade externa (Efeito Aquário).'
     },
     {
       type: 'list',
