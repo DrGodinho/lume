@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     siteName: 'LUME Controle Solar',
     images: [
       {
-        url: 'https://lumecontrolesolar.com.br/hero-bg.webp',
+        url: 'https://lumecontrolesolar.com.br/santocristo_hero_bg.webp',
         width: 1200,
         height: 630,
         alt: 'Insulfilm em Santo Cristo e Porto Maravilha - LUME Controle Solar',
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     title: 'Insulfilm em Santo Cristo RJ | LUME Controle Solar',
     description:
       'Redução de calor, privacidade e proteção UV em Santo Cristo e Porto Maravilha. Garantia de até 10 anos. Orçamento expresso via WhatsApp.',
-    images: ['https://lumecontrolesolar.com.br/hero-bg.webp'],
+    images: ['https://lumecontrolesolar.com.br/santocristo_hero_bg.webp'],
   },
 };
 

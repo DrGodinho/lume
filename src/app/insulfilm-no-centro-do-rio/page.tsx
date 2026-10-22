@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     siteName: 'LUME Controle Solar',
     images: [
       {
-        url: 'https://lumecontrolesolar.com.br/hero-bg.webp',
+        url: 'https://lumecontrolesolar.com.br/centrorio_hero_bg.webp',
         width: 1200,
         height: 630,
         alt: 'Insulfilm no Centro do Rio de Janeiro - LUME Controle Solar',
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     title: 'Insulfilm no Centro do Rio de Janeiro RJ | LUME Controle Solar',
     description:
       'Controle solar, anti-reflexo para escritórios e privacidade para apartamentos no Centro do Rio. Garantia de até 10 anos. Orçamento expresso via WhatsApp.',
-    images: ['https://lumecontrolesolar.com.br/hero-bg.webp'],
+    images: ['https://lumecontrolesolar.com.br/centrorio_hero_bg.webp'],
   },
 };
 

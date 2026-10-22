@@ -4,6 +4,7 @@ import { GoogleReviews } from './GoogleReviews';
 import { Particles } from './Particles';
 import { AnimatedCounter } from './AnimatedCounter';
 import { NavigationBreadcrumbs } from './NavigationBreadcrumbs';
+import { HeroEntrance } from './HeroEntrance';
 import type { NeighborhoodData } from '../data/neighborhoods';
 import { NeighborhoodAnimations } from './NeighborhoodAnimations';
 import Image from 'next/image';
@@ -98,43 +99,61 @@ export function NeighborhoodTemplate({ data }: Props) {
         <div className="absolute top-1/4 right-10 w-32 h-32 rounded-full bg-[#c9a227]/5 blur-3xl animate-float z-10" />
         <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-[#04080f]/30 blur-3xl animate-float z-10" style={{ animationDelay: '2s' }} />
 
-        <div className="container-lume relative z-20 page-entrance text-center md:text-left pt-24 pb-12">
+        <div className="container-lume relative z-20 text-center md:text-left pt-24 pb-12">
           <NavigationBreadcrumbs 
             showVisualTrail={false}
             items={[
               { label: 'Início', href: '/' },
+              { label: 'Onde Atendemos', href: '/#onde-atendemos' },
               { label: data.neighborName }
             ]}
           />
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#c9a227]/10 border border-[#c9a227]/30 mb-6">
-            <span className="w-2 h-2 rounded-full bg-[#c9a227] animate-pulse flex-shrink-0" />
-            <span className="text-[#c9a227] text-sm font-bold uppercase tracking-wider">{data.region}</span>
-          </div>
 
-          <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-montserrat mb-6 leading-tight">
-            {data.heroTitle} <span className="text-gradient-gold">{data.heroHighlight}</span>
-          </h1>
+          <HeroEntrance className="mt-4">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#c9a227]/10 border border-[#c9a227]/30 mb-6 font-semibold uppercase tracking-wider text-[#c9a227] text-xs md:text-sm shadow-[0_0_20px_rgba(201,162,39,0.15)] animate-hero">
+              <span className="w-2 h-2 rounded-full bg-[#c9a227] animate-pulse flex-shrink-0" />
+              <span>{data.region}</span>
+            </div>
 
-          <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto md:mx-0 mb-10 leading-relaxed font-light">
-            {data.heroSubtitle}
-          </p>
+            <h1 className="text-4xl md:text-5xl lg:text-7xl font-black font-montserrat mb-6 leading-tight tracking-tight">
+              {data.heroTitle.split(' ').map((word, i) => (
+                <span key={`ht-${i}`} className="inline-block word mr-3">{word}</span>
+              ))}
+              {data.heroHighlight.split(' ').map((word, i) => (
+                <span key={`hh-${i}`} className="inline-block word mr-3 text-gradient-gold">{word}</span>
+              ))}
+            </h1>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-            <a
-              href={`https://wa.me/5521965140612?text=${encodeURIComponent(data.whatsappMessage)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary inline-flex items-center justify-center gap-3 text-lg py-4 px-8 transform transition hover:scale-105"
-            >
-              {data.heroButtonText} <ArrowRight size={20} />
-            </a>
-            <a
-              href="#tipos"
-              className="btn-outline inline-flex items-center justify-center gap-3 text-lg py-4 px-8 border border-white/20 hover:bg-white/5 transition-colors rounded-xl font-bold uppercase tracking-widest text-sm"
-            >
-              {data.secondaryButtonText}
-            </a>
-          </div>
+            <div className="flex items-center justify-center md:justify-start gap-4 mb-6 animate-hero">
+              <div className="h-px w-10 bg-gradient-to-r from-transparent to-[#c9a227]" />
+              <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-semibold">
+                Atendimento Especializado · {data.neighborName}
+              </span>
+              <div className="h-px w-10 bg-gradient-to-l from-transparent to-[#c9a227]" />
+            </div>
+
+            <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto md:mx-0 mb-10 leading-relaxed font-light animate-hero">
+              {data.heroSubtitle}
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start animate-hero">
+              <a
+                href={`https://wa.me/5521965140612?text=${encodeURIComponent(data.whatsappMessage)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-primary inline-flex items-center justify-center gap-3 text-base sm:text-lg py-4 px-8 transform transition hover:scale-105 shadow-[0_10px_30px_rgba(201,162,39,0.25)]"
+              >
+                <MessageCircle size={20} />
+                {data.heroButtonText}
+              </a>
+              <a
+                href="#tipos"
+                className="btn-outline inline-flex items-center justify-center gap-3 text-sm sm:text-base py-4 px-8 border border-white/20 hover:bg-white/5 transition-colors rounded-xl font-bold uppercase tracking-wider"
+              >
+                {data.secondaryButtonText} <ArrowRight size={18} />
+              </a>
+            </div>
+          </HeroEntrance>
         </div>
       </section>
 
@@ -213,7 +232,16 @@ export function NeighborhoodTemplate({ data }: Props) {
       <section id="tipos" className="py-24 bg-[#04080f] px-4">
         <div className="container-lume">
           <div className="text-center mb-16 page-entrance">
-            <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-6 tracking-tight">INSULFILM DE ALTA PERFORMANCE</h2>
+            <div className="flex items-center justify-center gap-4 mb-4">
+              <div className="h-px w-12 bg-gradient-to-r from-transparent to-[#c9a227]" />
+              <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-semibold">
+                Catálogo de Películas
+              </span>
+              <div className="h-px w-12 bg-gradient-to-l from-transparent to-[#c9a227]" />
+            </div>
+            <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-6 tracking-tight text-white">
+              INSULFILM DE <span className="text-gradient-gold">ALTA PERFORMANCE</span>
+            </h2>
             <p className="text-gray-400 max-w-2xl mx-auto">Conheça as tecnologias mais procuradas em {data.neighborName} para controle térmico e privacidade.</p>
           </div>
 

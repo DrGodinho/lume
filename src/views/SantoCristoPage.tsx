@@ -12,12 +12,9 @@ import {
   Eye, 
   Building2, 
   Sparkles, 
-  Star, 
-  Zap, 
   MessageCircle, 
   Users, 
   Layers, 
-  Lock,
   ChevronDown
 } from 'lucide-react';
 import { NavigationBreadcrumbs } from '../components/NavigationBreadcrumbs';
@@ -42,10 +39,17 @@ export function SantoCristoPage({ faqs }: SantoCristoPageProps) {
       <section className="relative pt-28 pb-16 lg:pt-40 lg:pb-28 overflow-hidden px-4">
         {/* Background Ambience */}
         <div className="absolute inset-0 z-0 pointer-events-none">
-          <div className="w-full h-full bg-gradient-to-br from-[#04080f] via-[#071324] to-[#04080f]" />
+          <Image
+            src="/santocristo_hero_bg.webp"
+            alt="Varanda envidraçada com insulfilm em Santo Cristo e Porto Maravilha - LUME"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center opacity-30"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#04080f] via-[#04080f]/80 to-[#04080f]/60" />
           <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-[#c9a227]/10 blur-[140px] rounded-full pointer-events-none" />
           <div className="absolute bottom-10 right-10 w-96 h-96 bg-[#1a3a5c]/25 blur-[110px] rounded-full pointer-events-none" />
-          <div className="absolute inset-0 bg-black/40" />
         </div>
 
         <Particles />
@@ -300,6 +304,27 @@ export function SantoCristoPage({ faqs }: SantoCristoPageProps) {
               <div className="text-left">
                 <span className="text-[11px] text-gray-400 block uppercase tracking-wider">Área Total Medida</span>
                 <span className="text-sm sm:text-base font-bold text-[#c9a227]">5,78 m²</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Foto Ilustrativa da Varanda */}
+          <div className="max-w-4xl mx-auto mb-12 overflow-hidden rounded-3xl border border-white/10 relative group shadow-2xl">
+            <div className="relative h-64 sm:h-80 md:h-96 w-full">
+              <Image
+                src="/santocristo_hero_bg.webp"
+                alt="Exemplo real de cortina de vidro com 11 painéis em Santo Cristo - LUME"
+                fill
+                sizes="(max-width: 1024px) 100vw, 896px"
+                className="object-cover group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#04080f] via-transparent to-transparent opacity-85" />
+              <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs text-gray-300 bg-[#04080f]/85 backdrop-blur-md px-4 py-3 rounded-2xl border border-white/10">
+                <span className="font-semibold text-white flex items-center gap-2">
+                  <CheckCircle size={15} className="text-[#c9a227]" /> 
+                  Fechamento Real: 11 Vidros · 5,78 m² em Santo Cristo
+                </span>
+                <span className="text-[#c9a227] font-bold hidden sm:inline">Conforto Térmico & Vista da Baía</span>
               </div>
             </div>
           </div>

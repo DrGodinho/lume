@@ -53,21 +53,22 @@ export function NeighborhoodAnimations() {
 
       // Benefits Cards animation
       const cards = document.querySelectorAll('.benefit-card');
-      if (cards.length > 0) {
+      const benefitTrigger = document.getElementById('vantagens') || cards[0];
+      if (cards.length > 0 && benefitTrigger) {
         gsap.fromTo(
           cards,
-          { opacity: 0, scale: 0.8, rotate: -10 },
+          { opacity: 0, scale: 0.85, y: 20 },
           {
             opacity: 1,
             scale: 1,
-            rotate: 0,
+            y: 0,
             duration: 0.6,
-            stagger: 0.15,
-            ease: 'elastic.out(1, 0.5)',
+            stagger: 0.12,
+            ease: 'power3.out',
             scrollTrigger: {
-              trigger: '#vantagens',
-              start: 'top 75%',
-              toggleActions: 'play none none reverse',
+              trigger: benefitTrigger,
+              start: 'top 80%',
+              toggleActions: 'play none none none',
             },
           }
         );
@@ -75,21 +76,43 @@ export function NeighborhoodAnimations() {
 
       // Product Cards animation
       const productCards = document.querySelectorAll('.product-card');
-      if (productCards.length > 0) {
+      const productTrigger = document.getElementById('tipos') || productCards[0];
+      if (productCards.length > 0 && productTrigger) {
         gsap.fromTo(
           productCards,
-          { opacity: 0, rotateY: -30, x: -50 },
+          { opacity: 0, y: 30 },
           {
             opacity: 1,
-            rotateY: 0,
-            x: 0,
-            duration: 0.7,
-            stagger: 0.12,
+            y: 0,
+            duration: 0.6,
+            stagger: 0.1,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: productTrigger,
+              start: 'top 80%',
+              toggleActions: 'play none none none',
+            },
+          }
+        );
+      }
+
+      // Stat Cards animation
+      const statCards = document.querySelectorAll('.stat-card');
+      if (statCards.length > 0) {
+        gsap.fromTo(
+          statCards,
+          { opacity: 0, scale: 0.9, y: 20 },
+          {
+            opacity: 1,
+            scale: 1,
+            y: 0,
+            duration: 0.6,
+            stagger: 0.1,
             ease: 'expo.out',
             scrollTrigger: {
-              trigger: '#tipos',
-              start: 'top 75%',
-              toggleActions: 'play none none reverse',
+              trigger: statCards[0],
+              start: 'top 85%',
+              toggleActions: 'play none none none',
             },
           }
         );
@@ -98,9 +121,6 @@ export function NeighborhoodAnimations() {
 
     return () => {
       ctx.revert();
-      ScrollTrigger.getAll().forEach((trigger) => {
-        trigger.kill();
-      });
     };
   }, [prefersReducedMotion]);
 

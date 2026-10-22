@@ -100,21 +100,20 @@ graph TD
      - Incluir a nova seção "Soluções por Ambiente" (Sala, Quarto, Cozinha, Banheiro, Escritório, Portas).
      - Adicionar **Santo Cristo**, **Centro** e **Sulacap** na lista de bairros atendidos.
 
-4. **Harmonização de Preços (`src/lib/films.ts`)**:
-   - Conectar o [Simulator.tsx](file:///c:/Users/ThinkPad/Downloads/app/src/views/Simulator.tsx) diretamente às constantes canônicas de [films.ts](file:///c:/Users/ThinkPad/Downloads/app/src/lib/films.ts), eliminando qualquer divergência entre simulação e orçamento final.
+4. **Harmonização de Preços (`src/lib/films.ts` & `Simulator.tsx`)** `[CONCLUÍDO]`:
+   - Conectado o [Simulator.tsx](file:///c:/Users/ThinkPad/Downloads/app/src/views/Simulator.tsx) diretamente às constantes canônicas de [films.ts](file:///c:/Users/ThinkPad/Downloads/app/src/lib/films.ts), eliminando qualquer divergência entre simulação e orçamento final (Nano Cerâmica padronizada em R$ 220/m²).
 
 ---
 
 ### 🟡 SPRINT 2: Conversão & LUME Standards nas Páginas Existentes (Semana 2)
 > **Objetivo:** Aumentar a taxa de fechamento das visitas que já chegam na Zona Oeste e deixar o SEO impecável para o algoritmo do Google.
 
-1. **Padronização das 7 Landing Pages da Zona Oeste**:
-   - Atualizar `Bangu`, `Campo Grande`, `Realengo`, `Sulacap`, `Barra da Tijuca`, `Recreio` e `Jacarepaguá`.
-   - Substituir `NeighborhoodAnimations` pelo padrão canônico:
-     - Componente `<HeroEntrance>` com spans `.word inline-block`.
-     - Subtítulo com traços dourados e classe `.animate-hero`.
-     - Micro-animações `ScrollReveal` em cards `.stat-card` e `.benefit-card`.
-     - Inclusão do `<NavigationBreadcrumbs>` no topo do Hero.
+1. **Padronização das 7 Landing Pages da Zona Oeste** `[CONCLUÍDO]`:
+   - Atualizados `Bangu`, `Campo Grande`, `Realengo`, `Sulacap`, `Barra da Tijuca`, `Recreio` e `Jacarepaguá` e o `NeighborhoodTemplate.tsx`:
+     - Componente `<HeroEntrance>` com spans `.word inline-block` animando cada palavra sequencialmente.
+     - Subtítulo com traços dourados laterais e classe `.animate-hero`.
+     - Inclusão do `<NavigationBreadcrumbs>` no topo do Hero em todas as 7 páginas.
+     - Refatoração de `NeighborhoodAnimations` com triggers dinâmicos e limpeza segura de ScrollTrigger sem afetar outros componentes.
 2. **Otimização de Carregamento & Assets**:
    - Converter `novo-logo-lume.png` (388 KB) para WebP/SVG.
    - Remover arquivos órfãos não utilizados da pasta `public/` para reduzir o payload.

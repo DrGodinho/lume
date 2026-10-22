@@ -3,6 +3,8 @@ import { GoogleReviews } from '../components/GoogleReviews';
 import { Particles } from '../components/Particles';
 import { AnimatedCounter } from '../components/AnimatedCounter';
 import { NeighborhoodAnimations } from '../components/NeighborhoodAnimations';
+import { HeroEntrance } from '../components/HeroEntrance';
+import { NavigationBreadcrumbs } from '../components/NavigationBreadcrumbs';
 import Image from 'next/image';
 
 export function BarraPage({ faqs }: { faqs: { q: string; a: string }[] }) {
@@ -34,36 +36,60 @@ export function BarraPage({ faqs }: { faqs: { q: string; a: string }[] }) {
                 <div className="absolute top-1/4 right-10 w-32 h-32 rounded-full bg-[#c9a227]/5 blur-3xl animate-float z-10 pointer-events-none" />
                 <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-[#1a3a5c]/30 blur-3xl animate-float z-10 pointer-events-none" style={{ animationDelay: '2s' }} />
 
-                <div className="container-lume relative z-20 page-entrance text-center md:text-left pt-24 pb-12">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#c9a227]/10 border border-[#c9a227]/30 mb-6">
-                        <span className="w-2 h-2 rounded-full bg-[#c9a227] animate-pulse flex-shrink-0" />
-                        <span className="text-[#c9a227] text-sm font-bold uppercase tracking-wider">Barra da Tijuca e Região</span>
-                    </div>
+                <div className="container-lume relative z-20 text-center md:text-left pt-24 pb-12">
+                    <NavigationBreadcrumbs 
+                        showVisualTrail={false}
+                        items={[
+                            { label: 'Início', href: '/' },
+                            { label: 'Onde Atendemos', href: '/#onde-atendemos' },
+                            { label: 'Barra da Tijuca' }
+                        ]}
+                    />
 
-                    <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-montserrat mb-6 leading-tight">
-                        Insulfilm na <span className="text-gradient-gold">Barra</span>
-                    </h1>
+                    <HeroEntrance className="mt-4">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#c9a227]/10 border border-[#c9a227]/30 mb-6 font-semibold uppercase tracking-wider text-[#c9a227] text-xs md:text-sm shadow-[0_0_20px_rgba(201,162,39,0.15)] animate-hero">
+                            <span className="w-2 h-2 rounded-full bg-[#c9a227] animate-pulse flex-shrink-0" />
+                            <span>Barra da Tijuca e Região</span>
+                        </div>
 
-                    <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto md:mx-0 mb-10 leading-relaxed font-light">
-                        Eleve o padrão de conforto térmico do seu imóvel na Barra da Tijuca. Películas de alta tecnologia para residências de luxo e ambientes corporativos modernos, com películas a partir de R$ 80/m².
-                    </p>
+                        <h1 className="text-4xl md:text-5xl lg:text-7xl font-black font-montserrat mb-6 leading-tight tracking-tight">
+                            <span className="inline-block word mr-3">Insulfilm</span>
+                            <span className="inline-block word mr-3">na</span>
+                            <span className="inline-block word mr-3 text-gradient-gold">Barra</span>
+                            <span className="inline-block word mr-3 text-gradient-gold">da</span>
+                            <span className="inline-block word mr-3 text-gradient-gold">Tijuca</span>
+                        </h1>
 
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                        <a
-                            href="https://wa.me/5521965140612?text=Olá! Quero um orçamento de insulfilm na Barra da Tijuca."
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="btn-primary inline-flex items-center justify-center gap-3 text-lg py-4 px-8 transform transition hover:scale-105"
-                        >
-                            Solicitar Orçamento <ArrowRight size={20} />
-                        </a>
-                        <a
-                            href="#tipos"
-                            className="btn-outline inline-flex items-center justify-center gap-3 text-lg py-4 px-8 border border-white/20 hover:bg-white/5 transition-colors rounded-xl font-bold uppercase tracking-widest text-sm"
-                        >
-                            Ver Películas Elite
-                        </a>
-                    </div>
+                        <div className="flex items-center justify-center md:justify-start gap-4 mb-6 animate-hero">
+                            <div className="h-px w-10 bg-gradient-to-r from-transparent to-[#c9a227]" />
+                            <span className="text-[#c9a227] text-xs sm:text-sm uppercase tracking-widest font-semibold">
+                                Atendimento Especializado · Barra da Tijuca
+                            </span>
+                            <div className="h-px w-10 bg-gradient-to-l from-transparent to-[#c9a227]" />
+                        </div>
+
+                        <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto md:mx-0 mb-10 leading-relaxed font-light animate-hero">
+                            Eleve o padrão de conforto térmico do seu imóvel na Barra da Tijuca. Películas de alta tecnologia para residências de luxo e ambientes corporativos modernos, com películas a partir de R$ 80/m².
+                        </p>
+
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start animate-hero">
+                            <a
+                                href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Quero%20um%20or%C3%A7amento%20de%20insulfilm%20na%20Barra%20da%20Tijuca."
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn-primary inline-flex items-center justify-center gap-3 text-base sm:text-lg py-4 px-8 transform transition hover:scale-105 shadow-[0_10px_30px_rgba(201,162,39,0.25)]"
+                            >
+                                <MessageCircle size={20} />
+                                Solicitar Orçamento no WhatsApp
+                            </a>
+                            <a
+                                href="#tipos"
+                                className="btn-outline inline-flex items-center justify-center gap-3 text-sm sm:text-base py-4 px-8 border border-white/20 hover:bg-white/5 transition-colors rounded-xl font-bold uppercase tracking-wider"
+                            >
+                                Ver Películas Elite <ArrowRight size={18} />
+                            </a>
+                        </div>
+                    </HeroEntrance>
                 </div>
             </section>
 
