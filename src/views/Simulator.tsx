@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Sun, CheckCircle, Smartphone, Home, Shield, Thermometer, Eye, Wind, Building2, Droplets, ChevronRight, ArrowLeft } from 'lucide-react';
+import { Sun, CheckCircle, Smartphone, Home, Shield, Thermometer, Eye, Wind, Building2, Droplets, ChevronRight, ArrowLeft, X, MessageCircle, Sparkles } from 'lucide-react';
 import gsap from 'gsap';
 
 import { DEFAULT_FILM_TYPES } from '@/lib/films';
@@ -45,11 +45,22 @@ export function SimulatorPage() {
     const [alternativeMatch, setAlternativeMatch] = useState<ProductInfo | null>(null);
     const [directMatch, setDirectMatch] = useState(false);
 
+    // Lead Capture Modal state
+    const [showLeadModal, setShowLeadModal] = useState(false);
+    const [leadName, setLeadName] = useState('');
+    const [leadPhone, setLeadPhone] = useState('');
+    const [leadNeighborhood, setLeadNeighborhood] = useState('');
+    const [isSubmittingLead, setIsSubmittingLead] = useState(false);
+    const [leadError, setLeadError] = useState('');
+
     useEffect(() => {
-        gsap.fromTo('.page-entrance',
+        const anim = gsap.fromTo('.page-entrance',
             { opacity: 0, y: 20 },
             { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }
         );
+        return () => {
+            anim.kill();
+        };
     }, [step]);
 
 
@@ -175,17 +186,78 @@ export function SimulatorPage() {
         setStep('welcome');
     };
 
-    const sendWhatsApp = () => {
-        if (!bestMatch) return;
-        const msg = `Olá! O Assistente LUME me recomendou o insulfilm *${bestMatch.name}*. Gostaria de mais informações e um orçamento!`;
-        const url = `https://wa.me/5521965140612?text=${msg}`;
+    const handleOpenLeadModal = () => {
+        setShowLeadModal(true);
+        setLeadError('');
+    };
 
+    const handleCloseLeadModal = () => {
+        setShowLeadModal(false);
+        setLeadError('');
+    };
+
+    const triggerWhatsAppRedirect = (customMsg: string) => {
+        const url = `https://wa.me/5521965140612?text=${encodeURIComponent(customMsg)}`;
         const w = window as unknown as { gtagSendEvent?: (url: string) => void };
         if (typeof w.gtagSendEvent === 'function') {
             w.gtagSendEvent(url);
         } else {
             window.open(url, '_blank');
         }
+    };
+
+    const handleLeadSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!bestMatch) return;
+
+        if (!leadName.trim() || leadName.trim().length < 2) {
+            setLeadError('Por favor, informe seu nome.');
+            return;
+        }
+
+        const phoneClean = leadPhone.replace(/\D/g, '');
+        if (phoneClean.length < 10) {
+            setLeadError('Informe um WhatsApp válido com DDD (ex: 21999999999).');
+            return;
+        }
+
+        setIsSubmittingLead(true);
+        setLeadError('');
+
+        try {
+            await fetch('/api/crm/public-lead/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: leadName.trim(),
+                    phone: phoneClean,
+                    neighborhood: leadNeighborhood.trim() || 'Rio de Janeiro',
+                    filmType: bestMatch.name,
+                    sqm: 10,
+                    value: Number(bestMatch.price) * 10,
+                    location,
+                    condoRule,
+                    priorities,
+                    notes: `Recomendação principal: ${bestMatch.name}. Alternativa: ${alternativeMatch?.name || 'N/A'}`
+                })
+            });
+        } catch {
+            // Silently proceed to WhatsApp
+        } finally {
+            setIsSubmittingLead(false);
+            setShowLeadModal(false);
+
+            const bName = leadNeighborhood.trim() ? ` (${leadNeighborhood.trim()})` : '';
+            const msg = `Olá! Meu nome é ${leadName.trim()}${bName}. Fiz a simulação no site da LUME e o sistema me recomendou o insulfilm *${bestMatch.name}*. Gostaria de confirmar meu orçamento com desconto!`;
+            triggerWhatsAppRedirect(msg);
+        }
+    };
+
+    const handleDirectWhatsApp = () => {
+        if (!bestMatch) return;
+        setShowLeadModal(false);
+        const msg = `Olá! Fiz a simulação no site da LUME e o sistema me recomendou o insulfilm *${bestMatch.name}*. Gostaria de mais informações e um orçamento!`;
+        triggerWhatsAppRedirect(msg);
     };
 
     return (
@@ -410,7 +482,7 @@ export function SimulatorPage() {
                                     </div>
                                 </div>
 
-                                <button onClick={sendWhatsApp} className="w-full btn-primary py-4 text-lg flex justify-center items-center gap-3">
+                                <button onClick={handleOpenLeadModal} className="w-full btn-primary py-4 text-lg flex justify-center items-center gap-3">
                                     <Smartphone /> QUERO ESTE INSULFILM NO ORÇAMENTO
                                 </button>
                             </div>
@@ -440,6 +512,103 @@ export function SimulatorPage() {
                     )}
                 </div>
             </div>
+
+            {/* Modal de Pré-Lead para CRM & WhatsApp */}
+            {showLeadModal && bestMatch && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+                    <div className="bg-[#0a111e] border border-[#c9a227]/40 rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-[0_20px_50px_rgba(0,0,0,0.9)] relative text-left">
+                        <button
+                            onClick={handleCloseLeadModal}
+                            className="absolute top-4 right-4 text-gray-400 hover:text-white p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                            aria-label="Fechar"
+                        >
+                            <X size={18} />
+                        </button>
+
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#c9a227]/10 border border-[#c9a227]/30 mb-4 text-[#c9a227] text-xs font-semibold uppercase tracking-wider">
+                            <Sparkles size={12} /> Orçamento com Desconto Especial
+                        </div>
+
+                        <h3 className="text-xl sm:text-2xl font-bold font-montserrat text-white mb-2">
+                            Quase Pronto! 🎯
+                        </h3>
+                        <p className="text-sm text-gray-300 mb-6 leading-relaxed">
+                            Preencha seus dados para salvar sua recomendação de <strong className="text-[#c9a227]">{bestMatch.name}</strong> e falar com um especialista no WhatsApp:
+                        </p>
+
+                        <form onSubmit={handleLeadSubmit} className="space-y-4">
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">
+                                    Seu Nome Completo *
+                                </label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={leadName}
+                                    onChange={(e) => setLeadName(e.target.value)}
+                                    placeholder="Ex: Carlos Eduardo"
+                                    className="w-full px-4 py-3 rounded-xl bg-[#04080f] border border-white/10 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-[#c9a227] transition-colors"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">
+                                    Seu WhatsApp com DDD *
+                                </label>
+                                <input
+                                    type="tel"
+                                    required
+                                    value={leadPhone}
+                                    onChange={(e) => setLeadPhone(e.target.value)}
+                                    placeholder="Ex: (21) 99999-9999"
+                                    className="w-full px-4 py-3 rounded-xl bg-[#04080f] border border-white/10 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-[#c9a227] transition-colors"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">
+                                    Bairro no Rio de Janeiro (Opcional)
+                                </label>
+                                <input
+                                    type="text"
+                                    value={leadNeighborhood}
+                                    onChange={(e) => setLeadNeighborhood(e.target.value)}
+                                    placeholder="Ex: Copacabana, Ipanema, Barra, Tijuca..."
+                                    className="w-full px-4 py-3 rounded-xl bg-[#04080f] border border-white/10 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-[#c9a227] transition-colors"
+                                />
+                            </div>
+
+                            {leadError && (
+                                <p className="text-red-400 text-xs font-medium bg-red-500/10 border border-red-500/20 p-2.5 rounded-lg">
+                                    {leadError}
+                                </p>
+                            )}
+
+                            <button
+                                type="submit"
+                                disabled={isSubmittingLead}
+                                className="w-full btn-primary py-3.5 text-base font-bold flex justify-center items-center gap-2 rounded-xl shadow-[0_10px_25px_rgba(201,162,39,0.25)] hover:scale-[1.02] active:scale-[0.98] transition-transform disabled:opacity-50"
+                            >
+                                {isSubmittingLead ? (
+                                    <span>Conectando ao WhatsApp...</span>
+                                ) : (
+                                    <>
+                                        <MessageCircle size={18} /> Continuar para o WhatsApp
+                                    </>
+                                )}
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={handleDirectWhatsApp}
+                                className="w-full text-center text-xs text-gray-400 hover:text-white transition-colors pt-2 underline underline-offset-4"
+                            >
+                                Prefiro abrir o WhatsApp sem salvar cadastro
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

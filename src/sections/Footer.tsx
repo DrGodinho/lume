@@ -193,6 +193,10 @@ export function Footer() {
               {[
                 { name: 'Centro do Rio', href: '/insulfilm-no-centro-do-rio', highlight: true },
                 { name: 'Santo Cristo (Porto Maravilha)', href: '/insulfilm-em-santo-cristo', highlight: true },
+                { name: 'Copacabana', href: '/insulfilm-em-copacabana', highlight: true },
+                { name: 'Ipanema', href: '/insulfilm-em-ipanema', highlight: true },
+                { name: 'Leblon', href: '/insulfilm-no-leblon', highlight: true },
+                { name: 'Tijuca', href: '/insulfilm-na-tijuca', highlight: true },
                 { name: 'Barra da Tijuca', href: '/insulfilm-na-barra-da-tijuca' },
                 { name: 'Recreio', href: '/insulfilm-no-recreio' },
                 { name: 'Jacarepaguá', href: '/insulfilm-em-jacarepagua' },

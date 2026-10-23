@@ -126,16 +126,24 @@ graph TD
 
 ---
 
-### 🟣 SPRINT 3: Expansão de Alto Ticket (Semana 3)
-> **Objetivo:** Conquistar a demanda de bairros com maior capacidade de investimento em películas Nano Cerâmica (margem de lucro elevada).
+### 🟣 SPRINT 3: Expansão de Alto Ticket (Semana 3) `[CONCLUÍDO]`
+> **Objetivo:** Conquistar a demanda de bairros com maior capacidade de investimento em películas Nano Cerâmica (margem de lucro elevada) e integrar a captação de leads do Simulador ao CRM.
 
-1. **Criação das Landing Pages de Alto Padrão**:
-   - `/insulfilm-em-copacabana/`
-   - `/insulfilm-em-ipanema/`
-   - `/insulfilm-no-leblon/`
-   - `/insulfilm-na-tijuca/`
-2. **Integração do Simulador ao CRM LUME**:
-   - No final da simulação ou cálculo de economia, o botão "Enviar Orçamento para o WhatsApp" enviará a cotação pronta e criará automaticamente o lead no CRM com status `Novo Lead (Simulador)`.
+1. **Criação das Landing Pages de Alto Padrão** `[CONCLUÍDO]`:
+   - [Copacabana](/insulfilm-em-copacabana/): Foco em orla marítima, resistência à maresia sem oxidação, preservação da vista e conforto térmico na Av. Atlântica.
+   - [Ipanema](/insulfilm-em-ipanema/): Foco em residências nobres (Vieira Souto / Prudente de Morais), sol poente, conformidade com regras estritas de fachada e corte de 95% do calor com Nano Cerâmica.
+   - [Leblon](/insulfilm-no-leblon/): Foco no m² mais valorizado do país (Delfim Moreira / Alto Leblon), proteção UV absoluta para acervos de arte, isolamento acústico e discrição.
+   - [Tijuca](/insulfilm-na-tijuca/): Foco em alívio térmico urbano (redução de até 8°C), redução de ofuscamento para home office e custo-benefício com Carbono Elite e Dupla Camada.
+   - Todas as 4 páginas contam com:
+     - Hero backgrounds em `.webp` de alta fidelidade e contraste cinematográfico.
+     - Design System LUME Elite: `<HeroEntrance>` palavra por palavra, `<ScrollReveal>`, `<AnimatedCounter>`, `<GoogleReviews>`, `<LevelDots>` e `<ContactCTA>`.
+     - Schemas JSON-LD completos: `LocalBusiness` com coordenadas geo-localizadas, `Service` com `Offer` e `FAQPage` indexável.
+     - Registro em `sitemap.ts`, `Footer.tsx` e `Coverage.tsx` ("Onde Atendemos").
+
+2. **Integração do Simulador ao CRM LUME (Funil Direto de Conversão)** `[CONCLUÍDO]`:
+   - **Modal de Pré-Lead:** Disparado ao clicar em "Quero Este Insulfilm no Orçamento", permitindo coletar Nome, WhatsApp e Bairro com opção de abertura direta.
+   - **API Pública Segura (`POST /api/crm/public-lead/`):** Endpoint server-side com validação Zod, honeypot anti-spam e inserção com credencial de serviço no Supabase (`status: 'Novo'` e histórico).
+   - **Disparo Contextual para WhatsApp:** Mensagem pré-formatada com o nome do cliente, bairro e produto recomendado (ex: Nano Cerâmica), gerando um fluxo de atendimento contínuo.
 
 ---
 

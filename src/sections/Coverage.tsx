@@ -9,6 +9,10 @@ interface LocationItem {
 }
 
 const locations: LocationItem[] = [
+  { name: 'Copacabana', active: true, isNew: true },
+  { name: 'Ipanema', active: true, isNew: true },
+  { name: 'Leblon', active: true, isNew: true },
+  { name: 'Tijuca', active: true, isNew: true },
   { name: 'Centro do Rio', active: true, isNew: true },
   { name: 'Santo Cristo (Porto Maravilha)', active: true, isNew: true },
   { name: 'Barra da Tijuca', active: true },
@@ -21,6 +25,10 @@ const locations: LocationItem[] = [
 ];
 
 const urlMap: Record<string, string> = {
+  'Copacabana': '/insulfilm-em-copacabana',
+  'Ipanema': '/insulfilm-em-ipanema',
+  'Leblon': '/insulfilm-no-leblon',
+  'Tijuca': '/insulfilm-na-tijuca',
   'Centro do Rio': '/insulfilm-no-centro-do-rio',
   'Santo Cristo (Porto Maravilha)': '/insulfilm-em-santo-cristo',
   'Bangu': '/insulfilm-em-bangu',
