@@ -33,23 +33,47 @@ export interface CompensacaoPerdaInput {
   perdasFixas: number;
   eficiencia: number;
   subtotalBruto: number;
+  totalAreaM2?: number;
+  areaBobinaM2?: number;
+  price?: number;
 }
 
-/** Valor de compensação de perdas (fixo ou dinâmico). */
+/**
+ * Valor de compensação de perdas:
+ * - Modo fixo: percentual configurado sobre o subtotal bruto.
+ * - Modo dinâmico: cobrança real da área de bobina consumida ((área bobina - área vidros) × preço),
+ *   limitada a um teto de segurança de +100% do subtotal bruto.
+ */
 export function calcCompensacaoPerda({
   compensarPerdas,
   modoPerdas,
   perdasFixas,
   eficiencia,
   subtotalBruto,
+  totalAreaM2,
+  areaBobinaM2,
+  price,
 }: CompensacaoPerdaInput): number {
-  if (!compensarPerdas) return 0;
+  if (!compensarPerdas || subtotalBruto <= 0) return 0;
   if (modoPerdas === 'fixo') {
-    return subtotalBruto * (perdasFixas / 100);
+    return roundCurrency(subtotalBruto * (perdasFixas / 100));
   }
-  // dinâmico
+  // dinâmico: cobrança real da bobina gasta
   if (eficiencia >= 100 || eficiencia <= 0) return 0;
-  return subtotalBruto * ((100 - eficiencia) / 100);
+
+  let valorPerda = 0;
+  if (areaBobinaM2 !== undefined && totalAreaM2 !== undefined && price !== undefined && areaBobinaM2 > 0 && price > 0) {
+    const areaPerda = Math.max(0, areaBobinaM2 - totalAreaM2);
+    valorPerda = areaPerda * price;
+  } else {
+    // Fator real da bobina: (100 - E) / E
+    const fatorPerda = (100 - eficiencia) / eficiencia;
+    valorPerda = subtotalBruto * fatorPerda;
+  }
+
+  // Teto de segurança acordado: no máximo +100% do subtotal bruto
+  const tetoMaximo = subtotalBruto;
+  return roundCurrency(Math.min(valorPerda, tetoMaximo));
 }
 
 /** Preço final = bruto + perdas − desconto (arredondado em centavos). */

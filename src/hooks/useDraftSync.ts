@@ -54,6 +54,10 @@ interface DraftActions {
   setCloudStatus: (v: CloudStatus) => void;
 }
 
+interface UseDraftSyncOptions {
+  skipRestore?: boolean;
+}
+
 /**
  * C1: autosave do rascunho (local imediato + nuvem com debounce) e restore
  * (nuvem primeiro, localStorage como fallback). Lógica verbatim do god
@@ -63,7 +67,11 @@ export function useDraftSync(
   values: DraftValues,
   actions: DraftActions,
   authRefreshKey: number,
-): { draftRestored: boolean } {
+  options?: UseDraftSyncOptions,
+): {
+  draftRestored: boolean;
+  setDraftRestored: React.Dispatch<React.SetStateAction<boolean>>;
+} {
   const [draftRestored, setDraftRestored] = useState(false);
   const cloudTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scopeKeyRef = useRef<string | null>(null);
@@ -174,6 +182,13 @@ export function useDraftSync(
       try {
         const scopeKey = await resolveCalculatorScopeKey();
         scopeKeyRef.current = scopeKey;
+
+        if (options?.skipRestore) {
+          // Quando skipRestore é true (ex: orçamento sendo carregado via URL do CRM),
+          // não aplica o rascunho anterior para evitar sobrescrever o orçamento requisitado.
+          return;
+        }
+
         const cfgSource = loadConfig(scopeKey);
         let expirationMin = cfgSource.draftExpiration ?? DEFAULT_CONFIG.draftExpiration;
         try {
@@ -264,12 +279,12 @@ export function useDraftSync(
       } catch (err) {
         logger.error('Erro ao restaurar rascunho', err);
       } finally {
-        if (mounted) setDraftRestored(true);
+        if (mounted && !options?.skipRestore) setDraftRestored(true);
       }
     };
     restoreDraft();
     return () => { mounted = false; };
-  }, [authRefreshKey]);
+  }, [authRefreshKey, options?.skipRestore]);
 
-  return { draftRestored };
+  return { draftRestored, setDraftRestored };
 }

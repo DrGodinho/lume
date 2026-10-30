@@ -74,9 +74,8 @@ function SegmentGroup<T extends string>({
         <button
           key={option.value}
           onClick={() => onChange(option.value)}
-          className={`flex-1 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${
-            value === option.value ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'
-          }`}
+          className={`flex-1 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${value === option.value ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'
+            }`}
         >
           {option.label}
         </button>
@@ -223,7 +222,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
               />
               <HelpText>
                 {config.modoPerdas === 'dinamico'
-                  ? 'O botao usa a eficiencia do corte atual para calcular a perda automaticamente.'
+                  ? 'O botão cobra a área real consumida da bobina pelo corte (limitado a no máximo +100%).'
                   : 'O botao aplica sempre a porcentagem fixa configurada abaixo.'}
               </HelpText>
 

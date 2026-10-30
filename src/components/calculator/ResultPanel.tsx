@@ -22,6 +22,7 @@ interface ResultPanelProps {
     onTogglePerdas: () => void;
     modoPerdas: string;
     perdasFixas: number;
+    compensacaoPerda?: number;
     // Ações junto dos números (princípio 5: nenhum número sem verbo)
     onSalvar: () => void;
     onGerarImagem: () => void;
@@ -55,6 +56,7 @@ export function ResultPanel({
     onTogglePerdas,
     modoPerdas,
     perdasFixas,
+    compensacaoPerda,
     onSalvar,
     onGerarImagem,
     onGerarPDF,
@@ -181,11 +183,10 @@ export function ResultPanel({
                                 <button
                                     type="button"
                                     onClick={(e) => { e.stopPropagation(); onToggleUsarSobra?.(); }}
-                                    className={`w-full py-1.5 px-2.5 rounded-lg border text-[10px] font-bold uppercase transition-all flex items-center justify-between ${
-                                        usarSobra
+                                    className={`w-full py-1.5 px-2.5 rounded-lg border text-[10px] font-bold uppercase transition-all flex items-center justify-between ${usarSobra
                                             ? 'bg-green-500/20 border-green-500/50 text-green-300'
                                             : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:bg-white/10'
-                                    }`}
+                                        }`}
                                 >
                                     <span>Usar Sobra de Obra</span>
                                     <span className="flex items-center gap-1">
@@ -251,22 +252,20 @@ export function ResultPanel({
                                 <button
                                     type="button"
                                     onClick={() => modoDesconto !== 'real' && onToggleModoDesconto()}
-                                    className={`px-1.5 py-0.5 rounded text-[9px] font-black transition-all ${
-                                        modoDesconto !== 'porcentagem'
+                                    className={`px-1.5 py-0.5 rounded text-[9px] font-black transition-all ${modoDesconto !== 'porcentagem'
                                             ? 'bg-[#c9a227] text-black shadow-sm'
                                             : 'text-gray-400 hover:text-white'
-                                    }`}
+                                        }`}
                                 >
                                     R$
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => modoDesconto !== 'porcentagem' && onToggleModoDesconto()}
-                                    className={`px-1.5 py-0.5 rounded text-[9px] font-black transition-all ${
-                                        modoDesconto === 'porcentagem'
+                                    className={`px-1.5 py-0.5 rounded text-[9px] font-black transition-all ${modoDesconto === 'porcentagem'
                                             ? 'bg-[#c9a227] text-black shadow-sm'
                                             : 'text-gray-400 hover:text-white'
-                                    }`}
+                                        }`}
                                 >
                                     %
                                 </button>
@@ -334,11 +333,15 @@ export function ResultPanel({
                     <button
                         onClick={onTogglePerdas}
                         className={`p-2 rounded-lg border transition-all flex items-center gap-1.5 h-[34px] ${compensarPerdas ? 'bg-green-500/20 border-green-500/50 text-green-400' : 'bg-white/5 border-white/10 text-gray-500 hover:text-white'}`}
-                        title={modoPerdas === 'fixo' ? `Perdas fixas: ${perdasFixas}%` : 'Compensar perdas (dinâmico, baseado na eficiência)'}
+                        title={
+                            modoPerdas === 'fixo'
+                                ? `Perdas fixas: ${perdasFixas}%${compensarPerdas && compensacaoPerda ? ` (+${formatBRL(compensacaoPerda)})` : ''}`
+                                : `Compensar perdas (Cobrança real da bobina)${compensarPerdas && compensacaoPerda ? `: +${formatBRL(compensacaoPerda)}` : ''}`
+                        }
                     >
                         <Scissors size={14} />
                         <span className="text-[9px] font-bold uppercase whitespace-nowrap">
-                            Perdas
+                            Perdas{compensarPerdas && compensacaoPerda ? ` (+${formatBRL(compensacaoPerda)})` : ''}
                         </span>
                     </button>
                 </div>

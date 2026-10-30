@@ -28,17 +28,17 @@ import {
 } from '../lib/cloudSync';
 import { roundMeasure } from '../lib/numberPrecision';
 import {
-  calcCompensacaoPerda,
-  calcEficiencia,
-  calcFinalPrice,
-  calcMetrosComprar,
-  calcSubtotalBruto,
-  calcTotalAreaM2,
-  calcValorPraticoM2,
-  calcValorSelecionados,
-  calcLucroCalculadora,
-  calcDescontoEmReais,
-  converterDescontoEntreModos,
+    calcCompensacaoPerda,
+    calcEficiencia,
+    calcFinalPrice,
+    calcMetrosComprar,
+    calcSubtotalBruto,
+    calcTotalAreaM2,
+    calcValorPraticoM2,
+    calcValorSelecionados,
+    calcLucroCalculadora,
+    calcDescontoEmReais,
+    converterDescontoEntreModos,
 } from '../lib/pricing';
 import { formatBRL, formatNumber2 } from '../lib/money';
 import { groupByAmbiente } from '../lib/grouping';
@@ -48,44 +48,44 @@ import { supabase } from '../lib/supabase';
 // C1: domínio em lib/films.ts; load/save em lib/calculatorConfig.ts.
 
 const getCrmLeadHeaders = async () => {
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  if (!supabase) return headers;
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (!supabase) return headers;
 
-  const { data } = await supabase.auth.getSession();
-  const accessToken = data.session?.access_token;
-  if (accessToken) {
-    headers.Authorization = `Bearer ${accessToken}`;
-  }
+    const { data } = await supabase.auth.getSession();
+    const accessToken = data.session?.access_token;
+    if (accessToken) {
+        headers.Authorization = `Bearer ${accessToken}`;
+    }
 
-  return headers;
+    return headers;
 };
 
 import {
-  AppConfig,
-  ColorMode,
-  DEFAULT_CONFIG,
-  DEFAULT_FILM_CATALOG,
-  DEFAULT_FILM_TYPES,
-  DiscountMode,
-  FilmCatalogItem,
-  FILM_TYPE_LABELS,
-  FilmTypeKey,
-  GlassItem,
-  LossMode,
-  OptimizationMode,
-  OrcamentoSalvo,
-  buildRoomColorMap,
-  createGlassId,
-  getRoomColorByIndex,
-  getSizeColor,
-  isColorMode,
-  isLegacyDefaultRoomColors,
-  isLossMode,
-  isOptimizationMode,
-  normalizeFilmCatalog,
-  normalizeFilmTypeKey,
-  normalizeFilmTypes,
-  resolveRoomKey,
+    AppConfig,
+    ColorMode,
+    DEFAULT_CONFIG,
+    DEFAULT_FILM_CATALOG,
+    DEFAULT_FILM_TYPES,
+    DiscountMode,
+    FilmCatalogItem,
+    FILM_TYPE_LABELS,
+    FilmTypeKey,
+    GlassItem,
+    LossMode,
+    OptimizationMode,
+    OrcamentoSalvo,
+    buildRoomColorMap,
+    createGlassId,
+    getRoomColorByIndex,
+    getSizeColor,
+    isColorMode,
+    isLegacyDefaultRoomColors,
+    isLossMode,
+    isOptimizationMode,
+    normalizeFilmCatalog,
+    normalizeFilmTypeKey,
+    normalizeFilmTypes,
+    resolveRoomKey,
 } from '../lib/films';
 import { loadConfig, saveConfig } from '../lib/calculatorConfig';
 import { useCalculatorState } from '../hooks/useCalculatorState';
@@ -97,32 +97,32 @@ import { useCalculatorHistory } from '../hooks/useCalculatorHistory';
 
 
 type ImportedGlass = Partial<GlassItem> & {
-  h?: number;
-  w?: number;
+    h?: number;
+    w?: number;
 };
 
 interface ImportedZapPayload {
-  n?: string;
-  b?: string;
-  f?: string;
-  p?: string;
-  v?: ImportedGlass[];
+    n?: string;
+    b?: string;
+    f?: string;
+    p?: string;
+    v?: ImportedGlass[];
 }
 
 interface SavedProjectPayload {
-  config?: {
-    cliente?: string;
-    phone?: string;
-    neighborhood?: string;
-    rolo?: number | string;
-    preco?: number | string;
-    selectedFilm?: string;
-    customFilmName?: string;
-    compensarPerdas?: boolean;
-    desconto?: number;
-    modoDesconto?: DiscountMode;
-  };
-  vidros?: ImportedGlass[];
+    config?: {
+        cliente?: string;
+        phone?: string;
+        neighborhood?: string;
+        rolo?: number | string;
+        preco?: number | string;
+        selectedFilm?: string;
+        customFilmName?: string;
+        compensarPerdas?: boolean;
+        desconto?: number;
+        modoDesconto?: DiscountMode;
+    };
+    vidros?: ImportedGlass[];
 }
 
 // ─── UNDO/REDO REDUCER ────────────────────────────────────────────────────────
@@ -131,79 +131,79 @@ interface SavedProjectPayload {
 // ─── COMPONENTE PRINCIPAL ─────────────────────────────────────────────────────
 
 export function AdminCalculator() {
-  const cfg = useMemo(() => loadConfig(), []);
-  // C1: estado de sessão extraído (os ~32 useState + historyReducer).
-  const {
-    cliente, setCliente,
-    phone, setPhone,
-    neighborhood, setNeighborhood,
-    rollW, setRollW,
-    margin, setMargin,
-    price, setPrice,
-    userName, setUserName,
-    desconto, setDesconto,
-    descontoInput, setDescontoInput,
-    modoDesconto, setModoDesconto,
-    modoOtimizacao, setModoOtimizacao,
-    configAberto, setConfigAberto,
-    compensarPerdas, setCompensarPerdas,
-    modoPerdas, setModoPerdas,
-    perdasFixas, setPerdasFixas,
-    agressividadeCorte, setAgressividadeCorte,
-    filmTypes, setFilmTypes,
-    filmCatalog, setFilmCatalog,
-    selectedFilm, setSelectedFilm,
-    customFilmName, setCustomFilmName,
-    draftExpiration, setDraftExpiration,
-    configRestored, setConfigRestored,
-    heightIn, setHeightIn,
-    widthIn, setWidthIn,
-    qtyIn, setQtyIn,
-    labelIn, setLabelIn,
-    usarCoresPorAmbiente, setUsarCoresPorAmbiente,
-    roomColors, setRoomColors,
-    selectedIds, setSelectedIds,
-    cloudStatus, setCloudStatus,
-    authRefreshKey, setAuthRefreshKey,
-    isLoggingOut, setIsLoggingOut,
-    vidros, setVidros, canUndo, canRedo, undo, redo,
-    currentConfig,
-  } = useCalculatorState(cfg);
+    const cfg = useMemo(() => loadConfig(), []);
+    // C1: estado de sessão extraído (os ~32 useState + historyReducer).
+    const {
+        cliente, setCliente,
+        phone, setPhone,
+        neighborhood, setNeighborhood,
+        rollW, setRollW,
+        margin, setMargin,
+        price, setPrice,
+        userName, setUserName,
+        desconto, setDesconto,
+        descontoInput, setDescontoInput,
+        modoDesconto, setModoDesconto,
+        modoOtimizacao, setModoOtimizacao,
+        configAberto, setConfigAberto,
+        compensarPerdas, setCompensarPerdas,
+        modoPerdas, setModoPerdas,
+        perdasFixas, setPerdasFixas,
+        agressividadeCorte, setAgressividadeCorte,
+        filmTypes, setFilmTypes,
+        filmCatalog, setFilmCatalog,
+        selectedFilm, setSelectedFilm,
+        customFilmName, setCustomFilmName,
+        draftExpiration, setDraftExpiration,
+        configRestored, setConfigRestored,
+        heightIn, setHeightIn,
+        widthIn, setWidthIn,
+        qtyIn, setQtyIn,
+        labelIn, setLabelIn,
+        usarCoresPorAmbiente, setUsarCoresPorAmbiente,
+        roomColors, setRoomColors,
+        selectedIds, setSelectedIds,
+        cloudStatus, setCloudStatus,
+        authRefreshKey, setAuthRefreshKey,
+        isLoggingOut, setIsLoggingOut,
+        vidros, setVidros, canUndo, canRedo, undo, redo,
+        currentConfig,
+    } = useCalculatorState(cfg);
 
-  const [isCutMode, setIsCutMode] = useState(false);
-  const [vidrosBackup, setVidrosBackup] = useState<GlassItem[]>([]);
-  const [usarSobra, setUsarSobra] = useState(false);
-  const [custoAjudante, setCustoAjudante] = useState(0);
+    const [isCutMode, setIsCutMode] = useState(false);
+    const [vidrosBackup, setVidrosBackup] = useState<GlassItem[]>([]);
+    const [usarSobra, setUsarSobra] = useState(false);
+    const [custoAjudante, setCustoAjudante] = useState(0);
 
-  const handleSelectedFilmChange = useCallback((film: FilmTypeKey) => {
-    setSelectedFilm(film);
-    if (film !== 'personalizado') {
-      const salePrice =
-        filmCatalog?.[film]?.priceSale ??
-        filmTypes[film] ??
-        DEFAULT_FILM_CATALOG[film]?.priceSale ??
-        DEFAULT_FILM_TYPES[film] ??
-        0;
-      setPrice(salePrice);
-    }
-  }, [filmCatalog, filmTypes, setSelectedFilm, setPrice]);
+    const handleSelectedFilmChange = useCallback((film: FilmTypeKey) => {
+        setSelectedFilm(film);
+        if (film !== 'personalizado') {
+            const salePrice =
+                filmCatalog?.[film]?.priceSale ??
+                filmTypes[film] ??
+                DEFAULT_FILM_CATALOG[film]?.priceSale ??
+                DEFAULT_FILM_TYPES[film] ??
+                0;
+            setPrice(salePrice);
+        }
+    }, [filmCatalog, filmTypes, setSelectedFilm, setPrice]);
 
-  const handlePriceChange = useCallback((newPrice: number) => {
-    setPrice(newPrice);
-    if (selectedFilm !== 'personalizado') {
-      setFilmTypes((prev) => ({ ...prev, [selectedFilm]: newPrice }));
-      setFilmCatalog((prev) => {
-        if (!prev[selectedFilm]) return prev;
-        return {
-          ...prev,
-          [selectedFilm]: {
-            ...prev[selectedFilm],
-            priceSale: newPrice,
-          },
-        };
-      });
-    }
-  }, [selectedFilm, setPrice, setFilmTypes, setFilmCatalog]);
+    const handlePriceChange = useCallback((newPrice: number) => {
+        setPrice(newPrice);
+        if (selectedFilm !== 'personalizado') {
+            setFilmTypes((prev) => ({ ...prev, [selectedFilm]: newPrice }));
+            setFilmCatalog((prev) => {
+                if (!prev[selectedFilm]) return prev;
+                return {
+                    ...prev,
+                    [selectedFilm]: {
+                        ...prev[selectedFilm],
+                        priceSale: newPrice,
+                    },
+                };
+            });
+        }
+    }, [selectedFilm, setPrice, setFilmTypes, setFilmCatalog]);
 
 
 
@@ -222,6 +222,11 @@ export function AdminCalculator() {
     }, []);
 
     const [currentLeadId, setCurrentLeadId] = useState<string | null>(null);
+    const [hasUrlBudget] = useState(() => {
+        if (typeof window === 'undefined') return false;
+        const params = new URLSearchParams(window.location.search);
+        return Boolean(params.get('orcamentoId') || params.get('id'));
+    });
     // B1: toast único do DS (sucesso/erro) — substitui `alert`.
     const [toast, setToast] = useState<ToastData | null>(null);
     const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -364,101 +369,102 @@ export function AdminCalculator() {
         return formatNumber2(num);
     }, [modoDesconto, descontoInput]);
 
-// ─── AUTO-SAVE DRAFT ──────────────────────────────────────────────────
-  // C1: rascunho extraído (autosave local+nuvem + restore) — ver useDraftSync.
-  useDraftSync(
-    {
-      cliente, phone, neighborhood, vidros, desconto, descontoInput, modoDesconto,
-      rollW, price, margin, modoOtimizacao, userName, selectedFilm, customFilmName,
-      roomColors, isCutMode,
-    },
-    {
-      setVidros,
-      setCliente, setPhone, setNeighborhood,
-      setDesconto, setDescontoInput, setModoDesconto,
-      setRollW, setPrice, setMargin,
-      setModoOtimizacao, setUserName, setSelectedFilm, setCustomFilmName,
-      setRoomColors, setCloudStatus,
-    },
-    authRefreshKey,
-  );
+    // ─── AUTO-SAVE DRAFT ──────────────────────────────────────────────────
+    // C1: rascunho extraído (autosave local+nuvem + restore) — ver useDraftSync.
+    const { setDraftRestored } = useDraftSync(
+        {
+            cliente, phone, neighborhood, vidros, desconto, descontoInput, modoDesconto,
+            rollW, price, margin, modoOtimizacao, userName, selectedFilm, customFilmName,
+            roomColors, isCutMode,
+        },
+        {
+            setVidros,
+            setCliente, setPhone, setNeighborhood,
+            setDesconto, setDescontoInput, setModoDesconto,
+            setRollW, setPrice, setMargin,
+            setModoOtimizacao, setUserName, setSelectedFilm, setCustomFilmName,
+            setRoomColors, setCloudStatus,
+        },
+        authRefreshKey,
+        { skipRestore: hasUrlBudget },
+    );
 
-// ─── CLOUD CONFIG AUTO-SAVE (debounced 2s) ────────────────────────────────
-  const configCloudTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(() => {
-    if (!configRestored) return;
-    if (configCloudTimerRef.current) clearTimeout(configCloudTimerRef.current);
-    configCloudTimerRef.current = setTimeout(() => {
-      saveConfigToCloud(currentConfig);
-    }, 2000);
-    return () => { if (configCloudTimerRef.current) clearTimeout(configCloudTimerRef.current); };
-  }, [configRestored, currentConfig]);
+    // ─── CLOUD CONFIG AUTO-SAVE (debounced 2s) ────────────────────────────────
+    const configCloudTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    useEffect(() => {
+        if (!configRestored) return;
+        if (configCloudTimerRef.current) clearTimeout(configCloudTimerRef.current);
+        configCloudTimerRef.current = setTimeout(() => {
+            saveConfigToCloud(currentConfig);
+        }, 2000);
+        return () => { if (configCloudTimerRef.current) clearTimeout(configCloudTimerRef.current); };
+    }, [configRestored, currentConfig]);
 
-  // RESTORE CONFIG ON MOUNT (cloud-first, localStorage fallback) ────────────
-  useEffect(() => {
-    const restoreConfig = async () => {
-      try {
-        const scopeKey = await resolveCalculatorScopeKey();
-        const cloud = await loadConfigFromCloud();
-        const source = cloud || loadConfig(scopeKey);
+    // RESTORE CONFIG ON MOUNT (cloud-first, localStorage fallback) ────────────
+    useEffect(() => {
+        const restoreConfig = async () => {
+            try {
+                const scopeKey = await resolveCalculatorScopeKey();
+                const cloud = await loadConfigFromCloud();
+                const source = cloud || loadConfig(scopeKey);
 
-        const rawTypes = source.filmTypes;
-        const normalizedTypes = normalizeFilmTypes(rawTypes);
-        const catalog = normalizeFilmCatalog(source.filmCatalog, normalizedTypes);
+                const rawTypes = source.filmTypes;
+                const normalizedTypes = normalizeFilmTypes(rawTypes);
+                const catalog = normalizeFilmCatalog(source.filmCatalog, normalizedTypes);
 
-        // Sincroniza os precos de venda em filmTypes a partir do catalogo
-        (Object.entries(catalog) as [string, FilmCatalogItem][]).forEach(([key, item]) => {
-          if (item && Number.isFinite(item.priceSale) && item.priceSale > 0) {
-            normalizedTypes[key as keyof typeof normalizedTypes] = item.priceSale;
-          }
-        });
+                // Sincroniza os precos de venda em filmTypes a partir do catalogo
+                (Object.entries(catalog) as [string, FilmCatalogItem][]).forEach(([key, item]) => {
+                    if (item && Number.isFinite(item.priceSale) && item.priceSale > 0) {
+                        normalizedTypes[key as keyof typeof normalizedTypes] = item.priceSale;
+                    }
+                });
 
-        if (source.rollW) setRollW(source.rollW);
-        if (source.margin !== undefined) setMargin(source.margin);
-        if (isOptimizationMode(source.modoOtimizacao)) setModoOtimizacao(source.modoOtimizacao);
-        if (source.userName) setUserName(source.userName);
-        if (isLossMode(source.modoPerdas)) setModoPerdas(source.modoPerdas);
-        if (source.perdasFixas !== undefined) setPerdasFixas(source.perdasFixas);
-        if (isColorMode(source.modoCorConfig)) setUsarCoresPorAmbiente(source.modoCorConfig === 'ambiente');
-        if (source.agressividadeCorte !== undefined) setAgressividadeCorte(source.agressividadeCorte);
-        
-        setFilmTypes(normalizedTypes);
-        setFilmCatalog(catalog);
+                if (source.rollW) setRollW(source.rollW);
+                if (source.margin !== undefined) setMargin(source.margin);
+                if (isOptimizationMode(source.modoOtimizacao)) setModoOtimizacao(source.modoOtimizacao);
+                if (source.userName) setUserName(source.userName);
+                if (isLossMode(source.modoPerdas)) setModoPerdas(source.modoPerdas);
+                if (source.perdasFixas !== undefined) setPerdasFixas(source.perdasFixas);
+                if (isColorMode(source.modoCorConfig)) setUsarCoresPorAmbiente(source.modoCorConfig === 'ambiente');
+                if (source.agressividadeCorte !== undefined) setAgressividadeCorte(source.agressividadeCorte);
 
-        const currentFilm = normalizeFilmTypeKey(source.selectedFilm);
-        setSelectedFilm(currentFilm);
+                setFilmTypes(normalizedTypes);
+                setFilmCatalog(catalog);
 
-        if (currentFilm !== 'personalizado') {
-          const filmPrice = catalog[currentFilm]?.priceSale ?? normalizedTypes[currentFilm] ?? (source.price || 80);
-          setPrice(filmPrice);
-        } else if (source.price) {
-          setPrice(source.price);
-        }
+                const currentFilm = normalizeFilmTypeKey(source.selectedFilm);
+                setSelectedFilm(currentFilm);
 
-        if (source.draftExpiration !== undefined) setDraftExpiration(source.draftExpiration);
-        if (source.modoDesconto) setModoDesconto(source.modoDesconto);
+                if (currentFilm !== 'personalizado') {
+                    const filmPrice = catalog[currentFilm]?.priceSale ?? normalizedTypes[currentFilm] ?? (source.price || 80);
+                    setPrice(filmPrice);
+                } else if (source.price) {
+                    setPrice(source.price);
+                }
 
-        if (cloud) {
-          saveConfig({
-            ...DEFAULT_CONFIG,
-            ...source,
-            modoOtimizacao: isOptimizationMode(source.modoOtimizacao) ? source.modoOtimizacao : DEFAULT_CONFIG.modoOtimizacao,
-            modoPerdas: isLossMode(source.modoPerdas) ? source.modoPerdas : DEFAULT_CONFIG.modoPerdas,
-            modoCorConfig: isColorMode(source.modoCorConfig) ? source.modoCorConfig : DEFAULT_CONFIG.modoCorConfig,
-            selectedFilm: currentFilm,
-            filmTypes: normalizedTypes,
-            filmCatalog: catalog,
-            modoDesconto: source.modoDesconto || DEFAULT_CONFIG.modoDesconto,
-          }, scopeKey);
-        }
-      } finally {
-        setConfigRestored(true);
-      }
-    };
-    restoreConfig();
-  }, [authRefreshKey, setRollW, setPrice, setMargin, setModoOtimizacao, setUserName, setModoPerdas, setPerdasFixas, setUsarCoresPorAmbiente, setAgressividadeCorte, setFilmTypes, setFilmCatalog, setSelectedFilm, setDraftExpiration, setModoDesconto, setConfigRestored]);
+                if (source.draftExpiration !== undefined) setDraftExpiration(source.draftExpiration);
+                if (source.modoDesconto) setModoDesconto(source.modoDesconto);
 
-  // C1: restore do rascunho movido para useDraftSync (nuvem primeiro, local como fallback).
+                if (cloud) {
+                    saveConfig({
+                        ...DEFAULT_CONFIG,
+                        ...source,
+                        modoOtimizacao: isOptimizationMode(source.modoOtimizacao) ? source.modoOtimizacao : DEFAULT_CONFIG.modoOtimizacao,
+                        modoPerdas: isLossMode(source.modoPerdas) ? source.modoPerdas : DEFAULT_CONFIG.modoPerdas,
+                        modoCorConfig: isColorMode(source.modoCorConfig) ? source.modoCorConfig : DEFAULT_CONFIG.modoCorConfig,
+                        selectedFilm: currentFilm,
+                        filmTypes: normalizedTypes,
+                        filmCatalog: catalog,
+                        modoDesconto: source.modoDesconto || DEFAULT_CONFIG.modoDesconto,
+                    }, scopeKey);
+                }
+            } finally {
+                setConfigRestored(true);
+            }
+        };
+        restoreConfig();
+    }, [authRefreshKey, setRollW, setPrice, setMargin, setModoOtimizacao, setUserName, setModoPerdas, setPerdasFixas, setUsarCoresPorAmbiente, setAgressividadeCorte, setFilmTypes, setFilmCatalog, setSelectedFilm, setDraftExpiration, setModoDesconto, setConfigRestored]);
+
+    // C1: restore do rascunho movido para useDraftSync (nuvem primeiro, local como fallback).
 
     // ─── ENTER NOS INPUTS ──────────────────────────────────────────────────────
 
@@ -466,43 +472,43 @@ export function AdminCalculator() {
     const handleKeyDownWidth = (e: React.KeyboardEvent) => { if (e.key === 'Enter') qtyRef.current?.focus(); };
     const handleKeyDownQty = (e: React.KeyboardEvent) => { if (e.key === 'Enter') adicionar(); };
 
-  const getColorForItem = useCallback((label?: string, h?: number, w?: number, forceRoomScheme?: boolean) => {
-    const useRoomScheme = forceRoomScheme ?? usarCoresPorAmbiente;
-    if (!useRoomScheme) {
-      return getSizeColor(h, w);
-    }
-    const key = resolveRoomKey(label);
-    if (!isLegacyDefaultRoomColors(roomColors) && roomColors[key]) {
-      return roomColors[key];
-    }
-    const existingRooms: string[] = [];
-    if (!isLegacyDefaultRoomColors(roomColors)) {
-      Object.keys(roomColors).forEach(k => {
-        if (!existingRooms.includes(k)) existingRooms.push(k);
-      });
-    }
-    vidros.forEach(v => {
-      const k = resolveRoomKey(v.label);
-      if (k && !existingRooms.includes(k)) existingRooms.push(k);
-    });
-    const idx = existingRooms.indexOf(key);
-    return getRoomColorByIndex(idx >= 0 ? idx : existingRooms.length);
-  }, [usarCoresPorAmbiente, roomColors, vidros]);
+    const getColorForItem = useCallback((label?: string, h?: number, w?: number, forceRoomScheme?: boolean) => {
+        const useRoomScheme = forceRoomScheme ?? usarCoresPorAmbiente;
+        if (!useRoomScheme) {
+            return getSizeColor(h, w);
+        }
+        const key = resolveRoomKey(label);
+        if (!isLegacyDefaultRoomColors(roomColors) && roomColors[key]) {
+            return roomColors[key];
+        }
+        const existingRooms: string[] = [];
+        if (!isLegacyDefaultRoomColors(roomColors)) {
+            Object.keys(roomColors).forEach(k => {
+                if (!existingRooms.includes(k)) existingRooms.push(k);
+            });
+        }
+        vidros.forEach(v => {
+            const k = resolveRoomKey(v.label);
+            if (k && !existingRooms.includes(k)) existingRooms.push(k);
+        });
+        const idx = existingRooms.indexOf(key);
+        return getRoomColorByIndex(idx >= 0 ? idx : existingRooms.length);
+    }, [usarCoresPorAmbiente, roomColors, vidros]);
 
     // ─── AÇÕES DE VIDROS ───────────────────────────────────────────────────────
 
-  const selectSameSize = useCallback((oh: number, ow: number, label?: string) => {
-    const targetLabel = label || '';
-    const ids = vidros
-      .filter(v => v.oh === oh && v.ow === ow && (v.label || '') === targetLabel)
-      .map(v => v.id);
-    const allAlreadySelected = ids.length > 0 && ids.every(id => selectedIds.includes(id));
-    if (allAlreadySelected) {
-      setSelectedIds(prev => prev.filter(id => !ids.includes(id)));
-    } else {
-      setSelectedIds(prev => [...new Set([...prev, ...ids])]);
-    }
-  }, [vidros, selectedIds, setSelectedIds]);
+    const selectSameSize = useCallback((oh: number, ow: number, label?: string) => {
+        const targetLabel = label || '';
+        const ids = vidros
+            .filter(v => v.oh === oh && v.ow === ow && (v.label || '') === targetLabel)
+            .map(v => v.id);
+        const allAlreadySelected = ids.length > 0 && ids.every(id => selectedIds.includes(id));
+        if (allAlreadySelected) {
+            setSelectedIds(prev => prev.filter(id => !ids.includes(id)));
+        } else {
+            setSelectedIds(prev => [...new Set([...prev, ...ids])]);
+        }
+    }, [vidros, selectedIds, setSelectedIds]);
 
     const adicionar = () => {
         const h = parseFloat(heightIn.replace(',', '.'));
@@ -747,8 +753,9 @@ export function AdminCalculator() {
     }, [maxY, areaV, rollW]);
 
     const compensacaoPerda = useMemo(() => {
-        return calcCompensacaoPerda({ compensarPerdas, modoPerdas, perdasFixas, eficiencia, subtotalBruto });
-    }, [compensarPerdas, modoPerdas, perdasFixas, eficiencia, subtotalBruto]);
+        const areaBobinaM2 = (maxY * rollW) / 10000;
+        return calcCompensacaoPerda({ compensarPerdas, modoPerdas, perdasFixas, eficiencia, subtotalBruto, totalAreaM2, areaBobinaM2, price });
+    }, [compensarPerdas, modoPerdas, perdasFixas, eficiencia, subtotalBruto, maxY, rollW, totalAreaM2, price]);
 
     const baseParaDesconto = useMemo(() => {
         return subtotalBruto + (compensarPerdas ? compensacaoPerda : 0);
@@ -811,129 +818,129 @@ export function AdminCalculator() {
     }, [vidros, cliente, phone, neighborhood, finalPrice, rollW, price, margin, descontoEmReais, modoDesconto, modoOtimizacao, selectedFilm, currentLeadId, compensarPerdas, modoPerdas, perdasFixas, salvarNoHistoricoHook]);
 
     const criarLead = useCallback(async () => {
-      let finalPhone = phone.trim();
-      let finalNeighborhood = neighborhood.trim();
-      const digits = finalNeighborhood.replace(/\D/g, '');
-      if (!finalPhone && digits.length >= 8 && digits.length <= 13 && (finalNeighborhood.includes('+') || finalNeighborhood.includes('(') || digits.length >= 10)) {
-          finalPhone = finalNeighborhood;
-          finalNeighborhood = '';
-      }
-      if (!cliente && !finalPhone) {
-        showToast('Preencha o nome ou telefone do cliente.', 'error');
-        return;
-      }
-      const totalM2 = roundMeasure(vidros.reduce((acc, v) => acc + (v.oh * v.ow), 0) / 10000);
-      const res = await fetch('/api/crm/leads', {
-        method: 'POST',
-        headers: await getCrmLeadHeaders(),
-        credentials: 'include',
-        body: JSON.stringify({
-          name: cliente || `Cliente ${finalPhone}`,
-          phone: finalPhone,
-          email: '',
-          address: '',
-          neighborhood: finalNeighborhood,
-          filmType: selectedFilm === 'personalizado' ? (customFilmName || 'Personalizado') : (FILM_TYPE_LABELS[selectedFilm] || 'Nano Cerâmica 75'),
-          sqm: totalM2,
-          value: finalPrice,
-          status: 'Novo',
-          notes: `Película: ${selectedFilm === 'personalizado' ? (customFilmName || 'Personalizado') : (FILM_TYPE_LABELS[selectedFilm] || 'Nano Cerâmica 75')}.${descontoEmReais > 0 ? ` | Desconto aplicado: ${modoDesconto === 'porcentagem' ? `${descontoInput}% (${formatBRL(descontoEmReais)})` : formatBRL(descontoEmReais)}` : ''}`,
-        }),
-      });
-      if (res.ok) {
-        const createdLead = await res.json().catch(() => null);
-        const leadId = createdLead?.id || null;
-        setCurrentLeadId(leadId);
-
-        if (vidros.length > 0 && leadId) {
-          const clienteNome = cliente || `Cliente ${finalPhone}`;
-          const existing = historico.find(h => (currentLeadId && h.leadId === currentLeadId) || (h.cliente === clienteNome && !h.leadId));
-          const snapshotVidros = vidros.map(v => ({
-            id: v.id,
-            h: v.h,
-            w: v.w,
-            oh: v.oh,
-            ow: v.ow,
-            label: v.label || '',
-            cor: v.cor,
-            sortOrder: v.sortOrder,
-          }));
-          const orcId = existing ? existing.id : crypto.randomUUID();
-          const itemToSave: OrcamentoSalvo = {
-            id: orcId,
-            cliente: clienteNome,
-            phone: finalPhone,
-            neighborhood: finalNeighborhood,
-            data: existing?.data || new Date().toLocaleDateString('pt-BR'),
-            valor: finalPrice,
-            qtd: vidros.length,
-            vidros: snapshotVidros,
-            config: { rollW, price, margin, compensarPerdas, modoPerdas, perdasFixas, modoDesconto },
-            desconto: descontoEmReais,
-            modoDesconto,
-            modoOtimizacao,
-            selectedFilm,
-            leadId,
-            compensarPerdas,
-            modoPerdas,
-            perdasFixas,
-          };
-          await saveHistoryItemToCloud(itemToSave);
-          const atualizado = existing
-            ? historico.map(h => h.id === existing.id ? itemToSave : h)
-            : [itemToSave, ...historico].slice(0, 500);
-          setHistorico(atualizado);
-          resolveCalculatorScopeKey().then((scopeKey) => {
-            localStorage.setItem(buildCalculatorStorageKey('lume_historico', scopeKey), JSON.stringify(atualizado));
-          }).catch(() => null);
+        let finalPhone = phone.trim();
+        let finalNeighborhood = neighborhood.trim();
+        const digits = finalNeighborhood.replace(/\D/g, '');
+        if (!finalPhone && digits.length >= 8 && digits.length <= 13 && (finalNeighborhood.includes('+') || finalNeighborhood.includes('(') || digits.length >= 10)) {
+            finalPhone = finalNeighborhood;
+            finalNeighborhood = '';
         }
+        if (!cliente && !finalPhone) {
+            showToast('Preencha o nome ou telefone do cliente.', 'error');
+            return;
+        }
+        const totalM2 = roundMeasure(vidros.reduce((acc, v) => acc + (v.oh * v.ow), 0) / 10000);
+        const res = await fetch('/api/crm/leads', {
+            method: 'POST',
+            headers: await getCrmLeadHeaders(),
+            credentials: 'include',
+            body: JSON.stringify({
+                name: cliente || `Cliente ${finalPhone}`,
+                phone: finalPhone,
+                email: '',
+                address: '',
+                neighborhood: finalNeighborhood,
+                filmType: selectedFilm === 'personalizado' ? (customFilmName || 'Personalizado') : (FILM_TYPE_LABELS[selectedFilm] || 'Nano Cerâmica 75'),
+                sqm: totalM2,
+                value: finalPrice,
+                status: 'Novo',
+                notes: `Película: ${selectedFilm === 'personalizado' ? (customFilmName || 'Personalizado') : (FILM_TYPE_LABELS[selectedFilm] || 'Nano Cerâmica 75')}.${descontoEmReais > 0 ? ` | Desconto aplicado: ${modoDesconto === 'porcentagem' ? `${descontoInput}% (${formatBRL(descontoEmReais)})` : formatBRL(descontoEmReais)}` : ''}`,
+            }),
+        });
+        if (res.ok) {
+            const createdLead = await res.json().catch(() => null);
+            const leadId = createdLead?.id || null;
+            setCurrentLeadId(leadId);
 
-        showToast('Lead criado com sucesso!', 'success');
-      } else {
-        const err = await res.json().catch(() => ({}));
-        const details = [err.error, err.details, err.hint].filter(Boolean).join(' - ');
-        showToast('Erro ao criar lead: ' + (details || 'desconhecido'), 'error');
-      }
+            if (vidros.length > 0 && leadId) {
+                const clienteNome = cliente || `Cliente ${finalPhone}`;
+                const existing = historico.find(h => (currentLeadId && h.leadId === currentLeadId) || (h.cliente === clienteNome && !h.leadId));
+                const snapshotVidros = vidros.map(v => ({
+                    id: v.id,
+                    h: v.h,
+                    w: v.w,
+                    oh: v.oh,
+                    ow: v.ow,
+                    label: v.label || '',
+                    cor: v.cor,
+                    sortOrder: v.sortOrder,
+                }));
+                const orcId = existing ? existing.id : crypto.randomUUID();
+                const itemToSave: OrcamentoSalvo = {
+                    id: orcId,
+                    cliente: clienteNome,
+                    phone: finalPhone,
+                    neighborhood: finalNeighborhood,
+                    data: existing?.data || new Date().toLocaleDateString('pt-BR'),
+                    valor: finalPrice,
+                    qtd: vidros.length,
+                    vidros: snapshotVidros,
+                    config: { rollW, price, margin, compensarPerdas, modoPerdas, perdasFixas, modoDesconto },
+                    desconto: descontoEmReais,
+                    modoDesconto,
+                    modoOtimizacao,
+                    selectedFilm,
+                    leadId,
+                    compensarPerdas,
+                    modoPerdas,
+                    perdasFixas,
+                };
+                await saveHistoryItemToCloud(itemToSave);
+                const atualizado = existing
+                    ? historico.map(h => h.id === existing.id ? itemToSave : h)
+                    : [itemToSave, ...historico].slice(0, 500);
+                setHistorico(atualizado);
+                resolveCalculatorScopeKey().then((scopeKey) => {
+                    localStorage.setItem(buildCalculatorStorageKey('lume_historico', scopeKey), JSON.stringify(atualizado));
+                }).catch(() => null);
+            }
+
+            showToast('Lead criado com sucesso!', 'success');
+        } else {
+            const err = await res.json().catch(() => ({}));
+            const details = [err.error, err.details, err.hint].filter(Boolean).join(' - ');
+            showToast('Erro ao criar lead: ' + (details || 'desconhecido'), 'error');
+        }
     }, [cliente, phone, neighborhood, vidros, selectedFilm, customFilmName, finalPrice, rollW, price, margin, descontoEmReais, modoDesconto, descontoInput, modoOtimizacao, currentLeadId, compensarPerdas, modoPerdas, perdasFixas, historico, setHistorico, showToast]);
 
-// C1: abrir passa pelo schema do hook; aqui só a aplicação na sessão.
-const carregarDoHistorico = useCallback((orc: OrcamentoSalvo) => {
-    carregarDoHistoricoHook(orc, (valid) => {
-    setCliente(valid.cliente);
-    setPhone(valid.phone || '');
-    setNeighborhood(valid.neighborhood || '');
-    setRollW(valid.config.rollW);
-        setPrice(valid.config.price);
-        setMargin(valid.config.margin);
-        const desc = typeof valid.desconto === 'number' && !isNaN(valid.desconto) ? valid.desconto : 0;
-        const cfgObj = valid.config as { compensarPerdas?: boolean; modoPerdas?: LossMode; perdasFixas?: number; modoDesconto?: DiscountMode };
-        const savedModoDesc = valid.modoDesconto || cfgObj?.modoDesconto;
-        if (savedModoDesc === 'porcentagem' || savedModoDesc === 'real') {
-            setModoDesconto(savedModoDesc);
-        } else {
-            setModoDesconto('real');
-        }
-        setDesconto(desc);
-        setDescontoInput(Math.round(desc * 100).toString());
-  if (isOptimizationMode(valid.modoOtimizacao)) setModoOtimizacao(valid.modoOtimizacao);
-    setSelectedFilm(normalizeFilmTypeKey(valid.selectedFilm));
-    if (valid.leadId) setCurrentLeadId(valid.leadId);
-    setVidros(valid.vidros);
+    // C1: abrir passa pelo schema do hook; aqui só a aplicação na sessão.
+    const carregarDoHistorico = useCallback((orc: OrcamentoSalvo) => {
+        carregarDoHistoricoHook(orc, (valid) => {
+            setCliente(valid.cliente);
+            setPhone(valid.phone || '');
+            setNeighborhood(valid.neighborhood || '');
+            setRollW(valid.config.rollW);
+            setPrice(valid.config.price);
+            setMargin(valid.config.margin);
+            const desc = typeof valid.desconto === 'number' && !isNaN(valid.desconto) ? valid.desconto : 0;
+            const cfgObj = valid.config as { compensarPerdas?: boolean; modoPerdas?: LossMode; perdasFixas?: number; modoDesconto?: DiscountMode };
+            const savedModoDesc = valid.modoDesconto || cfgObj?.modoDesconto;
+            if (savedModoDesc === 'porcentagem' || savedModoDesc === 'real') {
+                setModoDesconto(savedModoDesc);
+            } else {
+                setModoDesconto('real');
+            }
+            setDesconto(desc);
+            setDescontoInput(Math.round(desc * 100).toString());
+            if (isOptimizationMode(valid.modoOtimizacao)) setModoOtimizacao(valid.modoOtimizacao);
+            setSelectedFilm(normalizeFilmTypeKey(valid.selectedFilm));
+            if (valid.leadId) setCurrentLeadId(valid.leadId);
+            setVidros(valid.vidros);
 
-    const savedCompensar = valid.compensarPerdas !== undefined ? valid.compensarPerdas : cfgObj?.compensarPerdas;
-    if (savedCompensar !== undefined) {
-        setCompensarPerdas(Boolean(savedCompensar));
-    }
-    const savedModoPerdas = valid.modoPerdas || cfgObj?.modoPerdas;
-    if (savedModoPerdas && isLossMode(savedModoPerdas)) {
-        setModoPerdas(savedModoPerdas);
-    }
-    const savedPerdasFixas = valid.perdasFixas !== undefined ? valid.perdasFixas : cfgObj?.perdasFixas;
-    if (savedPerdasFixas !== undefined) {
-        setPerdasFixas(savedPerdasFixas);
-    }
-    });
-}, [carregarDoHistoricoHook, setCliente, setPhone, setNeighborhood, setRollW, setPrice, setMargin, setDesconto, setDescontoInput, setModoDesconto, setModoOtimizacao, setSelectedFilm, setCurrentLeadId, setVidros, setCompensarPerdas, setModoPerdas, setPerdasFixas]);
+            const savedCompensar = valid.compensarPerdas !== undefined ? valid.compensarPerdas : cfgObj?.compensarPerdas;
+            if (savedCompensar !== undefined) {
+                setCompensarPerdas(Boolean(savedCompensar));
+            }
+            const savedModoPerdas = valid.modoPerdas || cfgObj?.modoPerdas;
+            if (savedModoPerdas && isLossMode(savedModoPerdas)) {
+                setModoPerdas(savedModoPerdas);
+            }
+            const savedPerdasFixas = valid.perdasFixas !== undefined ? valid.perdasFixas : cfgObj?.perdasFixas;
+            if (savedPerdasFixas !== undefined) {
+                setPerdasFixas(savedPerdasFixas);
+            }
+        });
+    }, [carregarDoHistoricoHook, setCliente, setPhone, setNeighborhood, setRollW, setPrice, setMargin, setDesconto, setDescontoInput, setModoDesconto, setModoOtimizacao, setSelectedFilm, setCurrentLeadId, setVidros, setCompensarPerdas, setModoPerdas, setPerdasFixas]);
 
     // Carregar orçamento via parâmetro da URL (ex: vindo do CRM via /admin/?orcamentoId=123)
     const orcamentoCarregadoRef = useRef(false);
@@ -963,12 +970,14 @@ const carregarDoHistorico = useCallback((orc: OrcamentoSalvo) => {
                     cache: 'no-store',
                 });
                 if (!res.ok) {
+                    setDraftRestored(true);
                     showToast('Orçamento não encontrado.', 'error');
                     return;
                 }
                 const data = await res.json();
                 const row = data?.item ?? data?.items?.[0];
                 if (!row) {
+                    setDraftRestored(true);
                     showToast('Orçamento não encontrado.', 'error');
                     return;
                 }
@@ -1000,9 +1009,11 @@ const carregarDoHistorico = useCallback((orc: OrcamentoSalvo) => {
                         perdasFixas: typeof cfgObj.perdasFixas === 'number' ? cfgObj.perdasFixas : undefined,
                     };
                     carregarDoHistorico(orcObj);
+                    setDraftRestored(true);
                     showToast(`Orçamento de ${orcObj.cliente || 'Cliente'} carregado na calculadora!`, 'success');
                 }
             } catch {
+                setDraftRestored(true);
                 showToast('Erro ao carregar orçamento.', 'error');
             }
         }
@@ -1012,7 +1023,7 @@ const carregarDoHistorico = useCallback((orc: OrcamentoSalvo) => {
         return () => {
             isCancelled = true;
         };
-    }, [carregarDoHistorico, showToast]);
+    }, [carregarDoHistorico, showToast, setDraftRestored]);
 
     // ─── IMPORTAR / SALVAR / ABRIR ─────────────────────────────────────────────
 
@@ -1172,7 +1183,7 @@ const carregarDoHistorico = useCallback((orc: OrcamentoSalvo) => {
             if (nativeShare) {
                 const fileName = `Orcamento_${cliente.replace(/\W+/g, '_') || 'LUME'}.pdf`;
                 const reader = new FileReader();
-                reader.readAsDataURL(blob); 
+                reader.readAsDataURL(blob);
                 reader.onloadend = async () => {
                     const base64data = (reader.result as string).split(',')[1];
                     const savedFile = await nativeShare.Filesystem.writeFile({
@@ -1200,97 +1211,97 @@ const carregarDoHistorico = useCallback((orc: OrcamentoSalvo) => {
         }
     };
 
-const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: AppConfig[K]) => {
-    if (key === 'modoCorConfig') {
-      const nextMode = value as ColorMode;
-      const isAmbiente = nextMode === 'ambiente';
-      setUsarCoresPorAmbiente(isAmbiente);
-      if (isAmbiente) {
-        const cleanColors = isLegacyDefaultRoomColors(roomColors) ? {} : roomColors;
-        const updatedMap = buildRoomColorMap(vidros, cleanColors);
-        setRoomColors(updatedMap);
-        setVidros(prev => prev.map(v => {
-          const roomLabel = (v.label || '').trim();
-          const rKey = resolveRoomKey(roomLabel);
-          const color = (rKey && updatedMap[rKey]) || getSizeColor(v.oh, v.ow);
-          return { ...v, cor: color };
-        }));
-      } else {
-        setVidros(prev => prev.map(v => ({
-          ...v,
-          cor: getSizeColor(v.oh, v.ow),
-        })));
-      }
-    } else {
-      switch (key) {
-        case 'rollW':
-          setRollW(value as number);
-          break;
-        case 'price':
-          setPrice(value as number);
-          break;
-        case 'margin':
-          setMargin(value as number);
-          break;
-        case 'modoOtimizacao':
-          setModoOtimizacao(value as OptimizationMode);
-          break;
-        case 'userName':
-          setUserName(value as string);
-          break;
-        case 'modoPerdas':
-          setModoPerdas(value as LossMode);
-          break;
-        case 'perdasFixas':
-          setPerdasFixas(Math.min(100, Math.max(0, value as number)));
-          break;
-        case 'agressividadeCorte':
-          setAgressividadeCorte(value as number);
-          break;
-        case 'filmTypes':
-          setFilmTypes(value as Record<FilmTypeKey, number>);
-          break;
-        case 'selectedFilm':
-          setSelectedFilm(value as FilmTypeKey);
-          break;
-        case 'draftExpiration':
-          setDraftExpiration(Math.max(0, value as number));
-          break;
-        case 'modoDesconto':
-          setModoDesconto(value as DiscountMode);
-          break;
-      }
-    }
-    const normalizedValue = key === 'perdasFixas' ? Math.min(100, Math.max(0, value as number)) : value;
-    const updated = { ...currentConfig, [key]: normalizedValue };
-    resolveCalculatorScopeKey().then((scopeKey) => saveConfig(updated, scopeKey)).catch(() => saveConfig(updated));
-  }, [currentConfig, getColorForItem, setVidros, setUsarCoresPorAmbiente, setRollW, setPrice, setMargin, setModoOtimizacao, setUserName, setModoPerdas, setPerdasFixas, setAgressividadeCorte, setFilmTypes, setSelectedFilm, setDraftExpiration, setModoDesconto]);
+    const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: AppConfig[K]) => {
+        if (key === 'modoCorConfig') {
+            const nextMode = value as ColorMode;
+            const isAmbiente = nextMode === 'ambiente';
+            setUsarCoresPorAmbiente(isAmbiente);
+            if (isAmbiente) {
+                const cleanColors = isLegacyDefaultRoomColors(roomColors) ? {} : roomColors;
+                const updatedMap = buildRoomColorMap(vidros, cleanColors);
+                setRoomColors(updatedMap);
+                setVidros(prev => prev.map(v => {
+                    const roomLabel = (v.label || '').trim();
+                    const rKey = resolveRoomKey(roomLabel);
+                    const color = (rKey && updatedMap[rKey]) || getSizeColor(v.oh, v.ow);
+                    return { ...v, cor: color };
+                }));
+            } else {
+                setVidros(prev => prev.map(v => ({
+                    ...v,
+                    cor: getSizeColor(v.oh, v.ow),
+                })));
+            }
+        } else {
+            switch (key) {
+                case 'rollW':
+                    setRollW(value as number);
+                    break;
+                case 'price':
+                    setPrice(value as number);
+                    break;
+                case 'margin':
+                    setMargin(value as number);
+                    break;
+                case 'modoOtimizacao':
+                    setModoOtimizacao(value as OptimizationMode);
+                    break;
+                case 'userName':
+                    setUserName(value as string);
+                    break;
+                case 'modoPerdas':
+                    setModoPerdas(value as LossMode);
+                    break;
+                case 'perdasFixas':
+                    setPerdasFixas(Math.min(100, Math.max(0, value as number)));
+                    break;
+                case 'agressividadeCorte':
+                    setAgressividadeCorte(value as number);
+                    break;
+                case 'filmTypes':
+                    setFilmTypes(value as Record<FilmTypeKey, number>);
+                    break;
+                case 'selectedFilm':
+                    setSelectedFilm(value as FilmTypeKey);
+                    break;
+                case 'draftExpiration':
+                    setDraftExpiration(Math.max(0, value as number));
+                    break;
+                case 'modoDesconto':
+                    setModoDesconto(value as DiscountMode);
+                    break;
+            }
+        }
+        const normalizedValue = key === 'perdasFixas' ? Math.min(100, Math.max(0, value as number)) : value;
+        const updated = { ...currentConfig, [key]: normalizedValue };
+        resolveCalculatorScopeKey().then((scopeKey) => saveConfig(updated, scopeKey)).catch(() => saveConfig(updated));
+    }, [currentConfig, getColorForItem, setVidros, setUsarCoresPorAmbiente, setRollW, setPrice, setMargin, setModoOtimizacao, setUserName, setModoPerdas, setPerdasFixas, setAgressividadeCorte, setFilmTypes, setSelectedFilm, setDraftExpiration, setModoDesconto]);
 
-  const handleLogout = useCallback(async () => {
-    if (isLoggingOut) return;
+    const handleLogout = useCallback(async () => {
+        if (isLoggingOut) return;
 
-    setIsLoggingOut(true);
-    setConfigAberto(false);
+        setIsLoggingOut(true);
+        setConfigAberto(false);
 
-    try {
-      if (supabase) {
-        await supabase.auth.signOut();
-      }
-    } catch (error) {
-      logger.warn('Falha ao encerrar a sessao do Supabase', { error });
-    }
+        try {
+            if (supabase) {
+                await supabase.auth.signOut();
+            }
+        } catch (error) {
+            logger.warn('Falha ao encerrar a sessao do Supabase', { error });
+        }
 
-    try {
-      await fetch('/api/auth/logout', { method: 'POST' });
-    } catch (error) {
-      logger.warn('Falha ao limpar cookies da sessao', { error });
-    }
+        try {
+            await fetch('/api/auth/logout', { method: 'POST' });
+        } catch (error) {
+            logger.warn('Falha ao limpar cookies da sessao', { error });
+        }
 
-    // C3: limpa o scope em cache para a próxima conta resolver do zero.
-    resetCalculatorScopeCache();
+        // C3: limpa o scope em cache para a próxima conta resolver do zero.
+        resetCalculatorScopeCache();
 
-    window.location.href = '/login';
-  }, [isLoggingOut, setIsLoggingOut, setConfigAberto]);
+        window.location.href = '/login';
+    }, [isLoggingOut, setIsLoggingOut, setConfigAberto]);
 
     // ─── MEMOS ─────────────────────────────────────────────────────────────────
 
@@ -1327,8 +1338,8 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
     const currentRoomLabel = labelIn.trim();
     const currentRoomKey = resolveRoomKey(currentRoomLabel);
     const currentRoomColor = currentRoomLabel
-      ? ((!isLegacyDefaultRoomColors(roomColors) && roomColors[currentRoomKey]) || getColorForItem(currentRoomLabel, undefined, undefined, true))
-      : '#94a3b8';
+        ? ((!isLegacyDefaultRoomColors(roomColors) && roomColors[currentRoomKey]) || getColorForItem(currentRoomLabel, undefined, undefined, true))
+        : '#94a3b8';
     const hasCurrentRoomPieces = currentRoomLabel ? vidros.some(v => (v.label || '') === currentRoomLabel) : false;
     const aplicarCorNoAmbiente = (ambiente: string) => {
         const trimmed = ambiente.trim();
@@ -1410,17 +1421,17 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
         <div className="min-h-screen bg-[#040811] text-white py-6 px-2 sm:px-4 relative overflow-x-hidden">
 
             {/* PAINEL LATERAL: CONFIGURAÇÕES (EXTRAÍDO) */}
-      <ConfigPanel
-        aberto={configAberto}
-        setAberto={setConfigAberto}
-        config={{ rollW, price, margin, modoOtimizacao, userName, modoPerdas, perdasFixas, modoCorConfig: usarCoresPorAmbiente ? 'ambiente' : 'tamanho', agressividadeCorte, filmTypes, selectedFilm, draftExpiration, modoDesconto }}
-        onUpdate={atualizarConfig}
-        onLogout={handleLogout}
-        loggingOut={isLoggingOut}
-      />
+            <ConfigPanel
+                aberto={configAberto}
+                setAberto={setConfigAberto}
+                config={{ rollW, price, margin, modoOtimizacao, userName, modoPerdas, perdasFixas, modoCorConfig: usarCoresPorAmbiente ? 'ambiente' : 'tamanho', agressividadeCorte, filmTypes, selectedFilm, draftExpiration, modoDesconto }}
+                onUpdate={atualizarConfig}
+                onLogout={handleLogout}
+                loggingOut={isLoggingOut}
+            />
 
             {/* PAINEL LATERAL: HISTÓRICO (EXTRAÍDO) */}
-            <HistoryPanel 
+            <HistoryPanel
                 aberto={historicoAberto}
                 setAberto={setHistoricoAberto}
                 historico={historico}
@@ -1447,50 +1458,50 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
                     <div className="h-px w-full bg-white/10" />
                     <div className="flex items-center justify-between gap-3">
                         <div className="flex-1 flex items-center gap-2 sm:gap-3">
-                        <button
-                            onPointerDown={(e) => { e.preventDefault(); handleRotateSelected(); }}
-                            className="flex-1 p-2 sm:p-2.5 bg-white/5 hover:bg-white/10 hover:text-[#c9a227] rounded-xl transition-colors flex items-center justify-center"
-                            title="Girar 90º"
-                        >
-                            <RotateCcw size={18} />
-                        </button>
-                        <button
-                            onPointerDown={(e) => { e.preventDefault(); handleAlignSelected('left'); }}
-                            className="flex-1 p-2 sm:p-2.5 bg-white/5 hover:bg-white/10 hover:text-blue-400 rounded-xl transition-colors flex items-center justify-center"
-                            title="Alinhar à Esquerda"
-                        >
-                            <AlignLeft size={18} />
-                        </button>
-                        <button
-                            onPointerDown={(e) => { e.preventDefault(); handleAlignSelected('right'); }}
-                            className="flex-1 p-2 sm:p-2.5 bg-white/5 hover:bg-white/10 hover:text-blue-400 rounded-xl transition-colors flex items-center justify-center"
-                            title="Alinhar à Direita"
-                        >
-                            <AlignRight size={18} />
-                        </button>
-                        <button
-                            onPointerDown={(e) => { e.preventDefault(); handleCopiarSelecionados(); }}
-                            className="flex-1 p-2 sm:p-2.5 bg-white/5 hover:bg-white/10 hover:text-[#25d366] rounded-xl transition-colors flex items-center justify-center"
-                            title="Copiar Peças Selecionadas"
-                        >
-                            <Copy size={18} />
-                        </button>
-                        {itensCopiados && itensCopiados.length > 0 && (
                             <button
-                                onPointerDown={(e) => { e.preventDefault(); handleAbrirModalColar(); }}
-                                className="flex-1 p-2 sm:p-2.5 bg-[#c9a227]/10 border border-[#c9a227]/30 hover:bg-[#c9a227]/20 text-[#c9a227] rounded-xl transition-colors flex items-center justify-center"
-                                title={`Colar ${itensCopiados.length} peça(s) copiada(s)`}
+                                onPointerDown={(e) => { e.preventDefault(); handleRotateSelected(); }}
+                                className="flex-1 p-2 sm:p-2.5 bg-white/5 hover:bg-white/10 hover:text-[#c9a227] rounded-xl transition-colors flex items-center justify-center"
+                                title="Girar 90º"
                             >
-                                <ClipboardPaste size={18} />
+                                <RotateCcw size={18} />
                             </button>
-                        )}
-                        <button
-                            onPointerDown={(e) => { e.preventDefault(); handleDeleteSelected(); }}
-                            className="flex-1 p-2 sm:p-2.5 bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300 rounded-xl transition-colors flex items-center justify-center"
-                            title="Deletar Peças"
-                        >
-                            <Trash2 size={18} />
-                        </button>
+                            <button
+                                onPointerDown={(e) => { e.preventDefault(); handleAlignSelected('left'); }}
+                                className="flex-1 p-2 sm:p-2.5 bg-white/5 hover:bg-white/10 hover:text-blue-400 rounded-xl transition-colors flex items-center justify-center"
+                                title="Alinhar à Esquerda"
+                            >
+                                <AlignLeft size={18} />
+                            </button>
+                            <button
+                                onPointerDown={(e) => { e.preventDefault(); handleAlignSelected('right'); }}
+                                className="flex-1 p-2 sm:p-2.5 bg-white/5 hover:bg-white/10 hover:text-blue-400 rounded-xl transition-colors flex items-center justify-center"
+                                title="Alinhar à Direita"
+                            >
+                                <AlignRight size={18} />
+                            </button>
+                            <button
+                                onPointerDown={(e) => { e.preventDefault(); handleCopiarSelecionados(); }}
+                                className="flex-1 p-2 sm:p-2.5 bg-white/5 hover:bg-white/10 hover:text-[#25d366] rounded-xl transition-colors flex items-center justify-center"
+                                title="Copiar Peças Selecionadas"
+                            >
+                                <Copy size={18} />
+                            </button>
+                            {itensCopiados && itensCopiados.length > 0 && (
+                                <button
+                                    onPointerDown={(e) => { e.preventDefault(); handleAbrirModalColar(); }}
+                                    className="flex-1 p-2 sm:p-2.5 bg-[#c9a227]/10 border border-[#c9a227]/30 hover:bg-[#c9a227]/20 text-[#c9a227] rounded-xl transition-colors flex items-center justify-center"
+                                    title={`Colar ${itensCopiados.length} peça(s) copiada(s)`}
+                                >
+                                    <ClipboardPaste size={18} />
+                                </button>
+                            )}
+                            <button
+                                onPointerDown={(e) => { e.preventDefault(); handleDeleteSelected(); }}
+                                className="flex-1 p-2 sm:p-2.5 bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300 rounded-xl transition-colors flex items-center justify-center"
+                                title="Deletar Peças"
+                            >
+                                <Trash2 size={18} />
+                            </button>
                         </div>
                         <button onClick={() => setSelectedIds([])} className="p-2 text-gray-400 hover:text-white transition-colors shrink-0"><X size={18} /></button>
                     </div>
@@ -1656,6 +1667,7 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
                                 onTogglePerdas={() => setCompensarPerdas(!compensarPerdas)}
                                 modoPerdas={modoPerdas}
                                 perdasFixas={perdasFixas}
+                                compensacaoPerda={compensacaoPerda}
                                 onSalvar={salvarNoHistorico}
                                 onGerarImagem={gerarImagem}
                                 onGerarPDF={gerarPDF}
@@ -1674,11 +1686,11 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
                                 onCriarLead={criarLead}
                             />
 
-                              {isCutMode && (
-                                  <div className="w-full bg-red-500/10 border border-red-500/30 text-red-400 p-3 rounded-xl text-center text-[10px] font-bold uppercase tracking-wider mb-4 animate-pulse flex items-center justify-center gap-2 shadow-lg">
-                                      <Scissors size={14} /> Modo de Corte Ativo - Sincronização Pausada
-                                  </div>
-                              )}
+                            {isCutMode && (
+                                <div className="w-full bg-red-500/10 border border-red-500/30 text-red-400 p-3 rounded-xl text-center text-[10px] font-bold uppercase tracking-wider mb-4 animate-pulse flex items-center justify-center gap-2 shadow-lg">
+                                    <Scissors size={14} /> Modo de Corte Ativo - Sincronização Pausada
+                                </div>
+                            )}
 
                             <div id="calc-algoritmo" className="flex items-center gap-2 mb-4 w-full scroll-mt-24">
                                 <div className="flex bg-[#04080f] border border-white/10 p-1.5 rounded-xl shadow-2xl flex-1 max-w-sm ml-auto">
@@ -1708,7 +1720,7 @@ const atualizarConfig = useCallback(<K extends keyof AppConfig>(key: K, value: A
             </div>
 
             {/* INVOICE PNG OCULTO (EXTRAÍDO) */}
-            <InvoicePNG 
+            <InvoicePNG
                 ref={invoiceRef}
                 cliente={cliente}
                 userName={userName}

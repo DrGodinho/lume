@@ -53,11 +53,32 @@ describe('calcCompensacaoPerda', () => {
     })).toBe(20);
   });
 
-  it('modo dinâmico compensa o desperdício', () => {
-    // eficiência 75% → compensa 25% de 200 = 50
+  it('modo dinâmico compensa a sobra real da bobina', () => {
+    // eficiência 75% com proporção (100 - 75)/75 = 1/3 → 200 * (1/3) = 66.67
     expect(calcCompensacaoPerda({
       compensarPerdas: true, modoPerdas: 'dinamico', perdasFixas: 20, eficiencia: 75, subtotalBruto: 200,
-    })).toBe(50);
+    })).toBe(66.67);
+  });
+
+  it('modo dinâmico usa área exata da bobina quando fornecida', () => {
+    // Área vidros 2m², bobina 3m², preço R$100/m² (subtotal R$200) -> sobra 1m² = R$100
+    expect(calcCompensacaoPerda({
+      compensarPerdas: true,
+      modoPerdas: 'dinamico',
+      perdasFixas: 20,
+      eficiencia: 67,
+      subtotalBruto: 200,
+      totalAreaM2: 2,
+      areaBobinaM2: 3,
+      price: 100,
+    })).toBe(100);
+  });
+
+  it('modo dinâmico respeita o teto de segurança de +100%', () => {
+    // Eficiência 20% daria fator 4x (+400%). Com teto, limita a +100% (R$200)
+    expect(calcCompensacaoPerda({
+      compensarPerdas: true, modoPerdas: 'dinamico', perdasFixas: 20, eficiencia: 20, subtotalBruto: 200,
+    })).toBe(200);
   });
 
   it('modo dinâmico zera nos extremos (0% ou ≥100%)', () => {
@@ -128,7 +149,7 @@ describe('calcValorSelecionados', () => {
   });
 
   it('aplica perdas dinâmicas baseadas na eficiência', () => {
-    // 2m² a R$100 = 200, eficiência 75% -> 25% de perdas -> 200 + 50 = 250
+    // 2m² a R$100 = 200, eficiência 75% -> sobra real de bobina (100-75)/75 = 1/3 (+33.33%) -> 200 + 66.67 = 266.67
     expect(calcValorSelecionados({
       areaSelecionadaM2: 2,
       price: 100,
@@ -136,7 +157,7 @@ describe('calcValorSelecionados', () => {
       modoPerdas: 'dinamico',
       perdasFixas: 20,
       eficiencia: 75,
-    })).toBe(250);
+    })).toBe(266.67);
   });
 
   it('não adiciona perdas dinâmicas se eficiência for 100%', () => {
