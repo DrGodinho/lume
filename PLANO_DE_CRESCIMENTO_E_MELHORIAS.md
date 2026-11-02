@@ -147,6 +147,25 @@ graph TD
 
 ---
 
+### 🟡 SPRINT 4: Nichos de Alto Ticket & Aprimoramento do Algoritmo de Corte (Semana 4) `[EM ANDAMENTO]`
+> **Objetivo:** Conquistar a demanda de nichos especializados de alta lucratividade (Varandas Gourmet, Segurança Antivandalismo e Tetos de Vidro) e refinar o algoritmo de corte da Calculadora Admin.
+
+1. **Criação das Landing Pages de Nichos Específicos** `[CONCLUÍDO]`:
+   - [Varanda Gourmet & Cortina de Vidro](/insulfilm-para-varanda-gourmet/): Solução definitiva contra o efeito estufa de sacadas envidraçadas no sol poente, com Nano Cerâmica 70%/75% que não infringe convenções de condomínio.
+   - [Películas Antivandalismo & Segurança](/insulfilm-antivandalismo/): Linhas PS4 (100 µm), PS8 (200 µm) e PS12 (300 µm) com retenção de 100% dos fragmentos cortantes contra invasões e quebra acidental.
+   - [Tetos de Vidro & Clarabóias](/insulfilm-para-teto-de-vidro/): Controle térmico zenital extremo (-8°C na sensação térmica) e filmes de absorção controlada sem risco de choque térmico no vidro.
+   - Todas as 3 páginas contam com:
+     - Hero backgrounds WebP ultraleves gerados sob medida.
+     - Design System LUME Elite: `<HeroEntrance>`, `<ScrollReveal>`, `<AnimatedCounter>`, `<GoogleReviews>`, `<LevelDots>`, `<ContactCTA>`.
+     - Schemas JSON-LD: `BreadcrumbList`, `LocalBusiness`, `Service` com `aggregateRating` e `FAQPage`.
+     - Integração a `sitemap.ts`, `Footer.tsx` e base de inteligência `public/llms-full.txt`.
+
+2. **Aprimoramento do Algoritmo de Corte da Calculadora Admin** `[PRÓXIMO PASSO]`:
+   - Refinamento das heurísticas de corte guilhotina e aproveitamento de bobina em `src/workers/packer.worker.ts`.
+   - Otimização do cálculo de perdas e interface em `src/views/AdminCalculator.tsx`.
+
+---
+
 ## 📌 6. Tabela de Monitoramento & Métricas de Sucesso (KPIs)
 
 | Métrica | Situação Atual | Meta Pós-Sprint 1 e 2 |

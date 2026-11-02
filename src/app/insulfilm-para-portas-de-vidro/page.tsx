@@ -118,13 +118,10 @@ const faqJsonLd = {
   })),
 };
 
-const breadcrumbJsonLd = {
-  '@context': 'https://schema.org',
-  ...buildBreadcrumbSchema([
-    { name: 'Início', url: 'https://lumecontrolesolar.com.br/' },
-    { name: 'Portas de Vidro', url: pageUrl },
-  ]),
-};
+const breadcrumbJsonLd = buildBreadcrumbSchema([
+  { name: 'Início', url: 'https://lumecontrolesolar.com.br/' },
+  { name: 'Portas de Vidro', url: pageUrl },
+]);
 
 export default function Page() {
   return (

@@ -1,8 +1,19 @@
-import { Shield, Thermometer, PiggyBank, Lock } from 'lucide-react';
+import { Shield, Thermometer, PiggyBank, Lock, type LucideIcon } from 'lucide-react';
 import { ScrollReveal } from '../components/ScrollReveal';
 import { AnimatedCounter } from '../components/AnimatedCounter';
 
-const benefits = [
+interface BenefitItem {
+  id: number;
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  stat: string;
+  statLabel: string;
+  prefix?: string;
+  sublabel?: string;
+}
+
+const benefits: BenefitItem[] = [
   {
     id: 1,
     icon: Shield,
@@ -32,8 +43,10 @@ const benefits = [
     icon: Lock,
     title: 'Segurança',
     description: 'Películas antivandalismo que dificultam a invasão e seguram vidros quebrados.',
-    stat: 'Até 10 anos',
+    prefix: 'Até',
+    stat: '10 Anos',
     statLabel: 'Garantia',
+    sublabel: 'Linha Nano Cerâmica',
   },
 ];
 
@@ -103,13 +116,25 @@ export function Benefits() {
 
               {/* Stat */}
               <div className="mb-3 sm:mb-4">
+                {benefit.prefix && (
+                  <span className="block text-[11px] sm:text-xs font-semibold uppercase tracking-widest text-[#c9a227]/80 mb-0.5 sm:mb-1">
+                    {benefit.prefix}
+                  </span>
+                )}
                 <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-gradient-gold font-montserrat">
                   <AnimatedCounter
                     target={benefit.stat.replace(/[^0-9-]/g, '')}
                     suffix={benefit.stat.replace(/[0-9-]/g, '')}
                   />
                 </span>
-                <p className="text-xs sm:text-sm text-gray-500 mt-1">{benefit.statLabel}</p>
+                <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                  {benefit.statLabel}
+                  {benefit.sublabel && (
+                    <span className="block text-[11px] sm:text-xs text-gray-500 mt-0.5">
+                      ({benefit.sublabel})
+                    </span>
+                  )}
+                </p>
               </div>
 
               {/* Content */}

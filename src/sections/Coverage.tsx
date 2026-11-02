@@ -5,16 +5,15 @@ import { businessInfo } from '@/lib/businessInfo';
 interface LocationItem {
   name: string;
   active: boolean;
-  isNew?: boolean;
 }
 
 const locations: LocationItem[] = [
-  { name: 'Copacabana', active: true, isNew: true },
-  { name: 'Ipanema', active: true, isNew: true },
-  { name: 'Leblon', active: true, isNew: true },
-  { name: 'Tijuca', active: true, isNew: true },
-  { name: 'Centro do Rio', active: true, isNew: true },
-  { name: 'Santo Cristo (Porto Maravilha)', active: true, isNew: true },
+  { name: 'Copacabana', active: true },
+  { name: 'Ipanema', active: true },
+  { name: 'Leblon', active: true },
+  { name: 'Tijuca', active: true },
+  { name: 'Centro do Rio', active: true },
+  { name: 'Santo Cristo (Porto Maravilha)', active: true },
   { name: 'Barra da Tijuca', active: true },
   { name: 'Recreio', active: true },
   { name: 'Jacarepaguá', active: true },
@@ -97,19 +96,10 @@ export function Coverage() {
                   <a
                     key={index}
                     href={url + '/'}
-                    className={`stat-card location-tag group px-3 sm:px-5 py-2 sm:py-3 rounded-full border transition-all duration-300 hover:-translate-y-1 text-xs sm:text-base flex items-center gap-1.5 sm:gap-2 shadow-[0_10px_30px_rgba(201,162,39,0.1)] ${
-                      location.isNew
-                        ? 'bg-[#c9a227]/20 border-[#c9a227] text-white hover:bg-[#c9a227] hover:text-[#04080f]'
-                        : 'bg-[#1a3a5c]/30 border-[#1a3a5c]/50 text-gray-300 hover:bg-[#c9a227] hover:border-[#c9a227] hover:text-[#04080f]'
-                    }`}
+                    className="stat-card location-tag group px-3 sm:px-5 py-2 sm:py-3 rounded-full border transition-all duration-300 hover:-translate-y-1 text-xs sm:text-base flex items-center gap-1.5 sm:gap-2 shadow-[0_10px_30px_rgba(201,162,39,0.1)] bg-[#1a3a5c]/30 border-[#1a3a5c]/50 text-gray-300 hover:bg-[#c9a227] hover:border-[#c9a227] hover:text-[#04080f]"
                   >
                     <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-[#c9a227] group-hover:text-inherit" />
                     {location.name}
-                    {location.isNew && (
-                      <span className="text-[10px] font-bold uppercase tracking-wider bg-[#c9a227] text-[#04080f] px-1.5 py-0.5 rounded-full ml-1">
-                        Novo
-                      </span>
-                    )}
                   </a>
                 );
               }

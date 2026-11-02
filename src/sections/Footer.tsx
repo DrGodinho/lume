@@ -17,6 +17,9 @@ const quickLinks = [
 
 const products = [
   { name: 'Nano Cerâmica', href: '/nano-ceramica' },
+  { name: 'Varanda Gourmet & Sacadas', href: '/insulfilm-para-varanda-gourmet' },
+  { name: 'Película Antivandalismo', href: '/insulfilm-antivandalismo' },
+  { name: 'Teto de Vidro & Clarabóias', href: '/insulfilm-para-teto-de-vidro' },
   { name: 'Carbono Premium', href: '/carbono' },
   { name: 'Dupla Camada', href: '/dupla-camada' },
   { name: 'Refletiva Clássica', href: '/refletiva' },

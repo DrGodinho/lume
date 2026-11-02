@@ -28,7 +28,6 @@ const jsonLd = {
   '@graph': [
     buildBreadcrumbSchema([
       { name: 'Início', url: 'https://lumecontrolesolar.com.br/' },
-      { name: 'Produtos', url: 'https://lumecontrolesolar.com.br/#produtos' },
       { name: 'Dupla Camada', url: 'https://lumecontrolesolar.com.br/dupla-camada/' },
     ]),
     {

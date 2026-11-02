@@ -1,5 +1,13 @@
-import { Check, Award, Users, Calendar, Shield } from 'lucide-react';
+import { Check, Award, Users, Calendar, Shield, type LucideIcon } from 'lucide-react';
 import { ScrollReveal } from '../components/ScrollReveal';
+
+interface StatItem {
+  icon: LucideIcon;
+  value: string;
+  label: string;
+  prefix?: string;
+  sublabel?: string;
+}
 
 const differentiators = [
   'Trabalhamos apenas com películas de alta qualidade',
@@ -8,10 +16,16 @@ const differentiators = [
   'Mais de 500 residências atendidas',
 ];
 
-const stats = [
+const stats: StatItem[] = [
   { icon: Calendar, value: '8+', label: 'Anos de Experiência' },
   { icon: Users, value: '500+', label: 'Residências Atendidas' },
-  { icon: Shield, value: 'Até 10', label: 'Anos de Garantia' },
+  {
+    icon: Shield,
+    prefix: 'Até',
+    value: '10',
+    label: 'Anos de Garantia',
+    sublabel: 'Linha Nano Cerâmica',
+  },
   { icon: Award, value: '100%', label: 'Clientes Satisfeitos' },
 ];
 
@@ -93,10 +107,22 @@ export function About() {
 
                 {/* Value */}
                 <div className="relative">
+                  {stat.prefix && (
+                    <span className="block text-[11px] sm:text-xs font-semibold uppercase tracking-widest text-[#c9a227]/80 mb-0.5 sm:mb-1">
+                      {stat.prefix}
+                    </span>
+                  )}
                   <span className="text-2xl sm:text-4xl md:text-5xl font-bold text-gradient-gold font-montserrat">
                     {stat.value}
                   </span>
-                  <p className="text-gray-400 text-xs sm:text-sm mt-1 sm:mt-2">{stat.label}</p>
+                  <p className="text-gray-400 text-xs sm:text-sm mt-1 sm:mt-2">
+                    {stat.label}
+                    {stat.sublabel && (
+                      <span className="block text-[11px] sm:text-xs text-gray-500 mt-0.5">
+                        ({stat.sublabel})
+                      </span>
+                    )}
+                  </p>
                 </div>
               </div>
             ))}

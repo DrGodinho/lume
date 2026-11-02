@@ -10,45 +10,51 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from './ui/breadcrumb';
+import {
+  buildBreadcrumbSchema,
+  type BreadcrumbItem as SchemaBreadcrumbItem,
+} from '@/lib/schema/breadcrumbs';
 
-interface BreadcrumbItem {
+interface BreadcrumbItemProps {
   label: string;
   href?: string;
 }
 
 interface NavigationBreadcrumbsProps {
-  items: BreadcrumbItem[];
+  items: BreadcrumbItemProps[];
   showVisualTrail?: boolean;
+  disableJsonLd?: boolean;
 }
 
 export function NavigationBreadcrumbs({
   items,
   showVisualTrail = true,
+  disableJsonLd = false,
 }: NavigationBreadcrumbsProps) {
   const pathname = usePathname();
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": items
-      .map((item, index) => {
-        const href = item.href ?? (index === items.length - 1 ? pathname : undefined);
-        if (!href) return null;
-        return {
-          "@type": "ListItem",
-          "position": index + 1,
-          "name": item.label,
-          "item": `https://lumecontrolesolar.com.br${href}`
-        };
-      })
-      .filter(Boolean)
-  };
+
+  // Constrói os itens canônicos garantindo que todos os nós possuam propriedade `item` válida
+  const schemaItems: SchemaBreadcrumbItem[] = items.map((item, index) => {
+    let resolvedUrl = item.href;
+    if (!resolvedUrl && index === items.length - 1) {
+      resolvedUrl = pathname ? (pathname.endsWith('/') ? pathname : `${pathname}/`) : '/';
+    }
+    return {
+      name: item.label,
+      url: resolvedUrl,
+    };
+  });
+
+  const jsonLd = buildBreadcrumbSchema(schemaItems);
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      {!disableJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
       {showVisualTrail && (
         <Breadcrumb className="mb-6">
           <BreadcrumbList className="text-gray-400">
@@ -61,8 +67,8 @@ export function NavigationBreadcrumbs({
                     </BreadcrumbPage>
                   ) : (
                     <BreadcrumbLink asChild>
-                      <a 
-                        href={item.href + (item.href === '/' ? '' : '/')} 
+                      <a
+                        href={item.href + (item.href === '/' || item.href.includes('#') ? '' : '/')}
                         className="text-gray-500 hover:text-[#c9a227] transition-colors"
                       >
                         {item.label}

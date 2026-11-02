@@ -42,7 +42,6 @@ const jsonLd = {
   '@graph': [
     buildBreadcrumbSchema([
       { name: 'Início', url: 'https://lumecontrolesolar.com.br/' },
-      { name: 'Soluções por Cômodo', url: 'https://lumecontrolesolar.com.br/#produtos' },
       { name: 'Insulfilm no Escritório', url: 'https://lumecontrolesolar.com.br/insulfilm-no-escritorio/' },
     ]),
     {
