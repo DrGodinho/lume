@@ -10,9 +10,7 @@ import {
   Sun,
   Thermometer,
   Zap,
-  Building,
   Sparkles,
-  CloudSun
 } from 'lucide-react';
 import { NavigationBreadcrumbs } from '../components/NavigationBreadcrumbs';
 import { HeroEntrance } from '../components/HeroEntrance';

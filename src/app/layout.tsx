@@ -7,16 +7,16 @@ import { businessAddressSchema, businessInfo, businessSameAs } from '@/lib/busin
 
 const montserrat = Montserrat({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800', '900'],
-  variable: '--font-montserrat',
   display: 'swap',
+  variable: '--font-montserrat',
+  fallback: ['system-ui', 'sans-serif'],
 });
 
 const openSans = Open_Sans({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-open-sans',
   display: 'swap',
+  variable: '--font-open-sans',
+  fallback: ['system-ui', 'sans-serif'],
 });
 
 export const metadata: Metadata = {

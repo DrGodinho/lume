@@ -10,9 +10,7 @@ import {
   Shield,
   ShieldAlert,
   Hammer,
-  Building,
   Zap,
-  Lock
 } from 'lucide-react';
 import { NavigationBreadcrumbs } from '../components/NavigationBreadcrumbs';
 import { HeroEntrance } from '../components/HeroEntrance';
