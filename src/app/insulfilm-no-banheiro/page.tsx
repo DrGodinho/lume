@@ -46,28 +46,17 @@ const jsonLd = {
       { name: 'Insulfilm no Banheiro', url: 'https://lumecontrolesolar.com.br/insulfilm-no-banheiro/' },
     ]),
     {
-      '@type': 'Service',
-      name: 'Instalação de Insulfilm Jateado para Banheiros',
+      '@type': 'Product',
+      name: 'Película Jateada para Banheiro e Box',
       alternateName: 'Película Jateada e Fosca para Básculas e Boxes',
       description:
         'Instalação profissional de películas jateadas e foscas para básculas, janelas e boxes de vidro temperado em banheiros no Rio de Janeiro. Garante privacidade total 24 horas por dia mesmo com a lâmpada acesa, mantém a passagem de luz natural e resiste perfeitamente ao vapor quente do chuveiro. Garantia oficial de até 10 anos.',
       url: 'https://lumecontrolesolar.com.br/insulfilm-no-banheiro/',
       image: 'https://lumecontrolesolar.com.br/og-image.jpg',
-      provider: {
-        '@type': 'LocalBusiness',
+      brand: {
+        '@type': 'Brand',
         name: 'LUME Controle Solar',
-        url: 'https://lumecontrolesolar.com.br',
-        telephone: businessInfo.phoneE164,
-        address: businessAddressSchema,
       },
-      areaServed: [
-        { '@type': 'City', name: 'Rio de Janeiro' },
-        { '@type': 'AdministrativeArea', name: 'Barra da Tijuca' },
-        { '@type': 'AdministrativeArea', name: 'Recreio dos Bandeirantes' },
-        { '@type': 'AdministrativeArea', name: 'Jacarepaguá' },
-        { '@type': 'AdministrativeArea', name: 'Campo Grande' },
-        { '@type': 'AdministrativeArea', name: 'Zona Sul' }
-      ],
       offers: {
         '@type': 'AggregateOffer',
         priceCurrency: 'BRL',
@@ -94,6 +83,28 @@ const jsonLd = {
         { '@type': 'PropertyValue', name: 'Resistência ao Vapor', value: '100% Impermeável' },
         { '@type': 'PropertyValue', name: 'Tempo Médio de Aplicação', value: '40min a 1h30' },
         { '@type': 'PropertyValue', name: 'Garantia', value: 'Até 10 Anos' },
+      ],
+    },
+    {
+      '@type': 'Service',
+      name: 'Instalação de Insulfilm Jateado para Banheiros',
+      serviceType: 'Aplicação de Películas Jateadas e Foscas para Vidros',
+      description:
+        'Serviço profissional de aplicação de película jateada de privacidade para boxes, janelas e básculas de banheiros residenciais no Rio de Janeiro.',
+      provider: {
+        '@type': 'LocalBusiness',
+        name: 'LUME Controle Solar',
+        url: 'https://lumecontrolesolar.com.br',
+        telephone: businessInfo.phoneE164,
+        address: businessAddressSchema,
+      },
+      areaServed: [
+        { '@type': 'City', name: 'Rio de Janeiro' },
+        { '@type': 'AdministrativeArea', name: 'Barra da Tijuca' },
+        { '@type': 'AdministrativeArea', name: 'Recreio dos Bandeirantes' },
+        { '@type': 'AdministrativeArea', name: 'Jacarepaguá' },
+        { '@type': 'AdministrativeArea', name: 'Campo Grande' },
+        { '@type': 'AdministrativeArea', name: 'Zona Sul' },
       ],
     },
     {

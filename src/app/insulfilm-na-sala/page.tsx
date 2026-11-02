@@ -47,28 +47,17 @@ const jsonLd = {
       { name: 'Insulfilm na Sala', url: 'https://lumecontrolesolar.com.br/insulfilm-na-sala/' },
     ]),
     {
-      '@type': 'Service',
-      name: 'Instalação de Insulfilm para Salas de Estar',
+      '@type': 'Product',
+      name: 'Película de Insulfilm para Salas de Estar',
       alternateName: 'Película de Controle Solar e Térmico para Sala',
       description:
         'Instalação profissional de películas de alta performance em salas residenciais no Rio de Janeiro. Ideal para eliminar reflexo na Smart TV, diminuir o calor solar, proteger móveis e pisos contra raios UV e garantir privacidade. Opções em Nano Cerâmica, Carbono e Refletiva com garantia de até 10 anos.',
       url: 'https://lumecontrolesolar.com.br/insulfilm-na-sala/',
       image: 'https://lumecontrolesolar.com.br/og-image.jpg',
-      provider: {
-        '@type': 'LocalBusiness',
+      brand: {
+        '@type': 'Brand',
         name: 'LUME Controle Solar',
-        url: 'https://lumecontrolesolar.com.br',
-        telephone: businessInfo.phoneE164,
-        address: businessAddressSchema,
       },
-      areaServed: [
-        { '@type': 'City', name: 'Rio de Janeiro' },
-        { '@type': 'AdministrativeArea', name: 'Barra da Tijuca' },
-        { '@type': 'AdministrativeArea', name: 'Recreio dos Bandeirantes' },
-        { '@type': 'AdministrativeArea', name: 'Jacarepaguá' },
-        { '@type': 'AdministrativeArea', name: 'Campo Grande' },
-        { '@type': 'AdministrativeArea', name: 'Zona Sul' }
-      ],
       offers: {
         '@type': 'AggregateOffer',
         priceCurrency: 'BRL',
@@ -95,6 +84,28 @@ const jsonLd = {
         { '@type': 'PropertyValue', name: 'Bloqueio de Raios UV', value: '99%' },
         { '@type': 'PropertyValue', name: 'Tempo Médio de Instalação', value: '1h30 a 3h' },
         { '@type': 'PropertyValue', name: 'Garantia', value: 'Até 10 Anos' },
+      ],
+    },
+    {
+      '@type': 'Service',
+      name: 'Instalação de Insulfilm para Salas de Estar',
+      serviceType: 'Aplicação de Películas de Controle Solar e Térmico Residencial',
+      description:
+        'Serviço profissional de instalação de insulfilm em janelas e portas de sala no Rio de Janeiro com corte de precisão e aplicação sem bolhas.',
+      provider: {
+        '@type': 'LocalBusiness',
+        name: 'LUME Controle Solar',
+        url: 'https://lumecontrolesolar.com.br',
+        telephone: businessInfo.phoneE164,
+        address: businessAddressSchema,
+      },
+      areaServed: [
+        { '@type': 'City', name: 'Rio de Janeiro' },
+        { '@type': 'AdministrativeArea', name: 'Barra da Tijuca' },
+        { '@type': 'AdministrativeArea', name: 'Recreio dos Bandeirantes' },
+        { '@type': 'AdministrativeArea', name: 'Jacarepaguá' },
+        { '@type': 'AdministrativeArea', name: 'Campo Grande' },
+        { '@type': 'AdministrativeArea', name: 'Zona Sul' },
       ],
     },
     {

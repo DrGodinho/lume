@@ -45,28 +45,17 @@ const jsonLd = {
       { name: 'Insulfilm na Cozinha', url: 'https://lumecontrolesolar.com.br/insulfilm-na-cozinha/' },
     ]),
     {
-      '@type': 'Service',
-      name: 'Instalação de Insulfilm para Cozinhas e Áreas de Serviço',
+      '@type': 'Product',
+      name: 'Película de Insulfilm para Cozinhas e Lavanderias',
       alternateName: 'Película Térmica e Jateada para Cozinha',
       description:
         'Instalação profissional de películas de controle solar de alta transparência (Nano Cerâmica) e películas decorativas jateadas em cozinhas residenciais e divisórias de lavanderia no Rio de Janeiro. Reduz o calor extremo, protege armários planejados contra raios UV e esconde varais de roupas com elegância. Garantia de até 10 anos.',
       url: 'https://lumecontrolesolar.com.br/insulfilm-na-cozinha/',
       image: 'https://lumecontrolesolar.com.br/og-image.jpg',
-      provider: {
-        '@type': 'LocalBusiness',
+      brand: {
+        '@type': 'Brand',
         name: 'LUME Controle Solar',
-        url: 'https://lumecontrolesolar.com.br',
-        telephone: businessInfo.phoneE164,
-        address: businessAddressSchema,
       },
-      areaServed: [
-        { '@type': 'City', name: 'Rio de Janeiro' },
-        { '@type': 'AdministrativeArea', name: 'Barra da Tijuca' },
-        { '@type': 'AdministrativeArea', name: 'Recreio dos Bandeirantes' },
-        { '@type': 'AdministrativeArea', name: 'Jacarepaguá' },
-        { '@type': 'AdministrativeArea', name: 'Campo Grande' },
-        { '@type': 'AdministrativeArea', name: 'Zona Sul' }
-      ],
       offers: {
         '@type': 'AggregateOffer',
         priceCurrency: 'BRL',
@@ -93,6 +82,28 @@ const jsonLd = {
         { '@type': 'PropertyValue', name: 'Transparência Visual', value: 'Alta (sem escurecer)' },
         { '@type': 'PropertyValue', name: 'Tempo Médio de Aplicação', value: '1h a 2h' },
         { '@type': 'PropertyValue', name: 'Garantia', value: 'Até 10 Anos' },
+      ],
+    },
+    {
+      '@type': 'Service',
+      name: 'Instalação de Insulfilm para Cozinhas e Áreas de Serviço',
+      serviceType: 'Aplicação de Películas Térmicas e Jateadas Residenciais',
+      description:
+        'Serviço profissional de instalação de películas de controle solar e privacidade jateada para cozinhas e divisórias de lavanderia no Rio de Janeiro.',
+      provider: {
+        '@type': 'LocalBusiness',
+        name: 'LUME Controle Solar',
+        url: 'https://lumecontrolesolar.com.br',
+        telephone: businessInfo.phoneE164,
+        address: businessAddressSchema,
+      },
+      areaServed: [
+        { '@type': 'City', name: 'Rio de Janeiro' },
+        { '@type': 'AdministrativeArea', name: 'Barra da Tijuca' },
+        { '@type': 'AdministrativeArea', name: 'Recreio dos Bandeirantes' },
+        { '@type': 'AdministrativeArea', name: 'Jacarepaguá' },
+        { '@type': 'AdministrativeArea', name: 'Campo Grande' },
+        { '@type': 'AdministrativeArea', name: 'Zona Sul' },
       ],
     },
     {

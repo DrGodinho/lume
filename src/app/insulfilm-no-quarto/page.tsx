@@ -47,28 +47,17 @@ const jsonLd = {
       { name: 'Insulfilm no Quarto', url: 'https://lumecontrolesolar.com.br/insulfilm-no-quarto/' },
     ]),
     {
-      '@type': 'Service',
-      name: 'Instalação de Insulfilm para Quartos e Dormitórios',
+      '@type': 'Product',
+      name: 'Película de Insulfilm Blackout e Térmica para Quartos',
       alternateName: 'Película Blackout e Controle Térmico para Quarto',
       description:
         'Instalação profissional de películas de alto poder de escurecimento e isolamento térmico em quartos residenciais no Rio de Janeiro. Ideal para quem trabalha em turnos, precisa de escuridão total para dormir de dia, quer proteger bebês e crianças do sol forte ou eliminar o calor acumulado da tarde. Películas Dupla Camada G5 e Carbono G5 com até 10 anos de garantia.',
       url: 'https://lumecontrolesolar.com.br/insulfilm-no-quarto/',
       image: 'https://lumecontrolesolar.com.br/og-image.jpg',
-      provider: {
-        '@type': 'LocalBusiness',
+      brand: {
+        '@type': 'Brand',
         name: 'LUME Controle Solar',
-        url: 'https://lumecontrolesolar.com.br',
-        telephone: businessInfo.phoneE164,
-        address: businessAddressSchema,
       },
-      areaServed: [
-        { '@type': 'City', name: 'Rio de Janeiro' },
-        { '@type': 'AdministrativeArea', name: 'Barra da Tijuca' },
-        { '@type': 'AdministrativeArea', name: 'Recreio dos Bandeirantes' },
-        { '@type': 'AdministrativeArea', name: 'Jacarepaguá' },
-        { '@type': 'AdministrativeArea', name: 'Campo Grande' },
-        { '@type': 'AdministrativeArea', name: 'Zona Sul' }
-      ],
       offers: {
         '@type': 'AggregateOffer',
         priceCurrency: 'BRL',
@@ -96,6 +85,28 @@ const jsonLd = {
         { '@type': 'PropertyValue', name: 'Privacidade', value: 'Total 24h' },
         { '@type': 'PropertyValue', name: 'Tempo Médio de Instalação', value: '1h a 1h30' },
         { '@type': 'PropertyValue', name: 'Garantia', value: 'Até 10 Anos' },
+      ],
+    },
+    {
+      '@type': 'Service',
+      name: 'Instalação de Insulfilm para Quartos e Dormitórios',
+      serviceType: 'Aplicação de Películas Blackout e Térmicas Residenciais',
+      description:
+        'Serviço profissional de instalação de insulfilm blackout e películas térmicas para janelas de quartos residenciais no Rio de Janeiro.',
+      provider: {
+        '@type': 'LocalBusiness',
+        name: 'LUME Controle Solar',
+        url: 'https://lumecontrolesolar.com.br',
+        telephone: businessInfo.phoneE164,
+        address: businessAddressSchema,
+      },
+      areaServed: [
+        { '@type': 'City', name: 'Rio de Janeiro' },
+        { '@type': 'AdministrativeArea', name: 'Barra da Tijuca' },
+        { '@type': 'AdministrativeArea', name: 'Recreio dos Bandeirantes' },
+        { '@type': 'AdministrativeArea', name: 'Jacarepaguá' },
+        { '@type': 'AdministrativeArea', name: 'Campo Grande' },
+        { '@type': 'AdministrativeArea', name: 'Zona Sul' },
       ],
     },
     {

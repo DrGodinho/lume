@@ -48,95 +48,97 @@ export const metadata: Metadata = {
   },
 };
 
-const serviceJsonLd = {
+const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'Service',
-  name: 'Insulfilm para Portas de Vidro',
-  alternateName: [
-    'Película para porta de vidro',
-    'Película de privacidade para porta de vidro',
-    'Insulfilm para porta blindex',
-  ],
-  description,
-  url: pageUrl,
-  image: 'https://lumecontrolesolar.com.br/og-image.jpg',
-  serviceType: 'Instalação de películas para portas de vidro residenciais e comerciais',
-  provider: {
-    '@type': 'LocalBusiness',
-    name: 'LUME Controle Solar',
-    url: 'https://lumecontrolesolar.com.br',
-    telephone: businessInfo.phoneE164,
-    address: businessAddressSchema,
-  },
-  areaServed: [
-    { '@type': 'Place', name: 'Bangu' },
-    { '@type': 'Place', name: 'Campo Grande' },
-    { '@type': 'Place', name: 'Realengo' },
-    { '@type': 'Place', name: 'Jacarepaguá' },
-    { '@type': 'Place', name: 'Barra da Tijuca' },
-    { '@type': 'Place', name: 'Recreio dos Bandeirantes' },
-    { '@type': 'City', name: 'Rio de Janeiro' },
-  ],
-  offers: {
-    '@type': 'AggregateOffer',
-    priceCurrency: 'BRL',
-    lowPrice: '380.00',
-    highPrice: '980.00',
-    offerCount: '3',
-    priceValidUntil: '2026-12-31',
-    availability: 'https://schema.org/InStock',
-    seller: {
-      '@type': 'LocalBusiness',
-      name: 'LUME Controle Solar',
+  '@graph': [
+    buildBreadcrumbSchema([
+      { name: 'Início', url: 'https://lumecontrolesolar.com.br/' },
+      { name: 'Portas de Vidro', url: pageUrl },
+    ]),
+    {
+      '@type': 'Product',
+      name: 'Película de Insulfilm para Portas de Vidro',
+      alternateName: [
+        'Película para porta de vidro',
+        'Película de privacidade para porta de vidro',
+        'Insulfilm para porta blindex',
+      ],
+      description,
+      url: pageUrl,
+      image: 'https://lumecontrolesolar.com.br/og-image.jpg',
+      brand: {
+        '@type': 'Brand',
+        name: 'LUME Controle Solar',
+      },
+      offers: {
+        '@type': 'AggregateOffer',
+        priceCurrency: 'BRL',
+        lowPrice: '380.00',
+        highPrice: '980.00',
+        offerCount: '3',
+        priceValidUntil: '2026-12-31',
+        availability: 'https://schema.org/InStock',
+        seller: {
+          '@type': 'LocalBusiness',
+          name: 'LUME Controle Solar',
+        },
+      },
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: '4.9',
+        reviewCount: '142',
+        bestRating: '5',
+        worstRating: '1',
+      },
+      additionalProperty: [
+        { '@type': 'PropertyValue', name: 'Garantia', value: 'Até 10 anos' },
+        { '@type': 'PropertyValue', name: 'Proteção UV', value: 'Até 99%' },
+        { '@type': 'PropertyValue', name: 'Rejeição de Calor', value: 'Até 82%' },
+        { '@type': 'PropertyValue', name: 'Aplicação', value: 'Residencial e comercial' },
+      ],
     },
-  },
-  aggregateRating: {
-    '@type': 'AggregateRating',
-    ratingValue: '4.9',
-    reviewCount: '142',
-    bestRating: '5',
-    worstRating: '1',
-  },
-  additionalProperty: [
-    { '@type': 'PropertyValue', name: 'Garantia', value: 'Até 10 anos' },
-    { '@type': 'PropertyValue', name: 'Proteção UV', value: 'Até 99%' },
-    { '@type': 'PropertyValue', name: 'Rejeição de Calor', value: 'Até 82%' },
-    { '@type': 'PropertyValue', name: 'Aplicação', value: 'Residencial e comercial' },
+    {
+      '@type': 'Service',
+      name: 'Instalação de Insulfilm para Portas de Vidro',
+      serviceType: 'Instalação de películas para portas de vidro residenciais e comerciais',
+      description,
+      provider: {
+        '@type': 'LocalBusiness',
+        name: 'LUME Controle Solar',
+        url: 'https://lumecontrolesolar.com.br',
+        telephone: businessInfo.phoneE164,
+        address: businessAddressSchema,
+      },
+      areaServed: [
+        { '@type': 'Place', name: 'Bangu' },
+        { '@type': 'Place', name: 'Campo Grande' },
+        { '@type': 'Place', name: 'Realengo' },
+        { '@type': 'Place', name: 'Jacarepaguá' },
+        { '@type': 'Place', name: 'Barra da Tijuca' },
+        { '@type': 'Place', name: 'Recreio dos Bandeirantes' },
+        { '@type': 'City', name: 'Rio de Janeiro' },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: portasVidroFaqs.map((faq) => ({
+        '@type': 'Question',
+        name: faq.q,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: faq.a,
+        },
+      })),
+    },
   ],
 };
-
-const faqJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'FAQPage',
-  mainEntity: portasVidroFaqs.map((faq) => ({
-    '@type': 'Question',
-    name: faq.q,
-    acceptedAnswer: {
-      '@type': 'Answer',
-      text: faq.a,
-    },
-  })),
-};
-
-const breadcrumbJsonLd = buildBreadcrumbSchema([
-  { name: 'Início', url: 'https://lumecontrolesolar.com.br/' },
-  { name: 'Portas de Vidro', url: pageUrl },
-]);
 
 export default function Page() {
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <InsulfilmPortasVidro />
     </>

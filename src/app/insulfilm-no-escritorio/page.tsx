@@ -45,29 +45,17 @@ const jsonLd = {
       { name: 'Insulfilm no Escritório', url: 'https://lumecontrolesolar.com.br/insulfilm-no-escritorio/' },
     ]),
     {
-      '@type': 'Service',
-      name: 'Instalação de Insulfilm para Escritórios e Home Offices',
+      '@type': 'Product',
+      name: 'Película de Insulfilm para Escritórios e Home Offices',
       alternateName: 'Película Anti-Reflexo e Térmica Corporativa',
       description:
         'Instalação profissional de películas de controle solar anti-ofuscamento e divisórias jateadas para escritórios, consultórios e home offices no Rio de Janeiro. Proporciona nitidez visual em monitores, elimina o contraluz em chamadas no Zoom/Meet e reduz até 30% no consumo de ar-condicionado. Garantia de até 10 anos.',
       url: 'https://lumecontrolesolar.com.br/insulfilm-no-escritorio/',
       image: 'https://lumecontrolesolar.com.br/og-image.jpg',
-      provider: {
-        '@type': 'LocalBusiness',
+      brand: {
+        '@type': 'Brand',
         name: 'LUME Controle Solar',
-        url: 'https://lumecontrolesolar.com.br',
-        telephone: businessInfo.phoneE164,
-        address: businessAddressSchema,
       },
-      areaServed: [
-        { '@type': 'City', name: 'Rio de Janeiro' },
-        { '@type': 'AdministrativeArea', name: 'Barra da Tijuca' },
-        { '@type': 'AdministrativeArea', name: 'Recreio dos Bandeirantes' },
-        { '@type': 'AdministrativeArea', name: 'Jacarepaguá' },
-        { '@type': 'AdministrativeArea', name: 'Campo Grande' },
-        { '@type': 'AdministrativeArea', name: 'Centro' },
-        { '@type': 'AdministrativeArea', name: 'Zona Sul' }
-      ],
       offers: {
         '@type': 'AggregateOffer',
         priceCurrency: 'BRL',
@@ -94,6 +82,29 @@ const jsonLd = {
         { '@type': 'PropertyValue', name: 'Bloqueio de Raios UV', value: '99%' },
         { '@type': 'PropertyValue', name: 'Tempo Médio de Instalação', value: '1h a 2h' },
         { '@type': 'PropertyValue', name: 'Garantia', value: 'Até 10 Anos' },
+      ],
+    },
+    {
+      '@type': 'Service',
+      name: 'Instalação de Insulfilm para Escritórios e Home Offices',
+      serviceType: 'Aplicação de Películas Anti-Reflexo e Divisórias Corporativas',
+      description:
+        'Serviço profissional de instalação de películas de proteção solar, anti-reflexo para monitores e divisórias de vidro em escritórios no Rio de Janeiro.',
+      provider: {
+        '@type': 'LocalBusiness',
+        name: 'LUME Controle Solar',
+        url: 'https://lumecontrolesolar.com.br',
+        telephone: businessInfo.phoneE164,
+        address: businessAddressSchema,
+      },
+      areaServed: [
+        { '@type': 'City', name: 'Rio de Janeiro' },
+        { '@type': 'AdministrativeArea', name: 'Barra da Tijuca' },
+        { '@type': 'AdministrativeArea', name: 'Recreio dos Bandeirantes' },
+        { '@type': 'AdministrativeArea', name: 'Jacarepaguá' },
+        { '@type': 'AdministrativeArea', name: 'Campo Grande' },
+        { '@type': 'AdministrativeArea', name: 'Centro' },
+        { '@type': 'AdministrativeArea', name: 'Zona Sul' },
       ],
     },
     {
