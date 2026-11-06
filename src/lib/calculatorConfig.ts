@@ -27,6 +27,7 @@ export function loadConfig(scopeKey?: string): AppConfig {
             filmCatalog,
             selectedFilm: normalizeFilmTypeKey(parsed.selectedFilm),
             modoDesconto: parsed.modoDesconto === 'porcentagem' ? 'porcentagem' : 'real',
+            compensarPerdas: typeof parsed.compensarPerdas === 'boolean' ? parsed.compensarPerdas : (DEFAULT_CONFIG.compensarPerdas ?? true),
           };
         }
     } catch {

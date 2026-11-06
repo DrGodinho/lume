@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
-import { Smartphone, Save, FolderOpen, Layers, X, Plus } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Smartphone, Save, FolderOpen, Layers, X, Plus, ChevronDown, Sparkles } from 'lucide-react';
 import { formatNumber2 } from '../../lib/money';
 import type { FilmCatalogItem, FilmTypeKey } from '../../lib/films';
 import { FILM_TYPE_LABELS } from '../../lib/films';
@@ -61,6 +61,7 @@ export interface MedidaProps {
     onQtyKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
     onAdicionar: () => void;
     addError: string | null;
+    onAbrirAiVision?: () => void;
 }
 
 interface InputPanelProps {
@@ -91,12 +92,25 @@ export function InputPanel({
         hasCurrentRoomPieces,
         onToggleCorEsquema, onSelectRoomColor, onAplicarCorNoAmbiente,
     } = corProps;
+    const [isRoloOpen, setIsRoloOpen] = useState(false);
+    const roloRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (roloRef.current && !roloRef.current.contains(event.target as Node)) {
+                setIsRoloOpen(false);
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
     const {
         labelIn, heightIn, widthIn, qtyIn,
         onLabelInChange, onHeightChange, onWidthChange, onQtyChange,
         heightRef, widthRef, qtyRef,
         onHeightKeyDown, onWidthKeyDown, onQtyKeyDown,
-        onAdicionar, addError,
+        onAdicionar, addError, onAbrirAiVision,
     } = medidaProps;
     return (
         <React.Fragment>
@@ -146,9 +160,42 @@ export function InputPanel({
 
             <div className="admin-entrance bg-[#070c14] border-2 border-[#c9a227]/25 rounded-2xl p-5 shadow-2xl">
                 <div className="grid grid-cols-3 gap-2">
-                    <div>
+                    <div ref={roloRef} className="relative">
                         <label className="block text-[10px] text-gray-400 mb-1 text-center font-bold uppercase">Rolo</label>
-                        <input type="number" inputMode="decimal" step="0.01" min="0" value={rollW} onChange={(e) => onRollWChange(parseFloat(e.target.value) || 0)} onFocus={(e) => e.target.select()} className="w-full bg-[#040811] border border-white/10 rounded-lg p-3 text-sm text-center font-bold" />
+                        <button
+                            type="button"
+                            onClick={() => setIsRoloOpen((prev) => !prev)}
+                            className="w-full bg-[#040811] border border-white/10 hover:border-[#c9a227]/60 text-white rounded-lg p-3 text-sm text-center font-bold flex items-center justify-center gap-1 transition-all"
+                            title="Selecione a largura da bobina"
+                        >
+                            <span>{rollW} cm</span>
+                            <ChevronDown size={14} className={`text-[#c9a227] transition-transform duration-200 ${isRoloOpen ? 'rotate-180' : ''}`} />
+                        </button>
+                        {isRoloOpen && (
+                            <div className="absolute left-0 right-0 top-full mt-1.5 z-40 bg-[#070c14] border border-[#c9a227]/40 rounded-xl shadow-2xl p-1.5 flex flex-col gap-1 backdrop-blur-md">
+                                {[152, 122, 100].map((option) => (
+                                    <button
+                                        key={option}
+                                        type="button"
+                                        onClick={() => {
+                                            onRollWChange(option);
+                                            setIsRoloOpen(false);
+                                        }}
+                                        className={`w-full py-2 px-2 rounded-lg text-xs font-bold transition-all flex items-center justify-between ${rollW === option
+                                                ? 'bg-[#c9a227] text-black shadow-md'
+                                                : 'text-gray-300 hover:text-white hover:bg-white/10'
+                                            }`}
+                                    >
+                                        <span>{option} cm</span>
+                                        {option === 152 && (
+                                            <span className={`text-[9px] uppercase px-1 rounded ${rollW === option ? 'bg-black/20 text-black' : 'text-gray-400'}`}>
+                                                Padrão
+                                            </span>
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
                     <div>
                         <label className="block text-[10px] text-gray-400 mb-1 text-center font-bold uppercase">Película</label>
@@ -203,7 +250,22 @@ export function InputPanel({
             </div>
 
             <div className="admin-entrance bg-[#0d1018] border-2 border-[#c9a227]/35 rounded-2xl p-5 shadow-2xl">
-                <label className="block text-[10px] uppercase text-[#c9a227] mb-4 font-bold flex items-center gap-2"><Layers size={14} /> Medidas</label>
+                <div className="flex items-center justify-between mb-4">
+                    <label className="text-[10px] uppercase text-[#c9a227] font-bold flex items-center gap-2">
+                        <Layers size={14} /> Medidas
+                    </label>
+                    {onAbrirAiVision && (
+                        <button
+                            type="button"
+                            onClick={onAbrirAiVision}
+                            className="px-2.5 py-1 rounded-lg bg-[#c9a227]/15 hover:bg-[#c9a227]/25 border border-[#c9a227]/40 text-[#c9a227] text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-[0_0_10px_rgba(201,162,39,0.15)]"
+                            title="Importar medidas por Foto, Texto ou Voz com IA Gemini"
+                        >
+                            <Sparkles size={12} className="text-[#c9a227]" />
+                            Medidas com IA
+                        </button>
+                    )}
+                </div>
 
                 <div className="space-y-1 mb-4">
                     <span className="text-[9px] text-gray-500 font-bold uppercase">Ambiente / Identificação</span>
@@ -231,11 +293,10 @@ export function InputPanel({
                     id="calc-cor-esquema"
                     type="button"
                     onClick={onToggleCorEsquema}
-                    className={`w-full mb-4 py-2.5 rounded-xl font-bold text-[10px] uppercase tracking-wider border transition-all ${
-                        usarCoresPorAmbiente
+                    className={`w-full mb-4 py-2.5 rounded-xl font-bold text-[10px] uppercase tracking-wider border transition-all ${usarCoresPorAmbiente
                             ? 'bg-[#c9a227]/15 border-[#c9a227]/50 text-[#c9a227]'
                             : 'bg-[#1a2c4e] border-white/10 text-blue-300'
-                    }`}
+                        }`}
                     title="Alterna entre cor por tamanho e cor por ambiente"
                 >
                     {usarCoresPorAmbiente ? 'Esquema: Cor por Ambiente (ON)' : 'Esquema: Cor por Tamanho (ON)'}

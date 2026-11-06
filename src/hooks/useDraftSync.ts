@@ -33,6 +33,7 @@ interface DraftValues {
   customFilmName?: string;
   roomColors: Record<string, string>;
   isCutMode: boolean;
+  compensarPerdas?: boolean;
 }
 
 interface DraftActions {
@@ -52,6 +53,7 @@ interface DraftActions {
   setCustomFilmName?: (v: string) => void;
   setRoomColors: (updater: Record<string, string> | ((prev: Record<string, string>) => Record<string, string>)) => void;
   setCloudStatus: (v: CloudStatus) => void;
+  setCompensarPerdas?: (v: boolean) => void;
 }
 
 interface UseDraftSyncOptions {
@@ -83,7 +85,7 @@ export function useDraftSync(
   const {
     cliente, phone, neighborhood, vidros, desconto, descontoInput, modoDesconto,
     rollW, price, margin, modoOtimizacao, userName, selectedFilm, customFilmName,
-    roomColors, isCutMode,
+    roomColors, isCutMode, compensarPerdas,
   } = values;
 
   // Guarda o último payload para flush síncrono no unmount / beforeunload
@@ -109,6 +111,7 @@ export function useDraftSync(
       selectedFilm,
       customFilmName,
       roomColors,
+      compensarPerdas: typeof compensarPerdas === 'boolean' ? compensarPerdas : true,
       lastSaved: now,
     };
 
@@ -127,6 +130,7 @@ export function useDraftSync(
       selected_film: selectedFilm,
       custom_film_name: customFilmName,
       modo_desconto: modoDesconto,
+      compensar_perdas: typeof compensarPerdas === 'boolean' ? compensarPerdas : true,
       last_saved: now,
     };
     pendingDraftPayloadRef.current = cloudPayload;
@@ -242,6 +246,10 @@ export function useDraftSync(
           if (film) actionsRef.current.setSelectedFilm(normalizeFilmTypeKey(film));
           const customFilm = (d.custom_film_name ?? d.customFilmName) as string | undefined;
           if (typeof customFilm === 'string') actionsRef.current.setCustomFilmName?.(customFilm);
+          const savedCompensar = d.compensar_perdas ?? d.compensarPerdas;
+          if (typeof savedCompensar === 'boolean') {
+            actionsRef.current.setCompensarPerdas?.(savedCompensar);
+          }
           applyLocalRoomColors();
           if (fromCloud) {
             actionsRef.current.setCloudStatus('synced');

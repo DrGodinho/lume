@@ -109,7 +109,7 @@ export function useCalculatorState(cfg: AppConfig) {
   const [modoDesconto, setModoDesconto] = useState<DiscountMode>(cfg.modoDesconto || 'real');
   const [modoOtimizacao, setModoOtimizacao] = useState<OptimizationMode>(cfg.modoOtimizacao);
   const [configAberto, setConfigAberto] = useState(false);
-  const [compensarPerdas, setCompensarPerdas] = useState(false);
+  const [compensarPerdas, setCompensarPerdas] = useState(typeof cfg.compensarPerdas === 'boolean' ? cfg.compensarPerdas : true);
   const [modoPerdas, setModoPerdas] = useState<LossMode>(cfg.modoPerdas);
   const [perdasFixas, setPerdasFixas] = useState(cfg.perdasFixas);
   const [agressividadeCorte, setAgressividadeCorte] = useState(cfg.agressividadeCorte);

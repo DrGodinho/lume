@@ -20,6 +20,8 @@ import { ResultPanel } from '../components/calculator/ResultPanel';
 import { ConfirmDialog } from '../components/calculator/ConfirmDialog';
 import { Toast, type ToastData } from '../components/calculator/Toast';
 import { ImportModal } from '../components/calculator/ImportModal';
+import { AiVisionModal, type ExtractedPieceDraft, type ExtractedClientMeta } from '../components/calculator/AiVisionModal';
+import { AiCutAdvisor } from '../components/calculator/AiCutAdvisor';
 import { CutModeToolbar } from '../components/calculator/CutModeToolbar';
 import { buildCalculatorStorageKey, resetCalculatorScopeCache, resolveCalculatorScopeKey } from '../lib/calculatorScope';
 import {
@@ -246,6 +248,7 @@ export function AdminCalculator() {
     const [importAberto, setImportAberto] = useState(false);
     const [importCode, setImportCode] = useState('');
     const [importError, setImportError] = useState<string | null>(null);
+    const [showAiVisionModal, setShowAiVisionModal] = useState(false);
     // B1: validação inline — substitui `alert` silencioso/evasivo.
     const [addError, setAddError] = useState<string | null>(null);
     const [renameError, setRenameError] = useState<string | null>(null);
@@ -375,7 +378,7 @@ export function AdminCalculator() {
         {
             cliente, phone, neighborhood, vidros, desconto, descontoInput, modoDesconto,
             rollW, price, margin, modoOtimizacao, userName, selectedFilm, customFilmName,
-            roomColors, isCutMode,
+            roomColors, isCutMode, compensarPerdas,
         },
         {
             setVidros,
@@ -383,7 +386,7 @@ export function AdminCalculator() {
             setDesconto, setDescontoInput, setModoDesconto,
             setRollW, setPrice, setMargin,
             setModoOtimizacao, setUserName, setSelectedFilm, setCustomFilmName,
-            setRoomColors, setCloudStatus,
+            setRoomColors, setCloudStatus, setCompensarPerdas,
         },
         authRefreshKey,
         { skipRestore: hasUrlBudget },
@@ -575,6 +578,7 @@ export function AdminCalculator() {
                 setSelectedFilm(DEFAULT_CONFIG.selectedFilm);
                 setCustomFilmName('');
                 setMargin(DEFAULT_CONFIG.margin);
+                setCompensarPerdas(true);
                 setSelectedIds([]);
                 setConfirmDialog(null);
             },
@@ -674,11 +678,15 @@ export function AdminCalculator() {
     };
 
     const handleRotateSelected = () => {
-        setVidros(prev => prev.map(v =>
-            selectedIds.includes(v.id)
-                ? { ...v, forceRotate: v.forceRotate === true ? undefined : true }
-                : v
-        ));
+        setVidros(prev => prev.map(v => {
+            if (!selectedIds.includes(v.id)) return v;
+            const bloco = blocosCalculados.find(b => b.id === v.id);
+            const estaRotacionado = bloco ? bloco.rotated : (v.forceRotate === true);
+            return {
+                ...v,
+                forceRotate: !estaRotacionado,
+            };
+        }));
     };
 
     const handleAlignSelected = (dir: 'left' | 'right') => {
@@ -1057,6 +1065,60 @@ export function AdminCalculator() {
         }
     };
 
+    const handleApplyAiMeasures = useCallback((
+        items: ExtractedPieceDraft[],
+        mode: 'append' | 'replace',
+        meta?: ExtractedClientMeta
+    ) => {
+        if (meta?.cliente) {
+            setCliente(meta.cliente);
+        }
+        if (meta?.bairro) {
+            setNeighborhood(meta.bairro);
+        }
+        if (meta?.telefone) {
+            setPhone(meta.telefone);
+        }
+
+        const novos: GlassItem[] = [];
+        const cleanColors = isLegacyDefaultRoomColors(roomColors) ? {} : { ...roomColors };
+        const updatedColors = { ...cleanColors };
+
+        items.forEach((item, itemIdx) => {
+            const amb = (item.ambiente || '').trim();
+            const key = resolveRoomKey(amb);
+            const roomColor = getColorForItem(amb, item.altura, item.largura, true);
+            if (key && !updatedColors[key]) {
+                updatedColors[key] = roomColor;
+            }
+
+            const q = Math.max(1, item.quantidade || 1);
+            for (let i = 0; i < q; i++) {
+                novos.push({
+                    id: createGlassId(),
+                    h: item.altura,
+                    w: item.largura,
+                    oh: item.altura,
+                    ow: item.largura,
+                    label: amb || undefined,
+                    cor: usarCoresPorAmbiente ? roomColor : getSizeColor(item.altura, item.largura),
+                    forceRotate: undefined,
+                    alignRight: false,
+                    sortOrder: Date.now() + itemIdx * 100 + i,
+                });
+            }
+        });
+
+        setRoomColors(updatedColors);
+        if (mode === 'replace') {
+            setVidros(novos);
+            showToast(`${novos.length} peça(s) importada(s) pela IA!`, 'success');
+        } else {
+            setVidros((prev) => [...prev, ...novos]);
+            showToast(`${novos.length} peça(s) adicionada(s) à lista pela IA!`, 'success');
+        }
+    }, [roomColors, getColorForItem, usarCoresPorAmbiente, setVidros, setRoomColors, showToast]);
+
     const salvarProjeto = () => {
         const dados = {
             config: { cliente, phone, neighborhood, rolo: rollW, preco: price, selectedFilm, customFilmName, compensarPerdas, desconto: descontoEmReais, modoDesconto },
@@ -1270,6 +1332,9 @@ export function AdminCalculator() {
                 case 'modoDesconto':
                     setModoDesconto(value as DiscountMode);
                     break;
+                case 'compensarPerdas':
+                    setCompensarPerdas(Boolean(value));
+                    break;
             }
         }
         const normalizedValue = key === 'perdasFixas' ? Math.min(100, Math.max(0, value as number)) : value;
@@ -1424,7 +1489,7 @@ export function AdminCalculator() {
             <ConfigPanel
                 aberto={configAberto}
                 setAberto={setConfigAberto}
-                config={{ rollW, price, margin, modoOtimizacao, userName, modoPerdas, perdasFixas, modoCorConfig: usarCoresPorAmbiente ? 'ambiente' : 'tamanho', agressividadeCorte, filmTypes, selectedFilm, draftExpiration, modoDesconto }}
+                config={{ rollW, price, margin, modoOtimizacao, userName, modoPerdas, perdasFixas, modoCorConfig: usarCoresPorAmbiente ? 'ambiente' : 'tamanho', agressividadeCorte, filmTypes, selectedFilm, draftExpiration, modoDesconto, compensarPerdas }}
                 onUpdate={atualizarConfig}
                 onLogout={handleLogout}
                 loggingOut={isLoggingOut}
@@ -1620,6 +1685,7 @@ export function AdminCalculator() {
                             onQtyKeyDown: handleKeyDownQty,
                             onAdicionar: adicionar,
                             addError,
+                            onAbrirAiVision: () => setShowAiVisionModal(true),
                         }}
                     />
 
@@ -1695,10 +1761,22 @@ export function AdminCalculator() {
                             <div id="calc-algoritmo" className="flex items-center gap-2 mb-4 w-full scroll-mt-24">
                                 <div className="flex bg-[#04080f] border border-white/10 p-1.5 rounded-xl shadow-2xl flex-1 max-w-sm ml-auto">
                                     <button onClick={() => setModoOtimizacao('densidade')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${modoOtimizacao === 'densidade' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}>Corte Densidade</button>
-                                    <button onClick={() => setModoOtimizacao('facilidade')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${modoOtimizacao === 'facilidade' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}>Corte Fácil v1</button>
-                                    <button onClick={() => setModoOtimizacao('facilidade_v2')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${modoOtimizacao === 'facilidade_v2' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}>Corte Fácil Pro</button>
+                                    <button onClick={() => setModoOtimizacao('facilidade_v2')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${modoOtimizacao !== 'densidade' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}>Corte Prático</button>
                                 </div>
                             </div>
+
+                            <AiCutAdvisor
+                                vidros={vidros}
+                                selectedFilm={selectedFilm}
+                                filmName={filmCatalog?.[selectedFilm]?.name || FILM_TYPE_LABELS[selectedFilm] || selectedFilm}
+                                currentRollW={rollW}
+                                currentMaxY={maxY}
+                                eficiencia={eficiencia}
+                                totalAreaM2={totalAreaM2}
+                                priceM2={price}
+                                margin={margin}
+                                onSwitchRollW={(newW) => setRollW(newW)}
+                            />
 
                             <CutMap
                                 isCutMode={isCutMode}
@@ -1760,6 +1838,14 @@ export function AdminCalculator() {
                 error={importError}
                 onClose={() => setImportAberto(false)}
                 onImport={confirmarImportacaoZap}
+            />
+
+            {/* MODAL: LEITURA DE MEDIDAS POR FOTO (IA GEMINI) */}
+            <AiVisionModal
+                show={showAiVisionModal}
+                onClose={() => setShowAiVisionModal(false)}
+                hasExistingGlasses={vidros.length > 0}
+                onApply={handleApplyAiMeasures}
             />
 
             {/* MODAL: COLAR EM... */}

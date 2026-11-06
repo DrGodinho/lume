@@ -117,7 +117,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
     }, 350);
   };
   const algoritmoLabel =
-    config.modoOtimizacao === 'densidade' ? 'Densidade' : config.modoOtimizacao === 'facilidade' ? 'Corte Fácil v1' : 'Corte Fácil Pro';
+    config.modoOtimizacao === 'densidade' ? 'Densidade' : 'Corte Prático';
   const corLabel = config.modoCorConfig === 'ambiente' ? 'Por ambiente' : 'Por tamanho';
   return (
     <>
@@ -155,7 +155,15 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <FieldLabel>Largura do Rolo (cm)</FieldLabel>
-                <NumberField value={config.rollW} onChange={(value) => onUpdate('rollW', value)} />
+                <SegmentGroup
+                  value={String(config.rollW)}
+                  options={[
+                    { label: '152 cm', value: '152' },
+                    { label: '122 cm', value: '122' },
+                    { label: '100 cm', value: '100' },
+                  ]}
+                  onChange={(val) => onUpdate('rollW', Number(val))}
+                />
               </div>
 
               <div>
@@ -211,7 +219,21 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
             </div>
 
             <div className="rounded-2xl border border-[#c9a227]/20 bg-[#c9a227]/[0.04] p-4">
-              <FieldLabel>Comportamento do Botao de Perdas</FieldLabel>
+              <div className="flex items-center justify-between gap-3 mb-3 pb-3 border-b border-white/5">
+                <div>
+                  <span className="text-xs font-bold text-white block">Ativado por Padrão</span>
+                  <span className="text-[10px] text-gray-400 block leading-tight">Inicia orçamentos sempre com compensação de perdas</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => onUpdate('compensarPerdas', config.compensarPerdas === false)}
+                  className={`w-11 h-6 rounded-full transition-colors relative p-0.5 shrink-0 ${config.compensarPerdas !== false ? 'bg-green-500' : 'bg-white/10'}`}
+                >
+                  <div className={`w-5 h-5 rounded-full bg-white transition-transform ${config.compensarPerdas !== false ? 'translate-x-5' : 'translate-x-0'}`} />
+                </button>
+              </div>
+
+              <FieldLabel>Cálculo da Compensação</FieldLabel>
               <SegmentGroup
                 value={config.modoPerdas}
                 onChange={(value) => onUpdate('modoPerdas', value)}

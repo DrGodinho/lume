@@ -88,6 +88,7 @@ export interface AppConfig {
   draftExpiration: number;
   modoDesconto?: DiscountMode;
   filmCatalog?: Record<string, FilmCatalogItem>;
+  compensarPerdas?: boolean;
 }
 
 export const DEFAULT_FILM_TYPES: Record<FilmTypeKey, number> = {
@@ -217,6 +218,7 @@ export const DEFAULT_CONFIG: AppConfig = {
   selectedFilm: 'carbono_g20',
   draftExpiration: 15,
   modoDesconto: 'real',
+  compensarPerdas: true,
 };
 
 export const DEFAULT_ROOM_COLORS: Record<string, string> = {};

@@ -23,6 +23,8 @@ interface DraftData {
   modo_otimizacao: string;
   user_name: string;
   selected_film: string;
+  compensar_perdas?: boolean;
+  modo_desconto?: string;
   last_saved?: number;
 }
 
@@ -66,6 +68,8 @@ function sanitizeDraft(draft: DraftData): DraftData | null {
     modo_otimizacao: typeof draft.modo_otimizacao === 'string' ? draft.modo_otimizacao : '',
     user_name: typeof draft.user_name === 'string' ? draft.user_name : '',
     selected_film: typeof draft.selected_film === 'string' ? draft.selected_film : '',
+    compensar_perdas: typeof draft.compensar_perdas === 'boolean' ? draft.compensar_perdas : true,
+    modo_desconto: typeof draft.modo_desconto === 'string' ? draft.modo_desconto : undefined,
     ...(lastSaved !== undefined ? { last_saved: lastSaved } : {}),
   };
 }

@@ -341,7 +341,9 @@ export function ResultPanel({
                     >
                         <Scissors size={14} />
                         <span className="text-[9px] font-bold uppercase whitespace-nowrap">
-                            Perdas{compensarPerdas && compensacaoPerda ? ` (+${formatBRL(compensacaoPerda)})` : ''}
+                            {compensarPerdas
+                                ? (compensacaoPerda ? `Perdas (+${formatBRL(compensacaoPerda)})` : 'Perdas (Ativa)')
+                                : 'Perdas (Off)'}
                         </span>
                     </button>
                 </div>

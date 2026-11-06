@@ -80,8 +80,8 @@ flowchart TD
 - [x] **T2.4:** Atualizar links de navegação cruzada (`Footer.tsx`, `sitemap.ts`, `llms-full.txt`).
 
 ### Fase 3: Algoritmo de Corte & Calculadora Admin
-- [ ] **T3.1:** Criar conjunto de testes de regressão para o worker de corte (`vitest` para empacotamento).
-- [ ] **T3.2:** Refinar heurística de corte para reduzir perdas e priorizar cortes de guilhotina sem entalhes complexos.
+- [x] **T3.1:** Criar conjunto de testes de regressão para o worker de corte (`vitest` para empacotamento).
+- [x] **T3.2:** Refinar heurística de corte para reduzir perdas e priorizar cortes de guilhotina sem entalhes complexos (fusão dos modos em Corte Prático sem cortes em L).
 - [ ] **T3.3:** Atualizar `AdminCalculator.tsx` para exibir métricas aprimoradas de corte e sobras utilizáveis.
 
 ### Fase 4: Validação & Auditoria de Qualidade
