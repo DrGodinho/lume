@@ -146,26 +146,56 @@ ${
             },
         };
 
-        const modelName = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(geminiPayload),
-            }
-        );
+        const candidateModels = [
+            process.env.GEMINI_MODEL,
+            'gemini-3.5-flash',
+            'gemini-3.6-flash',
+            'gemini-3.8-flash',
+            'gemini-3.7-flash',
+        ].filter(Boolean) as string[];
 
-        if (!response.ok) {
-            const errBody = await response.text();
-            console.error('[Gemini Cut Advisor Error]:', errBody);
+        let lastErrorText = '';
+        let lastStatus = 502;
+        let data: any = null;
+
+        for (const model of candidateModels) {
+            try {
+                const response = await fetch(
+                    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-goog-api-key': apiKey,
+                        },
+                        body: JSON.stringify(geminiPayload),
+                    }
+                );
+
+                if (response.ok) {
+                    data = await response.json();
+                    break;
+                }
+
+                lastStatus = response.status;
+                lastErrorText = await response.text();
+                console.warn(`[Gemini Cut Advisor Model ${model} failed with ${lastStatus}]:`, lastErrorText);
+
+                if (lastStatus !== 503 && lastStatus !== 429 && lastStatus !== 404) {
+                    break;
+                }
+            } catch (err: any) {
+                lastErrorText = err.message || 'Erro de conexão';
+            }
+        }
+
+        if (!data) {
+            console.error('[Gemini Cut Advisor Error]:', lastErrorText);
             return NextResponse.json(
-                { error: `Erro na comunicação com Google AI (${response.status}): ${errBody}` },
+                { error: `Erro na comunicação com Google AI (${lastStatus}): ${lastErrorText}` },
                 { status: 502 }
             );
         }
-
-        const data = await response.json();
         const rawJsonText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
         if (!rawJsonText) {
