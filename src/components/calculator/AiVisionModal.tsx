@@ -76,7 +76,7 @@ export function AiVisionModal({
     hasExistingGlasses,
     onApply,
 }: AiVisionModalProps) {
-    const [activeTab, setActiveTab] = useState<ModalTab>('foto');
+    const [activeTab, setActiveTab] = useState<ModalTab>('audio');
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [audioBlobUrl, setAudioBlobUrl] = useState<string | null>(null);
     const [textInput, setTextInput] = useState('');
@@ -484,6 +484,17 @@ export function AiVisionModal({
                     <div className="flex items-center border-b border-white/10 bg-[#040811] px-6 pt-2">
                         <button
                             type="button"
+                            onClick={() => { setActiveTab('audio'); setError(null); }}
+                            className={`flex items-center gap-2 px-4 py-3 text-xs font-bold uppercase tracking-wider border-b-2 transition-all ${
+                                activeTab === 'audio'
+                                    ? 'border-[#c9a227] text-[#c9a227]'
+                                    : 'border-transparent text-gray-400 hover:text-white'
+                            }`}
+                        >
+                            <Mic size={15} /> Gravar Voz / Áudio
+                        </button>
+                        <button
+                            type="button"
                             onClick={() => { setActiveTab('foto'); setError(null); }}
                             className={`flex items-center gap-2 px-4 py-3 text-xs font-bold uppercase tracking-wider border-b-2 transition-all ${
                                 activeTab === 'foto'
@@ -503,17 +514,6 @@ export function AiVisionModal({
                             }`}
                         >
                             <MessageSquare size={15} /> Colar Texto
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => { setActiveTab('audio'); setError(null); }}
-                            className={`flex items-center gap-2 px-4 py-3 text-xs font-bold uppercase tracking-wider border-b-2 transition-all ${
-                                activeTab === 'audio'
-                                    ? 'border-[#c9a227] text-[#c9a227]'
-                                    : 'border-transparent text-gray-400 hover:text-white'
-                            }`}
-                        >
-                            <Mic size={15} /> Gravar Voz / Áudio
                         </button>
                     </div>
                 )}
