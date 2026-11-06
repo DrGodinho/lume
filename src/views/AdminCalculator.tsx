@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import {
     Trash2, Scissors,
     Calculator, RotateCcw, AlignRight, AlignLeft, X,
-    History, Undo2, Redo2, Settings, Copy, ClipboardPaste, User
+    History, Undo2, Redo2, Settings, Copy, ClipboardPaste, User, Sparkles
 } from 'lucide-react';
 import { InvoicePNG } from '../components/InvoicePNG';
 import { createScopedLogger } from '../lib/logger';
@@ -249,6 +249,7 @@ export function AdminCalculator() {
     const [importCode, setImportCode] = useState('');
     const [importError, setImportError] = useState<string | null>(null);
     const [showAiVisionModal, setShowAiVisionModal] = useState(false);
+    const [showAiAdvisorModal, setShowAiAdvisorModal] = useState(false);
     // B1: validação inline — substitui `alert` silencioso/evasivo.
     const [addError, setAddError] = useState<string | null>(null);
     const [renameError, setRenameError] = useState<string | null>(null);
@@ -1758,7 +1759,18 @@ export function AdminCalculator() {
                                 </div>
                             )}
 
-                            <div id="calc-algoritmo" className="flex items-center gap-2 mb-4 w-full scroll-mt-24">
+                            <div id="calc-algoritmo" className="flex flex-wrap items-center justify-between gap-3 mb-4 w-full scroll-mt-24">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowAiAdvisorModal(true)}
+                                    disabled={vidros.length === 0}
+                                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0a0f1d] hover:bg-[#111e33] border border-[#c9a227]/40 hover:border-[#c9a227] text-[#c9a227] hover:text-white font-bold text-[11px] uppercase tracking-wider transition-all shadow-lg shadow-[#c9a227]/10 disabled:opacity-40 disabled:cursor-not-allowed group"
+                                    title="Consultor de Rentabilidade & Sobras com IA"
+                                >
+                                    <Sparkles size={14} className="text-[#c9a227] group-hover:rotate-12 transition-transform" />
+                                    <span>Consultor de Rentabilidade</span>
+                                </button>
+
                                 <div className="flex bg-[#04080f] border border-white/10 p-1.5 rounded-xl shadow-2xl flex-1 max-w-sm ml-auto">
                                     <button onClick={() => setModoOtimizacao('densidade')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${modoOtimizacao === 'densidade' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}>Corte Densidade</button>
                                     <button onClick={() => setModoOtimizacao('facilidade_v2')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all ${modoOtimizacao !== 'densidade' ? 'bg-[#c9a227] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}>Corte Prático</button>
@@ -1766,6 +1778,8 @@ export function AdminCalculator() {
                             </div>
 
                             <AiCutAdvisor
+                                isOpen={showAiAdvisorModal}
+                                onClose={() => setShowAiAdvisorModal(false)}
                                 vidros={vidros}
                                 selectedFilm={selectedFilm}
                                 filmName={filmCatalog?.[selectedFilm]?.name || FILM_TYPE_LABELS[selectedFilm] || selectedFilm}

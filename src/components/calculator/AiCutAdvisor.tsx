@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Sparkles, TrendingUp, AlertTriangle, CheckCircle2, ArrowRight, RefreshCw, Layers, ShieldCheck, Box } from 'lucide-react';
+import { Sparkles, TrendingUp, AlertTriangle, CheckCircle2, ArrowRight, RefreshCw, Layers, ShieldCheck, Box, X } from 'lucide-react';
 import type { FilmTypeKey, GlassItem } from '../../lib/films';
 import { calcMetrosComprar } from '../../lib/pricing';
 import { normalizeItems, packGuillotine } from '../../workers/packerCore';
@@ -24,6 +24,8 @@ interface AiCutAdvisorAnalysis {
 }
 
 interface AiCutAdvisorProps {
+    isOpen: boolean;
+    onClose: () => void;
     vidros: GlassItem[];
     selectedFilm: FilmTypeKey;
     filmName: string;
@@ -37,6 +39,8 @@ interface AiCutAdvisorProps {
 }
 
 export function AiCutAdvisor({
+    isOpen,
+    onClose,
     vidros,
     selectedFilm,
     filmName,
@@ -166,44 +170,55 @@ export function AiCutAdvisor({
         setHasRequested(false);
     }, [vidros.length, selectedFilm]);
 
-    if (vidros.length === 0) return null;
+    if (!isOpen || vidros.length === 0) return null;
 
     return (
-        <div className="w-full bg-[#0a0f1d] border-2 border-[#c9a227]/30 rounded-2xl p-4 shadow-2xl mb-4 transition-all">
-            {/* Header com Identidade Bluetech + IA */}
-            <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-3">
-                <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-[#c9a227]/15 border border-[#c9a227]/40 flex items-center justify-center text-[#c9a227]">
-                        <Sparkles size={15} />
-                    </div>
-                    <div>
-                        <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-white uppercase tracking-wider">
-                                Consultor de Rentabilidade & Sobras
-                            </span>
-                            <span className="text-[9px] bg-blue-500/10 text-blue-300 border border-blue-500/20 px-2 py-0.5 rounded-full font-mono">
-                                Catálogo Bluetech
-                            </span>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+            <div className="w-full max-w-2xl bg-[#0a0f1d] border-2 border-[#c9a227]/40 rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+                {/* Header com Identidade Bluetech + IA + Fechar */}
+                <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                    <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-[#c9a227]/15 border border-[#c9a227]/40 flex items-center justify-center text-[#c9a227]">
+                            <Sparkles size={18} />
                         </div>
-                        <p className="text-[10px] text-gray-400">
-                            {isNanoCeramica
-                                ? 'Linha Nano Cerâmica: bobinas de 1,52m e 1,00m disponíveis na distribuidora'
-                                : `Linha ${filmName}: restrita a bobina de 1,52m na distribuidora`}
-                        </p>
+                        <div>
+                            <div className="flex items-center gap-2">
+                                <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+                                    Consultor de Rentabilidade & Sobras
+                                </h3>
+                                <span className="text-[9px] bg-blue-500/10 text-blue-300 border border-blue-500/20 px-2 py-0.5 rounded-full font-mono">
+                                    Catálogo Bluetech
+                                </span>
+                            </div>
+                            <p className="text-xs text-gray-400">
+                                {isNanoCeramica
+                                    ? 'Linha Nano Cerâmica: bobinas de 1,52m e 1,00m disponíveis na distribuidora'
+                                    : `Linha ${filmName}: restrita a bobina de 1,52m na distribuidora`}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <button
+                            type="button"
+                            onClick={fetchAnalysis}
+                            disabled={isLoading}
+                            className="px-3 py-1.5 rounded-xl bg-[#c9a227]/15 hover:bg-[#c9a227]/25 border border-[#c9a227]/40 text-[#c9a227] text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all disabled:opacity-50"
+                            title="Pedir diagnóstico ao Gemini"
+                        >
+                            <RefreshCw size={12} className={isLoading ? 'animate-spin' : ''} />
+                            {isLoading ? 'Analisando...' : hasRequested ? 'Reanalisar' : 'Analisar com IA'}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="p-2 text-gray-400 hover:text-white rounded-xl hover:bg-white/10 transition-colors"
+                            title="Fechar"
+                        >
+                            <X size={18} />
+                        </button>
                     </div>
                 </div>
-
-                <button
-                    type="button"
-                    onClick={fetchAnalysis}
-                    disabled={isLoading}
-                    className="px-3 py-1.5 rounded-xl bg-[#c9a227]/15 hover:bg-[#c9a227]/25 border border-[#c9a227]/40 text-[#c9a227] text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all disabled:opacity-50"
-                    title="Pedir diagnóstico ao Gemini 3.8 Flash"
-                >
-                    <RefreshCw size={12} className={isLoading ? 'animate-spin' : ''} />
-                    {isLoading ? 'Analisando...' : hasRequested ? 'Reanalisar' : 'Analisar com IA'}
-                </button>
-            </div>
 
             {/* Estado de Carregamento */}
             {isLoading && (
@@ -328,6 +343,7 @@ export function AiCutAdvisor({
                     )}
                 </div>
             )}
+            </div>
         </div>
     );
 }
