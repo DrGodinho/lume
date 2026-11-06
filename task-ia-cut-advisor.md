@@ -22,7 +22,7 @@ Integrar um assistente inteligente de rentabilidade de corte que analisa o mapa 
 - Envia para o **Gemini 3.8 Flash** gerar diagnóstico comercial em português claro e conciso.
 
 ### Fase 2: Componente UI (`src/components/calculator/AiCutAdvisor.tsx`)
-- Card no padrão Dark & Gold LUME Elite (`#0a0e17`, `#c9a227`, borda suave).
+- Modal elegante no padrão Dark & Gold LUME Elite (`#0a0e17`, `#c9a227`, backdrop-blur, fechamento em `X`).
 - Exibe métrica de diagnóstico:
   - Badge de Status: "Otimizado" ou "Oportunidade de Economia".
   - Diagnóstico em linguagem direta.
@@ -30,9 +30,8 @@ Integrar um assistente inteligente de rentabilidade de corte que analisa o mapa 
   - Chip de "Retalho Nobre" com medidas da sobra aproveitável.
 
 ### Fase 3: Integração no `AdminCalculator.tsx`
-- Posicionado estrategicamente acima ou junto ao `CutMap`.
-- Execução automática / sob demanda (botão de atualizar análise com IA).
-- Atualização dinâmica ao trocar vidros ou bobina.
+- Reduzido a um botão compacto `[✨ Consultor de Rentabilidade]` posicionado estrategicamente na mesma barra dos modos de corte (`Corte Densidade` e `Corte Prático`), liberando espaço vertical total para o mapa de corte (`CutMap`).
+- Ao clicar no botão, abre a janela modal sobreposta com diagnóstico sob demanda e fechamento suave.
 
 ### Fase 4: Validação & Build
 - Testes com Nano Cerâmica e com Carbono G5.

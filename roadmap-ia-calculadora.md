@@ -10,9 +10,9 @@
 
 | Opção | Funcionalidade | Modelo | Status |
 | :--- | :--- | :---: | :---: |
-| **Opção A** | Leitura Automática de Medições por Foto/Câmera | Gemini 3.8 Flash | ✅ **Concluída** |
-| **Opção D** | Entrada Rápida via Áudio (Microfone/Zap) e Texto Livre | Gemini 3.8 Flash | ✅ **Concluída** |
-| **Opção C** | Consultor Estratégico de Bobinas & Retalhos (Bluetech) | Gemini 3.8 Flash | ✅ **Concluída** |
+| **Opção A** | Leitura Automática de Medições por Foto/Câmera | Gemini 3.5 / 3.8 Flash | ✅ **Concluída** |
+| **Opção D** | Entrada Rápida via Áudio (Microfone/Zap) e Texto Livre (Aba padrão) | Gemini 3.5 / 3.8 Flash | ✅ **Concluída** |
+| **Opção C** | Consultor Estratégico de Bobinas & Retalhos (Botão compacto + Modal) | Gemini 3.5 / 3.8 Flash | ✅ **Concluída** |
 | **Opção B** | Copiloto de Corte Narrativo de Bancada | Gemini 3.8 Flash | ⏸️ *Pausada (sob demanda)* |
 
 ---
