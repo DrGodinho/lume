@@ -200,7 +200,7 @@ export function AiVisionModal({
             const compressedBase64 = await compressImageIfNeeded(file);
             setImagePreview(compressedBase64);
 
-            const res = await fetch('/api/ai/vision-measures', {
+            const res = await fetch('/api/ai/vision-measures/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -233,7 +233,7 @@ export function AiVisionModal({
             setIsLoading(true);
             setLoadingMessage(isAppend ? 'Interpretando medidas adicionais de texto...' : 'O Gemini 3.8 Flash está interpretando o texto...');
 
-            const res = await fetch('/api/ai/vision-measures', {
+            const res = await fetch('/api/ai/vision-measures/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ text: textToProcess }),
@@ -267,7 +267,7 @@ export function AiVisionModal({
             const formData = new FormData();
             formData.append('file', file);
 
-            const res = await fetch('/api/ai/vision-measures', {
+            const res = await fetch('/api/ai/vision-measures/', {
                 method: 'POST',
                 body: formData,
             });
@@ -324,32 +324,30 @@ export function AiVisionModal({
                 // Envia para o Gemini
                 try {
                     setIsLoading(true);
+                    setError(null);
                     setLoadingMessage(
                         isAppendingAudioRef.current
                             ? 'Ouvindo áudio complementar e somando à lista...'
-                            : 'O Gemini 3.8 Flash está ouvindo sua voz e extraindo as medidas...'
+                            : 'O Gemini está ouvindo sua voz e extraindo as medidas...'
                     );
-                    const reader = new FileReader();
-                    reader.onloadend = async () => {
-                        const base64Audio = (reader.result as string).split(',')[1];
-                        const res = await fetch('/api/ai/vision-measures', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                audioBase64: base64Audio,
-                                mimeType: mimeType,
-                            }),
-                        });
-                        const data = await res.json();
-                        if (!res.ok || !data.success) {
-                            throw new Error(data.error || 'Não foi possível interpretar a voz gravada.');
-                        }
-                        processApiResponse(data, isAppendingAudioRef.current);
-                        setIsLoading(false);
-                    };
-                    reader.readAsDataURL(audioBlob);
+
+                    const formData = new FormData();
+                    formData.append('file', audioBlob, 'gravacao.webm');
+
+                    const res = await fetch('/api/ai/vision-measures/', {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    const data = await res.json();
+                    if (!res.ok || !data.success) {
+                        throw new Error(data.error || 'Não foi possível interpretar a voz gravada.');
+                    }
+                    processApiResponse(data, isAppendingAudioRef.current);
                 } catch (err: any) {
+                    console.error('[AiVisionModal Audio Error]:', err);
                     setError(err.message || 'Erro ao enviar gravação.');
+                } finally {
                     setIsLoading(false);
                 }
             };
