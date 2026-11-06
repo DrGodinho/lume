@@ -55,7 +55,7 @@ const ipanemaFaqs = [
   },
   {
     q: 'Quanto custa instalar película solar em Ipanema?',
-    a: 'Trabalhamos com valores transparentes: a linha Carbono a partir de R$ 90/m², Dupla Camada a partir de R$ 150/m² e a Nano Cerâmica premium a partir de R$ 220/m² instalado. Agendamos a visita técnica para medição gratuita em qualquer condomínio de Ipanema.',
+    a: 'Trabalhamos com valores transparentes: a linha Carbono a partir de R$ 80/m², Dupla Camada a partir de R$ 110/m² e a Nano Cerâmica premium a partir de R$ 200/m² instalado. Agendamos a visita técnica para medição gratuita em qualquer condomínio de Ipanema.',
   },
   {
     q: 'A instalação do insulfilm suja as paredes ou molha o piso de madeira nobre?',

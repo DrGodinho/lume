@@ -48,7 +48,7 @@ export const metadata: Metadata = {
 const copacabanaFaqs = [
   {
     q: 'Quanto custa instalar insulfilm em um apartamento em Copacabana?',
-    a: 'O valor depende da película e metragem: a linha Carbono Elite inicia a partir de R$ 90/m² instalado; a linha Dupla Camada (sem espelho interno à noite) a partir de R$ 150/m²; e a Nano Cerâmica de alta performance térmica inicia em R$ 220/m². Oferecemos visita para medição sem compromisso em qualquer endereço de Copacabana e Leme.',
+    a: 'O valor depende da película e metragem: a linha Carbono Premium inicia a partir de R$ 80/m² instalado; a linha Dupla Camada (sem espelho interno à noite) a partir de R$ 110/m²; e a Nano Cerâmica de alta performance térmica inicia a partir de R$ 200/m². Oferecemos visita para medição sem compromisso em qualquer endereço de Copacabana e Leme.',
   },
   {
     q: 'A maresia de Copacabana danifica a película com o tempo?',

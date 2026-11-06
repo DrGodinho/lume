@@ -1,3 +1,4 @@
+import { insulfilmSePagaSozinhoEconomiaArCondicionado } from './posts/insulfilm-se-paga-sozinho-economia-ar-condicionado';
 import { insulfilmCortinaDeVidroFechamentoSacada } from './posts/insulfilm-cortina-de-vidro-fechamento-sacada';
 import { precoInsulfilmResidencialRioDeJaneiro } from './posts/preco-insulfilm-residencial-rio-de-janeiro';
 import { comoProtegerMoveisDanosSol } from './posts/como-proteger-moveis-danos-sol';
@@ -9,6 +10,7 @@ import { insulfilmPrivacidadeNoturnaLuzAcesa } from './posts/insulfilm-privacida
 import type { BlogPost } from '@/lib/blog';
 
 export const blogPosts = [
+  insulfilmSePagaSozinhoEconomiaArCondicionado,
   insulfilmCortinaDeVidroFechamentoSacada,
   insulfilmPrivacidadeNoturnaLuzAcesa,
   elNino2026CasasMaisQuentesArCondicionado,

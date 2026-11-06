@@ -5,7 +5,7 @@ import { buildBreadcrumbSchema } from '@/lib/schema/breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Insulfilm em Sulacap RJ | Preço, Instalação e Garantia - LUME',
-  description: 'Aplicação profissional de insulfilm no Jardim Sulacap e região. Películas a partir de R$ 90/m²: redução de calor, privacidade e proteção UV com garantia de até 10 anos. Orçamento grátis no local e pelo WhatsApp.',
+  description: 'Aplicação profissional de insulfilm no Jardim Sulacap e região. Películas a partir de R$ 80/m²: redução de calor, privacidade e proteção UV com garantia de até 10 anos. Orçamento grátis no local e pelo WhatsApp.',
   keywords: [
     'insulfilm em sulacap',
     'insulfilm jardim sulacap rj',

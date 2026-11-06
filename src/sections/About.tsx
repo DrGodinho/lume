@@ -11,7 +11,7 @@ interface StatItem {
 
 const differentiators = [
   'Trabalhamos apenas com películas de alta qualidade',
-  'Garantia de até 10 anos (conforme a película)',
+  'Garantia de até 10 anos',
   'Atendimento personalizado na sua casa',
   'Mais de 500 residências atendidas',
 ];
@@ -24,7 +24,6 @@ const stats: StatItem[] = [
     prefix: 'Até',
     value: '10',
     label: 'Anos de Garantia',
-    sublabel: 'Linha Nano Cerâmica',
   },
   { icon: Award, value: '100%', label: 'Clientes Satisfeitos' },
 ];

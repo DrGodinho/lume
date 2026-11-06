@@ -17,8 +17,8 @@ export function SulacapPage({ faqs }: { faqs: { q: string; a: string }[] }) {
                 {/* Background Image */}
                 <div className="absolute inset-0 z-0">
                     <Image src="/hero-bg-v2.webp" alt="Instalação de insulfilm profissional no Jardim Sulacap - LUME Controle Solar" fill sizes="(max-width: 768px) 100vw, 100vw" priority className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#04080f]/95 via-[#04080f]/80 to-[#04080f]/60" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#04080f] via-transparent to-[#04080f]/50" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
                 </div>
 
                 {/* Particles & Effects */}
@@ -26,7 +26,7 @@ export function SulacapPage({ faqs }: { faqs: { q: string; a: string }[] }) {
                 
                 <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#04080f] to-transparent z-10" />
                 <div className="absolute top-1/4 right-10 w-32 h-32 rounded-full bg-[#c9a227]/5 blur-3xl animate-float z-10 pointer-events-none" />
-                <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-[#1a3a5c]/30 blur-3xl animate-float z-10 pointer-events-none" style={{ animationDelay: '2s' }} />
+                <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-[#c9a227]/10 blur-3xl animate-float z-10 pointer-events-none" style={{ animationDelay: "2s" }} />
 
                 <div className="container-lume relative z-20 text-center md:text-left pt-24 pb-12">
                     <NavigationBreadcrumbs 
@@ -258,7 +258,7 @@ export function SulacapPage({ faqs }: { faqs: { q: string; a: string }[] }) {
                             },
                             {
                                 icon: Lock, title: "Garantia Documentada", stat: "100%", label: "Segurança",
-                                desc: "Você recebe a nossa Garantia Oficial de até 10 anos (conforme a película) por escrito. A confiança de que seu insulfilm não vai formar bolhas no ano seguinte."
+                                desc: "Você recebe a nossa Garantia Oficial de até 10 anos por escrito. A confiança de que seu insulfilm não vai formar bolhas no ano seguinte."
                             }
                         ].map((benefit, idx) => (
                             <div key={idx} className="benefit-card group relative p-10 rounded-2xl bg-gradient-to-b from-[#1a3a5c]/40 to-[#04080f]/60 border border-[#1a3a5c]/30 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 text-center lg:text-left flex flex-col">

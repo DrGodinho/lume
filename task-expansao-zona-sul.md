@@ -10,7 +10,7 @@
    - `Flamengo`: foco em apartamentos tradicionais voltados para o Aterro/Praia, sol nascente intenso, preservação de móveis e conforto visual.
    - `Laranjeiras`: foco em alívio do calor em vales urbanos, conforto para quartos e home office com excelente custo-benefício térmico.
    - `Jardim Botânico / Gávea`: foco em residências nobres cercadas de verde, insolação contínua e proteção máxima contra raios UV e calor sem alterar fachadas.
-2. **Abordagem Comercial (Opção 2-B):** Foco 100% Térmico (Nano Cerâmica IR95, corte de 95% de infravermelho, alívio de ar-condicionado e proteção de pisos/móveis).
+2. **Abordagem Comercial (Opção 2-B):** Foco 100% Térmico (Nano Cerâmica Térmica, alívio de ar-condicionado e proteção de pisos/móveis).
 3. **Arquitetura Modular:** Reutilizar `PremiumNeighborhoodView.tsx` com `HeroEntrance`, `AnimatedCounter`, `LevelDots`, `GoogleReviews` e `ContactCTA`.
 4. **SEO & Link Building:** Schemas completos, inclusão em `sitemap.ts`, `Coverage.tsx`, `Footer.tsx` e `llms-full.txt`.
 

@@ -18,8 +18,8 @@ export function RealengoPage({ faqs }: { faqs: { q: string; a: string }[] }) {
                 {/* Background Image */}
                 <div className="absolute inset-0 z-0">
                     <Image src="/realengo_hero_bg.webp" alt="Instalação de insulfilm profissional em Realengo RJ - LUME Controle Solar" fill sizes="(max-width: 768px) 100vw, 100vw" priority className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#04080f]/95 via-[#04080f]/80 to-[#04080f]/60" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#04080f] via-transparent to-[#04080f]/50" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
                 </div>
 
                 {/* Particles & Effects */}
@@ -27,7 +27,7 @@ export function RealengoPage({ faqs }: { faqs: { q: string; a: string }[] }) {
                 
                 <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#04080f] to-transparent z-10" />
                 <div className="absolute top-1/4 right-10 w-32 h-32 rounded-full bg-[#c9a227]/5 blur-3xl animate-float z-10 pointer-events-none" />
-                <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-[#1a3a5c]/30 blur-3xl animate-float z-10 pointer-events-none" style={{ animationDelay: '2s' }} />
+                <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-[#c9a227]/10 blur-3xl animate-float z-10 pointer-events-none" style={{ animationDelay: "2s" }} />
 
                 <div className="container-lume relative z-20 text-center md:text-left pt-24 pb-12">
                     <NavigationBreadcrumbs 

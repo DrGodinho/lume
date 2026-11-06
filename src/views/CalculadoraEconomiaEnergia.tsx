@@ -190,11 +190,12 @@ export function CalculadoraEconomiaEnergiaPage() {
             src="/hero-bg.webp"
             alt="Fachada residencial com incidência solar"
             fill
-            className="object-cover opacity-30"
+            className="w-full h-full object-cover"
             priority
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#04080f] via-[#04080f]/60 to-[#04080f]/20" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
+          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#04080f] to-transparent z-10 pointer-events-none" />
         </div>
         <Particles />
         <div className="absolute top-24 right-8 w-32 h-32 rounded-full bg-[#c9a227]/5 blur-3xl pointer-events-none" />

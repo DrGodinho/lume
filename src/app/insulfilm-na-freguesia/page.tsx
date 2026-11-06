@@ -90,7 +90,7 @@ const freguesiaConfig: NeighborhoodConfig = {
   ],
   recommendedFilms: [
     {
-      name: 'Nano Cerâmica IR95',
+      name: 'Nano Cerâmica',
       category: 'Proteção Térmica Máxima',
       tag: 'Alta Transparência',
       highlight: true,
@@ -99,29 +99,29 @@ const freguesiaConfig: NeighborhoodConfig = {
       privacy: 2,
       durability: '10 Anos',
       idealFor: 'Varandas gourmet, cortinas de vidro e salas com sol da tarde.',
-      priceNote: 'A partir de R$ 220/m² instalado',
+      priceNote: 'A partir de R$ 200/m² instalado',
     },
     {
       name: 'Dupla Camada Cerâmica',
       category: 'Privacidade & Sem Espelho Noturno',
       tag: 'Visão Noturna Perfeita',
-      heatRejection: 4,
+      heatRejection: 5,
       uvBlock: 5,
-      privacy: 4,
+      privacy: 5,
       durability: '7 Anos',
       idealFor: 'Salas e varandas que exigem privacidade diurna sem reflexo de espelho por dentro à noite.',
-      priceNote: 'A partir de R$ 150/m² instalado',
+      priceNote: 'A partir de R$ 110/m² instalado',
     },
     {
-      name: 'Carbono Elite G5/G20',
+      name: 'Carbono Premium',
       category: 'Controle de Claridade & Calor',
       tag: 'Privacidade Total',
-      heatRejection: 4,
+      heatRejection: 3,
       uvBlock: 5,
       privacy: 5,
       durability: '5 Anos',
       idealFor: 'Quartos, home offices e áreas de serviço com excesso de claridade.',
-      priceNote: 'A partir de R$ 90/m² instalado',
+      priceNote: 'A partir de R$ 80/m² instalado',
     },
     {
       name: 'Película Antivandalismo PS4',
@@ -132,7 +132,7 @@ const freguesiaConfig: NeighborhoodConfig = {
       privacy: 2,
       durability: '10 Anos',
       idealFor: 'Portas de vidro, coberturas e janelas baixas sujeitas a choque mecânico e rajadas de vento.',
-      priceNote: 'A partir de R$ 160/m² instalado',
+      priceNote: 'A partir de R$ 110/m² instalado',
     },
   ],
   coverageLocations: [
@@ -217,11 +217,11 @@ const jsonLd = {
         name: 'Freguesia (Jacarepaguá)',
       },
       description:
-        'Aplicação especializada de insulfilm de alta tecnologia na Freguesia. Nano Cerâmica térmica para varandas e cortinas de vidro com garantia de até 10 anos.',
+        'Aplicação especializada de insulfilm de alta tecnologia na Freguesia. Nano Cerâmica para varandas e cortinas de vidro com garantia de até 10 anos.',
       offers: {
         '@type': 'Offer',
         priceCurrency: 'BRL',
-        price: '90.00',
+        price: '80.00',
         priceSpecification: {
           '@type': 'UnitPriceSpecification',
           priceType: 'https://schema.org/StartingPrice',

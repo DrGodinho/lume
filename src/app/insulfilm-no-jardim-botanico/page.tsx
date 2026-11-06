@@ -69,7 +69,7 @@ const jardimBotanicoConfig: NeighborhoodConfig = {
       problem:
         'Residências e coberturas em ruas nobres como Lopes Quintas, Visconde de Carandaí e Marquês de São Vicente possuem fachadas envidraçadas que acumulam intensa carga térmica durante todo o dia.',
       solution:
-        'A tecnologia Nano Cerâmica IR95 reflete e dissipa a energia solar no vidro, mantendo os interiores frescos sem necessidade de sobrecarregar o ar-condicionado.',
+        'A tecnologia Nano Cerâmica dissipa a energia solar no vidro, mantendo os interiores frescos sem necessidade de sobrecarregar o ar-condicionado.',
     },
     {
       title: 'Proteção de Obras de Arte e Madeiras Nobres',
@@ -88,7 +88,7 @@ const jardimBotanicoConfig: NeighborhoodConfig = {
   ],
   recommendedFilms: [
     {
-      name: 'Nano Cerâmica IR95',
+      name: 'Nano Cerâmica',
       category: 'Proteção Térmica & Preservação UV',
       tag: 'Alta Performance',
       highlight: true,
@@ -97,29 +97,29 @@ const jardimBotanicoConfig: NeighborhoodConfig = {
       privacy: 2,
       durability: '10 Anos',
       idealFor: 'Grandes panos de vidro, mezaninos, salas voltadas para o jardim e claraboias.',
-      priceNote: 'A partir de R$ 220/m² instalado',
+      priceNote: 'A partir de R$ 200/m² instalado',
     },
     {
       name: 'Dupla Camada Cerâmica',
       category: 'Conforto Térmico & Privacidade',
       tag: 'Sem Espelho Noturno',
-      heatRejection: 4,
+      heatRejection: 5,
       uvBlock: 5,
-      privacy: 4,
+      privacy: 5,
       durability: '7 Anos',
       idealFor: 'Quartos e livings com vista para ruas ou vizinhos na Gávea e Jardim Botânico.',
-      priceNote: 'A partir de R$ 150/m² instalado',
+      priceNote: 'A partir de R$ 110/m² instalado',
     },
     {
-      name: 'Carbono Elite Nobre',
+      name: 'Carbono Premium',
       category: 'Controle de Luminosidade',
       tag: 'Tonalidade Suave',
-      heatRejection: 4,
+      heatRejection: 3,
       uvBlock: 5,
       privacy: 5,
       durability: '5 Anos',
       idealFor: 'Bibliotecas, home cinema, escritórios e quartos.',
-      priceNote: 'A partir de R$ 90/m² instalado',
+      priceNote: 'A partir de R$ 80/m² instalado',
     },
     {
       name: 'Película de Proteção PS4',
@@ -130,7 +130,7 @@ const jardimBotanicoConfig: NeighborhoodConfig = {
       privacy: 2,
       durability: '10 Anos',
       idealFor: 'Portas de correr para áreas externas, claraboias e painéis de jardim.',
-      priceNote: 'A partir de R$ 160/m² instalado',
+      priceNote: 'A partir de R$ 110/m² instalado',
     },
   ],
   coverageLocations: [

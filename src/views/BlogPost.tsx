@@ -410,7 +410,7 @@ export function BlogPost({ post, relatedPosts }: BlogPostProps) {
       <section className="relative overflow-hidden px-4 pt-32 pb-16 lg:pt-44 lg:pb-24">
         <div className="absolute inset-0">
           <div
-            className="absolute inset-0 bg-cover bg-center opacity-35"
+            className="absolute inset-0 bg-cover bg-center opacity-60"
             style={{ backgroundImage: `url(${post.coverImageUrl || '/hero-bg.webp'})` }}
           />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(201,162,39,0.24),transparent_36%)]" />

@@ -47,7 +47,7 @@ export const metadata: Metadata = {
 const tijucaFaqs = [
   {
     q: 'Quanto custa instalar insulfilm em um apartamento na Tijuca?',
-    a: 'Nossos preços partem de R$ 90/m² instalado na linha Carbono Elite (a mais procurada para quartos e salas com muito sol); R$ 150/m² na linha Dupla Camada (sem reflexo interno à noite); e R$ 220/m² na linha Nano Cerâmica de alta performance térmica. A medição no local é 100% gratuita em qualquer rua da Tijuca.',
+    a: 'Nossos preços partem de R$ 80/m² instalado na linha Carbono Premium (a mais procurada para quartos e salas com muito sol); R$ 110/m² na linha Dupla Camada (sem reflexo interno à noite); e R$ 200/m² na linha Nano Cerâmica de alta performance térmica. A medição no local é 100% gratuita em qualquer rua da Tijuca.',
   },
   {
     q: 'O insulfilm realmente reduz a temperatura nos quartos e salas da Tijuca?',
@@ -55,7 +55,7 @@ const tijucaFaqs = [
   },
   {
     q: 'Qual película é recomendada para quem trabalha em home office e sofre com sol na tela?',
-    a: 'A linha Carbono Elite G20 ou G35 é excelente para escritórios e salas de TV. Ela suaviza o excesso de claridade que causa cansaço visual e reflexos nas telas de computador, sem escurecer excessivamente o espaço.',
+    a: 'A linha Carbono Premium G20 ou G35 é excelente para escritórios e salas de TV. Ela suaviza o excesso de claridade que causa cansaço visual e reflexos nas telas de computador, sem escurecer excessivamente o espaço.',
   },
   {
     q: 'Atendem prédios antigos e com janelas de ferro ou madeira na Tijuca?',

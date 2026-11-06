@@ -88,30 +88,30 @@ const pechinchaConfig: NeighborhoodConfig = {
   ],
   recommendedFilms: [
     {
-      name: 'Carbono Elite G5/G20',
+      name: 'Carbono Premium',
       category: 'Privacidade Total & Custo-Benefício',
       tag: 'Mais Popular no Pechincha',
       highlight: true,
-      heatRejection: 4,
+      heatRejection: 3,
       uvBlock: 5,
       privacy: 5,
       durability: '5 Anos',
       idealFor: 'Apartamentos com janelas próximas a vizinhos, quartos e home office.',
-      priceNote: 'A partir de R$ 90/m² instalado',
+      priceNote: 'A partir de R$ 80/m² instalado',
     },
     {
       name: 'Dupla Camada Cerâmica',
       category: 'Privacidade Diurna sem Espelho Noturno',
       tag: 'Conforto Ótico',
-      heatRejection: 4,
+      heatRejection: 5,
       uvBlock: 5,
-      privacy: 4,
+      privacy: 5,
       durability: '7 Anos',
       idealFor: 'Salas e varandas que exigem privacidade durante o dia e visão limpa à noite.',
-      priceNote: 'A partir de R$ 150/m² instalado',
+      priceNote: 'A partir de R$ 110/m² instalado',
     },
     {
-      name: 'Nano Cerâmica IR95',
+      name: 'Nano Cerâmica',
       category: 'Máximo Bloqueio de Calor',
       tag: 'Transparência Térmica',
       heatRejection: 5,
@@ -119,7 +119,7 @@ const pechinchaConfig: NeighborhoodConfig = {
       privacy: 2,
       durability: '10 Anos',
       idealFor: 'Varandas gourmet, cortinas de vidro e locais onde não se deseja alterar a luz natural.',
-      priceNote: 'A partir de R$ 220/m² instalado',
+      priceNote: 'A partir de R$ 200/m² instalado',
     },
     {
       name: 'Película de Segurança PS4',
@@ -130,7 +130,7 @@ const pechinchaConfig: NeighborhoodConfig = {
       privacy: 2,
       durability: '10 Anos',
       idealFor: 'Portas de vidro de correr, janelas baixas e divisórias residenciais.',
-      priceNote: 'A partir de R$ 160/m² instalado',
+      priceNote: 'A partir de R$ 110/m² instalado',
     },
   ],
   coverageLocations: [
@@ -151,7 +151,7 @@ const pechinchaConfig: NeighborhoodConfig = {
   faqs: [
     {
       q: 'Qual película é a mais indicada para quem tem janela de frente para o vizinho no Pechincha?',
-      a: 'A linha Carbono Elite G20 ou a película Dupla Camada são as escolhas ideais. Elas impedem a visão de fora para dentro durante o dia com alto conforto visual, permitindo que você veja o exterior com total nitidez sem ser observado.',
+      a: 'A linha Carbono Premium G20 ou a película Dupla Camada são as escolhas ideais. Elas impedem a visão de fora para dentro durante o dia com alto conforto visual, permitindo que você veja o exterior com total nitidez sem ser observado.',
     },
     {
       q: 'As películas bloqueiam a entrada de luz natural?',

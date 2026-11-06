@@ -5,7 +5,7 @@ import { buildBreadcrumbSchema } from '@/lib/schema/breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Insulfilm em Bangu RJ | Preço, Instalação e Garantia - LUME',
-  description: 'Aplicação profissional de insulfilm em Bangu, Rio de Janeiro. Películas a partir de R$ 90/m²: redução de calor, privacidade e proteção UV com garantia de até 10 anos. Orçamento grátis no local e pelo WhatsApp.',
+  description: 'Aplicação profissional de insulfilm em Bangu, Rio de Janeiro. Películas a partir de R$ 80/m²: redução de calor, privacidade e proteção UV com garantia de até 10 anos. Orçamento grátis no local e pelo WhatsApp.',
   keywords: [
     'insulfilm em bangu',
     'insulfilm bangu rj',
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://lumecontrolesolar.com.br/insulfilm-em-bangu/' },
   openGraph: {
     title: 'Insulfilm em Bangu RJ | Residencial e Comercial - LUME',
-    description: 'Insulfilm em Bangu a partir de R$ 90/m². Redução de calor, privacidade e proteção UV com garantia de até 10 anos. Orçamento grátis.',
+    description: 'Insulfilm em Bangu a partir de R$ 80/m². Redução de calor, privacidade e proteção UV com garantia de até 10 anos. Orçamento grátis.',
     url: 'https://lumecontrolesolar.com.br/insulfilm-em-bangu/',
     type: 'website',
     siteName: 'LUME Controle Solar',

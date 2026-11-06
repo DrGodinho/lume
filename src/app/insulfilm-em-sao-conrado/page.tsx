@@ -51,7 +51,7 @@ const saoConradoConfig: NeighborhoodConfig = {
   heroBg: '/saoconrado_hero_bg.webp',
   heroTitleWords: ['Insulfilm', 'em', 'São', 'Conrado', 'RJ'],
   heroGoldIndices: [2, 3],
-  subtitleBadge: 'Grandes Panos de Vidro · Imune à Maresia · Nano Cerâmica IR95',
+  subtitleBadge: 'Grandes Panos de Vidro · Imune à Maresia · Nano Cerâmica',
   description:
     'Controle solar e térmico de alto padrão para os edifícios e residências exclusivas de São Conrado. Corte até 95% do calor solar e elimine os efeitos corrosivos da maresia sem perder a vista privilegiada para o mar e a Pedra da Gávea.',
   whatsappUrl:
@@ -70,7 +70,7 @@ const saoConradoConfig: NeighborhoodConfig = {
       problem:
         'Condomínios como São Conrado Green, Village São Conrado e edifícios da Av. Mendes de Morais possuem panos de vidro gigantescos que recebem forte calor do sol e o reflexo contínuo da praia.',
       solution:
-        'A película Nano Cerâmica IR95 dissipa até 95% da energia solar térmica diretamente no vidro, estabilizando o ambiente com elegância e sem sobrecarregar o ar-condicionado.',
+        'A película Nano Cerâmica dissipa a radiação solar diretamente no vidro, estabilizando o ambiente com elegância e sem sobrecarregar o ar-condicionado.',
     },
     {
       title: 'Maresia Agressiva da Praia de São Conrado',
@@ -89,7 +89,7 @@ const saoConradoConfig: NeighborhoodConfig = {
   ],
   recommendedFilms: [
     {
-      name: 'Nano Cerâmica IR95',
+      name: 'Nano Cerâmica',
       category: 'Proteção Térmica Máxima & Anti-Maresia',
       tag: 'Alta Performance',
       highlight: true,
@@ -98,34 +98,34 @@ const saoConradoConfig: NeighborhoodConfig = {
       privacy: 2,
       durability: '10 Anos',
       idealFor: 'Grandes panos de vidro da orla, livings panorâmicos e varandas envidraçadas.',
-      priceNote: 'A partir de R$ 220/m² instalado',
+      priceNote: 'A partir de R$ 200/m² instalado',
     },
     {
       name: 'Dupla Camada Cerâmica',
       category: 'Privacidade & Conforto Térmico',
       tag: 'Sem Espelho Noturno',
-      heatRejection: 4,
+      heatRejection: 5,
       uvBlock: 5,
-      privacy: 4,
+      privacy: 5,
       durability: '7 Anos',
       idealFor: 'Quartos e salas voltadas para vias de acesso ou edifícios vizinhos.',
-      priceNote: 'A partir de R$ 150/m² instalado',
+      priceNote: 'A partir de R$ 110/m² instalado',
     },
     {
-      name: 'Carbono Elite Térmico',
+      name: 'Carbono Premium',
       category: 'Controle de Luminosidade',
       tag: 'Grafite Elegante',
-      heatRejection: 4,
+      heatRejection: 3,
       uvBlock: 5,
       privacy: 5,
       durability: '5 Anos',
       idealFor: 'Quartos, home cinema e ambientes com alta intensidade de claridade.',
-      priceNote: 'A partir de R$ 90/m² instalado',
+      priceNote: 'A partir de R$ 80/m² instalado',
     },
     {
-      name: 'Película de Segurança PS4/PS8',
-      category: 'Proteção Antivandalismo',
-      tag: 'Retenção Estrutural',
+      name: 'Película de Segurança PS8 Antivandalismo',
+      category: 'Proteção Antivandalismo & Rajadas',
+      tag: 'Retenção Estrutural Pesada',
       heatRejection: 3,
       uvBlock: 5,
       privacy: 2,

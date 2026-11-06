@@ -48,7 +48,7 @@ export const metadata: Metadata = {
 const centroRioFaqs = [
   {
     q: 'Quanto custa instalar insulfilm em um imóvel no Centro do Rio?',
-    a: 'O valor varia conforme a película e a metragem: a linha Carbono (ideal para privacidade e conforto) parte de R$ 80/m² a R$ 90/m²; a linha Jateada para divisórias de escritório parte de R$ 100/m²; e a Nano Cerâmica térmica de alta performance parte de R$ 180 a R$ 220/m². O orçamento para residências ou empresas no Centro é 100% gratuito pelo WhatsApp.',
+    a: 'O valor varia conforme a película e a metragem: a linha Carbono (ideal para privacidade e conforto) parte de R$ 80/m²; a linha Jateada para divisórias de escritório parte de R$ 80/m² a R$ 90/m²; e a Nano Cerâmica de alta performance inicia a partir de R$ 200/m². O orçamento para residências ou empresas no Centro é 100% gratuito pelo WhatsApp.',
   },
   {
     q: 'Vocês atendem escritórios e empresas fora do horário comercial no Centro?',

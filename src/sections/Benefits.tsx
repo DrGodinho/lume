@@ -46,7 +46,6 @@ const benefits: BenefitItem[] = [
     prefix: 'Até',
     stat: '10 Anos',
     statLabel: 'Garantia',
-    sublabel: 'Linha Nano Cerâmica',
   },
 ];
 

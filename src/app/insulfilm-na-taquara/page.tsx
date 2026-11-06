@@ -6,7 +6,7 @@ import { buildBreadcrumbSchema } from '@/lib/schema/breadcrumbs';
 export const metadata: Metadata = {
   title: 'Insulfilm na Taquara RJ | Redução de Calor e Privacidade - LUME',
   description:
-    'Instalação profissional de insulfilm na Taquara (Jacarepaguá). Películas solares térmicas a partir de R$ 90/m²: redução de até 8°C no calor, economia de energia e garantia de até 10 anos. Orçamento grátis no local e WhatsApp.',
+    'Instalação profissional de insulfilm na Taquara (Jacarepaguá). Películas solares a partir de R$ 80/m²: redução de até 8°C no calor, economia de energia e garantia de até 10 anos. Orçamento grátis no local e WhatsApp.',
   keywords: [
     'insulfilm na taquara',
     'insulfilm taquara rj',
@@ -78,7 +78,7 @@ const taquaraConfig: NeighborhoodConfig = {
       problem:
         'O excesso de claridade direta cansa a vista e impede o trabalho confortável em computadores ou a visualização nítida de televisores durante o dia.',
       solution:
-        'Linhas Carbono Elite e Dupla Camada que equilibram a transmissão de luz visível, proporcionando luz agradável e sem reflexos irritantes.',
+        'Linhas Carbono Premium e Dupla Camada que equilibram a transmissão de luz visível, proporcionando luz agradável e sem reflexos irritantes.',
     },
     {
       title: 'Películas Baratas que Ficam Roxas e com Bolhas',
@@ -90,7 +90,7 @@ const taquaraConfig: NeighborhoodConfig = {
   ],
   recommendedFilms: [
     {
-      name: 'Nano Cerâmica IR95',
+      name: 'Nano Cerâmica',
       category: 'Eficiência Energética & Térmica',
       tag: 'Alta Performance',
       highlight: true,
@@ -99,29 +99,29 @@ const taquaraConfig: NeighborhoodConfig = {
       privacy: 2,
       durability: '10 Anos',
       idealFor: 'Apartamentos com alta insolação, salas amplas e varandas envidraçadas.',
-      priceNote: 'A partir de R$ 220/m² instalado',
+      priceNote: 'A partir de R$ 200/m² instalado',
     },
     {
-      name: 'Carbono Elite G5/G20',
+      name: 'Carbono Premium',
       category: 'Controle de Calor & Privacidade',
       tag: 'Melhor Custo-Benefício',
-      heatRejection: 4,
+      heatRejection: 3,
       uvBlock: 5,
       privacy: 5,
       durability: '5 Anos',
       idealFor: 'Quartos, home office, janelas de condomínio e fachadas comerciais.',
-      priceNote: 'A partir de R$ 90/m² instalado',
+      priceNote: 'A partir de R$ 80/m² instalado',
     },
     {
       name: 'Dupla Camada Noturna',
       category: 'Privacidade Total sem Espelho Noturno',
       tag: 'Conforto Noturno',
-      heatRejection: 4,
+      heatRejection: 5,
       uvBlock: 5,
-      privacy: 4,
+      privacy: 5,
       durability: '7 Anos',
       idealFor: 'Salas e quartos onde se busca privacidade sem perder a visão do exterior à noite.',
-      priceNote: 'A partir de R$ 150/m² instalado',
+      priceNote: 'A partir de R$ 110/m² instalado',
     },
     {
       name: 'Película Jateada Decorativa',
@@ -132,7 +132,7 @@ const taquaraConfig: NeighborhoodConfig = {
       privacy: 5,
       durability: '10 Anos',
       idealFor: 'Divisórias de cozinha, banheiros, consultórios e escritórios na Taquara.',
-      priceNote: 'A partir de R$ 110/m² instalado',
+      priceNote: 'A partir de R$ 80/m² instalado',
     },
   ],
   coverageLocations: [
@@ -154,7 +154,7 @@ const taquaraConfig: NeighborhoodConfig = {
   faqs: [
     {
       q: 'Quanto custa para colocar insulfilm em um apartamento padrão na Taquara?',
-      a: 'O custo varia conforme a metragem e a película escolhida. A linha Carbono Elite inicia a partir de R$ 90/m² instalado, enquanto as linhas térmicas de alta tecnologia variam entre R$ 150 e R$ 220/m². Fazemos a medição gratuita no seu endereço na Taquara para passar o orçamento exato.',
+      a: 'O custo varia conforme a metragem e a película escolhida: a linha Carbono Premium inicia a partir de R$ 80/m² instalado, a Dupla Camada a partir de R$ 110/m² e a Nano Cerâmica de alta rejeição térmica a partir de R$ 200/m². Fazemos a medição gratuita no seu endereço na Taquara para passar o orçamento exato.',
     },
     {
       q: 'A instalação faz muita poeira ou bagunça na casa?',
@@ -221,7 +221,7 @@ const jsonLd = {
       offers: {
         '@type': 'Offer',
         priceCurrency: 'BRL',
-        price: '90.00',
+        price: '80.00',
         priceSpecification: {
           '@type': 'UnitPriceSpecification',
           priceType: 'https://schema.org/StartingPrice',

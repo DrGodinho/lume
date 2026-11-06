@@ -40,11 +40,13 @@ export function TijucaPage({ faqs }: TijucaPageProps) {
             fill
             priority
             sizes="100vw"
-            className="object-cover object-center opacity-30"
+            className="w-full h-full object-cover object-center"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#04080f] via-[#04080f]/80 to-[#04080f]/60" />
-          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-[#c9a227]/10 blur-[140px] rounded-full pointer-events-none" />
-          <div className="absolute bottom-10 right-10 w-96 h-96 bg-[#1a3a5c]/25 blur-[110px] rounded-full pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
+          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#04080f] to-transparent z-10 pointer-events-none" />
+          <div className="absolute top-1/4 right-10 w-32 h-32 rounded-full bg-[#c9a227]/5 blur-3xl pointer-events-none" />
+          <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-[#c9a227]/10 blur-3xl pointer-events-none" />
         </div>
 
         <Particles />
@@ -188,7 +190,7 @@ export function TijucaPage({ faqs }: TijucaPageProps) {
                   </div>
                   <h3 className="text-xl font-bold font-montserrat mb-3 text-white">Sem Reflexo na TV e Telas</h3>
                   <p className="text-gray-400 text-sm leading-relaxed mb-4">
-                    Ideal para quem faz home office ou assiste TV na sala à tarde. A linha Carbono Elite reduz drasticamente o brilho excessivo nos monitores sem necessidade de fechar cortinas pesadas.
+                    Ideal para quem faz home office ou assiste TV na sala à tarde. A linha Carbono Premium reduz drasticamente o brilho excessivo nos monitores sem necessidade de fechar cortinas pesadas.
                   </p>
                 </div>
                 <div className="pt-4 border-t border-white/5 flex items-center gap-2 text-xs text-[#c9a227] font-semibold">
@@ -236,14 +238,14 @@ export function TijucaPage({ faqs }: TijucaPageProps) {
           </ScrollReveal>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {/* Card 1: Carbono Elite */}
+            {/* Card 1: Carbono Premium */}
             <ScrollReveal animation="slide-up">
               <div className="glass-card rounded-2xl border border-[#c9a227]/40 bg-[#04080f]/90 p-8 flex flex-col justify-between relative shadow-[0_10px_30px_rgba(201,162,39,0.1)]">
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#c9a227] text-[#04080f] font-bold text-xs uppercase px-4 py-1 rounded-full shadow-lg">
                   Campeã de Vendas Tijuca
                 </div>
                 <div>
-                  <h3 className="text-2xl font-black font-montserrat text-white mb-2">Carbono Elite</h3>
+                  <h3 className="text-2xl font-black font-montserrat text-white mb-2">Carbono Premium</h3>
                   <p className="text-[#c9a227] text-sm font-semibold mb-4">Privacidade, Estética Grafite & Redução de Brilho</p>
                   <p className="text-gray-300 text-sm leading-relaxed mb-6">
                     A película mais procurada para quartos e salas com vista devassada. Não fica roxa com o sol e entrega excelente bloqueio térmico por um valor altamente acessível.
@@ -251,7 +253,7 @@ export function TijucaPage({ faqs }: TijucaPageProps) {
                   <div className="space-y-3 mb-6 bg-white/[0.03] p-4 rounded-xl border border-white/5">
                     <div>
                       <span className="text-xs text-gray-400 block mb-1">Redução de Calor:</span>
-                      <LevelDots level={4} />
+                      <LevelDots level={3} />
                     </div>
                     <div>
                       <span className="text-xs text-gray-400 block mb-1">Privacidade Diurna:</span>
@@ -265,15 +267,15 @@ export function TijucaPage({ faqs }: TijucaPageProps) {
                 </div>
                 <div>
                   <div className="text-xl font-bold text-white mb-4">
-                    A partir de <span className="text-[#c9a227]">R$ 90/m²</span> instalado
+                    A partir de <span className="text-[#c9a227]">R$ 80/m²</span> instalado
                   </div>
                   <a
-                    href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20de%20Carbono%20Elite%20para%20a%20Tijuca."
+                    href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20de%20Carbono%20Premium%20para%20a%20Tijuca."
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn-primary w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm"
                   >
-                    <MessageCircle size={16} /> Cotar Carbono Elite
+                    <MessageCircle size={16} /> Cotar Carbono Premium
                   </a>
                 </div>
               </div>
@@ -291,7 +293,7 @@ export function TijucaPage({ faqs }: TijucaPageProps) {
                   <div className="space-y-3 mb-6 bg-white/[0.03] p-4 rounded-xl border border-white/5">
                     <div>
                       <span className="text-xs text-gray-400 block mb-1">Redução de Calor:</span>
-                      <LevelDots level={5} />
+                      <LevelDots level={3} />
                     </div>
                     <div>
                       <span className="text-xs text-gray-400 block mb-1">Luminosidade Natural:</span>

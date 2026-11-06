@@ -70,7 +70,7 @@ const botafogoConfig: NeighborhoodConfig = {
       problem:
         'Os lançamentos modernos em ruas como Voluntários da Pátria, Mena Barreto e Sorocaba contam com amplas varandas que acumulam calor excessivo no sol poente, tornando o living desconfortável.',
       solution:
-        'A película Nano Cerâmica IR95 rejeita até 95% da radiação infravermelha, mantendo a temperatura amena e permitindo aproveitar a varanda o dia todo.',
+        'A película Nano Cerâmica bloqueia o calor solar excessivo, mantendo a temperatura amena e permitindo aproveitar a varanda o dia todo.',
     },
     {
       title: 'Regras de Fachada e Estética Condominial',
@@ -89,7 +89,7 @@ const botafogoConfig: NeighborhoodConfig = {
   ],
   recommendedFilms: [
     {
-      name: 'Nano Cerâmica IR95',
+      name: 'Nano Cerâmica',
       category: 'Proteção Térmica Máxima',
       tag: 'Alta Transparência',
       highlight: true,
@@ -98,29 +98,29 @@ const botafogoConfig: NeighborhoodConfig = {
       privacy: 2,
       durability: '10 Anos',
       idealFor: 'Varandas gourmet integradas, livings e janelões com vista livre para o Pão de Açúcar.',
-      priceNote: 'A partir de R$ 220/m² instalado',
+      priceNote: 'A partir de R$ 200/m² instalado',
     },
     {
       name: 'Dupla Camada Térmica',
       category: 'Privacidade & Conforto Térmico',
       tag: 'Sem Espelho Noturno',
-      heatRejection: 4,
+      heatRejection: 5,
       uvBlock: 5,
-      privacy: 4,
+      privacy: 5,
       durability: '7 Anos',
       idealFor: 'Salas e quartos que necessitam de conforto térmico somado à privacidade diurna.',
-      priceNote: 'A partir de R$ 150/m² instalado',
+      priceNote: 'A partir de R$ 110/m² instalado',
     },
     {
-      name: 'Carbono Elite Térmico',
+      name: 'Carbono Premium',
       category: 'Controle de Luminosidade & Calor',
       tag: 'Grafite Nobre',
-      heatRejection: 4,
+      heatRejection: 3,
       uvBlock: 5,
       privacy: 5,
       durability: '5 Anos',
       idealFor: 'Quartos, escritórios e consultórios com forte reflexo e claridade.',
-      priceNote: 'A partir de R$ 90/m² instalado',
+      priceNote: 'A partir de R$ 80/m² instalado',
     },
     {
       name: 'Película Refletiva Platinum',
@@ -131,7 +131,7 @@ const botafogoConfig: NeighborhoodConfig = {
       privacy: 5,
       durability: '5 Anos',
       idealFor: 'Salas comerciais e fachadas envidraçadas na Praia de Botafogo.',
-      priceNote: 'A partir de R$ 100/m² instalado',
+      priceNote: 'A partir de R$ 90/m² instalado',
     },
   ],
   coverageLocations: [
