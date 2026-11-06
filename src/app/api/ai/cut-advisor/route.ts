@@ -112,6 +112,9 @@ ${
             ],
             generationConfig: {
                 responseMimeType: 'application/json',
+                thinkingConfig: {
+                    thinkingLevel: 'low',
+                },
                 responseSchema: {
                     type: 'OBJECT',
                     properties: {

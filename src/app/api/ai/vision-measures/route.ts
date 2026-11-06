@@ -65,14 +65,26 @@ export async function POST(req: NextRequest) {
                     text: `Analise a seguinte mensagem/anotação de texto e extraia todas as medidas de vidros e dados do cliente encontrados:\n\n${textInput.trim()}`
                 });
             } else if (file) {
-                const mimeType = file.type || 'application/octet-stream';
+                const rawMime = (file.type || '').split(';')[0].trim().toLowerCase();
+                const fileName = (file.name || '').toLowerCase();
+                const isAudio = rawMime.startsWith('audio/') || fileName.endsWith('.mp3') || fileName.endsWith('.ogg') || fileName.endsWith('.m4a') || fileName.endsWith('.wav') || fileName.endsWith('.webm');
+
+                let resolvedMime = rawMime || 'application/octet-stream';
+                if (isAudio) {
+                    if (rawMime.includes('webm') || fileName.endsWith('.webm')) resolvedMime = 'audio/webm';
+                    else if (rawMime.includes('ogg') || fileName.endsWith('.ogg')) resolvedMime = 'audio/ogg';
+                    else if (rawMime.includes('mp4') || rawMime.includes('m4a') || fileName.endsWith('.m4a')) resolvedMime = 'audio/mp4';
+                    else if (rawMime.includes('wav') || fileName.endsWith('.wav')) resolvedMime = 'audio/wav';
+                    else if (rawMime.includes('mp3') || rawMime.includes('mpeg') || fileName.endsWith('.mp3')) resolvedMime = 'audio/mp3';
+                    else resolvedMime = 'audio/webm';
+                }
+
                 const arrayBuffer = await file.arrayBuffer();
                 const base64Data = Buffer.from(arrayBuffer).toString('base64');
-                const isAudio = mimeType.startsWith('audio/') || file.name.endsWith('.mp3') || file.name.endsWith('.ogg') || file.name.endsWith('.m4a') || file.name.endsWith('.wav');
 
                 parts.push({
                     inlineData: {
-                        mimeType: isAudio ? (mimeType.startsWith('audio/') ? mimeType : 'audio/mp3') : mimeType,
+                        mimeType: resolvedMime,
                         data: base64Data,
                     },
                 });
@@ -95,10 +107,10 @@ export async function POST(req: NextRequest) {
             } else if (body.audioBase64) {
                 // Entrada via Áudio Base64
                 const cleanBase64 = body.audioBase64.replace(/^data:audio\/[a-z0-9_-]+;base64,/, '');
-                const mime = body.mimeType || 'audio/webm';
+                const rawMime = (body.mimeType || 'audio/webm').split(';')[0].trim().toLowerCase();
                 parts.push({
                     inlineData: {
-                        mimeType: mime,
+                        mimeType: rawMime.includes('webm') ? 'audio/webm' : (rawMime.includes('mp4') || rawMime.includes('m4a') ? 'audio/mp4' : rawMime),
                         data: cleanBase64,
                     },
                 });
@@ -129,6 +141,9 @@ export async function POST(req: NextRequest) {
             contents: [{ parts }],
             generationConfig: {
                 responseMimeType: 'application/json',
+                thinkingConfig: {
+                    thinkingLevel: 'low',
+                },
                 responseSchema: {
                     type: 'OBJECT',
                     properties: {
