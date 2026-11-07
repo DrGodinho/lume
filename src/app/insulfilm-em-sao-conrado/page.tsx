@@ -156,7 +156,7 @@ const saoConradoConfig: NeighborhoodConfig = {
     },
     {
       q: 'A película pode ser instalada em vidros de pé-direito duplo ou de grande porte?',
-      a: 'Sim. Nossa equipe é especializada em grandes envidraçamentos e coberturas de alto padrão em São Conrado, utilizando equipamentos apropriados de elevação, andaimes seguros e corte computadorizado milimétrico.',
+      a: 'Sim. Nossa equipe é especializada em grandes envidraçamentos e coberturas de alto padrão em São Conrado, utilizando equipamentos apropriados de elevação, andaimes seguros e corte de alta precisão.',
     },
     {
       q: 'A película reduz a claridade ou a vista para o mar?',

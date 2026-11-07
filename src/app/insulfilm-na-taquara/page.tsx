@@ -61,7 +61,7 @@ const taquaraConfig: NeighborhoodConfig = {
     { target: '8', suffix: '°C', label: 'Redução na Sensação Térmica', sublabel: 'Conforto imediato sem forçar o ar' },
     { target: '99', suffix: '%', label: 'Bloqueio de Raios UV', sublabel: 'Proteção contra queimaduras solares e móveis' },
     { target: '10', suffix: ' Anos', label: 'Garantia Contratual', sublabel: 'Películas de poliéster virgem certificadas' },
-    { target: '24', suffix: 'h', label: 'Instalação Ágil', sublabel: 'Aplicação no local com corte computadorizado' },
+    { target: '24', suffix: 'h', label: 'Instalação Ágil', sublabel: 'Aplicação sob medida no local com acabamento fino' },
   ],
   localPainsTitle: 'Desafios do Calor e Conforto na Taquara',
   localPainsSubtitle: 'Otimização Térmica para o Subúrbio Carioca',

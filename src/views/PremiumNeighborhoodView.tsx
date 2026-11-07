@@ -16,7 +16,8 @@ import {
   MapPin,
   Clock,
   Layers,
-  Award
+  Award,
+  Zap
 } from 'lucide-react';
 import { NavigationBreadcrumbs } from '../components/NavigationBreadcrumbs';
 import { HeroEntrance } from '../components/HeroEntrance';
@@ -352,9 +353,9 @@ export function PremiumNeighborhoodView({ config }: Props) {
                 desc: 'Visita técnica e medição sem custo em qualquer condomínio ou rua de ' + config.name + '.',
               },
               {
-                icon: Layers,
-                title: 'Corte de Precisão',
-                desc: 'Corte computadorizado milimétrico sob medida para o seu vidro, sem frestas ou rebarbas.',
+                icon: Zap,
+                title: 'Eficiência Energética',
+                desc: 'Redução de até 8°C na incidência direta de calor, aliviando o uso do ar-condicionado e gerando economia real na conta de luz.',
               },
               {
                 icon: ShieldCheck,

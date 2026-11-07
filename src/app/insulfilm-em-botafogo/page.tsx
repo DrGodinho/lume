@@ -163,7 +163,7 @@ const botafogoConfig: NeighborhoodConfig = {
     },
     {
       q: 'A película pode ser instalada em portas de correr de varanda?',
-      a: 'Com certeza. Realizamos a aplicação sob medida em portas de correr, basculantes e cortinas de vidro articuladas, com corte computadorizado e acabamento rente às borrachas de vedação.',
+      a: 'Com certeza. Realizamos a aplicação sob medida em portas de correr, basculantes e cortinas de vidro articuladas, com corte milimétrico de precisão e acabamento rente às borrachas de vedação.',
     },
   ],
 };
