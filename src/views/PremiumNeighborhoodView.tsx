@@ -46,6 +46,7 @@ export interface RecommendedFilm {
   durability: string;
   idealFor: string;
   priceNote: string;
+  description?: string;
 }
 
 export interface NeighborhoodConfig {
@@ -89,6 +90,30 @@ export function getFilmPageUrl(name: string): string | null {
   if (lower.includes('jatead')) return '/jateado/';
   if (lower.includes('refletiv')) return '/refletiva/';
   return null;
+}
+
+export function getDefaultFilmDescription(name: string): string {
+  if (!name) return '';
+  const lower = name.toLowerCase().trim();
+  if (lower.includes('nano cer') || lower.includes('nano-cer') || lower.includes('cerâmica') || lower.includes('ceramica')) {
+    return 'Conforto térmico máximo sem alterar a fachada. Bloqueia até 95% do infravermelho com alta transparência, mantendo a luminosidade natural e vista livre.';
+  }
+  if (lower.includes('dupla camada')) {
+    return 'Camada refletiva externa e fumê interno relaxante: retenção solar de alto desempenho e privacidade diurna sem espelho por dentro à noite.';
+  }
+  if (lower.includes('carbono')) {
+    return 'Pigmentação profunda que mantém o tom grafite nobre sem desbotar nem arrochear. Garante privacidade, redução de calor e alívio do reflexo em telas.';
+  }
+  if (lower.includes('jatead')) {
+    return 'Privacidade visual completa com iluminação difusa e acabamento fosco refinado. Perfeita para divisórias de vidro, banheiros e consultórios.';
+  }
+  if (lower.includes('refletiv') || lower.includes('platinum')) {
+    return 'Blindagem solar de alta potência para fachadas com forte incidência solar direta, proporcionando espelhamento externo e alívio térmico imediato.';
+  }
+  if (lower.includes('antivandalismo') || lower.includes('ps4') || lower.includes('ps8') || lower.includes('ps12') || lower.includes('segurança')) {
+    return 'Película de segurança que retém os fragmentos de vidro presos à lâmina em caso de impacto ou quebra, prevenindo estilhaços e protegendo o ambiente.';
+  }
+  return 'Película de alta performance com retenção térmica, controle de luminosidade e proteção integral contra raios UV nocivos.';
 }
 
 export function renderWithFilmLinks(text: string): React.ReactNode {
@@ -321,9 +346,13 @@ export function PremiumNeighborhoodView({ config }: Props) {
                         film.name
                       )}
                     </h3>
-                    <div className="inline-block px-2.5 py-0.5 rounded-full bg-white/5 text-gray-300 text-xs mb-4 font-mono">
+                    <div className="inline-block px-2.5 py-0.5 rounded-full bg-white/5 text-gray-300 text-xs mb-3 font-mono">
                       {film.tag}
                     </div>
+
+                    <p className="text-gray-300 text-xs leading-relaxed mb-4 min-h-[44px]">
+                      {renderWithFilmLinks(film.description || getDefaultFilmDescription(film.name))}
+                    </p>
 
                     <div className="space-y-3 py-4 border-y border-white/5 text-xs">
                       <div>
@@ -349,11 +378,11 @@ export function PremiumNeighborhoodView({ config }: Props) {
                       </div>
                     </div>
 
-                    <div className="my-4 space-y-1 text-xs">
+                    <div className="my-4 space-y-1.5 text-xs">
                       <p className="text-gray-300">
                         <strong className="text-white">Garantia:</strong> {film.durability}
                       </p>
-                      <p className="text-gray-400 line-clamp-2">
+                      <p className="text-gray-400 leading-relaxed">
                         <strong className="text-white">Ideal para:</strong> {renderWithFilmLinks(film.idealFor)}
                       </p>
                     </div>
