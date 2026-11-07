@@ -101,7 +101,7 @@ const flamengoConfig: NeighborhoodConfig = {
       priceNote: 'A partir de R$ 200/m² instalado',
     },
     {
-      name: 'Dupla Camada Noturna',
+      name: 'Dupla Camada',
       category: 'Conforto Térmico & Privacidade',
       tag: 'Sem Espelho Noturno',
       heatRejection: 5,

@@ -100,7 +100,7 @@ const pechinchaConfig: NeighborhoodConfig = {
       priceNote: 'A partir de R$ 80/m² instalado',
     },
     {
-      name: 'Dupla Camada Cerâmica',
+      name: 'Dupla Camada',
       category: 'Privacidade Diurna sem Espelho Noturno',
       tag: 'Conforto Ótico',
       heatRejection: 5,

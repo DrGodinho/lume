@@ -111,7 +111,7 @@ const laranjeirasConfig: NeighborhoodConfig = {
       priceNote: 'A partir de R$ 80/m² instalado',
     },
     {
-      name: 'Dupla Camada Cerâmica',
+      name: 'Dupla Camada',
       category: 'Privacidade & Conforto Térmico',
       tag: 'Sem Espelho Noturno',
       heatRejection: 5,

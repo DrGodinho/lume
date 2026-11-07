@@ -112,7 +112,7 @@ const jardimOceanicoConfig: NeighborhoodConfig = {
       priceNote: 'A partir de R$ 200/m² instalado',
     },
     {
-      name: 'Dupla Camada Noturna',
+      name: 'Dupla Camada',
       category: 'Privacidade Superior',
       tag: 'Sem Espelho Noturno',
       heatRejection: 5,

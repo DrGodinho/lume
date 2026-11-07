@@ -101,7 +101,7 @@ const botafogoConfig: NeighborhoodConfig = {
       priceNote: 'A partir de R$ 200/m² instalado',
     },
     {
-      name: 'Dupla Camada Térmica',
+      name: 'Dupla Camada',
       category: 'Privacidade & Conforto Térmico',
       tag: 'Sem Espelho Noturno',
       heatRejection: 5,

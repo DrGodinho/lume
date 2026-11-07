@@ -113,7 +113,7 @@ const taquaraConfig: NeighborhoodConfig = {
       priceNote: 'A partir de R$ 80/m² instalado',
     },
     {
-      name: 'Dupla Camada Noturna',
+      name: 'Dupla Camada',
       category: 'Privacidade Total sem Espelho Noturno',
       tag: 'Conforto Noturno',
       heatRejection: 5,

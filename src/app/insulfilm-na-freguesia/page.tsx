@@ -102,7 +102,7 @@ const freguesiaConfig: NeighborhoodConfig = {
       priceNote: 'A partir de R$ 200/m² instalado',
     },
     {
-      name: 'Dupla Camada Cerâmica',
+      name: 'Dupla Camada',
       category: 'Privacidade & Sem Espelho Noturno',
       tag: 'Visão Noturna Perfeita',
       heatRejection: 5,
