@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { 
   CheckCircle2, 
   ArrowRight, 
@@ -75,6 +76,48 @@ interface Props {
   config: NeighborhoodConfig;
 }
 
+export function getFilmPageUrl(name: string): string | null {
+  if (!name) return null;
+  const lower = name.toLowerCase().trim();
+  // Exclui películas de segurança (Antivandalismo / PS4 / PS8 / PS12), que ainda não possuem página
+  if (lower.includes('antivandalismo') || lower.includes('ps4') || lower.includes('ps8') || lower.includes('ps12')) {
+    return null;
+  }
+  if (lower.includes('nano cer') || lower.includes('nano-cer')) return '/nano-ceramica/';
+  if (lower.includes('carbono')) return '/carbono/';
+  if (lower.includes('dupla camada')) return '/dupla-camada/';
+  if (lower.includes('jatead')) return '/jateado/';
+  if (lower.includes('refletiv')) return '/refletiva/';
+  return null;
+}
+
+export function renderWithFilmLinks(text: string): React.ReactNode {
+  if (!text) return text;
+
+  // Regex para capturar menções às películas com página própria
+  const pattern = /(Nano Cer[aâ]mica|Carbono Premium|Carbono G20|Carbono G5|Carbono|Dupla Camada|Pel[ií]cula Jateada|Jateado|Pel[ií]cula Refletiva|Refletiva)/gi;
+
+  const parts = text.split(pattern);
+  if (parts.length === 1) return text;
+
+  return parts.map((part, index) => {
+    const url = getFilmPageUrl(part);
+    if (url) {
+      return (
+        <Link
+          key={index}
+          href={url}
+          className="text-[#c9a227] hover:underline underline-offset-2 font-medium transition-colors"
+          title={`Ver detalhes sobre ${part}`}
+        >
+          {part}
+        </Link>
+      );
+    }
+    return part;
+  });
+}
+
 export function PremiumNeighborhoodView({ config }: Props) {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
@@ -141,7 +184,7 @@ export function PremiumNeighborhoodView({ config }: Props) {
             </div>
 
             <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mb-10 leading-relaxed font-light animate-hero">
-              {config.description}
+              {renderWithFilmLinks(config.description)}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-hero">
@@ -211,7 +254,7 @@ export function PremiumNeighborhoodView({ config }: Props) {
                       {item.title}
                     </h3>
                     <p className="text-sm text-gray-400 mb-4 leading-relaxed">
-                      {item.problem}
+                      {renderWithFilmLinks(item.problem)}
                     </p>
                   </div>
                   <div className="pt-4 border-t border-white/5">
@@ -219,7 +262,7 @@ export function PremiumNeighborhoodView({ config }: Props) {
                       Solução LUME:
                     </span>
                     <p className="text-xs text-gray-300 leading-relaxed font-light">
-                      {item.solution}
+                      {renderWithFilmLinks(item.solution)}
                     </p>
                   </div>
                 </div>
@@ -266,7 +309,17 @@ export function PremiumNeighborhoodView({ config }: Props) {
                       {film.category}
                     </div>
                     <h3 className="text-xl font-bold text-white font-montserrat mb-2">
-                      {film.name}
+                      {getFilmPageUrl(film.name) ? (
+                        <Link
+                          href={getFilmPageUrl(film.name)!}
+                          className="hover:text-[#c9a227] transition-colors underline-offset-4 hover:underline"
+                          title={`Ver detalhes da película ${film.name}`}
+                        >
+                          {film.name}
+                        </Link>
+                      ) : (
+                        film.name
+                      )}
                     </h3>
                     <div className="inline-block px-2.5 py-0.5 rounded-full bg-white/5 text-gray-300 text-xs mb-4 font-mono">
                       {film.tag}
@@ -301,15 +354,27 @@ export function PremiumNeighborhoodView({ config }: Props) {
                         <strong className="text-white">Garantia:</strong> {film.durability}
                       </p>
                       <p className="text-gray-400 line-clamp-2">
-                        <strong className="text-white">Ideal para:</strong> {film.idealFor}
+                        <strong className="text-white">Ideal para:</strong> {renderWithFilmLinks(film.idealFor)}
                       </p>
                     </div>
                   </div>
 
                   <div className="pt-4 border-t border-white/5">
-                    <span className="text-xs text-[#c9a227] font-semibold block mb-3">
-                      {film.priceNote}
-                    </span>
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs text-[#c9a227] font-semibold">
+                        {film.priceNote}
+                      </span>
+                      {getFilmPageUrl(film.name) && (
+                        <Link
+                          href={getFilmPageUrl(film.name)!}
+                          className="text-[11px] text-gray-400 hover:text-[#c9a227] hover:underline inline-flex items-center gap-1 font-medium transition-colors"
+                          title={`Ver especificações completas de ${film.name}`}
+                        >
+                          <span>Ver página</span>
+                          <ArrowRight size={11} />
+                        </Link>
+                      )}
+                    </div>
                     <a
                       href={`${config.whatsappUrl}%20Gostaria%20de%20saber%20mais%20sobre%20a%20pel%C3%ADcula%20${encodeURIComponent(film.name)}.`}
                       target="_blank"
@@ -454,7 +519,7 @@ export function PremiumNeighborhoodView({ config }: Props) {
                   </button>
                   {isOpen && (
                     <div className="px-6 pb-5 pt-1 text-sm sm:text-base text-gray-300 leading-relaxed font-light border-t border-white/5">
-                      {faq.a}
+                      {renderWithFilmLinks(faq.a)}
                     </div>
                   )}
                 </div>
