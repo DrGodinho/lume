@@ -60,7 +60,7 @@ const tetoVidroFaqs = [
   },
   {
     q: 'Quanto custa para instalar película em um teto de vidro ou clarabóia no RJ?',
-    a: 'O valor instalado inicia a partir de R$ 110/m² na linha Refletiva, R$ 150/m² na linha Dupla Camada e R$ 220/m² na linha Nano Cerâmica. O custo pode variar de acordo com a altura do pé-direito e necessidade de andaimes móveis, com medição e orçamento detalhado sem custo.',
+    a: 'O valor instalado inicia a partir de R$ 90/m² na linha Refletiva, R$ 110/m² na linha Dupla Camada e R$ 200/m² na linha Nano Cerâmica. O custo pode variar de acordo com a altura do pé-direito e necessidade de andaimes móveis, com medição e orçamento detalhado sem custo.',
   },
   {
     q: 'A película protege pisos de madeira e móveis localizados sob o pergolado?',
@@ -126,7 +126,7 @@ const jsonLd = {
       offers: {
         '@type': 'Offer',
         priceCurrency: 'BRL',
-        price: '220.00',
+        price: '90.00',
         priceValidUntil: '2026-12-31',
         availability: 'https://schema.org/InStock',
       },

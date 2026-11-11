@@ -250,7 +250,7 @@ export function VarandaGourmetPage({ faqs }: VarandaGourmetPageProps) {
                   Mais Recomendada
                 </div>
                 <div>
-                  <h3 className="text-2xl font-black font-montserrat text-white mb-2">Nano Cerâmica 75%</h3>
+                  <h3 className="text-2xl font-black font-montserrat text-white mb-2">Nano Cerâmica</h3>
                   <p className="text-[#c9a227] text-sm font-semibold mb-4">Máxima Rejeição de Calor & Transparência Total</p>
                   <p className="text-gray-300 text-sm leading-relaxed mb-6">
                     A escolha número 1 para varandas com vista panorâmica. Bloqueia a energia do sol poente sem escurecer o ambiente e sem mudar a estética da fachada exigida pelo condomínio.
@@ -272,7 +272,7 @@ export function VarandaGourmetPage({ faqs }: VarandaGourmetPageProps) {
                 </div>
                 <div>
                   <div className="text-xl font-bold text-white mb-4">
-                    A partir de <span className="text-[#c9a227]">R$ 220/m²</span> instalado
+                    A partir de <span className="text-[#c9a227]">R$ 200/m²</span> instalado
                   </div>
                   <a
                     href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Tenho%20interesse%20na%20Nano%20Cer%C3%A2mica%20para%20minha%20varanda%20gourmet."
@@ -312,7 +312,7 @@ export function VarandaGourmetPage({ faqs }: VarandaGourmetPageProps) {
                 </div>
                 <div>
                   <div className="text-xl font-bold text-white mb-4">
-                    A partir de <span className="text-[#c9a227]">R$ 110/m²</span> instalado
+                    A partir de <span className="text-[#c9a227]">R$ 90/m²</span> instalado
                   </div>
                   <a
                     href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Tenho%20interesse%20na%20pel%C3%ADcula%20Refletiva%20para%20minha%20varanda%20gourmet."
@@ -330,7 +330,7 @@ export function VarandaGourmetPage({ faqs }: VarandaGourmetPageProps) {
             <ScrollReveal animation="slide-up">
               <div className="glass-card rounded-2xl border border-white/5 bg-[#04080f]/90 p-8 flex flex-col justify-between hover:border-[#c9a227]/30 transition-all">
                 <div>
-                  <h3 className="text-2xl font-black font-montserrat text-white mb-2">Carbono Fumê G20/G35</h3>
+                  <h3 className="text-2xl font-black font-montserrat text-white mb-2">Carbono Premium</h3>
                   <p className="text-[#c9a227] text-sm font-semibold mb-4">Redução de Claridade & Tonalidade Grafite</p>
                   <p className="text-gray-300 text-sm leading-relaxed mb-6">
                     Para varandas com excesso de brilho solar que ofusca a TV ou a área da churrasqueira. Tonalidade grafite elegante que nunca desbota e reduz a fadiga ocular.
@@ -338,7 +338,7 @@ export function VarandaGourmetPage({ faqs }: VarandaGourmetPageProps) {
                   <div className="space-y-3 mb-6 bg-white/[0.03] p-4 rounded-xl border border-white/5">
                     <div>
                       <span className="text-xs text-gray-400 block mb-1">Corte Térmico:</span>
-                      <LevelDots level={4} />
+                      <LevelDots level={3} />
                     </div>
                     <div>
                       <span className="text-xs text-gray-400 block mb-1">Redução de Ofuscamento:</span>
@@ -352,15 +352,15 @@ export function VarandaGourmetPage({ faqs }: VarandaGourmetPageProps) {
                 </div>
                 <div>
                   <div className="text-xl font-bold text-white mb-4">
-                    A partir de <span className="text-[#c9a227]">R$ 90/m²</span> instalado
+                    A partir de <span className="text-[#c9a227]">R$ 80/m²</span> instalado
                   </div>
                   <a
-                    href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Tenho%20interesse%20no%20Carbono%20Fum%C3%AA%20para%20minha%20varanda."
+                    href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Tenho%20interesse%20no%20Carbono%20Premium%20para%20minha%20varanda."
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn-outline w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm border border-white/20 hover:border-[#c9a227]"
                   >
-                    <MessageCircle size={16} /> Cotar Carbono Fumê
+                    <MessageCircle size={16} /> Cotar Carbono Premium
                   </a>
                 </div>
               </div>

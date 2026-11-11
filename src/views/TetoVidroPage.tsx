@@ -273,7 +273,7 @@ export function TetoVidroPage({ faqs }: TetoVidroPageProps) {
                 </div>
                 <div>
                   <div className="text-xl font-bold text-white mb-4">
-                    A partir de <span className="text-[#c9a227]">R$ 220/m²</span> instalado
+                    A partir de <span className="text-[#c9a227]">R$ 200/m²</span> instalado
                   </div>
                   <a
                     href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20da%20Nano%20Cer%C3%A2mica%20para%20teto%20de%20vidro."
@@ -313,7 +313,7 @@ export function TetoVidroPage({ faqs }: TetoVidroPageProps) {
                 </div>
                 <div>
                   <div className="text-xl font-bold text-white mb-4">
-                    A partir de <span className="text-[#c9a227]">R$ 110/m²</span> instalado
+                    A partir de <span className="text-[#c9a227]">R$ 90/m²</span> instalado
                   </div>
                   <a
                     href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20da%20pel%C3%ADcula%20Refletiva%20para%20teto%20de%20vidro."
@@ -353,7 +353,7 @@ export function TetoVidroPage({ faqs }: TetoVidroPageProps) {
                 </div>
                 <div>
                   <div className="text-xl font-bold text-white mb-4">
-                    A partir de <span className="text-[#c9a227]">R$ 150/m²</span> instalado
+                    A partir de <span className="text-[#c9a227]">R$ 110/m²</span> instalado
                   </div>
                   <a
                     href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20da%20Dupla%20Camada%20para%20teto%20de%20vidro."

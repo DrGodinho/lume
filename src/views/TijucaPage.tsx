@@ -293,7 +293,7 @@ export function TijucaPage({ faqs }: TijucaPageProps) {
                   <div className="space-y-3 mb-6 bg-white/[0.03] p-4 rounded-xl border border-white/5">
                     <div>
                       <span className="text-xs text-gray-400 block mb-1">Redução de Calor:</span>
-                      <LevelDots level={3} />
+                      <LevelDots level={5} />
                     </div>
                     <div>
                       <span className="text-xs text-gray-400 block mb-1">Luminosidade Natural:</span>
@@ -307,7 +307,7 @@ export function TijucaPage({ faqs }: TijucaPageProps) {
                 </div>
                 <div>
                   <div className="text-xl font-bold text-white mb-4">
-                    A partir de <span className="text-[#c9a227]">R$ 220/m²</span> instalado
+                    A partir de <span className="text-[#c9a227]">R$ 200/m²</span> instalado
                   </div>
                   <a
                     href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20de%20Nano%20Cer%C3%A2mica%20para%20a%20Tijuca."
@@ -333,7 +333,7 @@ export function TijucaPage({ faqs }: TijucaPageProps) {
                   <div className="space-y-3 mb-6 bg-white/[0.03] p-4 rounded-xl border border-white/5">
                     <div>
                       <span className="text-xs text-gray-400 block mb-1">Redução de Calor:</span>
-                      <LevelDots level={4} />
+                      <LevelDots level={5} />
                     </div>
                     <div>
                       <span className="text-xs text-gray-400 block mb-1">Visão Noturna Limpa:</span>
@@ -347,7 +347,7 @@ export function TijucaPage({ faqs }: TijucaPageProps) {
                 </div>
                 <div>
                   <div className="text-xl font-bold text-white mb-4">
-                    A partir de <span className="text-[#c9a227]">R$ 150/m²</span> instalado
+                    A partir de <span className="text-[#c9a227]">R$ 110/m²</span> instalado
                   </div>
                   <a
                     href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20de%20Dupla%20Camada%20para%20a%20Tijuca."

@@ -245,7 +245,7 @@ export function LeblonPage({ faqs }: LeblonPageProps) {
                   Mais Instalada no Leblon
                 </div>
                 <div>
-                  <h3 className="text-2xl font-black font-montserrat text-white mb-2">Nano Cerâmica G70</h3>
+                  <h3 className="text-2xl font-black font-montserrat text-white mb-2">Nano Cerâmica</h3>
                   <p className="text-[#c9a227] text-sm font-semibold mb-4">Transparência Pura & Bloqueio Térmico Máximo</p>
                   <p className="text-gray-300 text-sm leading-relaxed mb-6">
                     Desenvolvida com partículas cerâmicas em escala nanométrica. Proporciona o maior corte de calor solar do mercado internacional sem escurecer e sem refletir.
@@ -267,7 +267,7 @@ export function LeblonPage({ faqs }: LeblonPageProps) {
                 </div>
                 <div>
                   <div className="text-xl font-bold text-white mb-4">
-                    A partir de <span className="text-[#c9a227]">R$ 220/m²</span> instalado
+                    A partir de <span className="text-[#c9a227]">R$ 200/m²</span> instalado
                   </div>
                   <a
                     href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20de%20Nano%20Cer%C3%A2mica%20para%20o%20Leblon."
@@ -293,7 +293,7 @@ export function LeblonPage({ faqs }: LeblonPageProps) {
                   <div className="space-y-3 mb-6 bg-white/[0.03] p-4 rounded-xl border border-white/5">
                     <div>
                       <span className="text-xs text-gray-400 block mb-1">Corte Térmico:</span>
-                      <LevelDots level={4} />
+                      <LevelDots level={5} />
                     </div>
                     <div>
                       <span className="text-xs text-gray-400 block mb-1">Visão Noturna:</span>
@@ -307,7 +307,7 @@ export function LeblonPage({ faqs }: LeblonPageProps) {
                 </div>
                 <div>
                   <div className="text-xl font-bold text-white mb-4">
-                    A partir de <span className="text-[#c9a227]">R$ 150/m²</span> instalado
+                    A partir de <span className="text-[#c9a227]">R$ 110/m²</span> instalado
                   </div>
                   <a
                     href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20de%20Dupla%20Camada%20para%20o%20Leblon."
@@ -325,7 +325,7 @@ export function LeblonPage({ faqs }: LeblonPageProps) {
             <ScrollReveal animation="slide-up">
               <div className="glass-card rounded-2xl border border-white/5 bg-[#04080f]/90 p-8 flex flex-col justify-between hover:border-[#c9a227]/30 transition-all">
                 <div>
-                  <h3 className="text-2xl font-black font-montserrat text-white mb-2">Jateado Fosco</h3>
+                  <h3 className="text-2xl font-black font-montserrat text-white mb-2">Jateado</h3>
                   <p className="text-[#c9a227] text-sm font-semibold mb-4">Design Minimalista & Privacidade Absoluta</p>
                   <p className="text-gray-300 text-sm leading-relaxed mb-6">
                     A solução sofisticada para banheiros, suítes máster, divisórias de escritórios e áreas técnicas residenciais. Textura suave e iluminação natural contínua.
@@ -347,7 +347,7 @@ export function LeblonPage({ faqs }: LeblonPageProps) {
                 </div>
                 <div>
                   <div className="text-xl font-bold text-white mb-4">
-                    A partir de <span className="text-[#c9a227]">R$ 120/m²</span> instalado
+                    A partir de <span className="text-[#c9a227]">R$ 80/m²</span> instalado
                   </div>
                   <a
                     href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20de%20Jateado%20para%20o%20Leblon."

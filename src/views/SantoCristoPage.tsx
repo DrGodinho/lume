@@ -598,7 +598,7 @@ export function SantoCristoPage({ faqs }: SantoCristoPageProps) {
               <div className="absolute top-4 right-4 bg-white/10 text-gray-300 text-[10px] font-bold uppercase px-2.5 py-1 rounded-full tracking-wider">
                 Privacidade 24h
               </div>
-              <h3 className="text-2xl font-bold font-montserrat text-white mb-2">Jateado Fosco</h3>
+              <h3 className="text-2xl font-bold font-montserrat text-white mb-2">Jateado</h3>
               <p className="text-xs text-gray-400 mb-6">Bloqueio visual total permanente (dia e noite, luz acesa) com luz suave difusa.</p>
 
               <div className="space-y-4 mb-8 text-sm">

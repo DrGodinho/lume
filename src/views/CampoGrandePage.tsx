@@ -155,18 +155,18 @@ export function CampoGrandePage({ faqs }: { faqs: { q: string; a: string }[] }) 
                         {[
                             {
                                 title: "Nano Cerâmica", selo: "Top de Linha", icon: Star, image: "/product-nano-ceramica.webp", path: "/nano-ceramica",
-                                desc: "Privacidade e frescor total. Rejeita o calor invisível (IR) sem alterar a fachada original. A escolha nº 1 para varandas em Campo Grande."
+                                desc: "Conforto térmico máximo com transparência. Rejeita até 95% do calor infravermelho sem alterar a fachada original. A escolha nº 1 para varandas em Campo Grande."
                             },
                             {
                                 title: "Carbono Premium", selo: "Privacidade", icon: SunDim, image: "/product-carbono.webp", path: "/carbono",
-                                desc: "O preto intenso que nunca fica roxo. Oferece elegância e bloqueio térmico de 80% para janelas residenciais."
+                                desc: "O preto intenso que nunca fica roxo. Oferece elegância e bloqueio térmico de até 70% para janelas residenciais."
                             },
                             {
-                                title: "Refletiva / Silver", selo: "Alta Rejeição", icon: Sun, image: "/product-refletiva.webp", path: "/refletiva",
+                                title: "Refletiva", selo: "Alta Rejeição", icon: Sun, image: "/product-refletiva.webp", path: "/refletiva",
                                 desc: "Efeito espelhado clássico. Máxima rejeição de calor para ambientes que recebem sol direto o dia todo."
                             },
                             {
-                                title: "Jateado Design", selo: "Decoração", icon: Eye, image: "/product-jateado-v2.webp", path: "/jateado",
+                                title: "Jateado", selo: "Decoração", icon: Eye, image: "/product-jateado-v2.webp", path: "/jateado",
                                 desc: "Estética fosca para privacidade em banheiros e divisórias de escritórios. Mantém a luminosidade natural difusa."
                             },
                             {

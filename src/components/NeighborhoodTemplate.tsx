@@ -247,10 +247,10 @@ export function NeighborhoodTemplate({ data }: Props) {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              { title: "Nano Cerâmica", selo: "Top de Linha", icon: Star, path: "/nano-ceramica", desc: "Privacidade e frescor total. Rejeita o calor invisível (IR) sem alterar a fachada original." },
-              { title: "Carbono Premium", selo: "Privacidade", icon: SunDim, path: "/carbono", desc: "O preto intenso que nunca fica roxo. Oferece elegância e bloqueio térmico de 80%." },
-              { title: "Refletiva / Silver", selo: "Alta Rejeição", icon: Sun, path: "/refletiva", desc: "Efeito espelhado clássico. Máxima rejeição de calor para sol direto o dia todo." },
-              { title: "Jateado Design", selo: "Decoração", icon: Eye, path: "/jateado", desc: "Estética fosca para privacidade em banheiros e divisórias de escritórios." },
+              { title: "Nano Cerâmica", selo: "Top de Linha", icon: Star, path: "/nano-ceramica", desc: "Conforto térmico máximo com transparência. Rejeita até 95% do calor infravermelho sem alterar a fachada original." },
+              { title: "Carbono Premium", selo: "Privacidade", icon: SunDim, path: "/carbono", desc: "O preto intenso que nunca fica roxo. Oferece elegância e bloqueio térmico de até 70%." },
+              { title: "Refletiva", selo: "Alta Rejeição", icon: Sun, path: "/refletiva", desc: "Efeito espelhado clássico. Máxima rejeição de calor para sol direto o dia todo." },
+              { title: "Jateado", selo: "Decoração", icon: Eye, path: "/jateado", desc: "Estética fosca para privacidade em banheiros e divisórias de escritórios." },
               { title: "Dupla Camada", selo: "Favorito", icon: Droplets, path: "/dupla-camada", desc: "Alta redução de calor com tecnologia especial: refletiva fora, fumê dentro." }
             ].map((product, idx) => (
               <div key={idx} className="product-card group relative bg-[#04080f]/60 rounded-2xl p-8 border border-white/5 hover:border-[#c9a227]/50 transition-all duration-500 flex flex-col h-full">

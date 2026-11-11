@@ -23,13 +23,13 @@ export function SulacapPage({ faqs }: { faqs: { q: string; a: string }[] }) {
 
                 {/* Particles & Effects */}
                 <Particles />
-                
+
                 <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#04080f] to-transparent z-10" />
                 <div className="absolute top-1/4 right-10 w-32 h-32 rounded-full bg-[#c9a227]/5 blur-3xl animate-float z-10 pointer-events-none" />
                 <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-[#c9a227]/10 blur-3xl animate-float z-10 pointer-events-none" style={{ animationDelay: "2s" }} />
 
                 <div className="container-lume relative z-20 text-center md:text-left pt-24 pb-12">
-                    <NavigationBreadcrumbs 
+                    <NavigationBreadcrumbs
                         showVisualTrail={false}
                         items={[
                             { label: 'Início', href: '/' },
@@ -157,14 +157,14 @@ export function SulacapPage({ faqs }: { faqs: { q: string; a: string }[] }) {
                             },
                             {
                                 title: "Carbono Premium", selo: "Best-Seller", icon: SunDim, image: "/product-carbono.webp", path: "/carbono",
-                                desc: "O tom fumê sofisticado que não fica roxo com o tempo. Oferece alta privacidade durante o dia, bloqueio superior de calor (até 80%) e um acabamento incrivelmente elegante, muito requisitado em casas de condomínio."
+                                desc: "O tom fumê sofisticado que não fica roxo com o tempo. Oferece alta privacidade durante o dia, bloqueio superior de calor (até 70%) e um acabamento incrivelmente elegante, muito requisitado em casas de condomínio."
                             },
                             {
-                                title: "Espelhado / Refletivo", selo: "Privacidade", icon: Sun, image: "/product-refletiva.webp", path: "/refletiva",
+                                title: "Refletiva", selo: "Privacidade", icon: Sun, image: "/product-refletiva.webp", path: "/refletiva",
                                 desc: "A armadura térmica contra o sol forte. Reflete a luz externa, bloqueando o calor extremo e garantindo que ninguém consiga ver o interior do ambiente durante o dia. Perfeito para fachadas comerciais e residenciais muito expostas."
                             },
                             {
-                                title: "Jateado / Fosco", selo: "Decoração", icon: Eye, image: "/product-jateado-v2.webp", path: "/jateado",
+                                title: "Jateado", selo: "Decoração", icon: Eye, image: "/product-jateado-v2.webp", path: "/jateado",
                                 desc: "A alternativa moderna e econômica ao vidro jateado. Bloqueia a visão nos dois sentidos sem impedir a passagem da luz. Fundamental para banheiros, área de serviço, portas e divisórias internas de escritórios."
                             },
                             {
@@ -192,7 +192,7 @@ export function SulacapPage({ faqs }: { faqs: { q: string; a: string }[] }) {
                                         <p className="text-sm text-gray-400 mb-6 leading-relaxed font-light flex-grow">
                                             {product.desc}
                                         </p>
-                                        
+
                                         {/* Specs */}
                                         <div className="grid grid-cols-2 gap-2 mt-auto pt-4 border-t border-white/5">
                                             <div className="text-[10px] sm:text-xs">
@@ -265,12 +265,12 @@ export function SulacapPage({ faqs }: { faqs: { q: string; a: string }[] }) {
                                 <div className="w-16 h-16 rounded-2xl bg-[#c9a227]/10 flex items-center justify-center mx-auto lg:mx-0 mb-8 group-hover:bg-[#c9a227]/20 transition-colors shadow-inner">
                                     <benefit.icon className="w-8 h-8 text-[#c9a227] group-hover:scale-110 transition-transform" />
                                 </div>
-                                
+
                                 <div className="mb-6">
                                     <span className="text-5xl font-black text-gradient-gold font-montserrat leading-none">
-                                        <AnimatedCounter 
-                                            target={benefit.stat.replace(/[^0-9-]/g, '')} 
-                                            suffix={benefit.stat.replace(/[0-9-]/g, '')} 
+                                        <AnimatedCounter
+                                            target={benefit.stat.replace(/[^0-9-]/g, '')}
+                                            suffix={benefit.stat.replace(/[0-9-]/g, '')}
                                         />
                                     </span>
                                     <p className="text-[11px] uppercase text-gray-500 font-black tracking-widest mt-2">{benefit.label}</p>
@@ -301,7 +301,7 @@ export function SulacapPage({ faqs }: { faqs: { q: string; a: string }[] }) {
                             <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
                         </div>
                         <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-10 text-center text-[#c9a227] tracking-tight underline decoration-[#c9a227]/20 underline-offset-8">Sua Referência em Sulacap</h2>
-                        
+
                         <div className="space-y-6 text-gray-400 leading-relaxed text-lg font-light text-center lg:text-justify mb-16 px-4 md:px-0">
                             <p>
                                 O Jardim Sulacap é um bairro que preza pela tranquilidade e por áreas residenciais bem estruturadas. Para manter a qualidade de vida, moradores de casas de vila, condomínios e apartamentos buscam soluções que aliam discrição e alto desempenho.
@@ -310,7 +310,7 @@ export function SulacapPage({ faqs }: { faqs: { q: string; a: string }[] }) {
                                 A <strong className="text-white">LUME Controle Solar</strong> entende exatamente essa demanda. Nossa equipe leva até você na região do Parque Sulacap, Catonho e adjacências um atendimento padrão ouro: vamos até o imóvel com catálogos e medidores de calor, ajudando você a escolher a película perfeita no conforto da sua casa, sem adivinhações.
                             </p>
                         </div>
-                        
+
                         <div className="grid lg:grid-cols-2 gap-12 items-stretch mt-12 text-left">
                             <div className="glass-card p-10 rounded-3xl border border-white/10 flex flex-col h-full bg-white/[0.01]">
                                 <h3 className="text-2xl font-bold font-montserrat mb-8 text-white flex items-center gap-3">
@@ -415,11 +415,11 @@ export function SulacapPage({ faqs }: { faqs: { q: string; a: string }[] }) {
                 <div className="container-lume relative z-10 px-4">
                     <div className="max-w-5xl mx-auto glass-card border border-white/10 rounded-[2.5rem] p-8 md:p-16 text-center animate-fade-in relative overflow-hidden">
                         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#c9a227] to-transparent opacity-30" />
-                        
+
                         <h2 className="text-4xl md:text-6xl lg:text-7xl font-black mb-8 font-montserrat tracking-tighter leading-tight">
                             Transforme sua Casa em um <span className="text-gradient-gold">Refúgio Térmico</span>
                         </h2>
-                        
+
                         <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mb-12 font-light leading-relaxed">
                             A <strong className="text-white">LUME</strong> está pronta para atender o Jardim Sulacap com o que há de melhor em tecnologia de controle solar. Não adie seu conforto.
                         </p>
@@ -434,7 +434,7 @@ export function SulacapPage({ faqs }: { faqs: { q: string; a: string }[] }) {
                                 <MessageCircle size={22} className="group-hover:rotate-12 transition-transform" />
                                 Orçamento via WhatsApp
                             </a>
-                            
+
                             <a
                                 href="/"
                                 className="w-full sm:w-auto bg-white/5 hover:bg-white/10 text-white border border-white/10 px-10 py-6 rounded-2xl font-bold uppercase tracking-widest transition-all text-sm backdrop-blur-sm"
@@ -453,7 +453,7 @@ export function SulacapPage({ faqs }: { faqs: { q: string; a: string }[] }) {
             </section>
 
             <footer className="py-12 bg-[#04080f] border-t border-white/5 text-center text-[10px] text-gray-500 font-bold uppercase tracking-[0.4em] px-4">
-                 © {new Date().getFullYear()} Lume Controle Solar · Conforto e Privacidade em Sulacap e RJ
+                © {new Date().getFullYear()} Lume Controle Solar · Conforto e Privacidade em Sulacap e RJ
             </footer>
         </div>
     );

@@ -166,14 +166,14 @@ export function BarraPage({ faqs }: { faqs: { q: string; a: string }[] }) {
                             },
                             {
                                 title: "Carbono Premium", selo: "Best-Seller", icon: SunDim, image: "/product-carbono.webp", path: "/carbono",
-                                desc: "Visual grafite sofisticado with durabilidade certificada. Não desbota nem cria bolhas, garantindo um visual sempre impecável para suas janelas."
+                                desc: "Visual grafite sofisticado com durabilidade certificada. Não desbota nem cria bolhas, garantindo um visual sempre impecável para suas janelas."
                             },
                             {
-                                title: "Espelhado / Refletivo", selo: "Privacidade", icon: Sun, image: "/product-refletiva.webp", path: "/refletiva",
+                                title: "Refletiva", selo: "Privacidade", icon: Sun, image: "/product-refletiva.webp", path: "/refletiva",
                                 desc: "Máxima privacidade diurna para casas e escritórios na Barra. Reflete o calor de forma bruta, tornando o ambiente interno muito mais produtivo e fresco."
                             },
                             {
-                                title: "Jateado / Fosco", selo: "Decoração", icon: Eye, image: "/product-jateado-v2.webp", path: "/jateado",
+                                title: "Jateado", selo: "Decoração", icon: Eye, image: "/product-jateado-v2.webp", path: "/jateado",
                                 desc: "Elegância decorativa para banheiros e divisórias de vidro. Transforma o visual do ambiente mantendo a luminosidade natural passar de forma suave."
                             },
                             {

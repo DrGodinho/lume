@@ -161,11 +161,11 @@ export function RealengoPage({ faqs }: { faqs: { q: string; a: string }[] }) {
                                 desc: "O tom grafite perfeito que não desbota. Oferece privacidade absoluta e excelente redução de calor para as janelas da sua residência ou escritório."
                             },
                             {
-                                title: "Espelhado / Refletivo", selo: "Proteção Solar", icon: Sun, image: "/product-refletiva.webp", path: "/refletiva",
+                                title: "Refletiva", selo: "Proteção Solar", icon: Sun, image: "/product-refletiva.webp", path: "/refletiva",
                                 desc: "A tecnologia clássica de rejeição solar agressiva. O efeito espelhado atua como um escudo, devolvendo o calor para fora antes que ele aqueça sua sala."
                             },
                             {
-                                title: "Jateado / Fosco", selo: "Estética", icon: Eye, image: "/product-jateado-v2.webp", path: "/jateado",
+                                title: "Jateado", selo: "Estética", icon: Eye, image: "/product-jateado-v2.webp", path: "/jateado",
                                 desc: "Privacidade bidirecional com acabamento fosco elegante. Perfeito para banheiros, divisórias e portas de entrada em Realengo."
                             },
                             {

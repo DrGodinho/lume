@@ -345,14 +345,14 @@ export function CentroRioPage({ faqs }: CentroRioPageProps) {
               <div className="inline-flex self-start px-3 py-1 rounded-full bg-[#c9a227]/20 text-[#c9a227] text-[11px] font-bold uppercase tracking-wider mb-4 mt-2">
                 Conjunto Comercial
               </div>
-              <h3 className="text-2xl font-bold font-montserrat text-white mb-1">Nano Cerâmica Térmica</h3>
+              <h3 className="text-2xl font-bold font-montserrat text-white mb-1">Nano Cerâmica</h3>
               <p className="text-xs text-gray-300 mb-6">Bloqueio brutal de calor com transparência elegante para não perder a vista do Rio.</p>
 
               <div className="mb-6 p-4 rounded-xl bg-[#c9a227]/10 border border-[#c9a227]/20">
                 <span className="text-[11px] text-[#c9a227] font-semibold block uppercase tracking-wider mb-1">A partir de</span>
                 <div className="flex items-baseline gap-1">
                   <span className="text-xs text-[#c9a227]">R$</span>
-                  <span className="text-3xl sm:text-4xl font-black font-montserrat text-white text-gradient-gold">180,00</span>
+                  <span className="text-3xl sm:text-4xl font-black font-montserrat text-white text-gradient-gold">200,00</span>
                   <span className="text-xs text-[#c9a227]">/m²</span>
                 </div>
                 <span className="text-[11px] text-gray-300 block mt-1">Alta rejeição de infravermelho instalada</span>
@@ -394,14 +394,14 @@ export function CentroRioPage({ faqs }: CentroRioPageProps) {
               <div className="inline-flex self-start px-3 py-1 rounded-full bg-blue-500/10 text-blue-300 text-[11px] font-bold uppercase tracking-wider mb-4">
                 Privacidade 24h
               </div>
-              <h3 className="text-2xl font-bold font-montserrat text-white mb-1">Jateado Fosco</h3>
+              <h3 className="text-2xl font-bold font-montserrat text-white mb-1">Jateado</h3>
               <p className="text-xs text-gray-400 mb-6">Para divisórias de vidro, salas de reunião, consultórios e lavabos.</p>
 
               <div className="mb-6 p-4 rounded-xl bg-white/[0.03] border border-white/5">
                 <span className="text-[11px] text-gray-400 block uppercase tracking-wider mb-1">A partir de</span>
                 <div className="flex items-baseline gap-1">
                   <span className="text-xs text-gray-400">R$</span>
-                  <span className="text-3xl sm:text-4xl font-black font-montserrat text-white">100,00</span>
+                  <span className="text-3xl sm:text-4xl font-black font-montserrat text-white">80,00</span>
                   <span className="text-xs text-gray-400">/m²</span>
                 </div>
                 <span className="text-[11px] text-gray-400 block mt-1">Acabamento fosco arquitetônico permanente</span>
@@ -488,10 +488,10 @@ export function CentroRioPage({ faqs }: CentroRioPageProps) {
                 </div>
                 <div>
                   <div className="flex justify-between text-xs text-gray-400 mb-1">
-                    <span>Privacidade Diurna</span>
-                    <span className="text-gray-400 font-bold">Suave</span>
+                    <span>Proteção UV</span>
+                    <span className="text-[#c9a227] font-bold">99,9%</span>
                   </div>
-                  <LevelDots level={3} />
+                  <LevelDots level={5} />
                 </div>
               </div>
 
@@ -554,7 +554,7 @@ export function CentroRioPage({ faqs }: CentroRioPageProps) {
               <div className="absolute top-4 right-4 bg-white/10 text-gray-300 text-[10px] font-bold uppercase px-2.5 py-1 rounded-full tracking-wider">
                 Privacidade 24h
               </div>
-              <h3 className="text-2xl font-bold font-montserrat text-white mb-2">Jateado Fosco</h3>
+              <h3 className="text-2xl font-bold font-montserrat text-white mb-2">Jateado</h3>
               <p className="text-xs text-gray-400 mb-6">Bloqueio visual total permanente (dia e noite) com passagem de luz difusa e suave.</p>
 
               <div className="space-y-4 mb-8 text-sm">

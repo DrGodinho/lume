@@ -95,7 +95,7 @@ const botafogoConfig: NeighborhoodConfig = {
       highlight: true,
       heatRejection: 5,
       uvBlock: 5,
-      privacy: 2,
+      privacy: 1,
       durability: '10 Anos',
       idealFor: 'Varandas gourmet integradas, livings e janelões com vista livre para o Pão de Açúcar.',
       priceNote: 'A partir de R$ 200/m² instalado',
@@ -123,7 +123,7 @@ const botafogoConfig: NeighborhoodConfig = {
       priceNote: 'A partir de R$ 80/m² instalado',
     },
     {
-      name: 'Película Refletiva Platinum',
+      name: 'Refletiva',
       category: 'Rejeição Solar Comercial',
       tag: 'Alta Eficiência',
       heatRejection: 5,

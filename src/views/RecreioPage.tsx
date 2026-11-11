@@ -160,18 +160,18 @@ export function RecreioPage({ faqs }: { faqs: { q: string; a: string }[] }) {
                         {[
                             {
                                 title: "Nano Cerâmica", selo: "Top de Linha", icon: Star, image: "/product-nano-ceramica.webp", path: "/nano-ceramica",
-                                desc: "Máxima rejeição de calor with transparência tecnológica. Ideal para apartamentos no Recreio que querem proteção total sem perder a claridade natural do sol."
+                                desc: "Máxima rejeição de calor com transparência tecnológica. Ideal para apartamentos no Recreio que querem proteção total sem perder a claridade natural do sol."
                             },
                             {
                                 title: "Carbono Premium", selo: "Best-Seller", icon: SunDim, image: "/product-carbono.webp", path: "/carbono",
                                 desc: "O visual grafite elegante que nunca sai de moda. Rejeição térmica de alto nível com garantia de estabilidade de cor por muitos anos."
                             },
                             {
-                                title: "Espelhado / Refletivo", selo: "Privacidade", icon: Sun, image: "/product-refletiva.webp", path: "/refletiva",
+                                title: "Refletiva", selo: "Privacidade", icon: Sun, image: "/product-refletiva.webp", path: "/refletiva",
                                 desc: "Privacidade absoluta durante o dia. Reflete a luz solar externa drasticamente, reduzindo a temperatura em quartos e salas de forma imediata."
                             },
                             {
-                                title: "Jateado / Fosco", selo: "Decoração", icon: Eye, image: "/product-jateado-v2.webp", path: "/jateado",
+                                title: "Jateado", selo: "Decoração", icon: Eye, image: "/product-jateado-v2.webp", path: "/jateado",
                                 desc: "Transforme vidros transparentes em foscos com elegância. Perfeito para banheiros, cozinhas e divisórias internas com acabamento profissional."
                             },
                             {

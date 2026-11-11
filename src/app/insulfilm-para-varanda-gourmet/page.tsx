@@ -52,7 +52,7 @@ const varandaGourmetFaqs = [
   },
   {
     q: 'Quanto custa instalar insulfilm em uma varanda gourmet envidraçada no Rio de Janeiro?',
-    a: 'O investimento médio varia conforme a metragem e a tecnologia escolhida: a linha Carbono Fumê inicia a partir de R$ 90/m²; a linha Refletiva (máxima privacidade diurna e rejeição solar) a partir de R$ 110/m²; e a Nano Cerâmica de alta performance térmica inicia em R$ 220/m². Realizamos visita técnica no local com medição exata e orçamento sem compromisso.',
+    a: 'O investimento médio varia conforme a metragem e a tecnologia escolhida: a linha Carbono Premium inicia a partir de R$ 80/m²; a linha Refletiva (máxima privacidade diurna e rejeição solar) a partir de R$ 90/m²; e a Nano Cerâmica de alta performance térmica inicia em R$ 200/m². Realizamos visita técnica no local com medição exata e orçamento sem compromisso.',
   },
   {
     q: 'A película atrapalha o fechamento ou o deslizamento das lâminas de vidro da sacada?',
@@ -126,7 +126,7 @@ const jsonLd = {
       offers: {
         '@type': 'Offer',
         priceCurrency: 'BRL',
-        price: '220.00',
+        price: '80.00',
         priceValidUntil: '2026-12-31',
         availability: 'https://schema.org/InStock',
       },
