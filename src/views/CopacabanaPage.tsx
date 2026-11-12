@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { 
   CheckCircle, 
   ArrowRight, 
@@ -10,7 +11,10 @@ import {
   MessageCircle, 
   Waves,
   Sun,
-  ChevronDown
+  ChevronDown,
+  ShieldCheck,
+  Zap,
+  Flame
 } from 'lucide-react';
 import { NavigationBreadcrumbs } from '../components/NavigationBreadcrumbs';
 import { HeroEntrance } from '../components/HeroEntrance';
@@ -101,42 +105,42 @@ export function CopacabanaPage({ faqs }: CopacabanaPageProps) {
       </section>
 
       {/* Estatísticas e Diferenciais de Alto Ticket */}
-      <section className="py-12 border-y border-white/5 bg-[#0a111e]/40 relative">
+      <section className="py-4 border-y border-white/5 bg-[#0a111e]/40 relative">
         <div className="container-lume">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             <ScrollReveal animation="slide-up">
-              <div className="stat-card p-4">
-                <div className="text-3xl lg:text-4xl font-black font-montserrat text-[#c9a227] mb-1">
+              <div className="stat-card p-2 sm:p-3">
+                <div className="text-2xl lg:text-3xl font-black font-montserrat text-[#c9a227] mb-0.5">
                   <AnimatedCounter target="95" suffix="%" />
                 </div>
-                <p className="text-xs lg:text-sm text-gray-400 font-medium">Rejeição de Calor Solar</p>
+                <p className="text-xs text-gray-400 font-medium">Rejeição de Calor Solar</p>
               </div>
             </ScrollReveal>
 
             <ScrollReveal animation="slide-up">
-              <div className="stat-card p-4">
-                <div className="text-3xl lg:text-4xl font-black font-montserrat text-white mb-1">
+              <div className="stat-card p-2 sm:p-3">
+                <div className="text-2xl lg:text-3xl font-black font-montserrat text-white mb-0.5">
                   <AnimatedCounter target="99" suffix=".9%" />
                 </div>
-                <p className="text-xs lg:text-sm text-gray-400 font-medium">Bloqueio dos Raios UV</p>
+                <p className="text-xs text-gray-400 font-medium">Bloqueio dos Raios UV</p>
               </div>
             </ScrollReveal>
 
             <ScrollReveal animation="slide-up">
-              <div className="stat-card p-4">
-                <div className="text-3xl lg:text-4xl font-black font-montserrat text-[#c9a227] mb-1">
+              <div className="stat-card p-2 sm:p-3">
+                <div className="text-2xl lg:text-3xl font-black font-montserrat text-[#c9a227] mb-0.5">
                   100%
                 </div>
-                <p className="text-xs lg:text-sm text-gray-400 font-medium">Resistente à Maresia</p>
+                <p className="text-xs text-gray-400 font-medium">Resistente à Maresia</p>
               </div>
             </ScrollReveal>
 
             <ScrollReveal animation="slide-up">
-              <div className="stat-card p-4">
-                <div className="text-3xl lg:text-4xl font-black font-montserrat text-white mb-1">
+              <div className="stat-card p-2 sm:p-3">
+                <div className="text-2xl lg:text-3xl font-black font-montserrat text-white mb-0.5">
                   Até 10 Anos
                 </div>
-                <p className="text-xs lg:text-sm text-gray-400 font-medium">Garantia Contratual</p>
+                <p className="text-xs text-gray-400 font-medium">Garantia Contratual</p>
               </div>
             </ScrollReveal>
           </div>
@@ -169,49 +173,49 @@ export function CopacabanaPage({ faqs }: CopacabanaPageProps) {
               <div className="glass-card p-8 rounded-2xl border border-white/5 bg-[#0a111e]/50 h-full flex flex-col justify-between hover:border-[#c9a227]/40 transition-all duration-300">
                 <div>
                   <div className="w-12 h-12 rounded-xl bg-[#c9a227]/10 flex items-center justify-center mb-6 text-[#c9a227]">
+                    <ShieldCheck size={24} />
+                  </div>
+                  <h3 className="text-xl font-bold font-montserrat mb-3 text-white">Proteção UV: Móveis e Pele</h3>
+                  <p className="text-gray-400 text-sm leading-relaxed mb-4">
+                    O sol forte da orla deteriora assoalhos de madeira nobre, sofás e tapetes, além de acelerar o envelhecimento da pele. Bloqueamos <strong className="text-white">99,9% da radiação ultravioleta prejudicial</strong>, criando um escudo protetor invisível para toda a família.
+                  </p>
+                </div>
+                <div className="pt-4 border-t border-white/5 flex items-center gap-2 text-xs text-[#c9a227] font-semibold">
+                  <CheckCircle size={14} /> Filtro UV-A e UV-B total certificado
+                </div>
+              </div>
+            </ScrollReveal>
+
+            <ScrollReveal animation="slide-up">
+              <div className="glass-card p-8 rounded-2xl border border-white/5 bg-[#0a111e]/50 h-full flex flex-col justify-between hover:border-[#c9a227]/40 transition-all duration-300">
+                <div>
+                  <div className="w-12 h-12 rounded-xl bg-[#c9a227]/10 flex items-center justify-center mb-6 text-[#c9a227]">
+                    <Zap size={24} />
+                  </div>
+                  <h3 className="text-xl font-bold font-montserrat mb-3 text-white">Alívio do Ar e Economia de Luz</h3>
+                  <p className="text-gray-400 text-sm leading-relaxed mb-4">
+                    Apartamentos voltados para o mar e ruas transversais sofrem com calor retido nos vidros. Com corte térmico de até 95%, os cômodos resfriam com rapidez sem forçar o ar-condicionado, gerando até <strong className="text-white">35% de economia mensal na tarifa de energia</strong>.
+                  </p>
+                </div>
+                <div className="pt-4 border-t border-white/5 flex items-center gap-2 text-xs text-[#c9a227] font-semibold">
+                  <CheckCircle size={14} /> Menor consumo elétrico e climatização estável
+                </div>
+              </div>
+            </ScrollReveal>
+
+            <ScrollReveal animation="slide-up">
+              <div className="glass-card p-8 rounded-2xl border border-white/5 bg-[#0a111e]/50 h-full flex flex-col justify-between hover:border-[#c9a227]/40 transition-all duration-300">
+                <div>
+                  <div className="w-12 h-12 rounded-xl bg-[#c9a227]/10 flex items-center justify-center mb-6 text-[#c9a227]">
                     <Waves size={24} />
                   </div>
-                  <h3 className="text-xl font-bold font-montserrat mb-3 text-white">Maresia & Durabilidade</h3>
+                  <h3 className="text-xl font-bold font-montserrat mb-3 text-white">Proteja-se do Calor sem Perder a Vista</h3>
                   <p className="text-gray-400 text-sm leading-relaxed mb-4">
-                    Películas metalizadas baratas oxidam e criam manchas esbranquiçadas com o ar marinho. Nossa linha <strong className="text-white">Nano Cerâmica 100% Cerâmica Pura</strong> é isenta de metais, imune à corrosão salina.
+                    Nossa linha Nano Cerâmica é 100% livre de metais — totalmente imune à maresia da praia de Copacabana e livre de reflexos internos. Você bloqueia o calor tórrido mantendo a contemplação límpida do mar tanto de dia quanto à noite.
                   </p>
                 </div>
                 <div className="pt-4 border-t border-white/5 flex items-center gap-2 text-xs text-[#c9a227] font-semibold">
-                  <CheckCircle size={14} /> Não oxida nem descasca
-                </div>
-              </div>
-            </ScrollReveal>
-
-            <ScrollReveal animation="slide-up">
-              <div className="glass-card p-8 rounded-2xl border border-white/5 bg-[#0a111e]/50 h-full flex flex-col justify-between hover:border-[#c9a227]/40 transition-all duration-300">
-                <div>
-                  <div className="w-12 h-12 rounded-xl bg-[#c9a227]/10 flex items-center justify-center mb-6 text-[#c9a227]">
-                    <Sun size={24} />
-                  </div>
-                  <h3 className="text-xl font-bold font-montserrat mb-3 text-white">Proteja Móveis & Obras de Arte</h3>
-                  <p className="text-gray-400 text-sm leading-relaxed mb-4">
-                    O sol forte da orla deteriora assoalhos de madeira nobre, sofás de couro e tapetes. Filtramos <strong className="text-white">99.9% da radiação UV prejudicial</strong>, mantendo seu patrimônio protegido por anos.
-                  </p>
-                </div>
-                <div className="pt-4 border-t border-white/5 flex items-center gap-2 text-xs text-[#c9a227] font-semibold">
-                  <CheckCircle size={14} /> Filtro UV-A e UV-B total
-                </div>
-              </div>
-            </ScrollReveal>
-
-            <ScrollReveal animation="slide-up">
-              <div className="glass-card p-8 rounded-2xl border border-white/5 bg-[#0a111e]/50 h-full flex flex-col justify-between hover:border-[#c9a227]/40 transition-all duration-300">
-                <div>
-                  <div className="w-12 h-12 rounded-xl bg-[#c9a227]/10 flex items-center justify-center mb-6 text-[#c9a227]">
-                    <Eye size={24} />
-                  </div>
-                  <h3 className="text-xl font-bold font-montserrat mb-3 text-white">Privacidade sem Perder a Vista</h3>
-                  <p className="text-gray-400 text-sm leading-relaxed mb-4">
-                    Desfrute da paisagem da praia sem vizinhos olhando para dentro da sua sala. A tecnologia nanoestruturada equilibra luz e privacidade sem criar efeito espelho escuro.
-                  </p>
-                </div>
-                <div className="pt-4 border-t border-white/5 flex items-center gap-2 text-xs text-[#c9a227] font-semibold">
-                  <CheckCircle size={14} /> Vista panorâmica cristalina
+                  <CheckCircle size={14} /> Conforto extremo com transparência e anti-maresia
                 </div>
               </div>
             </ScrollReveal>
@@ -248,7 +252,15 @@ export function CopacabanaPage({ faqs }: CopacabanaPageProps) {
                   Mais Pedida na Orla
                 </div>
                 <div>
-                  <h3 className="text-2xl font-black font-montserrat text-white mb-2">Nano Cerâmica</h3>
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <h3 className="text-2xl font-black font-montserrat text-white">Nano Cerâmica</h3>
+                    <Link 
+                      href="/nano-ceramica/" 
+                      className="text-xs text-[#c9a227] hover:underline inline-flex items-center gap-1 font-semibold whitespace-nowrap mt-1"
+                    >
+                      Ver detalhes <ArrowRight size={14} />
+                    </Link>
+                  </div>
                   <p className="text-[#c9a227] text-sm font-semibold mb-4">Conforto Térmico Extremo & Vista Cristalina</p>
                   <p className="text-gray-300 text-sm leading-relaxed mb-6">
                     A película de luxo por excelência. Bloqueia até 95% do calor do sol mantendo transparência quase total do vidro. Aprovada pela maioria das convenções de condomínio de Copacabana por não alterar a estética da fachada.
@@ -272,14 +284,22 @@ export function CopacabanaPage({ faqs }: CopacabanaPageProps) {
                   <div className="text-xl font-bold text-white mb-4">
                     A partir de <span className="text-[#c9a227]">R$ 200/m²</span> instalado
                   </div>
-                  <a
-                    href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Tenho%20interesse%20na%20Nano%20Cer%C3%A2mica%20para%20meu%20im%C3%B3vel%20em%20Copacabana."
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-primary w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm"
-                  >
-                    <MessageCircle size={16} /> Cotar Nano Cerâmica
-                  </a>
+                  <div className="flex flex-col gap-2">
+                    <a
+                      href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Tenho%20interesse%20na%20Nano%20Cer%C3%A2mica%20para%20meu%20im%C3%B3vel%20em%20Copacabana."
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-primary w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm"
+                    >
+                      <MessageCircle size={16} /> Cotar Nano Cerâmica
+                    </a>
+                    <Link
+                      href="/nano-ceramica/"
+                      className="text-center text-xs text-gray-400 hover:text-[#c9a227] py-1 transition-colors"
+                    >
+                      Conhecer tecnologia Nano Cerâmica →
+                    </Link>
+                  </div>
                 </div>
               </div>
             </ScrollReveal>
@@ -288,7 +308,15 @@ export function CopacabanaPage({ faqs }: CopacabanaPageProps) {
             <ScrollReveal animation="slide-up">
               <div className="glass-card rounded-2xl border border-white/5 bg-[#04080f]/90 p-8 flex flex-col justify-between hover:border-[#c9a227]/30 transition-all">
                 <div>
-                  <h3 className="text-2xl font-black font-montserrat text-white mb-2">Carbono Premium</h3>
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <h3 className="text-2xl font-black font-montserrat text-white">Carbono Premium</h3>
+                    <Link 
+                      href="/carbono/" 
+                      className="text-xs text-[#c9a227] hover:underline inline-flex items-center gap-1 font-semibold whitespace-nowrap mt-1"
+                    >
+                      Ver detalhes <ArrowRight size={14} />
+                    </Link>
+                  </div>
                   <p className="text-[#c9a227] text-sm font-semibold mb-4">Privacidade & Tom Grafite Profundo</p>
                   <p className="text-gray-300 text-sm leading-relaxed mb-6">
                     Ideal para quartos e salas com vista devassada. Bloqueia a visão externa durante o dia e reduz o ofuscamento solar na TV e telas de trabalho, sem nunca desbotar para a cor roxa.
@@ -312,14 +340,22 @@ export function CopacabanaPage({ faqs }: CopacabanaPageProps) {
                   <div className="text-xl font-bold text-white mb-4">
                     A partir de <span className="text-[#c9a227]">R$ 80/m²</span> instalado
                   </div>
-                  <a
-                    href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Tenho%20interesse%20no%20Carbono%20Premium%20para%20meu%20im%C3%B3vel%20em%20Copacabana."
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-outline w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm border border-white/20 hover:border-[#c9a227]"
-                  >
-                    <MessageCircle size={16} /> Cotar Carbono Premium
-                  </a>
+                  <div className="flex flex-col gap-2">
+                    <a
+                      href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Tenho%20interesse%20no%20Carbono%20Premium%20para%20meu%20im%C3%B3vel%20em%20Copacabana."
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-outline w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm border border-white/20 hover:border-[#c9a227]"
+                    >
+                      <MessageCircle size={16} /> Cotar Carbono Premium
+                    </a>
+                    <Link
+                      href="/carbono/"
+                      className="text-center text-xs text-gray-400 hover:text-[#c9a227] py-1 transition-colors"
+                    >
+                      Conhecer benefícios da Carbono Premium →
+                    </Link>
+                  </div>
                 </div>
               </div>
             </ScrollReveal>
@@ -328,10 +364,18 @@ export function CopacabanaPage({ faqs }: CopacabanaPageProps) {
             <ScrollReveal animation="slide-up">
               <div className="glass-card rounded-2xl border border-white/5 bg-[#04080f]/90 p-8 flex flex-col justify-between hover:border-[#c9a227]/30 transition-all">
                 <div>
-                  <h3 className="text-2xl font-black font-montserrat text-white mb-2">Dupla Camada</h3>
-                  <p className="text-[#c9a227] text-sm font-semibold mb-4">Sem Efeito Espelho Interno à Noite</p>
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <h3 className="text-2xl font-black font-montserrat text-white">Dupla Camada</h3>
+                    <Link 
+                      href="/dupla-camada/" 
+                      className="text-xs text-[#c9a227] hover:underline inline-flex items-center gap-1 font-semibold whitespace-nowrap mt-1"
+                    >
+                      Ver detalhes <ArrowRight size={14} />
+                    </Link>
+                  </div>
+                  <p className="text-[#c9a227] text-sm font-semibold mb-4">O Melhor de Dois Mundos & Alto Conforto</p>
                   <p className="text-gray-300 text-sm leading-relaxed mb-6">
-                    Desenvolvida especialmente para resolver a queixa de vidros que viram espelhos quando as luzes internas são acesas à noite. Permite continuar contemplando o mar e a praia iluminada à noite.
+                    O melhor de dois mundos: combina a alta rejeição de calor da película refletiva com o visual fumê interno sofisticado. Elimina o efeito espelho à noite e diminui o reflexo na TV, garantindo conforto visual absoluto para admirar a vista da praia.
                   </p>
                   <div className="space-y-3 mb-6 bg-white/[0.03] p-4 rounded-xl border border-white/5">
                     <div>
@@ -352,14 +396,22 @@ export function CopacabanaPage({ faqs }: CopacabanaPageProps) {
                   <div className="text-xl font-bold text-white mb-4">
                     A partir de <span className="text-[#c9a227]">R$ 110/m²</span> instalado
                   </div>
-                  <a
-                    href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Tenho%20interesse%20na%20Dupla%20Camada%20para%20meu%20im%C3%B3vel%20em%20Copacabana."
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-outline w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm border border-white/20 hover:border-[#c9a227]"
-                  >
-                    <MessageCircle size={16} /> Cotar Dupla Camada
-                  </a>
+                  <div className="flex flex-col gap-2">
+                    <a
+                      href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Tenho%20interesse%20na%20Dupla%20Camada%20para%20meu%20im%C3%B3vel%20em%20Copacabana."
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-outline w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm border border-white/20 hover:border-[#c9a227]"
+                    >
+                      <MessageCircle size={16} /> Cotar Dupla Camada
+                    </a>
+                    <Link
+                      href="/dupla-camada/"
+                      className="text-center text-xs text-gray-400 hover:text-[#c9a227] py-1 transition-colors"
+                    >
+                      Conhecer vantagens Dupla Camada →
+                    </Link>
+                  </div>
                 </div>
               </div>
             </ScrollReveal>

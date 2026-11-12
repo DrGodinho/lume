@@ -65,25 +65,25 @@ const pechinchaConfig: NeighborhoodConfig = {
   localPainsSubtitle: 'Privacidade e Conforto para Grandes Condomínios',
   localPains: [
     {
-      title: 'Proximidade Entre Janelas e Blocos Vizinhos',
+      title: 'Privacidade Total contra Prédios e Janelas Vizinhas',
       problem:
-        'A alta densidade de condomínios no Pechincha faz com que as janelas de quartos e salas fiquem de frente para outros blocos, forçando moradores a viver com cortinas fechadas o dia todo.',
+        'A alta densidade de condomínios no Pechincha faz com que janelas de quartos e salas fiquem viradas de frente para outros blocos, forçando famílias a viver confinadas com cortinas fechadas o dia todo.',
       solution:
-        'Películas Carbono Premium ou Dupla Camada que criam uma barreira de privacidade visual diurna total, permitindo curtir a claridade natural com tranquilidade.',
+        'Películas Carbono Premium e Dupla Camada que impedem a visão externa durante o dia, devolvendo a liberdade de circular à vontade com a luz natural entrando.',
     },
     {
-      title: 'Aquecimento Excessivo de Salas e Quartos',
+      title: 'Fim do Calor Excessivo e Alívio no Ar-Condicionado',
       problem:
-        'As tardes no Pechincha são marcadas por sol direto em fachadas envidraçadas, esquentando os cômodos e tornando o ambiente abafado até altas horas da noite.',
+        'O sol poente incide diretamente nos janelões do Pechincha, transformando os cômodos em estufas e fazendo o ar-condicionado operar na potência máxima com alto custo de luz.',
       solution:
-        'Linhas Nano Cerâmica e Dupla Camada que filtram o calor infravermelho no vidro, mantendo a temperatura amena e os ambientes muito mais agradáveis.',
+        'Nossas películas térmicas filtram o calor infravermelho no próprio vidro, reduzindo a temperatura em até 8°C e garantindo economia mensal na conta de energia.',
     },
     {
-      title: 'Proteção para Persianas, Sofás e Pisos',
+      title: 'Proteção UV: Blindagem para Persianas, Estofados e Pele',
       problem:
-        'A incidência contínua de raios ultravioleta descolora cortinas, queima sofás e resseca pisos laminados rapidamente.',
+        'A radiação solar diária queima cortinas, resseca sofás de tecido ou couro e desbota pisos laminados em questão de meses.',
       solution:
-        'Bloqueio UV de 99% que atua como um escudo invisível permanente, aumentando a durabilidade de toda a mobília.',
+        'Filtro solar UV de 99,9% que atua como um escudo protetor para a sua saúde e preserva o estado de novo de toda a decoração do imóvel.',
     },
   ],
   recommendedFilms: [

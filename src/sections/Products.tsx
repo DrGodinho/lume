@@ -18,10 +18,10 @@ const products = [
     image: '/product-nano-ceramica.webp',
     specs: [
       { label: 'Bloqueio UV', value: '99,9%' },
-      { label: 'Rejeição de Calor', value: 'Até 95%' },
-      { label: 'Transmissão de Luz', value: '86%' },
+      { label: 'Rejeição de Calor', value: 'Até 98%' },
+      { label: 'Transmissão de Luz', value: '5% a 75%' },
     ],
-    price: 'A partir de R$ 200/m²',
+    price: 'A partir de R$ 180/m²',
     cta: 'Quero Nano Cerâmica',
     icon: Star,
     path: '/nano-ceramica',

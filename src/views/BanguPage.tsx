@@ -170,7 +170,7 @@ export function BanguPage({ faqs }: { faqs: { q: string; a: string }[] }) {
                             },
                             {
                                 title: "Dupla Camada", selo: "Favorito", icon: Droplets, image: "/product-smoke.webp", path: "/dupla-camada",
-                                desc: "Alta redução de calor com uma tecnologia especial: camada refletiva externa para máxima redução de calor e camada fumê interna para uma visão relaxante. Diferente das películas comuns, reduz o reflexo interno à noite. Excelente custo-benefício para enfrentar o sol de Bangu."
+                                desc: "O melhor de dois mundos: une a alta rejeição de calor da película refletiva com a sofisticação do visual fumê interno. Sem efeito espelho à noite e diminuindo o reflexo na TV, excelente para enfrentar o sol de Bangu."
                             }
                         ].map((product, idx) => (
                             <div key={idx} className="product-card group relative bg-gradient-to-b from-[#0a1628]/60 to-[#04080f]/90 rounded-2xl overflow-hidden border border-white/5 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 flex flex-col h-full">

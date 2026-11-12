@@ -251,7 +251,7 @@ export function NeighborhoodTemplate({ data }: Props) {
               { title: "Carbono Premium", selo: "Privacidade", icon: SunDim, path: "/carbono", desc: "O preto intenso que nunca fica roxo. Oferece elegância e bloqueio térmico de até 70%." },
               { title: "Refletiva", selo: "Alta Rejeição", icon: Sun, path: "/refletiva", desc: "Efeito espelhado clássico. Máxima rejeição de calor para sol direto o dia todo." },
               { title: "Jateado", selo: "Decoração", icon: Eye, path: "/jateado", desc: "Estética fosca para privacidade em banheiros e divisórias de escritórios." },
-              { title: "Dupla Camada", selo: "Favorito", icon: Droplets, path: "/dupla-camada", desc: "Alta redução de calor com tecnologia especial: refletiva fora, fumê dentro." }
+              { title: "Dupla Camada", selo: "Favorito", icon: Droplets, path: "/dupla-camada", desc: "O melhor de dois mundos: alta rejeição de calor da película refletiva com a sofisticação do visual fumê interno (sem espelho à noite e reduzindo o reflexo na TV)." }
             ].map((product, idx) => (
               <div key={idx} className="product-card group relative bg-[#04080f]/60 rounded-2xl p-8 border border-white/5 hover:border-[#c9a227]/50 transition-all duration-500 flex flex-col h-full">
                 <div className="absolute top-4 left-4 px-3 py-1 bg-[#c9a227] text-[#04080f] text-[10px] font-bold uppercase rounded-full">{product.selo}</div>

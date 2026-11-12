@@ -4,12 +4,12 @@ import { businessAddressSchema, businessInfo } from '@/lib/businessInfo';
 import { buildBreadcrumbSchema } from '@/lib/schema/breadcrumbs';
 
 export const metadata: Metadata = {
-  title: 'Película Nano Cerâmica | Rejeição de 97% do Calor IR - LUME',
-  description: 'Película Nano Cerâmica com rejeição de até 97% do calor infravermelho. Transparência máxima, bloqueio UV 99% e garantia de até 10 anos. Orçamento grátis pelo WhatsApp.',
+  title: 'Película Nano Cerâmica RJ | Opções G5, G20, 70% e Window Blue - LUME',
+  description: 'Película Nano Cerâmica com opções G5, G20, 70% e Window Blue 75%. Rejeição de até 98% do calor infravermelho. A partir de R$ 180/m² instalado no Rio de Janeiro.',
   alternates: { canonical: 'https://lumecontrolesolar.com.br/nano-ceramica/' },
   openGraph: {
-    title: 'Película Nano Cerâmica | Rejeição de 97% do Calor IR - LUME',
-    description: 'A tecnologia mais avançada em controle solar. Rejeita 97% do calor com transparência total. Instalação profissional no Rio de Janeiro.',
+    title: 'Película Nano Cerâmica RJ | Opções G5, G20, 70% e Window Blue - LUME',
+    description: 'A tecnologia mais avançada em controle solar. Opções G5, G20, 70% e Window Blue 75% com rejeição de até 98% do calor IR a partir de R$ 180/m² instalado no Rio de Janeiro.',
     url: 'https://lumecontrolesolar.com.br/nano-ceramica/',
     type: 'website',
     siteName: 'LUME Controle Solar',
@@ -17,8 +17,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Película Nano Cerâmica | LUME Controle Solar',
-    description: 'Rejeita 97% do calor infravermelho com transparência total. Orçamento grátis.',
+    title: 'Película Nano Cerâmica RJ | LUME Controle Solar',
+    description: 'Rejeição de até 98% do calor infravermelho com opções G5, G20, 70% e Window Blue 75%. A partir de R$ 180/m² instalado.',
     images: ['https://lumecontrolesolar.com.br/nano-ceramica-hero.webp'],
   },
 };
@@ -34,7 +34,7 @@ const jsonLd = {
       '@type': 'Product',
       name: 'Película Nano Cerâmica LUME',
       image: 'https://lumecontrolesolar.com.br/nano-ceramica-hero.webp',
-      description: 'Película nano cerâmica profissional com rejeição de até 97% do calor infravermelho e transparência máxima. A tecnologia mais avançada em controle solar.',
+      description: 'Película nano cerâmica profissional em versões G5, G20, 70% e Window Blue 75% com rejeição de até 98% do calor infravermelho e garantia de até 10 anos.',
       brand: {
         '@type': 'Brand',
         name: 'LUME Controle Solar'
@@ -43,10 +43,10 @@ const jsonLd = {
         '@type': 'Offer',
         url: 'https://lumecontrolesolar.com.br/nano-ceramica',
         priceCurrency: 'BRL',
-        price: '220.00',
+        price: '180.00',
         priceSpecification: {
           '@type': 'UnitPriceSpecification',
-          price: '220.00',
+          price: '180.00',
           priceCurrency: 'BRL',
           unitText: 'm²'
         },
@@ -75,6 +75,14 @@ const jsonLd = {
     {
       '@type': 'FAQPage',
       'mainEntity': [
+        {
+          '@type': 'Question',
+          'name': 'Quais são as opções de Nano Cerâmica disponíveis e valores?',
+          'acceptedAnswer': {
+            '@type': 'Answer',
+            'text': 'Oferecemos quatro opções especializadas: Nano Cerâmica G5 e G20 a partir de R$ 180/m² (com alta privacidade e rejeição solar), Nano Cerâmica 70% a partir de R$ 200/m² (alta transparência para varandas e fachadas) e Window Blue 75% a partir de R$ 260/m² (linha ultra premium com até 98% de retenção de calor IR).'
+          }
+        },
         {
           '@type': 'Question',
           'name': 'O Insulfilm Nano Cerâmica interfere no sinal do celular ou GPS?',

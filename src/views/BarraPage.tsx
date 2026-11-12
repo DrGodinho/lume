@@ -17,12 +17,12 @@ export function BarraPage({ faqs }: { faqs: { q: string; a: string }[] }) {
             <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden px-4">
                 {/* Background Image */}
                 <div className="absolute inset-0 z-0">
-                    <Image 
-                        src="/barra_hero_bg.webp" 
-                        alt="Instalação de insulfilm profissional na Barra da Tijuca - LUME Controle Solar" 
-                        fill 
-                        sizes="(max-width: 768px) 100vw, 100vw" 
-                        priority 
+                    <Image
+                        src="/barra_hero_bg.webp"
+                        alt="Instalação de insulfilm profissional na Barra da Tijuca - LUME Controle Solar"
+                        fill
+                        sizes="(max-width: 768px) 100vw, 100vw"
+                        priority
                         className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
@@ -31,13 +31,13 @@ export function BarraPage({ faqs }: { faqs: { q: string; a: string }[] }) {
 
                 {/* Particles & Effects */}
                 <Particles />
-                
+
                 <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#04080f] to-transparent z-10" />
                 <div className="absolute top-1/4 right-10 w-32 h-32 rounded-full bg-[#c9a227]/5 blur-3xl animate-float z-10 pointer-events-none" />
                 <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-[#c9a227]/10 blur-3xl animate-float z-10 pointer-events-none" style={{ animationDelay: "2s" }} />
 
                 <div className="container-lume relative z-20 text-center md:text-left pt-24 pb-12">
-                    <NavigationBreadcrumbs 
+                    <NavigationBreadcrumbs
                         showVisualTrail={false}
                         items={[
                             { label: 'Início', href: '/' },
@@ -178,7 +178,7 @@ export function BarraPage({ faqs }: { faqs: { q: string; a: string }[] }) {
                             },
                             {
                                 title: "Dupla Camada", selo: "Favorito", icon: Droplets, image: "/product-smoke.webp", path: "/dupla-camada",
-                                desc: "A tecnologia híbrida definitiva. Rejeição de calor massiva com visão relaxada e baixa reflexão interna noturna. Perfeita para o sol da tarde carioca."
+                                desc: "O melhor de dois mundos: combina a alta rejeição de calor da película refletiva com o visual fumê interno sofisticado. Elimina o efeito espelho à noite e reduz o reflexo na TV, perfeita para o sol da tarde na Barra."
                             }
                         ].map((product, idx) => (
                             <div key={idx} className="product-card group relative bg-gradient-to-b from-[#1a3a5c]/60 to-[#04080f]/90 rounded-2xl overflow-hidden border border-[#1a3a5c]/50 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 flex flex-col h-full">
@@ -187,13 +187,13 @@ export function BarraPage({ faqs }: { faqs: { q: string; a: string }[] }) {
                                 </div>
                                 <a href={`${product.path}/`} className="flex flex-col flex-grow">
                                     <div className="relative h-44 overflow-hidden">
-                                        <Image 
-                                            src={product.image} 
-                                            alt={product.title} 
-                                            fill 
-                                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw" 
+                                        <Image
+                                            src={product.image}
+                                            alt={product.title}
+                                            fill
+                                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw"
                                             loading="lazy"
-                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-[#04080f] via-transparent to-transparent opacity-80" />
                                     </div>
@@ -208,7 +208,7 @@ export function BarraPage({ faqs }: { faqs: { q: string; a: string }[] }) {
                                         <p className="text-sm text-gray-400 mb-6 leading-relaxed font-light flex-grow">
                                             {product.desc}
                                         </p>
-                                        
+
                                         {/* Specs */}
                                         <div className="grid grid-cols-2 gap-2 mt-auto pt-4 border-t border-white/5">
                                             <div className="text-[10px] sm:text-xs">
@@ -281,12 +281,12 @@ export function BarraPage({ faqs }: { faqs: { q: string; a: string }[] }) {
                                 <div className="w-16 h-16 rounded-2xl bg-[#c9a227]/10 flex items-center justify-center mx-auto lg:mx-0 mb-8 group-hover:bg-[#c9a227]/20 transition-colors shadow-inner">
                                     <benefit.icon className="w-8 h-8 text-[#c9a227] group-hover:scale-110 transition-transform" />
                                 </div>
-                                
+
                                 <div className="mb-6">
                                     <span className="text-5xl font-black text-gradient-gold font-montserrat leading-none">
-                                        <AnimatedCounter 
-                                            target={benefit.stat.replace(/[^0-9-]/g, '')} 
-                                            suffix={benefit.stat.replace(/[0-9-]/g, '')} 
+                                        <AnimatedCounter
+                                            target={benefit.stat.replace(/[^0-9-]/g, '')}
+                                            suffix={benefit.stat.replace(/[0-9-]/g, '')}
                                         />
                                     </span>
                                     <p className="text-[11px] uppercase text-gray-500 font-black tracking-widest mt-2">{benefit.label}</p>
@@ -315,7 +315,7 @@ export function BarraPage({ faqs }: { faqs: { q: string; a: string }[] }) {
                         <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
                     </div>
                     <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-10 text-center text-[#c9a227] tracking-tight underline decoration-[#c9a227]/20 underline-offset-8">Conheça nossa área de atuação na Barra</h2>
-                    
+
                     <div className="grid lg:grid-cols-2 gap-12 items-stretch mt-12 text-left">
                         <div className="glass-card p-10 rounded-3xl border border-white/10 flex flex-col h-full bg-white/[0.01]">
                             <h3 className="text-2xl font-bold font-montserrat mb-8 text-white flex items-center gap-3">
@@ -346,12 +346,12 @@ export function BarraPage({ faqs }: { faqs: { q: string; a: string }[] }) {
                                 <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Joá</div>
                                 <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Itanhangá</div>
                                 <div className="flex items-center gap-2">                                <div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Cidade das Artes</div>
-                                        <a href="/insulfilm-no-recreio/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Recreio</a>
-                                        <a href="/insulfilm-em-jacarepagua/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Jacarepaguá</a>
-                                        <a href="/insulfilm-em-bangu/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Bangu</a>
-                                        <a href="/insulfilm-em-campo-grande/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Campo Grande</a>
-                                        <a href="/insulfilm-em-realengo/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Realengo</a>
-                                        <a href="/insulfilm-em-sulacap/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Sulacap</a>
+                                <a href="/insulfilm-no-recreio/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Recreio</a>
+                                <a href="/insulfilm-em-jacarepagua/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Jacarepaguá</a>
+                                <a href="/insulfilm-em-bangu/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Bangu</a>
+                                <a href="/insulfilm-em-campo-grande/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Campo Grande</a>
+                                <a href="/insulfilm-em-realengo/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Realengo</a>
+                                <a href="/insulfilm-em-sulacap/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Sulacap</a>
                             </div>
                         </div>
                     </div>
@@ -434,8 +434,8 @@ export function BarraPage({ faqs }: { faqs: { q: string; a: string }[] }) {
                 </div>
             </section>
 
-             <footer className="py-12 bg-[#04080f] border-t border-white/5 text-center text-[10px] text-gray-500 font-bold uppercase tracking-[0.4em] px-4">
-                 © 2026 Lume Controle Solar · Especialista na Barra da Tijuca e Zona Oeste
+            <footer className="py-12 bg-[#04080f] border-t border-white/5 text-center text-[10px] text-gray-500 font-bold uppercase tracking-[0.4em] px-4">
+                © 2026 Lume Controle Solar · Especialista na Barra da Tijuca e Zona Oeste
             </footer>
         </div>
     );

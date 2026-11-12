@@ -66,25 +66,25 @@ const jardimOceanicoConfig: NeighborhoodConfig = {
   localPainsSubtitle: 'Privacidade e Segurança em Prédios Baixos',
   localPains: [
     {
-      title: 'Privacidade em Prédios Baixos e Térreos',
+      title: 'Privacidade Total nos Prédios Baixos sem Viver no Escuro',
       problem:
-        'A tipologia única do Jardim Oceânico (prédios de até 3 andares em ruas arborizadas como Olegário Maciel e Érico Veríssimo) deixa os moradores expostos aos olhares de pedestres nas calçadas.',
+        'A tipologia do Jardim Oceânico (prédios de até 3 andares em ruas nobres como Olegário Maciel e Érico Veríssimo) expõe a intimidade dos moradores aos olhares de pedestres e veículos nas calçadas.',
       solution:
-        'Películas Dupla Camada e Carbono Premium com efeito de privacidade unidirecional diurna: quem está fora não vê nada por dentro, sem necessidade de cortinas fechadas.',
+        'Películas Dupla Camada e Carbono Premium com bloqueio de visão externo durante o dia, garantindo privacidade completa para circular à vontade sem precisar fechar cortinas pesadas.',
     },
     {
-      title: 'Segurança & Proteção Antivandalismo',
+      title: 'Segurança Reforçada contra Invasão e Estilhaços (Antivandalismo)',
       problem:
-        'Apartamentos nos primeiros pavimentos, varandas lineares e portas de vidro de acesso exigem barreira reforçada contra quebra acidental, estilhaços ou tentativas de invasão.',
+        'Apartamentos em pavimentos baixos, coberturas e portas de vidro de acesso exigem barreira reforçada contra quebra acidental, tempestades ou tentativas de arrombamento.',
       solution:
-        'Películas de segurança PS4 (100 µm) e PS8 (200 µm) que ancoram o vidro mesmo sob forte impacto mecânico, impedindo fragmentos cortantes e invasões rápidas.',
+        'Películas de segurança PS4 e PS8 que suportam impactos mecânicos intensos e mantêm os fragmentos de vidro colados à lâmina, impedindo acidentes graves e atrasando invasões.',
     },
     {
-      title: 'Sol da Orla e Maresia na Praia do Pepê',
+      title: 'Proteja-se do Calor da Praia do Pepê sem Oxidação por Maresia',
       problem:
-        'A proximidade do mar traz calor intenso, reflexo forte e maresia corrosiva que costuma degradar películas metalizadas comuns de baixa qualidade.',
+        'A forte incidência de calor e a maresia agressiva da orla oxidam e descascam películas metalizadas comuns em questão de meses.',
       solution:
-        'Nano Cerâmica pura 100% dielétrica (sem metais), totalmente imune à oxidação salina e maresia, com até 10 anos de garantia sem bolhas nem desbotamento.',
+        'Nossa linha Nano Cerâmica é 100% cerâmica nobre sem componentes metálicos, imune à maresia e com corte térmico de 95% para você desfrutar do clima praiano com o máximo de frescor.',
     },
   ],
   recommendedFilms: [

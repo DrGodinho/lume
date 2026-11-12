@@ -67,25 +67,25 @@ const taquaraConfig: NeighborhoodConfig = {
   localPainsSubtitle: 'Otimização Térmica para o Subúrbio Carioca',
   localPains: [
     {
-      title: 'Calor Intenso & Alta Conta de Luz',
+      title: 'Redução de Calor de até 8°C e Economia na Conta de Luz',
       problem:
-        'A Taquara registra temperaturas elevadas quase o ano todo. Janelas sem proteção transformam salas e quartos em estufas, forçando aparelhos de ar-condicionado a trabalhar no limite.',
+        'A Taquara sofre com temperaturas extremas na maior parte do ano. Vidros desprotegidos deixam os cômodos abafados mesmo com ar-condicionado na potência máxima, explodindo a conta de energia.',
       solution:
-        'Películas solares térmicas que bloqueiam até 95% do calor antes que ele entre no ambiente, gerando economia real de até 30% na tarifa de energia.',
+        'Nossas películas térmicas filtram até 95% do calor solar direto, estabilizando a temperatura ambiente e reduzindo em até 35% o consumo elétrico do ar-condicionado.',
     },
     {
-      title: 'Ofuscamento e Reflexo em Telas',
+      title: 'Proteção UV: Proteja Sua Pele e Conserve Seus Móveis',
       problem:
-        'O excesso de claridade direta cansa a vista e impede o trabalho confortável em computadores ou a visualização nítida de televisores durante o dia.',
+        'A forte incidência de raios solares queima cortinas, desbota móveis e pisos e causa envelhecimento precoce da pele de quem passa horas perto das janelas.',
       solution:
-        'Linhas Carbono Premium e Dupla Camada que equilibram a transmissão de luz visível, proporcionando luz agradável e sem reflexos irritantes.',
+        'Barreira de até 99,9% contra raios ultravioleta, prevenindo danos à saúde da sua família e mantendo sofás, camas e marcenaria com aspecto de novos.',
     },
     {
-      title: 'Películas Baratas que Ficam Roxas e com Bolhas',
+      title: 'Durabilidade Certificada: Nunca Fica Roxa Nem Cria Bolhas',
       problem:
-        'Muitos moradores relatam terem instalado películas comuns que, após 6 meses de sol na Taquara, ficaram cheias de bolhas, com cheiro de cola queimada e tom roxo.',
+        'Instalações amadoras e películas baratas da concorrência criam bolhas horríveis, cheiro forte de cola estragada e tom roxo após poucos meses de sol forte.',
       solution:
-        'Na LUME trabalhamos apenas com películas originais com camada anti-risco e pigmentação em carbono/cerâmica pura, garantidas por escrito por até 10 anos.',
+        'A LUME utiliza exclusivamente poliéster óptico de alta fusão e nanotecnologia inorgânica, com certificado de garantia formal de até 10 anos.',
     },
   ],
   recommendedFilms: [

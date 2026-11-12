@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { 
   Shield, 
   CheckCircle, 
@@ -10,7 +11,10 @@ import {
   Building2, 
   MessageCircle, 
   Sun,
-  ChevronDown
+  ChevronDown,
+  ShieldCheck,
+  Zap,
+  Flame
 } from 'lucide-react';
 import { NavigationBreadcrumbs } from '../components/NavigationBreadcrumbs';
 import { HeroEntrance } from '../components/HeroEntrance';
@@ -101,42 +105,42 @@ export function IpanemaPage({ faqs }: IpanemaPageProps) {
       </section>
 
       {/* Estatísticas e Diferenciais */}
-      <section className="py-12 border-y border-white/5 bg-[#0a111e]/40 relative">
+      <section className="py-4 border-y border-white/5 bg-[#0a111e]/40 relative">
         <div className="container-lume">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             <ScrollReveal animation="slide-up">
-              <div className="stat-card p-4">
-                <div className="text-3xl lg:text-4xl font-black font-montserrat text-[#c9a227] mb-1">
+              <div className="stat-card p-2 sm:p-3">
+                <div className="text-2xl lg:text-3xl font-black font-montserrat text-[#c9a227] mb-0.5">
                   <AnimatedCounter target="95" suffix="%" />
                 </div>
-                <p className="text-xs lg:text-sm text-gray-400 font-medium">Bloqueio de Calor Infravermelho</p>
+                <p className="text-xs text-gray-400 font-medium">Bloqueio de Calor Infravermelho</p>
               </div>
             </ScrollReveal>
 
             <ScrollReveal animation="slide-up">
-              <div className="stat-card p-4">
-                <div className="text-3xl lg:text-4xl font-black font-montserrat text-white mb-1">
+              <div className="stat-card p-2 sm:p-3">
+                <div className="text-2xl lg:text-3xl font-black font-montserrat text-white mb-0.5">
                   75%
                 </div>
-                <p className="text-xs lg:text-sm text-gray-400 font-medium">Transparência Óptica Pura</p>
+                <p className="text-xs text-gray-400 font-medium">Transparência Óptica Pura</p>
               </div>
             </ScrollReveal>
 
             <ScrollReveal animation="slide-up">
-              <div className="stat-card p-4">
-                <div className="text-3xl lg:text-4xl font-black font-montserrat text-[#c9a227] mb-1">
+              <div className="stat-card p-2 sm:p-3">
+                <div className="text-2xl lg:text-3xl font-black font-montserrat text-[#c9a227] mb-0.5">
                   Zero
                 </div>
-                <p className="text-xs lg:text-sm text-gray-400 font-medium">Alteração de Fachada</p>
+                <p className="text-xs text-gray-400 font-medium">Alteração de Fachada</p>
               </div>
             </ScrollReveal>
 
             <ScrollReveal animation="slide-up">
-              <div className="stat-card p-4">
-                <div className="text-3xl lg:text-4xl font-black font-montserrat text-white mb-1">
+              <div className="stat-card p-2 sm:p-3">
+                <div className="text-2xl lg:text-3xl font-black font-montserrat text-white mb-0.5">
                   10 Anos
                 </div>
-                <p className="text-xs lg:text-sm text-gray-400 font-medium">Garantia Formal LUME</p>
+                <p className="text-xs text-gray-400 font-medium">Garantia Formal LUME</p>
               </div>
             </ScrollReveal>
           </div>
@@ -169,49 +173,49 @@ export function IpanemaPage({ faqs }: IpanemaPageProps) {
               <div className="glass-card p-8 rounded-2xl border border-white/5 bg-[#0a111e]/50 h-full flex flex-col justify-between hover:border-[#c9a227]/40 transition-all duration-300">
                 <div>
                   <div className="w-12 h-12 rounded-xl bg-[#c9a227]/10 flex items-center justify-center mb-6 text-[#c9a227]">
+                    <ShieldCheck size={24} />
+                  </div>
+                  <h3 className="text-xl font-bold font-montserrat mb-3 text-white">Proteção UV: Móveis e Pele</h3>
+                  <p className="text-gray-400 text-sm leading-relaxed mb-4">
+                    Tapetes importados, marcenarias sob medida, obras de arte e sofás de design sofrem com descoloração severa. Nossa barreira de <strong className="text-white">99,9% contra raios UVA/UVB</strong> preserva os acabamentos nobres e protege a saúde da sua pele.
+                  </p>
+                </div>
+                <div className="pt-4 border-t border-white/5 flex items-center gap-2 text-xs text-[#c9a227] font-semibold">
+                  <CheckCircle size={14} /> Preservação de acervo e saúde familiar
+                </div>
+              </div>
+            </ScrollReveal>
+
+            <ScrollReveal animation="slide-up">
+              <div className="glass-card p-8 rounded-2xl border border-white/5 bg-[#0a111e]/50 h-full flex flex-col justify-between hover:border-[#c9a227]/40 transition-all duration-300">
+                <div>
+                  <div className="w-12 h-12 rounded-xl bg-[#c9a227]/10 flex items-center justify-center mb-6 text-[#c9a227]">
+                    <Zap size={24} />
+                  </div>
+                  <h3 className="text-xl font-bold font-montserrat mb-3 text-white">Alívio do Ar e Economia de Luz</h3>
+                  <p className="text-gray-400 text-sm leading-relaxed mb-4">
+                    Grandes painéis virados para o sol poente transformam os livings em estufas, forçando os aparelhos de ar-condicionado. A Nano Cerâmica bloqueia o calor radiante na fonte, gerando até <strong className="text-white">35% de economia na conta de energia</strong>.
+                  </p>
+                </div>
+                <div className="pt-4 border-t border-white/5 flex items-center gap-2 text-xs text-[#c9a227] font-semibold">
+                  <CheckCircle size={14} /> Resfriamento acelerado e menor consumo
+                </div>
+              </div>
+            </ScrollReveal>
+
+            <ScrollReveal animation="slide-up">
+              <div className="glass-card p-8 rounded-2xl border border-white/5 bg-[#0a111e]/50 h-full flex flex-col justify-between hover:border-[#c9a227]/40 transition-all duration-300">
+                <div>
+                  <div className="w-12 h-12 rounded-xl bg-[#c9a227]/10 flex items-center justify-center mb-6 text-[#c9a227]">
                     <Sun size={24} />
                   </div>
-                  <h3 className="text-xl font-bold font-montserrat mb-3 text-white">Sol Poente sem Efeito Estufa</h3>
+                  <h3 className="text-xl font-bold font-montserrat mb-3 text-white">Proteja-se do Calor sem Perder a Vista</h3>
                   <p className="text-gray-400 text-sm leading-relaxed mb-4">
-                    Grandes painéis de vidro virados para o poente transformam o ambiente em uma estufa. Nossa <strong className="text-white">Nano Cerâmica</strong> filtra o calor radiante na fonte, aliviando o ar-condicionado em até 30%.
+                    Prédios na Vieira Souto e Prudente de Morais possuem regras rígidas de convenção. Nossas películas garantem corte térmico máximo de até 95% mantendo transparência cristalina pura — sem espelho, sem metal e sem alterar a fachada.
                   </p>
                 </div>
                 <div className="pt-4 border-t border-white/5 flex items-center gap-2 text-xs text-[#c9a227] font-semibold">
-                  <CheckCircle size={14} /> Redução drástica da temperatura
-                </div>
-              </div>
-            </ScrollReveal>
-
-            <ScrollReveal animation="slide-up">
-              <div className="glass-card p-8 rounded-2xl border border-white/5 bg-[#0a111e]/50 h-full flex flex-col justify-between hover:border-[#c9a227]/40 transition-all duration-300">
-                <div>
-                  <div className="w-12 h-12 rounded-xl bg-[#c9a227]/10 flex items-center justify-center mb-6 text-[#c9a227]">
-                    <Shield size={24} />
-                  </div>
-                  <h3 className="text-xl font-bold font-montserrat mb-3 text-white">Conformidade Condominial</h3>
-                  <p className="text-gray-400 text-sm leading-relaxed mb-4">
-                    Prédios na Vieira Souto e Prudente de Morais possuem regras rígidas contra espelhamento externo. Nossas películas respeitam 100% o padrão estético original do edifício.
-                  </p>
-                </div>
-                <div className="pt-4 border-t border-white/5 flex items-center gap-2 text-xs text-[#c9a227] font-semibold">
-                  <CheckCircle size={14} /> Total aprovação em convenções
-                </div>
-              </div>
-            </ScrollReveal>
-
-            <ScrollReveal animation="slide-up">
-              <div className="glass-card p-8 rounded-2xl border border-white/5 bg-[#0a111e]/50 h-full flex flex-col justify-between hover:border-[#c9a227]/40 transition-all duration-300">
-                <div>
-                  <div className="w-12 h-12 rounded-xl bg-[#c9a227]/10 flex items-center justify-center mb-6 text-[#c9a227]">
-                    <Eye size={24} />
-                  </div>
-                  <h3 className="text-xl font-bold font-montserrat mb-3 text-white">Design & Arte Protegidos</h3>
-                  <p className="text-gray-400 text-sm leading-relaxed mb-4">
-                    Tapetes importados, marcenarias sob medida e telas de arte não sofrem mais com a descoloração. A barreira 99.9% anti-UV preserva as cores e texturas originais do projeto.
-                  </p>
-                </div>
-                <div className="pt-4 border-t border-white/5 flex items-center gap-2 text-xs text-[#c9a227] font-semibold">
-                  <CheckCircle size={14} /> Proteção patrimonial contínua
+                  <CheckCircle size={14} /> 100% de aprovação condominial e visão nítida
                 </div>
               </div>
             </ScrollReveal>
@@ -245,7 +249,15 @@ export function IpanemaPage({ faqs }: IpanemaPageProps) {
                   Escolha Nº 1 em Ipanema
                 </div>
                 <div>
-                  <h3 className="text-2xl font-black font-montserrat text-white mb-2">Nano Cerâmica</h3>
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <h3 className="text-2xl font-black font-montserrat text-white">Nano Cerâmica</h3>
+                    <Link 
+                      href="/nano-ceramica/" 
+                      className="text-xs text-[#c9a227] hover:underline inline-flex items-center gap-1 font-semibold whitespace-nowrap mt-1"
+                    >
+                      Ver detalhes <ArrowRight size={14} />
+                    </Link>
+                  </div>
                   <p className="text-[#c9a227] text-sm font-semibold mb-4">Invisível ao Olho, Máxima em Rejeição Térmica</p>
                   <p className="text-gray-300 text-sm leading-relaxed mb-6">
                     A película definitiva para quem não abre mão da vista panorâmica. Bloqueia o calor invisível com nano partículas cerâmicas sem escurecer os ambientes.
@@ -269,14 +281,22 @@ export function IpanemaPage({ faqs }: IpanemaPageProps) {
                   <div className="text-xl font-bold text-white mb-4">
                     A partir de <span className="text-[#c9a227]">R$ 200/m²</span> instalado
                   </div>
-                  <a
-                    href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20de%20Nano%20Cer%C3%A2mica%20para%20Ipanema."
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-primary w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm"
-                  >
-                    <MessageCircle size={16} /> Cotar Nano Cerâmica
-                  </a>
+                  <div className="flex flex-col gap-2">
+                    <a
+                      href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20de%20Nano%20Cer%C3%A2mica%20para%20Ipanema."
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-primary w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm"
+                    >
+                      <MessageCircle size={16} /> Cotar Nano Cerâmica
+                    </a>
+                    <Link
+                      href="/nano-ceramica/"
+                      className="text-center text-xs text-gray-400 hover:text-[#c9a227] py-1 transition-colors"
+                    >
+                      Conhecer tecnologia Nano Cerâmica →
+                    </Link>
+                  </div>
                 </div>
               </div>
             </ScrollReveal>
@@ -285,10 +305,18 @@ export function IpanemaPage({ faqs }: IpanemaPageProps) {
             <ScrollReveal animation="slide-up">
               <div className="glass-card rounded-2xl border border-white/5 bg-[#04080f]/90 p-8 flex flex-col justify-between hover:border-[#c9a227]/30 transition-all">
                 <div>
-                  <h3 className="text-2xl font-black font-montserrat text-white mb-2">Dupla Camada</h3>
-                  <p className="text-[#c9a227] text-sm font-semibold mb-4">Conforto Visual & Visão Noturna Preservada</p>
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <h3 className="text-2xl font-black font-montserrat text-white">Dupla Camada</h3>
+                    <Link 
+                      href="/dupla-camada/" 
+                      className="text-xs text-[#c9a227] hover:underline inline-flex items-center gap-1 font-semibold whitespace-nowrap mt-1"
+                    >
+                      Ver detalhes <ArrowRight size={14} />
+                    </Link>
+                  </div>
+                  <p className="text-[#c9a227] text-sm font-semibold mb-4">O Melhor de Dois Mundos & Sem Espelho Noturno</p>
                   <p className="text-gray-300 text-sm leading-relaxed mb-6">
-                    Elimina o incômodo reflexo de espelho quando as luzes do apartamento estão acesas à noite. Ideal para salas de estar integradas e suítes com vista mar.
+                    O melhor de dois mundos: une a potente rejeição de calor da película refletiva ao visual fumê interno elegante. Elimina o incômodo espelho noturno com luzes acesas e reduz o reflexo na TV em salas integradas e suítes.
                   </p>
                   <div className="space-y-3 mb-6 bg-white/[0.03] p-4 rounded-xl border border-white/5">
                     <div>
@@ -309,14 +337,22 @@ export function IpanemaPage({ faqs }: IpanemaPageProps) {
                   <div className="text-xl font-bold text-white mb-4">
                     A partir de <span className="text-[#c9a227]">R$ 110/m²</span> instalado
                   </div>
-                  <a
-                    href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20de%20Dupla%20Camada%20para%20Ipanema."
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-outline w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm border border-white/20 hover:border-[#c9a227]"
-                  >
-                    <MessageCircle size={16} /> Cotar Dupla Camada
-                  </a>
+                  <div className="flex flex-col gap-2">
+                    <a
+                      href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20de%20Dupla%20Camada%20para%20Ipanema."
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-outline w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm border border-white/20 hover:border-[#c9a227]"
+                    >
+                      <MessageCircle size={16} /> Cotar Dupla Camada
+                    </a>
+                    <Link
+                      href="/dupla-camada/"
+                      className="text-center text-xs text-gray-400 hover:text-[#c9a227] py-1 transition-colors"
+                    >
+                      Conhecer vantagens Dupla Camada →
+                    </Link>
+                  </div>
                 </div>
               </div>
             </ScrollReveal>
@@ -325,7 +361,15 @@ export function IpanemaPage({ faqs }: IpanemaPageProps) {
             <ScrollReveal animation="slide-up">
               <div className="glass-card rounded-2xl border border-white/5 bg-[#04080f]/90 p-8 flex flex-col justify-between hover:border-[#c9a227]/30 transition-all">
                 <div>
-                  <h3 className="text-2xl font-black font-montserrat text-white mb-2">Jateado</h3>
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <h3 className="text-2xl font-black font-montserrat text-white">Jateado</h3>
+                    <Link 
+                      href="/jateado/" 
+                      className="text-xs text-[#c9a227] hover:underline inline-flex items-center gap-1 font-semibold whitespace-nowrap mt-1"
+                    >
+                      Ver detalhes <ArrowRight size={14} />
+                    </Link>
+                  </div>
                   <p className="text-[#c9a227] text-sm font-semibold mb-4">Design Arquitetônico & Privacidade Elegante</p>
                   <p className="text-gray-300 text-sm leading-relaxed mb-6">
                     Para portas de correr, divisão de closet, banheiros e áreas de serviço. Garante privacidade total com difusão suave de luz natural e acabamento fosco refinado.
@@ -349,14 +393,22 @@ export function IpanemaPage({ faqs }: IpanemaPageProps) {
                   <div className="text-xl font-bold text-white mb-4">
                     A partir de <span className="text-[#c9a227]">R$ 80/m²</span> instalado
                   </div>
-                  <a
-                    href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20de%20Jateado%20para%20Ipanema."
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-outline w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm border border-white/20 hover:border-[#c9a227]"
-                  >
-                    <MessageCircle size={16} /> Cotar Jateado
-                  </a>
+                  <div className="flex flex-col gap-2">
+                    <a
+                      href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20de%20Jateado%20para%20Ipanema."
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-outline w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm border border-white/20 hover:border-[#c9a227]"
+                    >
+                      <MessageCircle size={16} /> Cotar Jateado
+                    </a>
+                    <Link
+                      href="/jateado/"
+                      className="text-center text-xs text-gray-400 hover:text-[#c9a227] py-1 transition-colors"
+                    >
+                      Conhecer aplicações da Película Jateada →
+                    </Link>
+                  </div>
                 </div>
               </div>
             </ScrollReveal>

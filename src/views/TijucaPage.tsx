@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { 
   CheckCircle, 
   ArrowRight, 
@@ -10,7 +11,10 @@ import {
   MessageCircle, 
   Sun,
   Flame,
-  ChevronDown
+  ChevronDown,
+  ShieldCheck,
+  Zap,
+  Sparkles
 } from 'lucide-react';
 import { NavigationBreadcrumbs } from '../components/NavigationBreadcrumbs';
 import { HeroEntrance } from '../components/HeroEntrance';
@@ -101,42 +105,42 @@ export function TijucaPage({ faqs }: TijucaPageProps) {
       </section>
 
       {/* Estatísticas e Diferenciais */}
-      <section className="py-12 border-y border-white/5 bg-[#0a111e]/40 relative">
+      <section className="py-4 border-y border-white/5 bg-[#0a111e]/40 relative">
         <div className="container-lume">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             <ScrollReveal animation="slide-up">
-              <div className="stat-card p-4">
-                <div className="text-3xl lg:text-4xl font-black font-montserrat text-[#c9a227] mb-1">
+              <div className="stat-card p-2 sm:p-3">
+                <div className="text-2xl lg:text-3xl font-black font-montserrat text-[#c9a227] mb-0.5">
                   Até -8°C
                 </div>
-                <p className="text-xs lg:text-sm text-gray-400 font-medium">Sensação Térmica no Quarto/Sala</p>
+                <p className="text-xs text-gray-400 font-medium">Sensação Térmica no Quarto/Sala</p>
               </div>
             </ScrollReveal>
 
             <ScrollReveal animation="slide-up">
-              <div className="stat-card p-4">
-                <div className="text-3xl lg:text-4xl font-black font-montserrat text-white mb-1">
+              <div className="stat-card p-2 sm:p-3">
+                <div className="text-2xl lg:text-3xl font-black font-montserrat text-white mb-0.5">
                   <AnimatedCounter target="35" suffix="%" />
                 </div>
-                <p className="text-xs lg:text-sm text-gray-400 font-medium">Economia no Ar-Condicionado</p>
+                <p className="text-xs text-gray-400 font-medium">Economia no Ar-Condicionado</p>
               </div>
             </ScrollReveal>
 
             <ScrollReveal animation="slide-up">
-              <div className="stat-card p-4">
-                <div className="text-3xl lg:text-4xl font-black font-montserrat text-[#c9a227] mb-1">
+              <div className="stat-card p-2 sm:p-3">
+                <div className="text-2xl lg:text-3xl font-black font-montserrat text-[#c9a227] mb-0.5">
                   <AnimatedCounter target="99" suffix=".9%" />
                 </div>
-                <p className="text-xs lg:text-sm text-gray-400 font-medium">Filtro de Raios UV Solar</p>
+                <p className="text-xs text-gray-400 font-medium">Filtro de Raios UV Solar</p>
               </div>
             </ScrollReveal>
 
             <ScrollReveal animation="slide-up">
-              <div className="stat-card p-4">
-                <div className="text-3xl lg:text-4xl font-black font-montserrat text-white mb-1">
+              <div className="stat-card p-2 sm:p-3">
+                <div className="text-2xl lg:text-3xl font-black font-montserrat text-white mb-0.5">
                   Até 10 Anos
                 </div>
-                <p className="text-xs lg:text-sm text-gray-400 font-medium">Garantia Contra Desbotamento</p>
+                <p className="text-xs text-gray-400 font-medium">Garantia Contra Desbotamento</p>
               </div>
             </ScrollReveal>
           </div>
@@ -169,49 +173,49 @@ export function TijucaPage({ faqs }: TijucaPageProps) {
               <div className="glass-card p-8 rounded-2xl border border-white/5 bg-[#0a111e]/50 h-full flex flex-col justify-between hover:border-[#c9a227]/40 transition-all duration-300">
                 <div>
                   <div className="w-12 h-12 rounded-xl bg-[#c9a227]/10 flex items-center justify-center mb-6 text-[#c9a227]">
+                    <ShieldCheck size={24} />
+                  </div>
+                  <h3 className="text-xl font-bold font-montserrat mb-3 text-white">Proteção UV: Móveis e Pele</h3>
+                  <p className="text-gray-400 text-sm leading-relaxed mb-4">
+                    Bloqueio de até <strong className="text-white">99,9% dos raios UVA e UVB</strong>. Evita o envelhecimento precoce e manchas na pele, além de impedir o desbotamento e ressecamento de sofás de couro, cortinas, pisos laminados e marcenarias planejadas.
+                  </p>
+                </div>
+                <div className="pt-4 border-t border-white/5 flex items-center gap-2 text-xs text-[#c9a227] font-semibold">
+                  <CheckCircle size={14} /> Preservação do patrimônio e saúde familiar
+                </div>
+              </div>
+            </ScrollReveal>
+
+            <ScrollReveal animation="slide-up">
+              <div className="glass-card p-8 rounded-2xl border border-white/5 bg-[#0a111e]/50 h-full flex flex-col justify-between hover:border-[#c9a227]/40 transition-all duration-300">
+                <div>
+                  <div className="w-12 h-12 rounded-xl bg-[#c9a227]/10 flex items-center justify-center mb-6 text-[#c9a227]">
+                    <Zap size={24} />
+                  </div>
+                  <h3 className="text-xl font-bold font-montserrat mb-3 text-white">Alívio do Ar e Economia de Luz</h3>
+                  <p className="text-gray-400 text-sm leading-relaxed mb-4">
+                    O sol da tarde na Tijuca sobrecarrega o ar-condicionado no modo máximo. Ao barrar o ganho solar nos vidros, os aparelhos resfriam muito mais rápido em potências moderadas, gerando até <strong className="text-white">35% de economia na fatura de energia</strong>.
+                  </p>
+                </div>
+                <div className="pt-4 border-t border-white/5 flex items-center gap-2 text-xs text-[#c9a227] font-semibold">
+                  <CheckCircle size={14} /> Menor consumo elétrico e maior vida útil do ar
+                </div>
+              </div>
+            </ScrollReveal>
+
+            <ScrollReveal animation="slide-up">
+              <div className="glass-card p-8 rounded-2xl border border-white/5 bg-[#0a111e]/50 h-full flex flex-col justify-between hover:border-[#c9a227]/40 transition-all duration-300">
+                <div>
+                  <div className="w-12 h-12 rounded-xl bg-[#c9a227]/10 flex items-center justify-center mb-6 text-[#c9a227]">
                     <Flame size={24} />
                   </div>
-                  <h3 className="text-xl font-bold font-montserrat mb-3 text-white">Fim do Efeito Forno</h3>
+                  <h3 className="text-xl font-bold font-montserrat mb-3 text-white">Redução Térmica de até 8°C</h3>
                   <p className="text-gray-400 text-sm leading-relaxed mb-4">
-                    O sol que incide na janela aquece o ar interno sem parar. Nossas películas bloqueiam a radiação infravermelha antes que ela entre no ambiente, mantendo os cômodos frescos o dia todo.
+                    Barreira nanotecnológica contra os raios infravermelhos (calor radiante). Elimina o &ldquo;efeito estufa&rdquo; em salas e quartos com sol poente, devolvendo o conforto térmico natural sem a necessidade de viver confinado em cortinas fechadas.
                   </p>
                 </div>
                 <div className="pt-4 border-t border-white/5 flex items-center gap-2 text-xs text-[#c9a227] font-semibold">
-                  <CheckCircle size={14} /> Conforto térmico imediato
-                </div>
-              </div>
-            </ScrollReveal>
-
-            <ScrollReveal animation="slide-up">
-              <div className="glass-card p-8 rounded-2xl border border-white/5 bg-[#0a111e]/50 h-full flex flex-col justify-between hover:border-[#c9a227]/40 transition-all duration-300">
-                <div>
-                  <div className="w-12 h-12 rounded-xl bg-[#c9a227]/10 flex items-center justify-center mb-6 text-[#c9a227]">
-                    <Sun size={24} />
-                  </div>
-                  <h3 className="text-xl font-bold font-montserrat mb-3 text-white">Sem Reflexo na TV e Telas</h3>
-                  <p className="text-gray-400 text-sm leading-relaxed mb-4">
-                    Ideal para quem faz home office ou assiste TV na sala à tarde. A linha Carbono Premium reduz drasticamente o brilho excessivo nos monitores sem necessidade de fechar cortinas pesadas.
-                  </p>
-                </div>
-                <div className="pt-4 border-t border-white/5 flex items-center gap-2 text-xs text-[#c9a227] font-semibold">
-                  <CheckCircle size={14} /> Iluminação suave e equilibrada
-                </div>
-              </div>
-            </ScrollReveal>
-
-            <ScrollReveal animation="slide-up">
-              <div className="glass-card p-8 rounded-2xl border border-white/5 bg-[#0a111e]/50 h-full flex flex-col justify-between hover:border-[#c9a227]/40 transition-all duration-300">
-                <div>
-                  <div className="w-12 h-12 rounded-xl bg-[#c9a227]/10 flex items-center justify-center mb-6 text-[#c9a227]">
-                    <Eye size={24} />
-                  </div>
-                  <h3 className="text-xl font-bold font-montserrat mb-3 text-white">Privacidade Diurna</h3>
-                  <p className="text-gray-400 text-sm leading-relaxed mb-4">
-                    Com a alta densidade de prédios vizinhos na Conde de Bonfim e ruas transversais, você ganha privacidade total durante o dia para circular à vontade dentro de casa.
-                  </p>
-                </div>
-                <div className="pt-4 border-t border-white/5 flex items-center gap-2 text-xs text-[#c9a227] font-semibold">
-                  <CheckCircle size={14} /> Liberdade e segurança dentro do lar
+                  <CheckCircle size={14} /> Queda expressiva de calor nos ambientes
                 </div>
               </div>
             </ScrollReveal>
@@ -245,7 +249,15 @@ export function TijucaPage({ faqs }: TijucaPageProps) {
                   Campeã de Vendas Tijuca
                 </div>
                 <div>
-                  <h3 className="text-2xl font-black font-montserrat text-white mb-2">Carbono Premium</h3>
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <h3 className="text-2xl font-black font-montserrat text-white">Carbono Premium</h3>
+                    <Link 
+                      href="/carbono/" 
+                      className="text-xs text-[#c9a227] hover:underline inline-flex items-center gap-1 font-semibold whitespace-nowrap mt-1"
+                    >
+                      Ver detalhes <ArrowRight size={14} />
+                    </Link>
+                  </div>
                   <p className="text-[#c9a227] text-sm font-semibold mb-4">Privacidade, Estética Grafite & Redução de Brilho</p>
                   <p className="text-gray-300 text-sm leading-relaxed mb-6">
                     A película mais procurada para quartos e salas com vista devassada. Não fica roxa com o sol e entrega excelente bloqueio térmico por um valor altamente acessível.
@@ -269,14 +281,22 @@ export function TijucaPage({ faqs }: TijucaPageProps) {
                   <div className="text-xl font-bold text-white mb-4">
                     A partir de <span className="text-[#c9a227]">R$ 80/m²</span> instalado
                   </div>
-                  <a
-                    href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20de%20Carbono%20Premium%20para%20a%20Tijuca."
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-primary w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm"
-                  >
-                    <MessageCircle size={16} /> Cotar Carbono Premium
-                  </a>
+                  <div className="flex flex-col gap-2">
+                    <a
+                      href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20de%20Carbono%20Premium%20para%20a%20Tijuca."
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-primary w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm"
+                    >
+                      <MessageCircle size={16} /> Cotar Carbono Premium
+                    </a>
+                    <Link
+                      href="/carbono/"
+                      className="text-center text-xs text-gray-400 hover:text-[#c9a227] py-1 transition-colors"
+                    >
+                      Conhecer benefícios da Carbono Premium →
+                    </Link>
+                  </div>
                 </div>
               </div>
             </ScrollReveal>
@@ -285,7 +305,15 @@ export function TijucaPage({ faqs }: TijucaPageProps) {
             <ScrollReveal animation="slide-up">
               <div className="glass-card rounded-2xl border border-white/5 bg-[#04080f]/90 p-8 flex flex-col justify-between hover:border-[#c9a227]/30 transition-all">
                 <div>
-                  <h3 className="text-2xl font-black font-montserrat text-white mb-2">Nano Cerâmica</h3>
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <h3 className="text-2xl font-black font-montserrat text-white">Nano Cerâmica</h3>
+                    <Link 
+                      href="/nano-ceramica/" 
+                      className="text-xs text-[#c9a227] hover:underline inline-flex items-center gap-1 font-semibold whitespace-nowrap mt-1"
+                    >
+                      Ver detalhes <ArrowRight size={14} />
+                    </Link>
+                  </div>
                   <p className="text-[#c9a227] text-sm font-semibold mb-4">Corte Térmico Máximo sem Escurecer a Casa</p>
                   <p className="text-gray-300 text-sm leading-relaxed mb-6">
                     Ideal para varandas gourmet e salas amplas onde você deseja manter a claridade e a vista aberta das montanhas da Floresta da Tijuca, eliminando o calor do sol.
@@ -309,14 +337,22 @@ export function TijucaPage({ faqs }: TijucaPageProps) {
                   <div className="text-xl font-bold text-white mb-4">
                     A partir de <span className="text-[#c9a227]">R$ 200/m²</span> instalado
                   </div>
-                  <a
-                    href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20de%20Nano%20Cer%C3%A2mica%20para%20a%20Tijuca."
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-outline w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm border border-white/20 hover:border-[#c9a227]"
-                  >
-                    <MessageCircle size={16} /> Cotar Nano Cerâmica
-                  </a>
+                  <div className="flex flex-col gap-2">
+                    <a
+                      href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20de%20Nano%20Cer%C3%A2mica%20para%20a%20Tijuca."
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-outline w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm border border-white/20 hover:border-[#c9a227]"
+                    >
+                      <MessageCircle size={16} /> Cotar Nano Cerâmica
+                    </a>
+                    <Link
+                      href="/nano-ceramica/"
+                      className="text-center text-xs text-gray-400 hover:text-[#c9a227] py-1 transition-colors"
+                    >
+                      Conhecer tecnologia Nano Cerâmica →
+                    </Link>
+                  </div>
                 </div>
               </div>
             </ScrollReveal>
@@ -325,10 +361,18 @@ export function TijucaPage({ faqs }: TijucaPageProps) {
             <ScrollReveal animation="slide-up">
               <div className="glass-card rounded-2xl border border-white/5 bg-[#04080f]/90 p-8 flex flex-col justify-between hover:border-[#c9a227]/30 transition-all">
                 <div>
-                  <h3 className="text-2xl font-black font-montserrat text-white mb-2">Dupla Camada</h3>
-                  <p className="text-[#c9a227] text-sm font-semibold mb-4">Sem Espelho Noturno & Alto Desempenho</p>
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <h3 className="text-2xl font-black font-montserrat text-white">Dupla Camada</h3>
+                    <Link 
+                      href="/dupla-camada/" 
+                      className="text-xs text-[#c9a227] hover:underline inline-flex items-center gap-1 font-semibold whitespace-nowrap mt-1"
+                    >
+                      Ver detalhes <ArrowRight size={14} />
+                    </Link>
+                  </div>
+                  <p className="text-[#c9a227] text-sm font-semibold mb-4">O Melhor de Dois Mundos & Alto Desempenho</p>
                   <p className="text-gray-300 text-sm leading-relaxed mb-6">
-                    A tecnologia antirreflexo interno impede que o vidro reflita o interior do apartamento à noite quando as lâmpadas são acesas. Excelente para salas de estar e quartos.
+                    O melhor de dois mundos: une a potente rejeição de calor da película refletiva ao visual fumê interno confortável. Elimina o efeito espelho à noite e diminui o reflexo na TV em salas de estar e quartos.
                   </p>
                   <div className="space-y-3 mb-6 bg-white/[0.03] p-4 rounded-xl border border-white/5">
                     <div>
@@ -349,14 +393,22 @@ export function TijucaPage({ faqs }: TijucaPageProps) {
                   <div className="text-xl font-bold text-white mb-4">
                     A partir de <span className="text-[#c9a227]">R$ 110/m²</span> instalado
                   </div>
-                  <a
-                    href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20de%20Dupla%20Camada%20para%20a%20Tijuca."
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-outline w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm border border-white/20 hover:border-[#c9a227]"
-                  >
-                    <MessageCircle size={16} /> Cotar Dupla Camada
-                  </a>
+                  <div className="flex flex-col gap-2">
+                    <a
+                      href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20de%20Dupla%20Camada%20para%20a%20Tijuca."
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-outline w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm border border-white/20 hover:border-[#c9a227]"
+                    >
+                      <MessageCircle size={16} /> Cotar Dupla Camada
+                    </a>
+                    <Link
+                      href="/dupla-camada/"
+                      className="text-center text-xs text-gray-400 hover:text-[#c9a227] py-1 transition-colors"
+                    >
+                      Conhecer vantagens Dupla Camada →
+                    </Link>
+                  </div>
                 </div>
               </div>
             </ScrollReveal>

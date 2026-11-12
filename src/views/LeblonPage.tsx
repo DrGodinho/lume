@@ -2,15 +2,19 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { 
-  Shield, 
-  CheckCircle, 
-  ArrowRight, 
-  Eye, 
-  MessageCircle, 
+import Link from 'next/link';
+import {
+  Shield,
+  CheckCircle,
+  ArrowRight,
+  Eye,
+  MessageCircle,
   Sun,
   Crown,
-  ChevronDown
+  ChevronDown,
+  ShieldCheck,
+  Zap,
+  Flame
 } from 'lucide-react';
 import { NavigationBreadcrumbs } from '../components/NavigationBreadcrumbs';
 import { HeroEntrance } from '../components/HeroEntrance';
@@ -52,7 +56,7 @@ export function LeblonPage({ faqs }: LeblonPageProps) {
         <Particles />
 
         <div className="container-lume relative z-10 text-center max-w-4xl mx-auto">
-          <NavigationBreadcrumbs 
+          <NavigationBreadcrumbs
             showVisualTrail={false}
             items={[
               { label: 'Início', href: '/' },
@@ -101,42 +105,42 @@ export function LeblonPage({ faqs }: LeblonPageProps) {
       </section>
 
       {/* Estatísticas de Excelência */}
-      <section className="py-12 border-y border-white/5 bg-[#0a111e]/40 relative">
+      <section className="py-4 border-y border-white/5 bg-[#0a111e]/40 relative">
         <div className="container-lume">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             <ScrollReveal animation="slide-up">
-              <div className="stat-card p-4">
-                <div className="text-3xl lg:text-4xl font-black font-montserrat text-[#c9a227] mb-1">
+              <div className="stat-card p-2 sm:p-3">
+                <div className="text-2xl lg:text-3xl font-black font-montserrat text-[#c9a227] mb-0.5">
                   <AnimatedCounter target="95" suffix="%" />
                 </div>
-                <p className="text-xs lg:text-sm text-gray-400 font-medium">Rejeição Térmica Infravermelha</p>
+                <p className="text-xs text-gray-400 font-medium">Rejeição Térmica Infravermelha</p>
               </div>
             </ScrollReveal>
 
             <ScrollReveal animation="slide-up">
-              <div className="stat-card p-4">
-                <div className="text-3xl lg:text-4xl font-black font-montserrat text-white mb-1">
+              <div className="stat-card p-2 sm:p-3">
+                <div className="text-2xl lg:text-3xl font-black font-montserrat text-white mb-0.5">
                   99.9%
                 </div>
-                <p className="text-xs lg:text-sm text-gray-400 font-medium">Filtro de Raios UV Solar</p>
+                <p className="text-xs text-gray-400 font-medium">Filtro de Raios UV Solar</p>
               </div>
             </ScrollReveal>
 
             <ScrollReveal animation="slide-up">
-              <div className="stat-card p-4">
-                <div className="text-3xl lg:text-4xl font-black font-montserrat text-[#c9a227] mb-1">
+              <div className="stat-card p-2 sm:p-3">
+                <div className="text-2xl lg:text-3xl font-black font-montserrat text-[#c9a227] mb-0.5">
                   100%
                 </div>
-                <p className="text-xs lg:text-sm text-gray-400 font-medium">Cerâmica Pura Isenta de Metais</p>
+                <p className="text-xs text-gray-400 font-medium">Cerâmica Pura Isenta de Metais</p>
               </div>
             </ScrollReveal>
 
             <ScrollReveal animation="slide-up">
-              <div className="stat-card p-4">
-                <div className="text-3xl lg:text-4xl font-black font-montserrat text-white mb-1">
+              <div className="stat-card p-2 sm:p-3">
+                <div className="text-2xl lg:text-3xl font-black font-montserrat text-white mb-0.5">
                   10 Anos
                 </div>
-                <p className="text-xs lg:text-sm text-gray-400 font-medium">Garantia Formal Certificada</p>
+                <p className="text-xs text-gray-400 font-medium">Garantia Formal Certificada</p>
               </div>
             </ScrollReveal>
           </div>
@@ -169,15 +173,15 @@ export function LeblonPage({ faqs }: LeblonPageProps) {
               <div className="glass-card p-8 rounded-2xl border border-white/5 bg-[#0a111e]/50 h-full flex flex-col justify-between hover:border-[#c9a227]/40 transition-all duration-300">
                 <div>
                   <div className="w-12 h-12 rounded-xl bg-[#c9a227]/10 flex items-center justify-center mb-6 text-[#c9a227]">
-                    <Shield size={24} />
+                    <ShieldCheck size={24} />
                   </div>
-                  <h3 className="text-xl font-bold font-montserrat mb-3 text-white">Discrição & Limpeza Cirúrgica</h3>
+                  <h3 className="text-xl font-bold font-montserrat mb-3 text-white">Proteção UV: Acervos, Móveis e Pele</h3>
                   <p className="text-gray-400 text-sm leading-relaxed mb-4">
-                    Nossa equipe utiliza proteção acolchoada para móveis e pisos de madeira, garantindo que o imóvel permaneça exatamente como estava, com isolamento acústico e térmico instantâneo.
+                    Pinturas a óleo, gravuras assinadas, tapetes e marcenarias de grife sofrem danos irreversíveis pelo sol. Bloqueamos <strong className="text-white">99,9% dos raios UVA e UVB</strong>, protegendo tanto as obras quanto a saúde da pele com certificação óptica rigorosa.
                   </p>
                 </div>
                 <div className="pt-4 border-t border-white/5 flex items-center gap-2 text-xs text-[#c9a227] font-semibold">
-                  <CheckCircle size={14} /> Aplicação limpa sem respingos
+                  <CheckCircle size={14} /> Recomendado por arquitetos e curadores
                 </div>
               </div>
             </ScrollReveal>
@@ -186,15 +190,15 @@ export function LeblonPage({ faqs }: LeblonPageProps) {
               <div className="glass-card p-8 rounded-2xl border border-white/5 bg-[#0a111e]/50 h-full flex flex-col justify-between hover:border-[#c9a227]/40 transition-all duration-300">
                 <div>
                   <div className="w-12 h-12 rounded-xl bg-[#c9a227]/10 flex items-center justify-center mb-6 text-[#c9a227]">
-                    <Sun size={24} />
+                    <Zap size={24} />
                   </div>
-                  <h3 className="text-xl font-bold font-montserrat mb-3 text-white">Preservação de Acervos de Arte</h3>
+                  <h3 className="text-xl font-bold font-montserrat mb-3 text-white">Alívio do Ar e Climatização Silenciosa</h3>
                   <p className="text-gray-400 text-sm leading-relaxed mb-4">
-                    Pinturas a óleo, gravuras assinadas e tapeçarias sofrem danos irreparáveis pela luz solar direta. Bloqueamos 99.9% dos raios UV com certificação óptica.
+                    Grandes aberturas de vidro na Delfim Moreira e vias do Leblon recebem calor radiante implacável. Ao barrar até 95% do calor no vidro, seu sistema de ar-condicionado atinge o conforto térmico sem esforço contínuo, gerando economia real de até <strong className="text-white">35% de energia</strong>.
                   </p>
                 </div>
                 <div className="pt-4 border-t border-white/5 flex items-center gap-2 text-xs text-[#c9a227] font-semibold">
-                  <CheckCircle size={14} /> Recomendado por galeristas
+                  <CheckCircle size={14} /> Eficiência energética com conforto térmico nobre
                 </div>
               </div>
             </ScrollReveal>
@@ -203,15 +207,15 @@ export function LeblonPage({ faqs }: LeblonPageProps) {
               <div className="glass-card p-8 rounded-2xl border border-white/5 bg-[#0a111e]/50 h-full flex flex-col justify-between hover:border-[#c9a227]/40 transition-all duration-300">
                 <div>
                   <div className="w-12 h-12 rounded-xl bg-[#c9a227]/10 flex items-center justify-center mb-6 text-[#c9a227]">
-                    <Eye size={24} />
+                    <Crown size={24} />
                   </div>
-                  <h3 className="text-xl font-bold font-montserrat mb-3 text-white">Privacidade e Sem Reflexos</h3>
+                  <h3 className="text-xl font-bold font-montserrat mb-3 text-white">Proteja-se do Calor sem Perder a Vista</h3>
                   <p className="text-gray-400 text-sm leading-relaxed mb-4">
-                    Preserva a intimidade da família contra olhares de prédios vizinhos no baixo Leblon, mantendo o vidro perfeitamente translúcido para quem está dentro da residência.
+                    Residências exclusivas demandam transparência pura e conformidade estética integral. Nossa Nano Cerâmica rejeita o calor solar sem alterar a fachada externa e sem gerar reflexos internos à noite, preservando a vista panorâmica em sua plenitude.
                   </p>
                 </div>
                 <div className="pt-4 border-t border-white/5 flex items-center gap-2 text-xs text-[#c9a227] font-semibold">
-                  <CheckCircle size={14} /> Conforto óptico inigualável
+                  <CheckCircle size={14} /> Transparência óptica neutra e padrão condominial
                 </div>
               </div>
             </ScrollReveal>
@@ -245,7 +249,15 @@ export function LeblonPage({ faqs }: LeblonPageProps) {
                   Mais Instalada no Leblon
                 </div>
                 <div>
-                  <h3 className="text-2xl font-black font-montserrat text-white mb-2">Nano Cerâmica</h3>
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <h3 className="text-2xl font-black font-montserrat text-white">Nano Cerâmica</h3>
+                    <Link 
+                      href="/nano-ceramica/" 
+                      className="text-xs text-[#c9a227] hover:underline inline-flex items-center gap-1 font-semibold whitespace-nowrap mt-1"
+                    >
+                      Ver detalhes <ArrowRight size={14} />
+                    </Link>
+                  </div>
                   <p className="text-[#c9a227] text-sm font-semibold mb-4">Transparência Pura & Bloqueio Térmico Máximo</p>
                   <p className="text-gray-300 text-sm leading-relaxed mb-6">
                     Desenvolvida com partículas cerâmicas em escala nanométrica. Proporciona o maior corte de calor solar do mercado internacional sem escurecer e sem refletir.
@@ -269,14 +281,22 @@ export function LeblonPage({ faqs }: LeblonPageProps) {
                   <div className="text-xl font-bold text-white mb-4">
                     A partir de <span className="text-[#c9a227]">R$ 200/m²</span> instalado
                   </div>
-                  <a
-                    href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20de%20Nano%20Cer%C3%A2mica%20para%20o%20Leblon."
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-primary w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm"
-                  >
-                    <MessageCircle size={16} /> Cotar Nano Cerâmica
-                  </a>
+                  <div className="flex flex-col gap-2">
+                    <a
+                      href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20de%20Nano%20Cer%C3%A2mica%20para%20o%20Leblon."
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-primary w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm"
+                    >
+                      <MessageCircle size={16} /> Cotar Nano Cerâmica
+                    </a>
+                    <Link
+                      href="/nano-ceramica/"
+                      className="text-center text-xs text-gray-400 hover:text-[#c9a227] py-1 transition-colors"
+                    >
+                      Conhecer tecnologia Nano Cerâmica →
+                    </Link>
+                  </div>
                 </div>
               </div>
             </ScrollReveal>
@@ -285,10 +305,18 @@ export function LeblonPage({ faqs }: LeblonPageProps) {
             <ScrollReveal animation="slide-up">
               <div className="glass-card rounded-2xl border border-white/5 bg-[#04080f]/90 p-8 flex flex-col justify-between hover:border-[#c9a227]/30 transition-all">
                 <div>
-                  <h3 className="text-2xl font-black font-montserrat text-white mb-2">Dupla Camada</h3>
-                  <p className="text-[#c9a227] text-sm font-semibold mb-4">Visão Noturna & Conforto Acústico</p>
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <h3 className="text-2xl font-black font-montserrat text-white">Dupla Camada</h3>
+                    <Link 
+                      href="/dupla-camada/" 
+                      className="text-xs text-[#c9a227] hover:underline inline-flex items-center gap-1 font-semibold whitespace-nowrap mt-1"
+                    >
+                      Ver detalhes <ArrowRight size={14} />
+                    </Link>
+                  </div>
+                  <p className="text-[#c9a227] text-sm font-semibold mb-4">O Melhor de Dois Mundos & Conforto Visual</p>
                   <p className="text-gray-300 text-sm leading-relaxed mb-6">
-                    A película perfeita para quem janta ou relaxa na sala de estar admirando a vista noturna da orla e do Morro Dois Irmãos sem ser perturbado por reflexos internos.
+                    O melhor de dois mundos: combina a alta rejeição térmica da película refletiva com o visual fumê interno nobre. Sem espelho interno à noite e diminuindo o reflexo na TV, para contemplar a vista com total conforto.
                   </p>
                   <div className="space-y-3 mb-6 bg-white/[0.03] p-4 rounded-xl border border-white/5">
                     <div>
@@ -309,14 +337,22 @@ export function LeblonPage({ faqs }: LeblonPageProps) {
                   <div className="text-xl font-bold text-white mb-4">
                     A partir de <span className="text-[#c9a227]">R$ 110/m²</span> instalado
                   </div>
-                  <a
-                    href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20de%20Dupla%20Camada%20para%20o%20Leblon."
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-outline w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm border border-white/20 hover:border-[#c9a227]"
-                  >
-                    <MessageCircle size={16} /> Cotar Dupla Camada
-                  </a>
+                  <div className="flex flex-col gap-2">
+                    <a
+                      href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20de%20Dupla%20Camada%20para%20o%20Leblon."
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-outline w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm border border-white/20 hover:border-[#c9a227]"
+                    >
+                      <MessageCircle size={16} /> Cotar Dupla Camada
+                    </a>
+                    <Link
+                      href="/dupla-camada/"
+                      className="text-center text-xs text-gray-400 hover:text-[#c9a227] py-1 transition-colors"
+                    >
+                      Conhecer vantagens Dupla Camada →
+                    </Link>
+                  </div>
                 </div>
               </div>
             </ScrollReveal>
@@ -325,7 +361,15 @@ export function LeblonPage({ faqs }: LeblonPageProps) {
             <ScrollReveal animation="slide-up">
               <div className="glass-card rounded-2xl border border-white/5 bg-[#04080f]/90 p-8 flex flex-col justify-between hover:border-[#c9a227]/30 transition-all">
                 <div>
-                  <h3 className="text-2xl font-black font-montserrat text-white mb-2">Jateado</h3>
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <h3 className="text-2xl font-black font-montserrat text-white">Jateado</h3>
+                    <Link 
+                      href="/jateado/" 
+                      className="text-xs text-[#c9a227] hover:underline inline-flex items-center gap-1 font-semibold whitespace-nowrap mt-1"
+                    >
+                      Ver detalhes <ArrowRight size={14} />
+                    </Link>
+                  </div>
                   <p className="text-[#c9a227] text-sm font-semibold mb-4">Design Minimalista & Privacidade Absoluta</p>
                   <p className="text-gray-300 text-sm leading-relaxed mb-6">
                     A solução sofisticada para banheiros, suítes máster, divisórias de escritórios e áreas técnicas residenciais. Textura suave e iluminação natural contínua.
@@ -349,14 +393,22 @@ export function LeblonPage({ faqs }: LeblonPageProps) {
                   <div className="text-xl font-bold text-white mb-4">
                     A partir de <span className="text-[#c9a227]">R$ 80/m²</span> instalado
                   </div>
-                  <a
-                    href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20de%20Jateado%20para%20o%20Leblon."
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-outline w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm border border-white/20 hover:border-[#c9a227]"
-                  >
-                    <MessageCircle size={16} /> Cotar Jateado
-                  </a>
+                  <div className="flex flex-col gap-2">
+                    <a
+                      href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20de%20Jateado%20para%20o%20Leblon."
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-outline w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm border border-white/20 hover:border-[#c9a227]"
+                    >
+                      <MessageCircle size={16} /> Cotar Jateado
+                    </a>
+                    <Link
+                      href="/jateado/"
+                      className="text-center text-xs text-gray-400 hover:text-[#c9a227] py-1 transition-colors"
+                    >
+                      Conhecer aplicações da Película Jateada →
+                    </Link>
+                  </div>
                 </div>
               </div>
             </ScrollReveal>

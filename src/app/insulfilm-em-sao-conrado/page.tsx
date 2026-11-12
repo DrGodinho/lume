@@ -66,25 +66,25 @@ const saoConradoConfig: NeighborhoodConfig = {
   localPainsSubtitle: 'Exigências de Luxo Frente ao Mar e Montanha',
   localPains: [
     {
-      title: 'Grandes Vãos de Vidro e Insolação Refletida',
+      title: 'Conforto Térmico sem Efeito Forno nos Grandes Janelões',
       problem:
-        'Condomínios como São Conrado Green, Village São Conrado e edifícios da Av. Mendes de Morais possuem panos de vidro gigantescos que recebem forte calor do sol e o reflexo contínuo da praia.',
+        'Condomínios como São Conrado Green, Village São Conrado e edifícios da Av. Mendes de Morais possuem panos de vidro gigantescos que retêm calor extremo e ofuscam a visão com o reflexo solar da praia.',
       solution:
-        'A película Nano Cerâmica dissipa a radiação solar diretamente no vidro, estabilizando o ambiente com elegância e sem sobrecarregar o ar-condicionado.',
+        'A película Nano Cerâmica bloqueia até 95% do infravermelho diretamente no vidro, estabilizando o ambiente com alívio imediato no ar-condicionado e sensação de frescor contínuo.',
     },
     {
-      title: 'Maresia Agressiva da Praia de São Conrado',
+      title: 'Blindagem Anti-Maresia sem Oxidação nem Descascamento',
       problem:
-        'Filmes metalizados de baixa qualidade oxidam, ganham manchas brancas e descascam em poucos meses devido à névoa salina vinda do oceano.',
+        'Filmes comuns com ligas metálicas oxidam com a maresia pesada de São Conrado, criando manchas brancas, perda de transparência e bolhas em poucos meses.',
       solution:
-        'Nossa linha Nano Cerâmica é 100% cerâmica pura dielétrica, totalmente livre de partículas metálicas, garantindo durabilidade perfeita por até 10 anos.',
+        'Nossa linha Nano Cerâmica é 100% cerâmica nobre dielétrica, totalmente imune à salinidade do mar, com garantia formal de até 10 anos.',
     },
     {
-      title: 'Preservação da Vista para o Mar e Pedra da Gávea',
+      title: 'Proteja-se do Calor sem Perder a Vista Panorâmica',
       problem:
-        'Películas escuras ou espelhadas estragam a vista panorâmica e causam reflexos incômodos nas salas e varandas envidraçadas.',
+        'Películas escuras ou refletivas baratas arruínam a contemplação da orla e da Pedra da Gávea, criando incômodo reflexo espelhado nas salas e varandas envidraçadas à noite.',
       solution:
-        'Transparência cristalina de até 70% com reflexão ótica neutra, preservando a vista cinematográfica tanto de dia quanto à noite.',
+        'Transparência cristalina de até 70% com corte térmico cirúrgico, garantindo conforto máximo sem escurecer os ambientes e mantendo a vista cinematográfica dia e noite.',
     },
   ],
   recommendedFilms: [

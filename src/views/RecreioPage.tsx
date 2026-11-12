@@ -176,7 +176,7 @@ export function RecreioPage({ faqs }: { faqs: { q: string; a: string }[] }) {
                             },
                             {
                                 title: "Dupla Camada", selo: "Favorito", icon: Droplets, image: "/product-smoke.webp", path: "/dupla-camada",
-                                desc: "Tecnologia especial que combina redução de calor extrema com uma visão interna relaxante, ideal para enfrentar o sol da tarde no Recreio."
+                                desc: "O melhor de dois mundos: combina a alta rejeição de calor da película refletiva com a elegância do visual fumê interno. Sem espelho interno à noite e reduzindo o reflexo na TV, ideal para o sol da tarde no Recreio."
                             }
                         ].map((product, idx) => (
                             <div key={idx} className="product-card group relative bg-gradient-to-b from-[#1a3a5c]/60 to-[#04080f]/90 rounded-2xl overflow-hidden border border-[#1a3a5c]/50 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 flex flex-col h-full">

@@ -67,25 +67,25 @@ const freguesiaConfig: NeighborhoodConfig = {
   localPainsSubtitle: 'Diagnóstico Arquitetônico Local',
   localPains: [
     {
-      title: 'Efeito Estufa em Varandas Gourmet',
+      title: 'Fim do Efeito Estufa na Varanda Gourmet e Alívio no Ar',
       problem:
-        'A Freguesia possui centenas de condomínios modernos com grandes painéis de cortina de vidro virados para o sol poente. À tarde, a varanda se torna inabitável e esquenta toda a sala.',
+        'A Freguesia possui centenas de condomínios modernos com grandes painéis de cortina de vidro virados para o sol poente. À tarde, a varanda vira um forno que sobrecarrega os aparelhos de ar-condicionado de toda a casa.',
       solution:
-        'A película Nano Cerâmica 70% rejeita até 95% dos raios infravermelhos (calor), permitindo desfrutar da varanda mesmo nos dias mais quentes do verão carioca.',
+        'A película Nano Cerâmica bloqueia até 95% do calor solar direto, reduzindo a sensação térmica em até 8°C e gerando economia comprovada de até 35% na conta de luz.',
     },
     {
-      title: 'Regras Rígidas de Condomínio',
+      title: 'Conformidade Condominial com Fachada 100% Neutra',
       problem:
-        'A maioria dos condomínios da Estrada dos Três Rios e Rua Araguaia proíbe películas reflexivas ou escuras que alterem a harmonia estética da fachada externa.',
+        'A maioria dos condomínios da Estrada dos Três Rios e Rua Araguaia proíbe películas reflexivas ou escuras que alterem o padrão estético da fachada.',
       solution:
-        'Nossas películas térmicas mantêm transparência cristalina com padrão neutro de alto luxo, 100% de acordo com as convenções condominiais.',
+        'Nossas soluções de Nano Cerâmica mantêm transparência cristalina com padrão neutro, sendo 100% aprovadas em convenções de condomínio.',
     },
     {
-      title: 'Desbotamento de Sofás e Pisos Vinílicos',
+      title: 'Proteção UV: Blindagem para Móveis, Pisos Vinílicos e Pele',
       problem:
-        'A radiação ultravioleta diária resseca couros, queima tecidos finos e mancha revestimentos de madeira e vinílico em poucos meses.',
+        'A radiação ultravioleta diária resseca estofados e tecidos finos, desbota pisos vinílicos/laminados e prejudica a saúde da pele com o sol da tarde.',
       solution:
-        'Filtro UV400 que bloqueia 99% da radiação ultravioleta, preservando integralmente o investimento feito no acabamento do seu lar.',
+        'Filtro UV400 com 99,9% de bloqueio solar, prevenindo o envelhecimento precoce de acabamentos nobres e protegendo toda a família.',
     },
   ],
   recommendedFilms: [

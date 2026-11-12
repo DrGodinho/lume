@@ -102,42 +102,42 @@ export function AntivandalismoPage({ faqs }: AntivandalismoPageProps) {
       </section>
 
       {/* Estatísticas de Segurança */}
-      <section className="py-12 border-y border-white/5 bg-[#0a111e]/40 relative">
+      <section className="py-4 border-y border-white/5 bg-[#0a111e]/40 relative">
         <div className="container-lume">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             <ScrollReveal animation="slide-up">
-              <div className="stat-card p-4">
-                <div className="text-3xl lg:text-4xl font-black font-montserrat text-[#c9a227] mb-1">
+              <div className="stat-card p-2 sm:p-3">
+                <div className="text-2xl lg:text-3xl font-black font-montserrat text-[#c9a227] mb-0.5">
                   <AnimatedCounter target="300" suffix=" µm" />
                 </div>
-                <p className="text-xs lg:text-sm text-gray-400 font-medium">Espessura Máxima (PS12)</p>
+                <p className="text-xs text-gray-400 font-medium">Espessura Máxima (PS12)</p>
               </div>
             </ScrollReveal>
 
             <ScrollReveal animation="slide-up">
-              <div className="stat-card p-4">
-                <div className="text-3xl lg:text-4xl font-black font-montserrat text-white mb-1">
+              <div className="stat-card p-2 sm:p-3">
+                <div className="text-2xl lg:text-3xl font-black font-montserrat text-white mb-0.5">
                   100%
                 </div>
-                <p className="text-xs lg:text-sm text-gray-400 font-medium">Retenção de Estilhaços</p>
+                <p className="text-xs text-gray-400 font-medium">Retenção de Estilhaços</p>
               </div>
             </ScrollReveal>
 
             <ScrollReveal animation="slide-up">
-              <div className="stat-card p-4">
-                <div className="text-3xl lg:text-4xl font-black font-montserrat text-[#c9a227] mb-1">
+              <div className="stat-card p-2 sm:p-3">
+                <div className="text-2xl lg:text-3xl font-black font-montserrat text-[#c9a227] mb-0.5">
                   <AnimatedCounter target="4" suffix="x" />
                 </div>
-                <p className="text-xs lg:text-sm text-gray-400 font-medium">Mais Resistência Mecânica</p>
+                <p className="text-xs text-gray-400 font-medium">Mais Resistência Mecânica</p>
               </div>
             </ScrollReveal>
 
             <ScrollReveal animation="slide-up">
-              <div className="stat-card p-4">
-                <div className="text-3xl lg:text-4xl font-black font-montserrat text-white mb-1">
+              <div className="stat-card p-2 sm:p-3">
+                <div className="text-2xl lg:text-3xl font-black font-montserrat text-white mb-0.5">
                   Até 10 Anos
                 </div>
-                <p className="text-xs lg:text-sm text-gray-400 font-medium">Garantia Certificada</p>
+                <p className="text-xs text-gray-400 font-medium">Garantia Certificada</p>
               </div>
             </ScrollReveal>
           </div>

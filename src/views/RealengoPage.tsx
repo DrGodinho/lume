@@ -170,7 +170,7 @@ export function RealengoPage({ faqs }: { faqs: { q: string; a: string }[] }) {
                             },
                             {
                                 title: "Dupla Camada", selo: "Favorito", icon: Droplets, image: "/product-smoke.webp", path: "/dupla-camada",
-                                desc: "Alta redução de calor com uma tecnologia especial: camada refletiva externa para máxima redução de calor e camada fumê interna para uma visão relaxante. Diferente das películas comuns, reduz o reflexo interno à noite. Perfeito para casas e apartamentos em Realengo."
+                                desc: "O melhor de dois mundos: une a alta rejeição de calor da película refletiva com a sofisticação do visual fumê interno. Sem efeito espelho à noite e diminuindo o reflexo na TV, perfeita para residências em Realengo."
                             }
                         ].map((product, idx) => (
                             <div key={idx} className="product-card group relative bg-gradient-to-b from-[#1a3a5c]/60 to-[#04080f]/90 rounded-2xl overflow-hidden border border-[#1a3a5c]/50 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 flex flex-col h-full">

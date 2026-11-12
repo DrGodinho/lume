@@ -66,25 +66,25 @@ const botafogoConfig: NeighborhoodConfig = {
   localPainsSubtitle: 'Diagnóstico de Climatização Urbana',
   localPains: [
     {
-      title: 'Efeito Estufa em Varandas Integradas',
+      title: 'Fim do Efeito Estufa nas Varandas Integradas e Salas',
       problem:
-        'Os lançamentos modernos em ruas como Voluntários da Pátria, Mena Barreto e Sorocaba contam com amplas varandas que acumulam calor excessivo no sol poente, tornando o living desconfortável.',
+        'Lançamentos modernos e apartamentos em ruas como Voluntários da Pátria, Mena Barreto e Sorocaba acumulam calor intenso no sol poente, tornando o living desconfortável e superaquecendo o ar-condicionado.',
       solution:
-        'A película Nano Cerâmica bloqueia o calor solar excessivo, mantendo a temperatura amena e permitindo aproveitar a varanda o dia todo.',
+        'A película Nano Cerâmica bloqueia até 95% do calor solar antes dele atravessar o vidro, reduzindo a temperatura em até 8°C e aliviando a conta de luz imediatamente.',
     },
     {
-      title: 'Regras de Fachada e Estética Condominial',
+      title: 'Aprovação 100% em Convenções Condominiais',
       problem:
-        'Condomínios de alto padrão na Zona Sul não permitem filmes reflexivos ou espelhados que desarmonizem a fachada externa do prédio.',
+        'Condomínios de alto padrão na Zona Sul proíbem rigorosamente filmes metalizados ou espelhados que alterem a harmonia da fachada externa.',
       solution:
-        'Nossas películas térmicas são transparentes e neutras, atuando seletivamente na luz invisível do calor sem mudar a tonalidade externa da janela.',
+        'Nossas soluções de Nano Cerâmica são totalmente neutras e sem brilho metálico, filtrando o calor seletivamente sem mudar a tonalidade nem a estética da fachada.',
     },
     {
-      title: 'Desbotamento de Madeiras e Acervos Finos',
+      title: 'Proteção UV: Blindagem para Móveis, Pisos e Pele',
       problem:
-        'A luz solar direta em janelas de prédios tradicionais degrada cortinas de linho, pisos de taco/peroba e móveis planejados.',
+        'A incidência contínua de raios solares queima cortinas de linho, desbota pisos nobres de taco/madeira e resseca marcenarias sob medida.',
       solution:
-        'Filtro de bloqueio UV de 99.9% que conserva o acabamento original e valoriza a decoração do imóvel por anos.',
+        'Filtro solar UV de 99,9% que protege a saúde da sua família contra raios nocivos e blinda o patrimônio interno contra desbotamento precoce.',
     },
   ],
   recommendedFilms: [

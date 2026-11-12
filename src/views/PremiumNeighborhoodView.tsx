@@ -99,7 +99,7 @@ export function getDefaultFilmDescription(name: string): string {
     return 'Conforto térmico máximo sem alterar a fachada. Bloqueia até 95% do infravermelho com alta transparência, mantendo a luminosidade natural e vista livre.';
   }
   if (lower.includes('dupla camada')) {
-    return 'Camada refletiva externa e fumê interno relaxante: retenção solar de alto desempenho e privacidade diurna sem espelho por dentro à noite.';
+    return 'O melhor de dois mundos: alta rejeição de calor da película refletiva com a sofisticação do visual fumê interno — sem espelho à noite e reduzindo o reflexo na TV.';
   }
   if (lower.includes('carbono')) {
     return 'Pigmentação profunda que mantém o tom grafite nobre sem desbotar nem arrochear. Garante privacidade, redução de calor e alívio do reflexo em telas.';
@@ -235,16 +235,16 @@ export function PremiumNeighborhoodView({ config }: Props) {
       </section>
 
       {/* Metrics Bar */}
-      <section className="relative z-10 py-10 bg-[#0a111e]/90 border-y border-[#c9a227]/20 backdrop-blur-md">
+      <section className="relative z-10 py-3.5 sm:py-4 bg-[#0a111e]/90 border-y border-[#c9a227]/20 backdrop-blur-md">
         <div className="container-lume">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-center">
             {config.stats.map((stat, i) => (
               <div key={i} className="flex flex-col items-center">
-                <div className="text-3xl sm:text-4xl lg:text-5xl font-black font-montserrat text-[#c9a227] mb-1">
+                <div className="text-2xl sm:text-3xl font-black font-montserrat text-[#c9a227] leading-none mb-1">
                   <AnimatedCounter target={stat.target} suffix={stat.suffix} />
                 </div>
-                <div className="text-sm font-semibold text-white tracking-wide">{stat.label}</div>
-                <div className="text-xs text-gray-400 mt-0.5">{stat.sublabel}</div>
+                <div className="text-xs sm:text-sm font-semibold text-white tracking-wide">{stat.label}</div>
+                <div className="text-[11px] text-gray-400 mt-0.5 leading-tight">{stat.sublabel}</div>
               </div>
             ))}
           </div>

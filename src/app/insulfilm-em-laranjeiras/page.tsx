@@ -65,25 +65,25 @@ const laranjeirasConfig: NeighborhoodConfig = {
   localPainsSubtitle: 'Otimização Térmica para o Vale de Laranjeiras',
   localPains: [
     {
-      title: 'Calor Retido no Vale Urbano',
+      title: 'Adeus ao Calor Acumulado no Vale e Alívio no Ar',
       problem:
-        'A topografia de Laranjeiras cria um efeito de retenção térmica nas tardes de verão. O calor penetra pelas janelas de prédios na Rua das Laranjeiras e General Glicério e permanece nos cômodos à noite.',
+        'A topografia de Laranjeiras retém bolsões de ar quente no verão. O sol da tarde penetra pelas janelas de prédios na Rua das Laranjeiras e General Glicério, superaquecendo os quartos até a madrugada.',
       solution:
-        'A película Nano Cerâmica bloqueia o calor antes que ele transpasse o vidro, mantendo as paredes e pisos frios e amenizando a sensação de abafamento.',
+        'A tecnologia Nano Cerâmica bloqueia até 95% da radiação infravermelha antes que ela entre no ambiente, garantindo cômodos frescos e reduzindo a conta de luz com o ar-condicionado.',
     },
     {
-      title: 'Conforto para Home Office e Descanso',
+      title: 'Proteção UV: Cuide da Sua Pele e Preserve Pisos e Estofados',
       problem:
-        'O excesso de luminosidade e calor direto cansa os olhos e sobrecarrega os aparelhos de ar-condicionado durante o horário de trabalho em casa.',
+        'A radiação ultravioleta que atravessa vidros comuns desbota pisos de madeira e tecidos nobres, além de acelerar o envelhecimento e manchas na pele de quem fica próximo às janelas.',
       solution:
-        'Filtragem seletiva de luz que reduz o ofuscamento sem escurecer os ambientes, criando um clima agradável e fresco para o dia a dia.',
+        'Filtro solar UV de 99,9% que protege a saúde de toda a família e preserva intacta a coloração e textura da decoração do lar.',
     },
     {
-      title: 'Películas de Alta Estabilidade Ótica',
+      title: 'Película Nobre que Jamais Fica Roxa ou com Bolhas',
       problem:
-        'Películas inferiores descascam e ficam arroxeadas com facilidade devido à alternância de umidade da serra com o sol intenso.',
+        'Filmes de baixa procedência criam bolhas horríveis, descolam e mudam de tom para roxo em menos de um ano devido ao calor carioca.',
       solution:
-        'Utilizamos somente poliéster puro com partículas de cerâmica inorgânica, imunes a desbotamentos e com certificado de garantia de até 10 anos.',
+        'Trabalhamos exclusivamente com poliéster virgem e cerâmica inorgânica estável, garantindo durabilidade impecável e garantia contratual de até 10 anos.',
     },
   ],
   recommendedFilms: [

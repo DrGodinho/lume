@@ -66,25 +66,25 @@ const flamengoConfig: NeighborhoodConfig = {
   localPainsSubtitle: 'Conforto em Prédios Históricos e Clássicos',
   localPains: [
     {
-      title: 'Janelões Amplos e Sol da Manhã Feroz',
+      title: 'Adeus ao Efeito Forno nos Grandes Janelões do Flamengo',
       problem:
-        'Apartamentos na Praia do Flamengo e Senador Vergueiro contam com janelas monumentais de ponta a ponta. O sol da manhã aquece o ambiente precocemente, mantendo a sala abafada ao longo de todo o dia.',
+        'Apartamentos na Praia do Flamengo e Senador Vergueiro contam com janelas monumentais de ponta a ponta. O sol da manhã aquece o ambiente precocemente, sobrecarregando o ar-condicionado e mantendo a sala abafada ao longo de todo o dia.',
       solution:
-        'A película Nano Cerâmica filtra os raios de calor infravermelho mantendo 70% da luz natural, estabilizando o clima com leveza e frescor.',
+        'A película Nano Cerâmica bloqueia até 95% da radiação infravermelha, mantendo a luminosidade natural abundante enquanto dissipa o calor antes de entrar na sala.',
     },
     {
-      title: 'Preservação de Pisos de Madeira e Obras de Arte',
+      title: 'Proteção UV Absoluta para Pisos de Madeira, Estofados e Pele',
       problem:
-        'A forte incidência de raios UV descolora assoalhos de taco peroba, cortinas e mobília de valor em salas com grandes aberturas de vidro.',
+        'A forte incidência de raios UV descolora assoalhos nobres de taco, resseca sofás de couro e danifica quadros e obras de arte de valor inestimável.',
       solution:
-        'Proteção UV400 com 99.9% de filtragem, criando uma barreira transparente que impede o envelhecimento precoce de acabamentos nobres.',
+        'Barreira UV400 com 99,9% de filtragem contra radiação ultravioleta, prevenindo manchas na pele e garantindo vida longa a pisos nobres e mobílias clássicas.',
     },
     {
-      title: 'Preservação da Vista da Baía e Pão de Açúcar',
+      title: 'Alívio Térmico sem Perder a Vista da Baía e Pão de Açúcar',
       problem:
-        'Moradores temem que películas escuras ou espelhadas estraguem a vista privilegiada do Parque do Flamengo e da enseada.',
+        'Películas comuns escuras ou metalizadas arruínam a vista icônica do Aterro e causam espelhamento interno com luzes acesas à noite.',
       solution:
-        'A tecnologia Nano Cerâmica é totalmente neutra e anti-reflexiva, garantindo nitidez cristalina tanto de dia quanto à noite.',
+        'A tecnologia Nano Cerâmica é 100% neutra, proporcionando alta transparência óptica sem espelho noturno para você contemplar a Baía de Guanabara a qualquer hora.',
     },
   ],
   recommendedFilms: [

@@ -65,25 +65,25 @@ const jardimBotanicoConfig: NeighborhoodConfig = {
   localPainsSubtitle: 'Preservação Patrimonial e Conforto Solar',
   localPains: [
     {
-      title: 'Grandes Vãos de Vidro e Insolação Contínua',
+      title: 'Conforto Térmico nos Grandes Vãos de Vidro sem Pesar no Ar',
       problem:
-        'Residências e coberturas em ruas nobres como Lopes Quintas, Visconde de Carandaí e Marquês de São Vicente possuem fachadas envidraçadas que acumulam intensa carga térmica durante todo o dia.',
+        'Residências e coberturas em ruas nobres como Lopes Quintas, Visconde de Carandaí e Marquês de São Vicente possuem fachadas envidraçadas que retêm calor solar intenso o dia inteiro.',
       solution:
-        'A tecnologia Nano Cerâmica dissipa a energia solar no vidro, mantendo os interiores frescos sem necessidade de sobrecarregar o ar-condicionado.',
+        'A nanotecnologia cerâmica bloqueia até 95% do calor solar antes que ele entre, garantindo frescor imediato e reduzindo os gastos com ar-condicionado em até 35%.',
     },
     {
-      title: 'Proteção de Obras de Arte e Madeiras Nobres',
+      title: 'Proteção UV: Blindagem para Obras de Arte, Madeiras e Pele',
       problem:
-        'Acervos artísticos, tapetes orientais, cortinas finas e marcenaria de design sofrem descoloração e ressecamento irreversíveis provocados pela radiação UV.',
+        'Acervos artísticos, tapetes orientais, cortinas finas e marcenarias de alto padrão sofrem descoloração e ressecamento irreversíveis causados pela radiação ultravioleta.',
       solution:
-        'Filtragem UV400 com 99.9% de retenção atua como um verniz protetor invisível que salvaguarda o patrimônio decorativo por gerações.',
+        'Filtragem UV400 com 99,9% de retenção que protege a pele e funciona como um escudo invisível sobre todo o patrimônio decorativo do imóvel.',
     },
     {
-      title: 'Integração com a Natureza sem Reflexo',
+      title: 'Proteja-se do Calor sem Perder a Vista da Mata e do Cristo',
       problem:
-        'Moradores exigem manter a vista exuberante da mata e do Cristo Redentor sem o efeito de espelhamento que prejudica a contemplação do jardim.',
+        'Películas escuras ou espelhadas desfiguram a vista exuberante da natureza e criam reflexo espelhado nas salas e varandas com as luzes acesas à noite.',
       solution:
-        'Películas 100% ópticas e incolores com baixa refletividade interna e externa, proporcionando transparência total dia e noite.',
+        'Películas 100% ópticas incolores que eliminam o calor sem alterar a luz natural, mantendo a integração visual completa com a mata dia e noite.',
     },
   ],
   recommendedFilms: [
