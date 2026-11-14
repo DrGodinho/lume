@@ -80,16 +80,28 @@ interface Props {
 export function getFilmPageUrl(name: string): string | null {
   if (!name) return null;
   const lower = name.toLowerCase().trim();
-  // Exclui películas de segurança (Antivandalismo / PS4 / PS8 / PS12), que ainda não possuem página
-  if (lower.includes('antivandalismo') || lower.includes('ps4') || lower.includes('ps8') || lower.includes('ps12')) {
-    return null;
+  if (lower.includes('antivandalismo') || lower.includes('ps4') || lower.includes('ps8') || lower.includes('ps12') || lower.includes('segurança')) {
+    return '/insulfilm-antivandalismo/';
   }
-  if (lower.includes('nano cer') || lower.includes('nano-cer')) return '/nano-ceramica/';
+  if (lower.includes('nano cer') || lower.includes('nano-cer') || lower.includes('cerâmica') || lower.includes('ceramica')) return '/nano-ceramica/';
   if (lower.includes('carbono')) return '/carbono/';
   if (lower.includes('dupla camada')) return '/dupla-camada/';
   if (lower.includes('jatead')) return '/jateado/';
   if (lower.includes('refletiv')) return '/refletiva/';
   return null;
+}
+
+export function getFilmImage(name: string): string {
+  if (!name) return '/product-nano-ceramica.webp';
+  const lower = name.toLowerCase().trim();
+  if (lower.includes('antivandalismo') || lower.includes('ps4') || lower.includes('ps8') || lower.includes('ps12')) {
+    return '/antivandalismo_hero_bg.webp';
+  }
+  if (lower.includes('carbono')) return '/product-carbono.webp';
+  if (lower.includes('dupla camada')) return '/product-smoke.webp';
+  if (lower.includes('jatead')) return '/product-jateado-v2.webp';
+  if (lower.includes('refletiv')) return '/product-refletiva.webp';
+  return '/product-nano-ceramica.webp';
 }
 
 export function getDefaultFilmDescription(name: string): string {
@@ -315,112 +327,129 @@ export function PremiumNeighborhoodView({ config }: Props) {
           </ScrollReveal>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {config.recommendedFilms.map((film, index) => (
-              <ScrollReveal key={index} animation="slide-up">
-                <div className={`h-full relative rounded-2xl p-6 flex flex-col justify-between transition-all duration-300 ${
-                  film.highlight 
-                    ? 'bg-gradient-to-b from-[#121c2e] to-[#0a111e] border-2 border-[#c9a227] shadow-[0_0_30px_rgba(201,162,39,0.2)] -translate-y-1' 
-                    : 'bg-[#0a111e]/80 border border-white/10 hover:border-white/20'
-                }`}>
-                  {film.highlight && (
-                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-1 bg-[#c9a227] text-[#04080f] text-[10px] uppercase tracking-wider font-extrabold rounded-full shadow-md flex items-center gap-1">
-                      <Sparkles size={12} />
-                      Mais Escolhida
-                    </div>
-                  )}
+            {config.recommendedFilms.map((film, index) => {
+              const filmUrl = getFilmPageUrl(film.name);
+              const filmImg = getFilmImage(film.name);
 
-                  <div>
-                    <div className="text-[11px] font-semibold text-[#c9a227] uppercase tracking-wider mb-1">
-                      {film.category}
-                    </div>
-                    <h3 className="text-xl font-bold text-white font-montserrat mb-2">
-                      {getFilmPageUrl(film.name) ? (
-                        <Link
-                          href={getFilmPageUrl(film.name)!}
-                          className="hover:text-[#c9a227] transition-colors underline-offset-4 hover:underline"
-                          title={`Ver detalhes da película ${film.name}`}
-                        >
-                          {film.name}
-                        </Link>
-                      ) : (
-                        film.name
-                      )}
-                    </h3>
-                    <div className="inline-block px-2.5 py-0.5 rounded-full bg-white/5 text-gray-300 text-xs mb-3 font-mono">
-                      {film.tag}
-                    </div>
-
-                    <p className="text-gray-300 text-xs leading-relaxed mb-4 min-h-[44px]">
-                      {renderWithFilmLinks(film.description || getDefaultFilmDescription(film.name))}
-                    </p>
-
-                    <div className="space-y-3 py-4 border-y border-white/5 text-xs">
-                      <div>
-                        <div className="flex justify-between text-gray-400 mb-1">
-                          <span>Rejeição de Calor</span>
-                          <span className="text-[#c9a227] font-semibold">{film.heatRejection}/5</span>
-                        </div>
-                        <LevelDots level={film.heatRejection} />
+              return (
+                <ScrollReveal key={index} animation="slide-up">
+                  <div className={`product-card group h-full relative rounded-2xl overflow-hidden flex flex-col justify-between transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_15px_35px_rgba(201,162,39,0.15)] ${
+                    film.highlight 
+                      ? 'bg-gradient-to-b from-[#121c2e] to-[#04080f] border-2 border-[#c9a227] shadow-[0_0_30px_rgba(201,162,39,0.2)] -translate-y-1' 
+                      : 'bg-[#0a111e]/90 border border-white/10 hover:border-[#c9a227]/50'
+                  }`}>
+                    {film.highlight && (
+                      <div className="absolute top-3.5 right-3.5 z-20 px-3 py-1 bg-[#c9a227] text-[#04080f] text-[10px] uppercase tracking-wider font-extrabold rounded-full shadow-md flex items-center gap-1 pointer-events-none">
+                        <Sparkles size={12} />
+                        Mais Escolhida
                       </div>
-                      <div>
-                        <div className="flex justify-between text-gray-400 mb-1">
-                          <span>Bloqueio UV</span>
-                          <span className="text-[#c9a227] font-semibold">{film.uvBlock}/5</span>
-                        </div>
-                        <LevelDots level={film.uvBlock} />
-                      </div>
-                      <div>
-                        <div className="flex justify-between text-gray-400 mb-1">
-                          <span>Privacidade Diurna</span>
-                          <span className="text-[#c9a227] font-semibold">{film.privacy}/5</span>
-                        </div>
-                        <LevelDots level={film.privacy} />
+                    )}
+
+                    {/* Image Header with Zoom on Hover */}
+                    <div className="relative h-44 w-full overflow-hidden">
+                      <Image
+                        src={filmImg}
+                        alt={`Película ${film.name} em ${config.name}`}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                        className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0a111e] via-[#0a111e]/40 to-transparent" />
+                      <div className="absolute top-3.5 left-3.5 z-10 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[#c9a227] text-[10px] font-bold uppercase tracking-wider">
+                        {film.tag}
                       </div>
                     </div>
 
-                    <div className="my-4 space-y-1.5 text-xs">
-                      <p className="text-gray-300">
-                        <strong className="text-white">Garantia:</strong> {film.durability}
+                    <div className="p-6 flex flex-col flex-grow">
+                      <div className="text-[11px] font-semibold text-[#c9a227] uppercase tracking-wider mb-1">
+                        {film.category}
+                      </div>
+                      <h3 className="text-xl font-bold text-white font-montserrat mb-2">
+                        {filmUrl ? (
+                          <Link
+                            href={filmUrl}
+                            className="hover:text-[#c9a227] transition-colors underline-offset-4 group-hover:underline"
+                            title={`Ver detalhes da película ${film.name}`}
+                          >
+                            {film.name}
+                          </Link>
+                        ) : (
+                          film.name
+                        )}
+                      </h3>
+
+                      <p className="text-gray-300 text-xs leading-relaxed mb-4 min-h-[44px]">
+                        {renderWithFilmLinks(film.description || getDefaultFilmDescription(film.name))}
                       </p>
-                      <p className="text-gray-400 leading-relaxed">
-                        <strong className="text-white">Ideal para:</strong> {renderWithFilmLinks(film.idealFor)}
-                      </p>
+
+                      <div className="space-y-3 py-4 border-y border-white/5 text-xs">
+                        <div>
+                          <div className="flex justify-between text-gray-400 mb-1">
+                            <span>Rejeição de Calor</span>
+                            <span className="text-[#c9a227] font-semibold">{film.heatRejection}/5</span>
+                          </div>
+                          <LevelDots level={film.heatRejection} />
+                        </div>
+                        <div>
+                          <div className="flex justify-between text-gray-400 mb-1">
+                            <span>Bloqueio UV</span>
+                            <span className="text-[#c9a227] font-semibold">{film.uvBlock}/5</span>
+                          </div>
+                          <LevelDots level={film.uvBlock} />
+                        </div>
+                        <div>
+                          <div className="flex justify-between text-gray-400 mb-1">
+                            <span>Privacidade Diurna</span>
+                            <span className="text-[#c9a227] font-semibold">{film.privacy}/5</span>
+                          </div>
+                          <LevelDots level={film.privacy} />
+                        </div>
+                      </div>
+
+                      <div className="my-4 space-y-1.5 text-xs">
+                        <p className="text-gray-300">
+                          <strong className="text-white">Garantia:</strong> {film.durability}
+                        </p>
+                        <p className="text-gray-400 leading-relaxed">
+                          <strong className="text-white">Ideal para:</strong> {renderWithFilmLinks(film.idealFor)}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="p-6 pt-0 border-t border-white/5">
+                      <div className="flex items-center justify-between mb-3 pt-3">
+                        <span className="text-xs text-[#c9a227] font-bold">
+                          {film.priceNote}
+                        </span>
+                        {filmUrl && (
+                          <Link
+                            href={filmUrl}
+                            className="text-[11px] text-gray-400 hover:text-[#c9a227] hover:underline inline-flex items-center gap-1 font-medium transition-colors"
+                            title={`Ver especificações completas de ${film.name}`}
+                          >
+                            <span>Ver página</span>
+                            <ArrowRight size={11} />
+                          </Link>
+                        )}
+                      </div>
+                      <a
+                        href={`${config.whatsappUrl}%20Gostaria%20de%20saber%20mais%20sobre%20a%20pel%C3%ADcula%20${encodeURIComponent(film.name)}.`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`w-full py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all transform hover:scale-[1.02] shadow-md ${
+                          film.highlight
+                            ? 'bg-[#c9a227] text-[#04080f] hover:bg-[#d4b035]'
+                            : 'bg-[#111e33] text-white hover:bg-[#c9a227] hover:text-[#04080f] border border-white/5'
+                        }`}
+                      >
+                        Pedir Orçamento
+                        <ArrowRight size={14} />
+                      </a>
                     </div>
                   </div>
-
-                  <div className="pt-4 border-t border-white/5">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-xs text-[#c9a227] font-semibold">
-                        {film.priceNote}
-                      </span>
-                      {getFilmPageUrl(film.name) && (
-                        <Link
-                          href={getFilmPageUrl(film.name)!}
-                          className="text-[11px] text-gray-400 hover:text-[#c9a227] hover:underline inline-flex items-center gap-1 font-medium transition-colors"
-                          title={`Ver especificações completas de ${film.name}`}
-                        >
-                          <span>Ver página</span>
-                          <ArrowRight size={11} />
-                        </Link>
-                      )}
-                    </div>
-                    <a
-                      href={`${config.whatsappUrl}%20Gostaria%20de%20saber%20mais%20sobre%20a%20pel%C3%ADcula%20${encodeURIComponent(film.name)}.`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`w-full py-2.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
-                        film.highlight
-                          ? 'bg-[#c9a227] text-[#04080f] hover:bg-[#d4b035]'
-                          : 'bg-white/10 text-white hover:bg-white/20'
-                      }`}
-                    >
-                      Pedir Orçamento
-                      <ArrowRight size={14} />
-                    </a>
-                  </div>
-                </div>
-              </ScrollReveal>
-            ))}
+                </ScrollReveal>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -463,12 +492,14 @@ export function PremiumNeighborhoodView({ config }: Props) {
               },
             ].map((d, i) => (
               <ScrollReveal key={i} animation="slide-up">
-                <div className="p-6 rounded-2xl bg-[#0a111e]/60 border border-white/5 hover:border-[#c9a227]/30 transition-all text-center">
-                  <div className="w-12 h-12 rounded-xl bg-[#c9a227]/10 flex items-center justify-center text-[#c9a227] mx-auto mb-4">
-                    <d.icon className="w-6 h-6" />
+                <div className="benefit-card group p-6 rounded-2xl bg-[#0a111e]/60 border border-white/5 hover:border-[#c9a227]/40 transition-all duration-300 hover:-translate-y-2 text-center h-full flex flex-col justify-between hover:shadow-[0_10px_30px_rgba(201,162,39,0.1)]">
+                  <div>
+                    <div className="w-12 h-12 rounded-xl bg-[#c9a227]/10 flex items-center justify-center text-[#c9a227] mx-auto mb-4 group-hover:scale-110 group-hover:bg-[#c9a227]/20 transition-all">
+                      <d.icon className="w-6 h-6" />
+                    </div>
+                    <h3 className="font-bold text-white text-base mb-2 font-montserrat">{d.title}</h3>
+                    <p className="text-xs text-gray-400 leading-relaxed font-light">{d.desc}</p>
                   </div>
-                  <h3 className="font-bold text-white text-base mb-2 font-montserrat">{d.title}</h3>
-                  <p className="text-xs text-gray-400 leading-relaxed font-light">{d.desc}</p>
                 </div>
               </ScrollReveal>
             ))}

@@ -10,11 +10,12 @@ import {
   Eye, 
   Building2, 
   MessageCircle, 
-  Sun,
-  ChevronDown,
-  ShieldCheck,
-  Zap,
-  Flame
+  Sun, 
+  ChevronDown, 
+  ShieldCheck, 
+  Zap, 
+  Flame,
+  Sparkles
 } from 'lucide-react';
 import { NavigationBreadcrumbs } from '../components/NavigationBreadcrumbs';
 import { HeroEntrance } from '../components/HeroEntrance';
@@ -244,16 +245,26 @@ export function IpanemaPage({ faqs }: IpanemaPageProps) {
           <div className="grid md:grid-cols-3 gap-8">
             {/* Card 1: Nano Cerâmica */}
             <ScrollReveal animation="slide-up">
-              <div className="glass-card rounded-2xl border border-[#c9a227]/40 bg-[#04080f]/90 p-8 flex flex-col justify-between relative shadow-[0_10px_30px_rgba(201,162,39,0.1)]">
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#c9a227] text-[#04080f] font-bold text-xs uppercase px-4 py-1 rounded-full shadow-lg">
-                  Escolha Nº 1 em Ipanema
+              <div className="product-card group rounded-2xl overflow-hidden border border-[#c9a227]/40 bg-[#04080f]/90 flex flex-col justify-between relative shadow-[0_10px_30px_rgba(201,162,39,0.1)] hover:border-[#c9a227] hover:shadow-[0_15px_35px_rgba(201,162,39,0.2)] transition-all duration-500 hover:-translate-y-2">
+                <div className="absolute top-3.5 right-3.5 z-20 bg-[#c9a227] text-[#04080f] font-extrabold text-[10px] uppercase px-3 py-1 rounded-full shadow-lg pointer-events-none flex items-center gap-1">
+                  <Sparkles size={11} /> Escolha Nº 1 Ipanema
                 </div>
-                <div>
+                <div className="relative h-44 w-full overflow-hidden">
+                  <Image
+                    src="/product-nano-ceramica.webp"
+                    alt="Película Nano Cerâmica em Ipanema"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#04080f] via-[#04080f]/40 to-transparent" />
+                </div>
+                <div className="p-6 sm:p-8 flex-grow">
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <h3 className="text-2xl font-black font-montserrat text-white">Nano Cerâmica</h3>
                     <Link 
                       href="/nano-ceramica/" 
-                      className="text-xs text-[#c9a227] hover:underline inline-flex items-center gap-1 font-semibold whitespace-nowrap mt-1"
+                      className="text-xs text-[#c9a227] hover:underline inline-flex items-center gap-1 font-semibold whitespace-nowrap mt-1 group-hover:translate-x-1 transition-transform"
                     >
                       Ver detalhes <ArrowRight size={14} />
                     </Link>
@@ -277,7 +288,7 @@ export function IpanemaPage({ faqs }: IpanemaPageProps) {
                     </div>
                   </div>
                 </div>
-                <div>
+                <div className="p-6 sm:p-8 pt-0">
                   <div className="text-xl font-bold text-white mb-4">
                     A partir de <span className="text-[#c9a227]">R$ 200/m²</span> instalado
                   </div>
@@ -286,7 +297,7 @@ export function IpanemaPage({ faqs }: IpanemaPageProps) {
                       href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20de%20Nano%20Cer%C3%A2mica%20para%20Ipanema."
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn-primary w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm"
+                      className="btn-primary w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm transform hover:scale-[1.02] transition-transform shadow-md"
                     >
                       <MessageCircle size={16} /> Cotar Nano Cerâmica
                     </a>
@@ -303,13 +314,23 @@ export function IpanemaPage({ faqs }: IpanemaPageProps) {
 
             {/* Card 2: Dupla Camada */}
             <ScrollReveal animation="slide-up">
-              <div className="glass-card rounded-2xl border border-white/5 bg-[#04080f]/90 p-8 flex flex-col justify-between hover:border-[#c9a227]/30 transition-all">
-                <div>
+              <div className="product-card group rounded-2xl overflow-hidden border border-white/10 bg-[#04080f]/90 flex flex-col justify-between hover:border-[#c9a227]/50 hover:shadow-[0_15px_35px_rgba(201,162,39,0.15)] transition-all duration-500 hover:-translate-y-2">
+                <div className="relative h-44 w-full overflow-hidden">
+                  <Image
+                    src="/product-smoke.webp"
+                    alt="Película Dupla Camada em Ipanema"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#04080f] via-[#04080f]/40 to-transparent" />
+                </div>
+                <div className="p-6 sm:p-8 flex-grow">
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <h3 className="text-2xl font-black font-montserrat text-white">Dupla Camada</h3>
                     <Link 
                       href="/dupla-camada/" 
-                      className="text-xs text-[#c9a227] hover:underline inline-flex items-center gap-1 font-semibold whitespace-nowrap mt-1"
+                      className="text-xs text-[#c9a227] hover:underline inline-flex items-center gap-1 font-semibold whitespace-nowrap mt-1 group-hover:translate-x-1 transition-transform"
                     >
                       Ver detalhes <ArrowRight size={14} />
                     </Link>
@@ -333,7 +354,7 @@ export function IpanemaPage({ faqs }: IpanemaPageProps) {
                     </div>
                   </div>
                 </div>
-                <div>
+                <div className="p-6 sm:p-8 pt-0">
                   <div className="text-xl font-bold text-white mb-4">
                     A partir de <span className="text-[#c9a227]">R$ 110/m²</span> instalado
                   </div>
@@ -342,7 +363,7 @@ export function IpanemaPage({ faqs }: IpanemaPageProps) {
                       href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20de%20Dupla%20Camada%20para%20Ipanema."
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn-outline w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm border border-white/20 hover:border-[#c9a227]"
+                      className="btn-outline w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm border border-white/20 hover:border-[#c9a227] hover:bg-[#c9a227] hover:text-[#04080f] transition-all"
                     >
                       <MessageCircle size={16} /> Cotar Dupla Camada
                     </a>
@@ -359,13 +380,23 @@ export function IpanemaPage({ faqs }: IpanemaPageProps) {
 
             {/* Card 3: Jateado Decorativo */}
             <ScrollReveal animation="slide-up">
-              <div className="glass-card rounded-2xl border border-white/5 bg-[#04080f]/90 p-8 flex flex-col justify-between hover:border-[#c9a227]/30 transition-all">
-                <div>
+              <div className="product-card group rounded-2xl overflow-hidden border border-white/10 bg-[#04080f]/90 flex flex-col justify-between hover:border-[#c9a227]/50 hover:shadow-[0_15px_35px_rgba(201,162,39,0.15)] transition-all duration-500 hover:-translate-y-2">
+                <div className="relative h-44 w-full overflow-hidden">
+                  <Image
+                    src="/product-jateado-v2.webp"
+                    alt="Película Jateada em Ipanema"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#04080f] via-[#04080f]/40 to-transparent" />
+                </div>
+                <div className="p-6 sm:p-8 flex-grow">
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <h3 className="text-2xl font-black font-montserrat text-white">Jateado</h3>
                     <Link 
                       href="/jateado/" 
-                      className="text-xs text-[#c9a227] hover:underline inline-flex items-center gap-1 font-semibold whitespace-nowrap mt-1"
+                      className="text-xs text-[#c9a227] hover:underline inline-flex items-center gap-1 font-semibold whitespace-nowrap mt-1 group-hover:translate-x-1 transition-transform"
                     >
                       Ver detalhes <ArrowRight size={14} />
                     </Link>
@@ -389,7 +420,7 @@ export function IpanemaPage({ faqs }: IpanemaPageProps) {
                     </div>
                   </div>
                 </div>
-                <div>
+                <div className="p-6 sm:p-8 pt-0">
                   <div className="text-xl font-bold text-white mb-4">
                     A partir de <span className="text-[#c9a227]">R$ 80/m²</span> instalado
                   </div>
@@ -398,7 +429,7 @@ export function IpanemaPage({ faqs }: IpanemaPageProps) {
                       href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20de%20Jateado%20para%20Ipanema."
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn-outline w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm border border-white/20 hover:border-[#c9a227]"
+                      className="btn-outline w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm border border-white/20 hover:border-[#c9a227] hover:bg-[#c9a227] hover:text-[#04080f] transition-all"
                     >
                       <MessageCircle size={16} /> Cotar Jateado
                     </a>
