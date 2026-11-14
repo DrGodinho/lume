@@ -262,8 +262,8 @@ export function LeblonPage({ faqs }: LeblonPageProps) {
                 <div className="p-6 sm:p-8 flex-grow">
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <h3 className="text-2xl font-black font-montserrat text-white">Nano Cerâmica</h3>
-                    <Link 
-                      href="/nano-ceramica/" 
+                    <Link
+                      href="/nano-ceramica/"
                       className="text-xs text-[#c9a227] hover:underline inline-flex items-center gap-1 font-semibold whitespace-nowrap mt-1 group-hover:translate-x-1 transition-transform"
                     >
                       Ver detalhes <ArrowRight size={14} />
@@ -328,8 +328,8 @@ export function LeblonPage({ faqs }: LeblonPageProps) {
                 <div className="p-6 sm:p-8 flex-grow">
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <h3 className="text-2xl font-black font-montserrat text-white">Dupla Camada</h3>
-                    <Link 
-                      href="/dupla-camada/" 
+                    <Link
+                      href="/dupla-camada/"
                       className="text-xs text-[#c9a227] hover:underline inline-flex items-center gap-1 font-semibold whitespace-nowrap mt-1 group-hover:translate-x-1 transition-transform"
                     >
                       Ver detalhes <ArrowRight size={14} />
@@ -394,8 +394,8 @@ export function LeblonPage({ faqs }: LeblonPageProps) {
                 <div className="p-6 sm:p-8 flex-grow">
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <h3 className="text-2xl font-black font-montserrat text-white">Jateado</h3>
-                    <Link 
-                      href="/jateado/" 
+                    <Link
+                      href="/jateado/"
                       className="text-xs text-[#c9a227] hover:underline inline-flex items-center gap-1 font-semibold whitespace-nowrap mt-1 group-hover:translate-x-1 transition-transform"
                     >
                       Ver detalhes <ArrowRight size={14} />

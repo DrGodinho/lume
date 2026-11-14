@@ -454,6 +454,110 @@ export function PremiumNeighborhoodView({ config }: Props) {
         </div>
       </section>
 
+      {/* Tabela Comparativa de Películas e Custo-Benefício Premium */}
+      <section className="relative py-20 px-4 bg-[#070f1a]/50 border-t border-white/5">
+        <div className="container-lume max-w-5xl mx-auto">
+          <ScrollReveal animation="slide-up">
+            <div className="text-center mb-14">
+              <span className="text-[#c9a227] text-xs uppercase tracking-widest font-semibold block mb-2">
+                Transparência e Melhor Valor em {config.name}
+              </span>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black font-montserrat tracking-tight mb-4">
+                Comparativo de Películas e Custo-Benefício
+              </h2>
+              <p className="text-sm sm:text-base text-gray-400 max-w-3xl mx-auto font-light">
+                Instalação direta com equipe própria certificada. Nossa <strong className="text-white">Nano Cerâmica</strong> entrega retenção térmica de ponta com investimento até 30% mais acessível do que as tabelas tradicionais da Zona Sul e Barra.
+              </p>
+            </div>
+          </ScrollReveal>
+
+          <ScrollReveal animation="slide-up">
+            <div className="overflow-x-auto rounded-2xl border border-white/10 bg-[#04080f]/90 shadow-2xl">
+              <table className="w-full text-left border-collapse text-xs sm:text-sm">
+                <thead>
+                  <tr className="border-b border-white/10 bg-white/[0.03] text-gray-300">
+                    <th className="py-4 px-4 sm:px-6 font-bold uppercase tracking-wider text-white">Linha de Película</th>
+                    <th className="py-4 px-4 sm:px-6 font-bold uppercase tracking-wider">Corte Infravermelho</th>
+                    <th className="py-4 px-4 sm:px-6 font-bold uppercase tracking-wider">Filtro UV</th>
+                    <th className="py-4 px-4 sm:px-6 font-bold uppercase tracking-wider">Estética da Fachada</th>
+                    <th className="py-4 px-4 sm:px-6 font-bold uppercase tracking-wider text-right">Investimento LUME</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5 text-gray-300">
+                  <tr className="hover:bg-white/[0.02] transition-colors">
+                    <td className="py-4 px-4 sm:px-6 font-bold text-white flex items-center gap-2">
+                      <Link href="/carbono/" className="hover:text-[#c9a227] transition-colors underline-offset-4 hover:underline">
+                        Carbono Premium
+                      </Link>
+                    </td>
+                    <td className="py-4 px-4 sm:px-6 text-[#c9a227] font-semibold">Até 70%</td>
+                    <td className="py-4 px-4 sm:px-6">99%</td>
+                    <td className="py-4 px-4 sm:px-6">Fumê Grafite Elegante</td>
+                    <td className="py-4 px-4 sm:px-6 font-black text-white text-right whitespace-nowrap">
+                      A partir de <span className="text-[#c9a227]">R$ 80/m²</span>
+                    </td>
+                  </tr>
+                  <tr className="hover:bg-white/[0.02] transition-colors">
+                    <td className="py-4 px-4 sm:px-6 font-bold text-white">
+                      <Link href="/dupla-camada/" className="hover:text-[#c9a227] transition-colors underline-offset-4 hover:underline">
+                        Dupla Camada
+                      </Link>
+                    </td>
+                    <td className="py-4 px-4 sm:px-6 text-[#c9a227] font-semibold">Até 85%</td>
+                    <td className="py-4 px-4 sm:px-6">99%</td>
+                    <td className="py-4 px-4 sm:px-6">Fumê Interno / Sem Espelho</td>
+                    <td className="py-4 px-4 sm:px-6 font-black text-white text-right whitespace-nowrap">
+                      A partir de <span className="text-[#c9a227]">R$ 110/m²</span>
+                    </td>
+                  </tr>
+                  <tr className="bg-[#c9a227]/10 border-y border-[#c9a227]/30 hover:bg-[#c9a227]/15 transition-colors">
+                    <td className="py-4 px-4 sm:px-6 font-black text-white flex items-center gap-2">
+                      <Link href="/nano-ceramica/" className="text-[#c9a227] hover:underline flex items-center gap-1.5">
+                        <Sparkles size={14} className="text-[#c9a227]" />
+                        Nano Cerâmica
+                      </Link>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#c9a227] text-[#04080f] font-extrabold uppercase">
+                        Melhor Valor
+                      </span>
+                    </td>
+                    <td className="py-4 px-4 sm:px-6 text-[#c9a227] font-black">Até 95% (Máximo)</td>
+                    <td className="py-4 px-4 sm:px-6 font-bold text-white">99.9% UV400</td>
+                    <td className="py-4 px-4 sm:px-6 text-white font-medium">100% Neutra / Incolor (Luz Natural)</td>
+                    <td className="py-4 px-4 sm:px-6 font-black text-[#c9a227] text-right whitespace-nowrap text-base">
+                      A partir de R$ 200/m²
+                    </td>
+                  </tr>
+                  <tr className="hover:bg-white/[0.02] transition-colors">
+                    <td className="py-4 px-4 sm:px-6 font-bold text-white">
+                      <Link href="/insulfilm-antivandalismo/" className="hover:text-[#c9a227] transition-colors underline-offset-4 hover:underline">
+                        Antivandalismo (PS4/PS8)
+                      </Link>
+                    </td>
+                    <td className="py-4 px-4 sm:px-6">Proteção de Vidro</td>
+                    <td className="py-4 px-4 sm:px-6">99%</td>
+                    <td className="py-4 px-4 sm:px-6">Cristalina de Alta Resistência</td>
+                    <td className="py-4 px-4 sm:px-6 font-black text-white text-right whitespace-nowrap">
+                      A partir de <span className="text-[#c9a227]">R$ 110/m²</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div className="mt-4 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-400 gap-2 px-2">
+              <span>* Valores instalados com medição gratuita a laser e certificado de garantia formal LUME.</span>
+              <a
+                href={`${config.whatsappUrl}%20Gostaria%20de%20receber%20um%20comparativo%20de%20or%C3%A7amento.`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#c9a227] hover:underline font-semibold inline-flex items-center gap-1"
+              >
+                Solicitar cotação comparativa no WhatsApp <ArrowRight size={13} />
+              </a>
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
+
       {/* Differentials Section */}
       <section className="relative py-20 px-4">
         <div className="container-lume max-w-5xl mx-auto">
