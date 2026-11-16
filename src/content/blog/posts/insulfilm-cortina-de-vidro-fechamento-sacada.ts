@@ -232,6 +232,11 @@ export const insulfilmCortinaDeVidroFechamentoSacada: BlogPost = {
       type: 'faq',
       items: [
         {
+          question: 'Quais são as condições de pagamento para fechamento de sacadas?',
+          answer:
+            'Como o fechamento de varandas e cortinas de vidro envolve áreas envidraçadas maiores, a LUME facilita o pagamento em até 3x sem juros no cartão de crédito, além de Pix e transferência bancária, com medição e consultoria técnica especializada no local.',
+        },
+        {
           question: 'A película atrapalha o recolhimento e a movimentação das folhas da cortina de vidro?',
           answer:
             'Não, desde que instalada por profissionais especializados. A espessura da película de controle solar é de poucas micras e a aplicação é feita folha por folha, com refilamento perfeito nas bordas para não encostar nos trilhos, roldanas ou escovas de silicone.',

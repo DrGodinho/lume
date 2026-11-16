@@ -14,7 +14,8 @@ import {
     Thermometer,
     ShieldCheck,
     Calculator,
-    HelpCircle
+    HelpCircle,
+    CreditCard
 } from 'lucide-react';
 import gsap from 'gsap';
 
@@ -338,6 +339,11 @@ export function QuotePage() {
                         <Send size={20} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                         ENVIAR PELO WHATSAPP
                     </button>
+
+                    <p className="text-center text-xs text-gray-400 mt-3 flex items-center justify-center gap-1.5">
+                        <CreditCard size={14} className="text-[#c9a227]" />
+                        <span>Pagamento facilitado em até <strong className="text-gray-200 font-medium">3x sem juros</strong> no cartão</span>
+                    </p>
 
                     <p className="text-center text-[10px] text-gray-600 mt-4 uppercase tracking-[0.2em]">
                         © 2026 LUME Películas • Sistema de Orçamento Seguro

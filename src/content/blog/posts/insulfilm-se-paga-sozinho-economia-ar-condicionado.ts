@@ -130,6 +130,11 @@ export const insulfilmSePagaSozinhoEconomiaArCondicionado: BlogPost = {
       type: 'faq',
       items: [
         {
+          question: 'Como funciona o parcelamento da instalação?',
+          answer:
+            'Para que a economia na conta de luz comece a amortizar o investimento desde o primeiro mês sem pesar no seu bolso, a LUME oferece parcelamento em até 3x sem juros no cartão de crédito, além de pagamentos via Pix e transferência bancária.',
+        },
+        {
           question: 'A película precisa ser escura para gerar economia de energia?',
           answer:
             'Não. Esse é o maior mito da área. A tecnologia de cerâmica de alta densidade rejeita o calor invisível (infravermelho) mesmo em versões com alta transmissão de luz visível (70% ou 80% de claridade). Você preserva a luminosidade natural e a vista enquanto barra a caloria solar.',

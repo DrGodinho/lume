@@ -18,7 +18,8 @@ import {
   Clock,
   Layers,
   Award,
-  Zap
+  Zap,
+  CreditCard
 } from 'lucide-react';
 import { NavigationBreadcrumbs } from '../components/NavigationBreadcrumbs';
 import { HeroEntrance } from '../components/HeroEntrance';
@@ -242,6 +243,24 @@ export function PremiumNeighborhoodView({ config }: Props) {
                 <ArrowRight size={18} />
               </a>
             </div>
+
+            {/* Trust Badges */}
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs text-gray-400 animate-hero">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={14} className="text-[#c9a227]" />
+                <span>Atendimento ágil em {config.name}</span>
+              </div>
+              <div className="hidden sm:block w-px h-3.5 bg-white/10" />
+              <div className="flex items-center gap-2">
+                <CreditCard size={14} className="text-[#c9a227]" />
+                <span>Até <strong className="text-white font-medium">3x sem juros</strong> no cartão</span>
+              </div>
+              <div className="hidden sm:block w-px h-3.5 bg-white/10" />
+              <div className="flex items-center gap-2">
+                <ShieldCheck size={14} className="text-[#c9a227]" />
+                <span>Garantia de até 10 anos</span>
+              </div>
+            </div>
           </HeroEntrance>
         </div>
       </section>
@@ -417,7 +436,7 @@ export function PremiumNeighborhoodView({ config }: Props) {
                     </div>
 
                     <div className="p-6 pt-0 border-t border-white/5">
-                      <div className="flex items-center justify-between mb-3 pt-3">
+                      <div className="flex items-center justify-between pt-3">
                         <span className="text-xs text-[#c9a227] font-bold">
                           {film.priceNote}
                         </span>
@@ -431,6 +450,10 @@ export function PremiumNeighborhoodView({ config }: Props) {
                             <ArrowRight size={11} />
                           </Link>
                         )}
+                      </div>
+                      <div className="flex items-center gap-1.5 mt-1 mb-3 text-[11px] text-gray-400">
+                        <CreditCard size={12} className="text-[#c9a227] flex-shrink-0" />
+                        <span>Em até <strong className="text-gray-200 font-medium">3x sem juros</strong> no cartão</span>
                       </div>
                       <a
                         href={`${config.whatsappUrl}%20Gostaria%20de%20saber%20mais%20sobre%20a%20pel%C3%ADcula%20${encodeURIComponent(film.name)}.`}

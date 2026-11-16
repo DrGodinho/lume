@@ -1,6 +1,6 @@
  'use client';
 
-import { ArrowRight, CalendarDays, Clock, MessageCircle, Tag, User, ShieldCheck } from 'lucide-react';
+import { ArrowRight, CalendarDays, Clock, MessageCircle, Tag, User, ShieldCheck, CreditCard } from 'lucide-react';
 import { getBlogUrl, getReadingTime, type BlogContentBlock, type BlogPost as BlogPostType } from '@/lib/blog';
 
 type BlogPostProps = {
@@ -527,6 +527,11 @@ export function BlogPost({ post, relatedPosts }: BlogPostProps) {
               Falar no WhatsApp
             </a>
 
+            <div className="mt-3 flex items-center justify-center gap-1.5 text-xs text-gray-400">
+              <CreditCard className="h-3.5 w-3.5 text-[#c9a227] flex-shrink-0" />
+              <span>Até <strong className="text-gray-200 font-medium">3x sem juros</strong> no cartão</span>
+            </div>
+
             {post.tags.length > 0 && (
               <div className="mt-8">
                 <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#c9a227]">Tags</p>
@@ -562,7 +567,7 @@ export function BlogPost({ post, relatedPosts }: BlogPostProps) {
           </div>
         </aside>
       </main>
-      <div className="lg:hidden fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-[#04080f]/95 px-4 pt-3 backdrop-blur pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+      <div className="lg:hidden fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-[#04080f]/95 px-4 pt-2.5 backdrop-blur pb-[max(0.75rem,env(safe-area-inset-bottom))]">
         <a
           href={waHref}
           target="_blank"
@@ -572,6 +577,10 @@ export function BlogPost({ post, relatedPosts }: BlogPostProps) {
           <MessageCircle className="h-4 w-4" />
           Pedir orçamento no WhatsApp
         </a>
+        <p className="mt-1.5 text-[11px] text-center text-gray-400 flex items-center justify-center gap-1">
+          <CreditCard className="h-3 w-3 text-[#c9a227]" />
+          <span>Até <strong className="text-white">3x sem juros</strong> no cartão</span>
+        </p>
       </div>
     </article>
   );

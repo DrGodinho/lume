@@ -4,6 +4,7 @@ import { Montserrat, Open_Sans } from 'next/font/google';
 import './globals.css';
 import { LayoutShell } from './LayoutShell';
 import { businessAddressSchema, businessInfo, businessSameAs } from '@/lib/businessInfo';
+import googleReviewsData from '@/data/googleReviews.json';
 
 const montserrat = Montserrat({
   subsets: ['latin'],
@@ -83,11 +84,20 @@ const jsonLd = {
   url: businessInfo.siteUrl,
   telephone: businessInfo.phoneE164,
   priceRange: '$$',
+  paymentAccepted: 'Cartão de Crédito (em até 3x sem juros), Pix, Transferência Bancária',
+  currenciesAccepted: 'BRL',
   address: businessAddressSchema,
   geo: {
     '@type': 'GeoCoordinates',
     latitude: -22.8767,
     longitude: -43.4651,
+  },
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: String(googleReviewsData.rating || '5.0'),
+    reviewCount: String(googleReviewsData.userRatingCount || '31'),
+    bestRating: '5',
+    worstRating: '1',
   },
   openingHoursSpecification: {
     '@type': 'OpeningHoursSpecification',
@@ -97,11 +107,19 @@ const jsonLd = {
   },
   areaServed: [
     { '@type': 'City', name: 'Rio de Janeiro' },
-    { '@type': 'AdministrativeArea', name: 'Bangu' },
+    { '@type': 'AdministrativeArea', name: 'Santo Cristo' },
+    { '@type': 'AdministrativeArea', name: 'Porto Maravilha' },
+    { '@type': 'AdministrativeArea', name: 'Centro' },
+    { '@type': 'AdministrativeArea', name: 'Copacabana' },
+    { '@type': 'AdministrativeArea', name: 'Ipanema' },
+    { '@type': 'AdministrativeArea', name: 'Leblon' },
+    { '@type': 'AdministrativeArea', name: 'Tijuca' },
     { '@type': 'AdministrativeArea', name: 'Barra da Tijuca' },
     { '@type': 'AdministrativeArea', name: 'Recreio dos Bandeirantes' },
+    { '@type': 'AdministrativeArea', name: 'Jacarepaguá' },
     { '@type': 'AdministrativeArea', name: 'Campo Grande' },
-    { '@type': 'AdministrativeArea', name: 'Jacarepaguá' }
+    { '@type': 'AdministrativeArea', name: 'Bangu' },
+    { '@type': 'AdministrativeArea', name: 'Realengo' }
   ],
   contactPoint: {
     '@type': 'ContactPoint',
@@ -171,6 +189,94 @@ const jsonLd = {
             '@type': 'Service',
             name: 'Instalacao de insulfilm refletivo',
             description: 'Servico profissional de instalacao de insulfilm refletivo para privacidade e reducao eficiente de calor.',
+            provider: {
+              '@type': 'LocalBusiness',
+              name: businessInfo.name,
+              telephone: businessInfo.phoneE164,
+              address: businessAddressSchema,
+            },
+            areaServed: { '@type': 'City', name: 'Rio de Janeiro' },
+          },
+        },
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        item: {
+          '@type': 'Offer',
+          url: `${businessInfo.siteUrl}/dupla-camada`,
+          priceCurrency: 'BRL',
+          availability: 'https://schema.org/InStock',
+          itemOffered: {
+            '@type': 'Service',
+            name: 'Instalacao de insulfilm dupla camada',
+            description: 'Servico de insulfilm dupla camada combinando rejeicao solar externa e conforto visual fume interno.',
+            provider: {
+              '@type': 'LocalBusiness',
+              name: businessInfo.name,
+              telephone: businessInfo.phoneE164,
+              address: businessAddressSchema,
+            },
+            areaServed: { '@type': 'City', name: 'Rio de Janeiro' },
+          },
+        },
+      },
+      {
+        '@type': 'ListItem',
+        position: 5,
+        item: {
+          '@type': 'Offer',
+          url: `${businessInfo.siteUrl}/jateado`,
+          priceCurrency: 'BRL',
+          availability: 'https://schema.org/InStock',
+          itemOffered: {
+            '@type': 'Service',
+            name: 'Instalacao de insulfilm jateado',
+            description: 'Pelicula fosca decorativa para privacidade total 24 horas em banheiros, divisorias e escritorios.',
+            provider: {
+              '@type': 'LocalBusiness',
+              name: businessInfo.name,
+              telephone: businessInfo.phoneE164,
+              address: businessAddressSchema,
+            },
+            areaServed: { '@type': 'City', name: 'Rio de Janeiro' },
+          },
+        },
+      },
+      {
+        '@type': 'ListItem',
+        position: 6,
+        item: {
+          '@type': 'Offer',
+          url: `${businessInfo.siteUrl}/insulfilm-antivandalismo`,
+          priceCurrency: 'BRL',
+          availability: 'https://schema.org/InStock',
+          itemOffered: {
+            '@type': 'Service',
+            name: 'Instalacao de insulfilm de seguranca antivandalismo',
+            description: 'Peliculas de seguranca PS4, PS8 e PS12 para retencao de estilhacos e protecao contra impactos severos.',
+            provider: {
+              '@type': 'LocalBusiness',
+              name: businessInfo.name,
+              telephone: businessInfo.phoneE164,
+              address: businessAddressSchema,
+            },
+            areaServed: { '@type': 'City', name: 'Rio de Janeiro' },
+          },
+        },
+      },
+      {
+        '@type': 'ListItem',
+        position: 7,
+        item: {
+          '@type': 'Offer',
+          url: `${businessInfo.siteUrl}/insulfilm-para-varanda-gourmet`,
+          priceCurrency: 'BRL',
+          availability: 'https://schema.org/InStock',
+          itemOffered: {
+            '@type': 'Service',
+            name: 'Instalacao de insulfilm para varanda gourmet e cortina de vidro',
+            description: 'Reducao termica seletiva de calor em sacadas envidracadas sem alterar a estetica da fachada.',
             provider: {
               '@type': 'LocalBusiness',
               name: businessInfo.name,

@@ -172,7 +172,7 @@ export function NanoCeramicaPage() {
                                 Solicitar Orçamento Grátis <ArrowRight size={20} />
                             </a>
                             <span className="text-xs sm:text-sm text-gray-400 font-medium text-center sm:text-left">
-                                A partir de <strong className="text-[#c9a227]">R$ 180/m²</strong> • Até 10 Anos de Garantia
+                                A partir de <strong className="text-[#c9a227]">R$ 180/m²</strong> • Em até <strong className="text-white">3x sem juros</strong> • Até 10 Anos de Garantia
                             </span>
                         </div>
                     </HeroEntrance>
@@ -362,6 +362,7 @@ export function NanoCeramicaPage() {
                                                     R$ {model.price}
                                                 </span>
                                                 <span className="text-xs text-gray-400">/m²</span>
+                                                <span className="block text-[10px] text-gray-400 mt-0.5">Em até 3x sem juros</span>
                                             </td>
 
                                             {/* Ação */}
@@ -434,6 +435,7 @@ export function NanoCeramicaPage() {
                                                 R$ {model.price}
                                             </span>
                                             <span className="text-xs text-gray-400">/m²</span>
+                                            <span className="text-[10px] text-gray-400 block mt-0.5">Em até 3x sem juros</span>
                                         </div>
                                     </div>
 
@@ -516,7 +518,10 @@ export function NanoCeramicaPage() {
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-[#c9a227] blur-[100px] opacity-20" />
 
                                 <h3 className="text-2xl font-bold font-montserrat text-white mb-2 border-b border-white/10 pb-4">Painel de Performance da Tecnologia</h3>
-                                <div className="mb-8 text-[#c9a227] font-bold text-xl uppercase tracking-wider">Nano Cerâmica a partir de R$ 180/m² instalado</div>
+                                <div className="mb-8 flex flex-wrap items-center gap-2 sm:gap-3 text-sm sm:text-base font-semibold">
+                                    <span className="text-[#c9a227] uppercase tracking-wider text-lg sm:text-xl font-bold">Nano Cerâmica a partir de R$ 180/m² instalado</span>
+                                    <span className="px-2.5 py-0.5 rounded-full bg-[#c9a227]/10 text-gray-200 border border-[#c9a227]/30 text-xs font-medium">Em até 3x sem juros no cartão</span>
+                                </div>
 
                                 <div className="space-y-6">
                                     <div className="perf-row opacity-0">

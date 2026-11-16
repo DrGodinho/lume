@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { ArrowRight, Star, Thermometer, Sun, Eye, Droplets, Sparkles } from 'lucide-react';
+import { ArrowRight, Star, Thermometer, Sun, Eye, Droplets, Sparkles, CreditCard } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Image from 'next/image';
@@ -233,9 +233,13 @@ export function Products() {
 
                   {/* Price */}
                   <div className="mb-3 sm:mb-4">
-                    <span className="text-sm sm:text-lg font-bold text-gradient-gold">
+                    <span className="text-sm sm:text-lg font-bold text-gradient-gold block">
                       {product.price}
                     </span>
+                    <div className="flex items-center gap-1.5 mt-1 text-[11px] sm:text-xs text-gray-400">
+                      <CreditCard className="w-3.5 h-3.5 text-[#c9a227] flex-shrink-0" />
+                      <span>Em até <strong className="text-gray-200 font-medium">3x sem juros</strong> no cartão</span>
+                    </div>
                   </div>
                 </div>
               </a>

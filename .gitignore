@@ -43,6 +43,7 @@ Agentic-SEO-Skill/
 *.json
 !package.json
 !tsconfig.json
+!src/data/googleReviews.json
 !next.config.mjs
 *.log
 kkk.txt

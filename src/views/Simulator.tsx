@@ -478,7 +478,10 @@ export function SimulatorPage() {
                                     </div>
                                     <div className="flex justify-between items-center pt-1">
                                         <span className="text-gray-400 text-sm">Investimento (a partir de)</span>
-                                        <span className="font-bold text-[#c9a227]">R$ {bestMatch.price}/m²</span>
+                                        <div className="text-right">
+                                            <span className="font-bold text-[#c9a227]">R$ {bestMatch.price}/m²</span>
+                                            <span className="block text-[11px] text-gray-400 font-normal">Até 3x sem juros no cartão</span>
+                                        </div>
                                     </div>
                                 </div>
 

@@ -1,0 +1,63 @@
+{
+  "rating": 5,
+  "userRatingCount": 32,
+  "googleMapsUrl": "https://maps.google.com/?cid=10747417637393527133&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+  "lastSyncedAt": "2026-11-16T22:26:10.056Z",
+  "reviews": [
+    {
+      "id": 1,
+      "name": "Gilberto Trindade",
+      "date": "4 meses atrás",
+      "rating": 5,
+      "text": "O serviço foi muito bem feito. O instalador foi pontual, e atendeu perfeitamente a minha necessidade! EU O INDICO!",
+      "initial": "G",
+      "color": "bg-[#1a3a5c]",
+      "authorUri": "https://www.google.com/maps/contrib/116549199614603217164/reviews",
+      "photoUri": "https://lh3.googleusercontent.com/a/ACg8ocJZTGxIvkxWwCiOHngXsukD3uvTojWXTOsyZPCr9bchquVj9Q=s128-c0x00000000-cc-rp-mo"
+    },
+    {
+      "id": 2,
+      "name": "Gabriel Menezes",
+      "date": "5 meses atrás",
+      "rating": 5,
+      "text": "Excelente profissional e excelente trabalho, realmente cumpre o que promete, deixando o ambiente mais fresco, agradável e aconchegante.",
+      "initial": "G",
+      "color": "bg-[#c9a227]",
+      "authorUri": "https://www.google.com/maps/contrib/116994606562737778845/reviews",
+      "photoUri": "https://lh3.googleusercontent.com/a/ACg8ocLVNJPUpqY00RkNk_wZmUx4ocQpct2oRm6tMwVL6hYHDXwB1Q=s128-c0x00000000-cc-rp-mo"
+    },
+    {
+      "id": 3,
+      "name": "Milena Da silva perrote",
+      "date": "3 meses atrás",
+      "rating": 5,
+      "text": "Excelente profissional educado e muito caprichoso super indico",
+      "initial": "M",
+      "color": "bg-slate-700",
+      "authorUri": "https://www.google.com/maps/contrib/113456399869165710062/reviews",
+      "photoUri": "https://lh3.googleusercontent.com/a/ACg8ocJu50boERu-2yxyNKS2JUo4UzKsl-OUyTcyk8f8IFLHvWYfKg=s128-c0x00000000-cc-rp-mo"
+    },
+    {
+      "id": 4,
+      "name": "Ana Lamas",
+      "date": "3 meses atrás",
+      "rating": 5,
+      "text": "Atendimento de excelência, com pontualidade, compromisso e orientação para as dúvidas surgidas.",
+      "initial": "A",
+      "color": "bg-blue-900",
+      "authorUri": "https://www.google.com/maps/contrib/108405324798492595967/reviews",
+      "photoUri": "https://lh3.googleusercontent.com/a/ACg8ocIeuISvF0xjmCULJTpkdIqcKZvnMoLxpx2SAEqPCWniMWvzwg=s128-c0x00000000-cc-rp-mo"
+    },
+    {
+      "id": 5,
+      "name": "Thalita Justo",
+      "date": "6 meses atrás",
+      "rating": 5,
+      "text": "Servico rapido e bem feito. Recomendo a todos. Instalei insilfilm g20 e ficou perfeito.",
+      "initial": "T",
+      "color": "bg-amber-800",
+      "authorUri": "https://www.google.com/maps/contrib/104898002223924334706/reviews",
+      "photoUri": "https://lh3.googleusercontent.com/a/ACg8ocIDJxZBEBKcm-XUEwdbKaNqXZSGzcpGlIBRqdbIl-SJSEkYuw=s128-c0x00000000-cc-rp-mo"
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-import { ArrowRight, Check, MessageCircle } from 'lucide-react';
+import { ArrowRight, Check, MessageCircle, CreditCard } from 'lucide-react';
 import { Particles } from '../components/Particles';
 import { HeroEntrance } from '../components/HeroEntrance';
 import { GtagLink } from '../components/GtagLink';
@@ -79,17 +79,17 @@ export function Hero() {
           <div className="animate-hero opacity-0 flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-400">
             <div className="flex items-center gap-2">
               <Check className="w-3 h-3 sm:w-4 sm:h-4 text-[#c9a227] flex-shrink-0" />
-              <span>Atendimento em todo o Rio de Janeiro</span>
+              <span>Atendimento em todo o RJ</span>
+            </div>
+            <div className="hidden sm:block w-px h-4 bg-gray-600" />
+            <div className="flex items-center gap-2">
+              <CreditCard className="w-3 h-3 sm:w-4 sm:h-4 text-[#c9a227] flex-shrink-0" />
+              <span>Até <span className="text-gray-200 font-semibold">3x sem juros</span> no cartão</span>
             </div>
             <div className="hidden sm:block w-px h-4 bg-gray-600" />
             <div className="flex items-center gap-2">
               <Check className="w-3 h-3 sm:w-4 sm:h-4 text-[#c9a227] flex-shrink-0" />
-              <span>Bangu, Campo Grande, Realengo</span>
-            </div>
-            <div className="hidden sm:block w-px h-4 bg-gray-600" />
-            <div className="flex items-center gap-2">
-              <Check className="w-3 h-3 sm:w-4 sm:h-4 text-[#c9a227] flex-shrink-0" />
-              <span>Barra, Recreio, Jacarepaguá</span>
+              <span>Barra, Recreio e Zona Oeste</span>
             </div>
           </div>
         </HeroEntrance>

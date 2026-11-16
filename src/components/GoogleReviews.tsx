@@ -1,34 +1,40 @@
 import { Star, Quote, ExternalLink } from 'lucide-react';
 import { businessInfo } from '@/lib/businessInfo';
-
-const reviews = [
-  {
-    id: 1,
-    name: 'Carlos Mendes',
-    date: '1 semana atrás',
-    text: 'Trabalho impecável! Instalaram a película Nano Cerâmica no meu apartamento e a redução de calor foi imediata. Excelente atendimento do início ao fim.',
-    initial: 'C',
-    color: 'bg-[#1a3a5c]'
-  },
-  {
-    id: 2,
-    name: 'Mariana Silva',
-    date: '3 semanas atrás',
-    text: 'Pesquisei muito antes de fechar e a LUME me passou mais confiança. Fizeram a varanda com a película refletiva. Ficou lindo e muito privativo.',
-    initial: 'M',
-    color: 'bg-[#c9a227]'
-  },
-  {
-    id: 3,
-    name: 'Roberto Castro',
-    date: '1 mês atrás',
-    text: 'Profissionais de altíssimo nível. O insulfilm de carbono escureceu na medida certa para a minha sala sem perder a visibilidade de dentro para fora.',
-    initial: 'R',
-    color: 'bg-slate-700'
-  }
-];
+import googleReviewsData from '@/data/googleReviews.json';
 
 export function GoogleReviews() {
+  const reviews = (googleReviewsData.reviews && googleReviewsData.reviews.length > 0)
+    ? googleReviewsData.reviews.slice(0, 3)
+    : [
+        {
+          id: 1,
+          name: 'Carlos Mendes',
+          date: '1 semana atrás',
+          text: 'Trabalho impecável! Instalaram a película Nano Cerâmica no meu apartamento e a redução de calor foi imediata. Excelente atendimento do início ao fim.',
+          initial: 'C',
+          color: 'bg-[#1a3a5c]'
+        },
+        {
+          id: 2,
+          name: 'Mariana Silva',
+          date: '3 semanas atrás',
+          text: 'Pesquisei muito antes de fechar e a LUME me passou mais confiança. Fizeram a varanda com a película refletiva. Ficou lindo e muito privativo.',
+          initial: 'M',
+          color: 'bg-[#c9a227]'
+        },
+        {
+          id: 3,
+          name: 'Roberto Castro',
+          date: '1 mês atrás',
+          text: 'Profissionais de altíssimo nível. O insulfilm de carbono escureceu na medida certa para a minha sala sem perder a visibilidade de dentro para fora.',
+          initial: 'R',
+          color: 'bg-slate-700'
+        }
+      ];
+
+  const rating = googleReviewsData.rating || 5.0;
+  const count = googleReviewsData.userRatingCount || 31;
+  const mapsUrl = googleReviewsData.googleMapsUrl || businessInfo.googleMapsUrl;
   return (
     <section className="py-20 bg-[#04080f] overflow-hidden">
       <div className="container-lume">
@@ -72,8 +78,18 @@ export function GoogleReviews() {
 
               {/* Customer Info */}
               <div className="flex items-center gap-4 mt-auto">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-lg ${review.color}`}>
-                  {review.initial}
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-lg ${review.color} overflow-hidden shrink-0 border border-white/10`}>
+                  {'photoUri' in review && review.photoUri ? (
+                    <img
+                      src={review.photoUri}
+                      alt={review.name}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    review.initial
+                  )}
                 </div>
                 <div>
                   <h4 className="text-white font-semibold text-sm font-montserrat">{review.name}</h4>
@@ -87,7 +103,7 @@ export function GoogleReviews() {
         {/* Call to action for more reviews */}
         <div className="text-center mt-12">
           <a
-            href={businessInfo.googleMapsUrl}
+            href={mapsUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 text-[#c9a227] hover:text-white transition-all text-sm font-semibold border border-[#c9a227]/40 hover:border-[#c9a227] rounded-full px-7 py-3 bg-[#c9a227]/10 hover:bg-[#c9a227]/20 shadow-lg shadow-[#c9a227]/5"
@@ -97,7 +113,7 @@ export function GoogleReviews() {
                 <Star key={i} className="w-3.5 h-3.5 fill-[#c9a227] text-[#c9a227]" />
               ))}
             </div>
-            <span>Ver perfil e avaliações no Google Maps</span>
+            <span>Ver perfil e {count} avaliações no Google Maps</span>
             <ExternalLink className="w-3.5 h-3.5 ml-0.5" />
           </a>
         </div>

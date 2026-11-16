@@ -14,7 +14,8 @@ import {
   Users, 
   ChevronDown,
   Briefcase,
-  Monitor
+  Monitor,
+  CreditCard
 } from 'lucide-react';
 import { NavigationBreadcrumbs } from '../components/NavigationBreadcrumbs';
 import { HeroEntrance } from '../components/HeroEntrance';
@@ -121,6 +122,10 @@ export function CentroRioPage({ faqs }: CentroRioPageProps) {
             <div className="flex items-center gap-2">
               <Eye size={16} className="text-[#c9a227]" />
               <span>Privacidade em Fachadas e Divisórias Jateadas</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CreditCard size={16} className="text-[#c9a227]" />
+              <span>Até 3x sem juros no cartão</span>
             </div>
             <div className="flex items-center gap-2">
               <Shield size={16} className="text-[#c9a227]" />

@@ -3,19 +3,20 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { 
-  Shield, 
-  Sun, 
-  Thermometer, 
-  CheckCircle, 
-  ArrowRight, 
-  Eye, 
-  Building2, 
-  Sparkles, 
-  MessageCircle, 
-  Users, 
-  Layers, 
-  ChevronDown
+import {
+  Shield,
+  Sun,
+  Thermometer,
+  CheckCircle,
+  ArrowRight,
+  Eye,
+  Building2,
+  Sparkles,
+  MessageCircle,
+  Users,
+  Layers,
+  ChevronDown,
+  CreditCard
 } from 'lucide-react';
 import { NavigationBreadcrumbs } from '../components/NavigationBreadcrumbs';
 import { HeroEntrance } from '../components/HeroEntrance';
@@ -57,7 +58,7 @@ export function SantoCristoPage({ faqs }: SantoCristoPageProps) {
         <Particles />
 
         <div className="container-lume relative z-10 text-center max-w-4xl mx-auto">
-          <NavigationBreadcrumbs 
+          <NavigationBreadcrumbs
             showVisualTrail={false}
             items={[
               { label: 'Início', href: '/' },
@@ -122,6 +123,10 @@ export function SantoCristoPage({ faqs }: SantoCristoPageProps) {
             <div className="flex items-center gap-2">
               <Building2 size={16} className="text-[#c9a227]" />
               <span>Compatível com Convenções de Fachada</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CreditCard size={16} className="text-[#c9a227]" />
+              <span>Até 3x sem juros no cartão</span>
             </div>
             <div className="flex items-center gap-2">
               <Shield size={16} className="text-[#c9a227]" />
@@ -323,7 +328,7 @@ export function SantoCristoPage({ faqs }: SantoCristoPageProps) {
               <div className="absolute inset-0 bg-gradient-to-t from-[#04080f] via-transparent to-transparent opacity-85" />
               <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs text-gray-300 bg-[#04080f]/85 backdrop-blur-md px-4 py-3 rounded-2xl border border-white/10">
                 <span className="font-semibold text-white flex items-center gap-2">
-                  <CheckCircle size={15} className="text-[#c9a227]" /> 
+                  <CheckCircle size={15} className="text-[#c9a227]" />
                   Fechamento Real: 11 Vidros · 5,78 m² em Santo Cristo
                 </span>
                 <span className="text-[#c9a227] font-bold hidden sm:inline">Conforto Térmico & Vista da Baía</span>

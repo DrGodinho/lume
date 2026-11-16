@@ -7,6 +7,7 @@ import { businessInfo } from '@/lib/businessInfo';
 const trustIndicators = [
   'Resposta em até 2h',
   'Orçamento sem compromisso',
+  'Até 3x sem juros no cartão',
   'Atendimento 7 dias',
 ];
 

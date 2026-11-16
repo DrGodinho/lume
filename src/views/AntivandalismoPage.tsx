@@ -270,9 +270,10 @@ export function AntivandalismoPage({ faqs }: AntivandalismoPageProps) {
                   </div>
                 </div>
                 <div>
-                  <div className="text-xl font-bold text-white mb-4">
+                  <div className="text-xl font-bold text-white mb-1">
                     A partir de <span className="text-[#c9a227]">R$ 110/m²</span> instalado
                   </div>
+                  <span className="block text-xs font-normal text-gray-400 mb-4">Em até 3x sem juros no cartão</span>
                   <a
                     href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20da%20pel%C3%ADcula%20de%20seguran%C3%A7a%20PS4."
                     target="_blank"
@@ -316,9 +317,10 @@ export function AntivandalismoPage({ faqs }: AntivandalismoPageProps) {
                   </div>
                 </div>
                 <div>
-                  <div className="text-xl font-bold text-white mb-4">
+                  <div className="text-xl font-bold text-white mb-1">
                     A partir de <span className="text-[#c9a227]">R$ 160/m²</span> instalado
                   </div>
+                  <span className="block text-xs font-normal text-gray-400 mb-4">Em até 3x sem juros no cartão</span>
                   <a
                     href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20da%20pel%C3%ADcula%20antivandalismo%20PS8."
                     target="_blank"
@@ -359,9 +361,10 @@ export function AntivandalismoPage({ faqs }: AntivandalismoPageProps) {
                   </div>
                 </div>
                 <div>
-                  <div className="text-xl font-bold text-white mb-4">
+                  <div className="text-xl font-bold text-white mb-1">
                     A partir de <span className="text-[#c9a227]">R$ 240/m²</span> instalado
                   </div>
+                  <span className="block text-xs font-normal text-gray-400 mb-4">Em até 3x sem juros no cartão</span>
                   <a
                     href="https://wa.me/5521965140612?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20da%20pel%C3%ADcula%20de%20seguran%C3%A7a%20PS12."
                     target="_blank"

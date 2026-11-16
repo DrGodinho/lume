@@ -97,15 +97,18 @@ export function DuplaCamadaPage() {
                             A união impecável de <strong>Privacidade, Estética Premium e Escudo Térmico</strong>. Construída com metais nobres interligados para rejeitar agressivamente o forte calor carioca direto da sua janela.
                         </p>
 
-                        <div className="animate-hero opacity-0">
+                        <div className="animate-hero opacity-0 flex flex-col sm:flex-row items-center gap-4">
                             <a
                                 href="https://wa.me/5521965140612?text=Olá! Quero proteger minha casa com Filme Dupla Camada contra o sol."
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="btn-primary inline-flex items-center justify-center gap-3 text-lg py-4 px-8"
+                                className="btn-primary inline-flex items-center justify-center gap-3 text-lg py-4 px-8 w-full sm:w-auto"
                             >
                                 Pedir Orçamento sem Compromisso <ArrowRight size={20} />
                             </a>
+                            <span className="text-xs sm:text-sm text-gray-400 font-medium text-center sm:text-left">
+                                A partir de <strong className="text-[#c9a227]">R$ 110/m²</strong> • Até <strong className="text-white">3x sem juros</strong> no cartão
+                            </span>
                         </div>
                     </HeroEntrance>
                 </div>
@@ -214,7 +217,7 @@ export function DuplaCamadaPage() {
                         </div>
                         <div className="animate-item inline-flex flex-col items-center">
                             <h2 className="text-3xl lg:text-4xl font-bold font-montserrat mb-2 text-white">Escolha sua Dupla Camada</h2>
-                            <span className="text-[#c9a227] font-semibold tracking-wide bg-[#c9a227]/10 px-4 py-1 rounded-full text-sm">Apenas R$ 110/m² Instalado</span>
+                            <span className="text-[#c9a227] font-semibold tracking-wide bg-[#c9a227]/10 px-4 py-1 rounded-full text-sm">Apenas R$ 110/m² Instalado • Até 3x sem juros no cartão</span>
                         </div>
                     </ScrollReveal>
 

@@ -106,15 +106,18 @@ export function CarbonoPage() {
                             Esqueça os filmes tingidos que ficam roxos e desbotam com o tempo. Descubra a linha definitiva para <strong>privacidade absoluta, cor permanente e altíssima rejeição de calor</strong>.
                         </p>
 
-                        <div className="animate-hero opacity-0">
+                        <div className="animate-hero opacity-0 flex flex-col sm:flex-row items-center gap-4">
                             <a
                                 href="https://wa.me/5521965140612?text=Olá! Quero um orçamento para Insulfilm Carbono no meu imóvel."
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="btn-primary inline-flex items-center justify-center gap-3 text-lg py-4 px-8"
+                                className="btn-primary inline-flex items-center justify-center gap-3 text-lg py-4 px-8 w-full sm:w-auto"
                             >
                                 Solicitar Orçamento no WhatsApp <ArrowRight size={20} />
                             </a>
+                            <span className="text-xs sm:text-sm text-gray-400 font-medium text-center sm:text-left">
+                                A partir de <strong className="text-[#c9a227]">R$ 80/m²</strong> • Até <strong className="text-white">3x sem juros</strong> no cartão
+                            </span>
                         </div>
                     </HeroEntrance>
                 </div>
@@ -158,7 +161,7 @@ export function CarbonoPage() {
                             <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
                         </div>
                         <h2 className="animate-item text-3xl lg:text-4xl font-bold font-montserrat mb-4 text-[#c9a227]">Escolha seu Grau de Privacidade</h2>
-                        <p className="animate-item text-gray-400 max-w-2xl mx-auto text-lg">A exata transparência ideal para a necessidade da sua residência ou empresa (Apenas R$ 80/m² instalado).</p>
+                        <p className="animate-item text-gray-400 max-w-2xl mx-auto text-lg">A exata transparência ideal para sua residência ou empresa — a partir de R$ 80/m² instalado em até 3x sem juros no cartão.</p>
                     </ScrollReveal>
 
                     <ScrollReveal animation="slide-up" className="grid lg:grid-cols-2 gap-8 md:gap-12 max-w-5xl mx-auto">

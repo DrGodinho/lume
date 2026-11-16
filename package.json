@@ -8,6 +8,7 @@
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint src --ext .ts,.tsx",
+    "sync-reviews": "node scripts/sync-google-reviews.mjs",
     "test:crm": "vitest run src/app/crm/hooks/__tests__ --config vitest.config.ts",
     "android:sync": "npm run build && npx cap sync",
     "android:open": "npx cap open android"

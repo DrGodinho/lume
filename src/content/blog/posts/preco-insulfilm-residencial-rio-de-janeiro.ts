@@ -150,6 +150,11 @@ export const precoInsulfilmResidencialRioDeJaneiro: BlogPost = {
         },
       ],
     },
+    {
+      type: 'callout',
+      title: '💳 Facilidade de pagamento LUME',
+      text: 'Todos os projetos e instalações residenciais contam com parcelamento em até 3x sem juros no cartão de crédito, além de Pix e transferência bancária. Assim você protege seus vidros e móveis imediatamente sem pesar no orçamento.',
+    },
 
     // --- BLOCO 1B: PREÇO PARA JANELA (keyword) ---
     {
@@ -497,6 +502,11 @@ export const precoInsulfilmResidencialRioDeJaneiro: BlogPost = {
       type: 'faq',
       items: [
         {
+          question: 'Quais são as condições de pagamento e parcelamento?',
+          answer:
+            'A LUME facilita o pagamento em até 3x sem juros no cartão de crédito, além de aceitar Pix e transferência bancária. O pagamento é realizado com total comodidade e segurança após a conclusão e conferência do serviço.',
+        },
+        {
           question: 'Qual é o preço do insulfilm residencial por m² no Rio de Janeiro em 2026?',
           answer:
             'Em 2026, os valores variam por tipo de película. Como referência prática: carbono parte de ~R$ 80/m², refletiva de ~R$ 90/m² e nano cerâmica de ~R$ 200/m². O preço final depende também de quantidade de vidros, acesso ao local, recortes e se há remoção de película antiga.',
@@ -573,7 +583,7 @@ export const precoInsulfilmResidencialRioDeJaneiro: BlogPost = {
     {
       type: 'cta',
       title: 'Quer saber o preço exato para o seu imóvel no Rio de Janeiro em 2026?',
-      text: 'Envie uma foto das janelas ou portas de vidro, as medidas aproximadas e o bairro. A LUME responde com a indicação de película mais adequada e uma estimativa objetiva — sem rodeios, sem compromisso.',
+      text: 'Envie uma foto das janelas ou portas de vidro, as medidas aproximadas e o bairro. A LUME responde com a indicação de película mais adequada, parcelamento em até 3x sem juros no cartão e garantia de até 10 anos — sem rodeios e sem compromisso.',
       href: 'https://wa.me/5521965140612?text=Ol%C3%A1!%20Vi%20a%20p%C3%A1gina%20sobre%20pre%C3%A7o%20de%20insulfilm%20residencial%20e%20quero%20um%20or%C3%A7amento%20para%20minhas%20janelas%20ou%20porta%20de%20vidro.',
       label: 'Pedir preço no WhatsApp agora',
     },

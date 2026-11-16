@@ -33,4 +33,8 @@ export const homeFaqs: HomeFaq[] = [
     q: 'Quanto tempo leva a instalação?',
     a: 'Uma janela leva minutos e uma casa ou apartamento inteiro costuma ficar pronto no mesmo dia, sem sujeira de obra. Nos primeiros 5 dias após instalar, é só não limpar os vidros.',
   },
+  {
+    q: 'Quais são as formas de pagamento aceitas?',
+    a: 'Aceitamos cartões de crédito com parcelamento em até 3x sem juros, além de Pix e transferência bancária. O pagamento é realizado com total comodidade e segurança após a conclusão e conferência do serviço.',
+  },
 ];

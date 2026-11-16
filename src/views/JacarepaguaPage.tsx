@@ -1,4 +1,4 @@
-import { Shield, Sun, Thermometer, CheckCircle, ArrowRight, Eye, SunDim, Star, PiggyBank, Lock, MapPin, Zap, MessageCircle, Droplets } from 'lucide-react';
+import { Shield, Sun, Thermometer, CheckCircle, ArrowRight, Eye, SunDim, Star, PiggyBank, Lock, MapPin, Zap, MessageCircle, Droplets, CreditCard } from 'lucide-react';
 import { GoogleReviews } from '../components/GoogleReviews';
 import { Particles } from '../components/Particles';
 import { AnimatedCounter } from '../components/AnimatedCounter';
@@ -17,12 +17,12 @@ export function JacarepaguaPage({ faqs }: { faqs: { q: string; a: string }[] }) 
             <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden px-4">
                 {/* Background Image */}
                 <div className="absolute inset-0 z-0">
-                    <Image 
-                        src="/jacarepagua_hero_bg.webp" 
-                        alt="Instalação de insulfilm profissional em Jacarepaguá - LUME Controle Solar" 
-                        fill 
-                        sizes="(max-width: 768px) 100vw, 100vw" 
-                        priority 
+                    <Image
+                        src="/jacarepagua_hero_bg.webp"
+                        alt="Instalação de insulfilm profissional em Jacarepaguá - LUME Controle Solar"
+                        fill
+                        sizes="(max-width: 768px) 100vw, 100vw"
+                        priority
                         className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
@@ -31,13 +31,13 @@ export function JacarepaguaPage({ faqs }: { faqs: { q: string; a: string }[] }) 
 
                 {/* Particles & Effects */}
                 <Particles />
-                
+
                 <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#04080f] to-transparent z-10" />
                 <div className="absolute top-1/4 right-10 w-32 h-32 rounded-full bg-[#c9a227]/5 blur-3xl animate-float z-10 pointer-events-none" />
                 <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-[#c9a227]/10 blur-3xl animate-float z-10 pointer-events-none" style={{ animationDelay: "2s" }} />
 
                 <div className="container-lume relative z-20 text-center md:text-left pt-24 pb-12">
-                    <NavigationBreadcrumbs 
+                    <NavigationBreadcrumbs
                         showVisualTrail={false}
                         items={[
                             { label: 'Início', href: '/' },
@@ -97,6 +97,7 @@ export function JacarepaguaPage({ faqs }: { faqs: { q: string; a: string }[] }) 
                     <div className="flex flex-wrap justify-center gap-6 lg:gap-8 text-sm text-gray-400 font-medium">
                         <div className="flex items-center gap-2"><Thermometer size={16} className="text-[#c9a227]" /> Até 80% de Rejeição de Calor</div>
                         <div className="flex items-center gap-2"><Sun size={16} className="text-[#c9a227]" /> 99% Bloqueio Anti-UV</div>
+                        <div className="flex items-center gap-2"><CreditCard size={16} className="text-[#c9a227]" /> Até 3x Sem Juros no Cartão</div>
                         <div className="flex items-center gap-2"><CheckCircle size={16} className="text-[#c9a227]" /> Orçamento Gratuito no Local</div>
                         <div className="flex items-center gap-2"><Shield size={16} className="text-[#c9a227]" /> Garantia de até 10 Anos Lume</div>
                     </div>
@@ -199,7 +200,7 @@ export function JacarepaguaPage({ faqs }: { faqs: { q: string; a: string }[] }) 
                                         <p className="text-sm text-gray-400 mb-6 leading-relaxed font-light flex-grow">
                                             {product.desc}
                                         </p>
-                                        
+
                                         {/* Specs */}
                                         <div className="grid grid-cols-2 gap-2 mt-auto pt-4 border-t border-white/5">
                                             <div className="text-[10px] sm:text-xs">
@@ -272,12 +273,12 @@ export function JacarepaguaPage({ faqs }: { faqs: { q: string; a: string }[] }) 
                                 <div className="w-16 h-16 rounded-2xl bg-[#c9a227]/10 flex items-center justify-center mx-auto lg:mx-0 mb-8 group-hover:bg-[#c9a227]/20 transition-colors shadow-inner">
                                     <benefit.icon className="w-8 h-8 text-[#c9a227] group-hover:scale-110 transition-transform" />
                                 </div>
-                                
+
                                 <div className="mb-6">
                                     <span className="text-5xl font-black text-gradient-gold font-montserrat leading-none">
-                                        <AnimatedCounter 
-                                            target={benefit.stat.replace(/[^0-9-]/g, '')} 
-                                            suffix={benefit.stat.replace(/[0-9-]/g, '')} 
+                                        <AnimatedCounter
+                                            target={benefit.stat.replace(/[^0-9-]/g, '')}
+                                            suffix={benefit.stat.replace(/[0-9-]/g, '')}
                                         />
                                     </span>
                                     <p className="text-[11px] uppercase text-gray-500 font-black tracking-widest mt-2">{benefit.label}</p>
@@ -307,7 +308,7 @@ export function JacarepaguaPage({ faqs }: { faqs: { q: string; a: string }[] }) 
                             <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#c9a227]" />
                         </div>
                         <h2 className="text-3xl lg:text-5xl font-black font-montserrat mb-10 text-center text-[#c9a227] tracking-tight underline decoration-[#c9a227]/20 underline-offset-8">Atendimento Jacarepaguá</h2>
-                        
+
                         <div className="grid lg:grid-cols-2 gap-12 items-stretch mt-12 text-left">
                             <div className="glass-card p-10 rounded-3xl border border-white/10 flex flex-col h-full bg-white/[0.01]">
                                 <h3 className="text-2xl font-bold font-montserrat mb-8 text-white flex items-center gap-3">
@@ -338,13 +339,13 @@ export function JacarepaguaPage({ faqs }: { faqs: { q: string; a: string }[] }) 
                                     <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Vila Valqueire</div>
                                     <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Gardenia Azul</div>
                                     <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Rio das Pedras</div>
-                                        <a href="/insulfilm-na-barra-da-tijuca/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Barra da Tijuca</a>
-                                        <a href="/insulfilm-no-recreio/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Recreio</a>
-                                        <a href="/insulfilm-em-bangu/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Bangu</a>
-                                        <a href="/insulfilm-em-campo-grande/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Campo Grande</a>
-                                        <a href="/insulfilm-em-realengo/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Realengo</a>
-                                        <a href="/insulfilm-em-sulacap/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Sulacap</a>
-                                 </div>
+                                    <a href="/insulfilm-na-barra-da-tijuca/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Barra da Tijuca</a>
+                                    <a href="/insulfilm-no-recreio/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Recreio</a>
+                                    <a href="/insulfilm-em-bangu/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Bangu</a>
+                                    <a href="/insulfilm-em-campo-grande/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Campo Grande</a>
+                                    <a href="/insulfilm-em-realengo/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Realengo</a>
+                                    <a href="/insulfilm-em-sulacap/" className="flex items-center gap-2 text-[#c9a227] hover:underline"><div className="w-1.5 h-1.5 rounded-full bg-[#c9a227]" /> Sulacap</a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -410,11 +411,11 @@ export function JacarepaguaPage({ faqs }: { faqs: { q: string; a: string }[] }) 
                 <div className="container-lume relative z-10 px-4">
                     <div className="max-w-5xl mx-auto glass-card border border-white/10 rounded-[2.5rem] p-8 md:p-16 text-center animate-fade-in relative overflow-hidden">
                         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#c9a227] to-transparent opacity-30" />
-                        
+
                         <h2 className="text-4xl md:text-6xl lg:text-7xl font-black mb-8 font-montserrat tracking-tighter leading-tight">
                             Proteja seu Lar do <span className="text-gradient-gold">Calor de JPA</span>
                         </h2>
-                        
+
                         <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mb-12 font-light leading-relaxed">
                             Agende uma visita técnica gratuita em <strong className="text-white">Jacarepaguá</strong> e descubra por que somos referência em controle solar na Zona Oeste.
                         </p>
@@ -429,7 +430,7 @@ export function JacarepaguaPage({ faqs }: { faqs: { q: string; a: string }[] }) 
                                 <MessageCircle size={22} className="group-hover:rotate-12 transition-transform" />
                                 Orçamento via WhatsApp
                             </a>
-                            
+
                             <a
                                 href="/"
                                 className="w-full sm:w-auto bg-white/5 hover:bg-white/10 text-white border border-white/10 px-10 py-6 rounded-2xl font-bold uppercase tracking-widest transition-all text-sm backdrop-blur-sm"
@@ -447,8 +448,8 @@ export function JacarepaguaPage({ faqs }: { faqs: { q: string; a: string }[] }) 
                 </div>
             </section>
 
-             <footer className="py-12 bg-[#04080f] border-t border-white/5 text-center text-[10px] text-gray-500 font-bold uppercase tracking-[0.4em] px-4">
-                 © 2026 Lume Controle Solar · Especialista em Jacarepaguá e Zona Oeste
+            <footer className="py-12 bg-[#04080f] border-t border-white/5 text-center text-[10px] text-gray-500 font-bold uppercase tracking-[0.4em] px-4">
+                © 2026 Lume Controle Solar · Especialista em Jacarepaguá e Zona Oeste
             </footer>
         </div>
     );

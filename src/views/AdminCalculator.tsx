@@ -1118,7 +1118,7 @@ export function AdminCalculator() {
             setVidros((prev) => [...prev, ...novos]);
             showToast(`${novos.length} peça(s) adicionada(s) à lista pela IA!`, 'success');
         }
-    }, [roomColors, getColorForItem, usarCoresPorAmbiente, setVidros, setRoomColors, showToast]);
+    }, [roomColors, getColorForItem, usarCoresPorAmbiente, setVidros, setRoomColors, showToast, setCliente, setNeighborhood, setPhone]);
 
     const salvarProjeto = () => {
         const dados = {
@@ -1341,7 +1341,7 @@ export function AdminCalculator() {
         const normalizedValue = key === 'perdasFixas' ? Math.min(100, Math.max(0, value as number)) : value;
         const updated = { ...currentConfig, [key]: normalizedValue };
         resolveCalculatorScopeKey().then((scopeKey) => saveConfig(updated, scopeKey)).catch(() => saveConfig(updated));
-    }, [currentConfig, getColorForItem, setVidros, setUsarCoresPorAmbiente, setRollW, setPrice, setMargin, setModoOtimizacao, setUserName, setModoPerdas, setPerdasFixas, setAgressividadeCorte, setFilmTypes, setSelectedFilm, setDraftExpiration, setModoDesconto]);
+    }, [currentConfig, setVidros, setUsarCoresPorAmbiente, setRollW, setPrice, setMargin, setModoOtimizacao, setUserName, setModoPerdas, setPerdasFixas, setAgressividadeCorte, setFilmTypes, setSelectedFilm, setDraftExpiration, setModoDesconto, roomColors, setRoomColors, setCompensarPerdas, vidros]);
 
     const handleLogout = useCallback(async () => {
         if (isLoggingOut) return;
