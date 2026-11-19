@@ -50,8 +50,8 @@ const CRM_NAV_SECTIONS: Array<{ label: string; items: CrmNavItem[] }> = [
     label: 'Dados',
     items: [
       { id: 'historico', label: 'Orçamentos', description: 'Calculadora Supabase', icon: Database, tone: 'gold' },
-      { id: 'peliculas', label: 'Tabela de Películas', description: 'Custos e preços de venda', icon: Layers, tone: 'gold' },
       { id: 'extratos', label: 'Extratos Mensais', description: 'Metas e fechamentos', icon: ReceiptText, tone: 'slate' },
+      { id: 'peliculas', label: 'Tabela de Películas', description: 'Custos e preços de venda', icon: Layers, tone: 'gold' },
       { id: 'settings', label: 'Playbook', description: 'Automação de regras', icon: Settings, tone: 'slate' },
       { id: 'archive', label: 'Arquivo', description: 'Leads fechados antigos', icon: Archive, tone: 'gold' },
       { id: 'trash', label: 'Lixeira', description: 'Leads removidos', icon: Trash2, tone: 'red' },

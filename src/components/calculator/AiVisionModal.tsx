@@ -70,6 +70,33 @@ async function compressImageIfNeeded(file: File, maxDim = 1600, quality = 0.85):
     });
 }
 
+async function callVisionApi(body: string | FormData, headers?: Record<string, string>) {
+    const res = await fetch('/api/ai/vision-measures', {
+        method: 'POST',
+        headers,
+        body,
+    });
+
+    const contentType = res.headers.get('content-type') || '';
+    let data: any = null;
+    if (contentType.includes('application/json')) {
+        try {
+            data = await res.json();
+        } catch {
+            // falha de parse ignorada
+        }
+    }
+
+    if (!res.ok || !data?.success) {
+        if (res.status === 504 || res.status === 502) {
+            throw new Error('A IA demorou para responder devido a pico de tráfego. Tente reenviar em alguns instantes.');
+        }
+        throw new Error(data?.error || `Erro ao processar medidas (${res.status}).`);
+    }
+
+    return data;
+}
+
 export function AiVisionModal({
     show,
     onClose,
@@ -200,19 +227,14 @@ export function AiVisionModal({
             const compressedBase64 = await compressImageIfNeeded(file);
             setImagePreview(compressedBase64);
 
-            const res = await fetch('/api/ai/vision-measures/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
+            const data = await callVisionApi(
+                JSON.stringify({
                     imageBase64: compressedBase64,
                     mimeType: 'image/jpeg',
                 }),
-            });
+                { 'Content-Type': 'application/json' }
+            );
 
-            const data = await res.json();
-            if (!res.ok || !data.success) {
-                throw new Error(data.error || 'Não foi possível ler as medidas da imagem.');
-            }
             processApiResponse(data, isAppend);
         } catch (err: any) {
             console.error('[AiVisionModal Foto Error]:', err);
@@ -233,16 +255,11 @@ export function AiVisionModal({
             setIsLoading(true);
             setLoadingMessage(isAppend ? 'Interpretando medidas adicionais de texto...' : 'O Gemini 3.8 Flash está interpretando o texto...');
 
-            const res = await fetch('/api/ai/vision-measures/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text: textToProcess }),
-            });
+            const data = await callVisionApi(
+                JSON.stringify({ text: textToProcess }),
+                { 'Content-Type': 'application/json' }
+            );
 
-            const data = await res.json();
-            if (!res.ok || !data.success) {
-                throw new Error(data.error || 'Não foi possível interpretar o texto.');
-            }
             processApiResponse(data, isAppend);
             if (isAppend) {
                 setAppendTextInput('');
@@ -267,15 +284,8 @@ export function AiVisionModal({
             const formData = new FormData();
             formData.append('file', file);
 
-            const res = await fetch('/api/ai/vision-measures/', {
-                method: 'POST',
-                body: formData,
-            });
+            const data = await callVisionApi(formData);
 
-            const data = await res.json();
-            if (!res.ok || !data.success) {
-                throw new Error(data.error || 'Não foi possível processar o áudio.');
-            }
             processApiResponse(data, isAppend);
         } catch (err: any) {
             console.error('[AiVisionModal Audio File Error]:', err);
@@ -334,15 +344,7 @@ export function AiVisionModal({
                     const formData = new FormData();
                     formData.append('file', audioBlob, 'gravacao.webm');
 
-                    const res = await fetch('/api/ai/vision-measures/', {
-                        method: 'POST',
-                        body: formData,
-                    });
-
-                    const data = await res.json();
-                    if (!res.ok || !data.success) {
-                        throw new Error(data.error || 'Não foi possível interpretar a voz gravada.');
-                    }
+                    const data = await callVisionApi(formData);
                     processApiResponse(data, isAppendingAudioRef.current);
                 } catch (err: any) {
                     console.error('[AiVisionModal Audio Error]:', err);

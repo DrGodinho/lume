@@ -39,7 +39,7 @@ REGRAS OBRIGATÓRIAS DE LEITURA E CONVERSÃO:
    - 'baixa': áudio com eco inaudível ou letra ilegível.
 6. DADOS DO CLIENTE E LOCALIZAÇÃO:
    - Se na anotação, cabeçalho, mensagem ou áudio for falado o nome do cliente (ex: "Cliente: Carla", "Orçamento pro Marcos", "Apto da Dra. Beatriz"), extraia em 'cliente'.
-   - Se for citado o bairro ou cidade (ex: "Barra da Tijuca", "Recreio", "Copacabana", "Tijuca", "Ipanema"), extraia em 'bairro'.
+   - Se for citado o bairro ou cidade (ex: "Barra da Tijuca", "Recreio", "Copacabana", "Ipanema", "Leblon", "Gávea", "Botafogo", "Flamengo", "Laranjeiras", "Urca", "São Conrado", "Jardim Botânico", "Itanhangá", "Tijuca", "Centro", "Santo Cristo", "Campo Grande", "Bangu", "Realengo", "Sulacap", "Jacarepaguá", "Freguesia", "Taquara", "Pechincha"), extraia em 'bairro'.
    - Se houver número de contato ou telefone, extraia em 'telefone'.`;
 
 export async function POST(req: NextRequest) {
@@ -174,10 +174,11 @@ export async function POST(req: NextRequest) {
 
         const candidateModels = [
             process.env.GEMINI_MODEL,
+            'gemini-3.5-flash-lite',
+            'gemini-flash-lite-latest',
             'gemini-3.5-flash',
             'gemini-3.6-flash',
             'gemini-3.8-flash',
-            'gemini-3.7-flash',
         ].filter(Boolean) as string[];
 
         let lastErrorText = '';
@@ -195,6 +196,7 @@ export async function POST(req: NextRequest) {
                             'x-goog-api-key': apiKey,
                         },
                         body: JSON.stringify(geminiPayload),
+                        signal: AbortSignal.timeout(6000),
                     }
                 );
 
@@ -207,19 +209,20 @@ export async function POST(req: NextRequest) {
                 lastErrorText = await response.text();
                 console.warn(`[Gemini Model ${model} failed with ${lastStatus}]:`, lastErrorText);
 
-                // Se for sobrecarga (503), rate limit (429) ou modelo indisponível (404), tenta o próximo
-                if (lastStatus !== 503 && lastStatus !== 429 && lastStatus !== 404) {
+                // Se for sobrecarga (503), rate limit (429), indisponível (404) ou erro de servidor, tenta o próximo
+                if (lastStatus !== 503 && lastStatus !== 429 && lastStatus !== 404 && lastStatus !== 500) {
                     break;
                 }
             } catch (err: any) {
-                lastErrorText = err.message || 'Erro de conexão';
+                lastErrorText = err.message || 'Erro de conexão/timeout';
+                console.warn(`[Gemini Model ${model} error/timeout]:`, lastErrorText);
             }
         }
 
         if (!data) {
             console.error('[Gemini Multimodal API Error]:', lastErrorText);
             return NextResponse.json(
-                { error: `Erro na comunicação com Google AI (${lastStatus}): ${lastErrorText}` },
+                { success: false, error: `Serviço de IA temporariamente indisponível (${lastStatus}). Tente novamente em instantes.` },
                 { status: 502 }
             );
         }
@@ -227,12 +230,13 @@ export async function POST(req: NextRequest) {
 
         if (!rawJsonText) {
             return NextResponse.json(
-                { error: 'O modelo não retornou conteúdo estruturado para esta entrada.' },
+                { success: false, error: 'O modelo não retornou conteúdo estruturado para esta entrada.' },
                 { status: 500 }
             );
         }
 
-        const parsed: VisionApiResponse = JSON.parse(rawJsonText);
+        const cleanJson = rawJsonText.trim().replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim();
+        const parsed: VisionApiResponse = JSON.parse(cleanJson);
         return NextResponse.json({
             success: true,
             items: parsed.items || [],
@@ -244,6 +248,6 @@ export async function POST(req: NextRequest) {
     } catch (err: unknown) {
         console.error('[Multimodal Route Exception]:', err);
         const msg = err instanceof Error ? err.message : 'Erro interno ao processar medidas.';
-        return NextResponse.json({ error: msg }, { status: 500 });
+        return NextResponse.json({ success: false, error: msg }, { status: 500 });
     }
 }

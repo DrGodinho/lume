@@ -150,9 +150,21 @@ export function AiCutAdvisor({
                 }),
             });
 
-            const data = await res.json();
-            if (!res.ok || !data.success) {
-                throw new Error(data.error || 'Erro ao consultar IA.');
+            const contentType = res.headers.get('content-type') || '';
+            let data: any = null;
+            if (contentType.includes('application/json')) {
+                try {
+                    data = await res.json();
+                } catch {
+                    // falha de parse ignorada
+                }
+            }
+
+            if (!res.ok || !data?.success) {
+                if (res.status === 504 || res.status === 502) {
+                    throw new Error('A IA demorou para responder devido a alto tráfego. Tente novamente em instantes.');
+                }
+                throw new Error(data?.error || `Erro ao consultar IA (${res.status}).`);
             }
 
             setAnalysis(data.analysis);

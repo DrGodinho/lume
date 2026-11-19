@@ -148,10 +148,11 @@ ${
 
         const candidateModels = [
             process.env.GEMINI_MODEL,
+            'gemini-3.5-flash-lite',
+            'gemini-flash-lite-latest',
             'gemini-3.5-flash',
             'gemini-3.6-flash',
             'gemini-3.8-flash',
-            'gemini-3.7-flash',
         ].filter(Boolean) as string[];
 
         let lastErrorText = '';
@@ -169,6 +170,7 @@ ${
                             'x-goog-api-key': apiKey,
                         },
                         body: JSON.stringify(geminiPayload),
+                        signal: AbortSignal.timeout(6000),
                     }
                 );
 
@@ -181,18 +183,19 @@ ${
                 lastErrorText = await response.text();
                 console.warn(`[Gemini Cut Advisor Model ${model} failed with ${lastStatus}]:`, lastErrorText);
 
-                if (lastStatus !== 503 && lastStatus !== 429 && lastStatus !== 404) {
+                if (lastStatus !== 503 && lastStatus !== 429 && lastStatus !== 404 && lastStatus !== 500) {
                     break;
                 }
             } catch (err: any) {
-                lastErrorText = err.message || 'Erro de conexão';
+                lastErrorText = err.message || 'Erro de conexão/timeout';
+                console.warn(`[Gemini Cut Advisor Model ${model} error/timeout]:`, lastErrorText);
             }
         }
 
         if (!data) {
             console.error('[Gemini Cut Advisor Error]:', lastErrorText);
             return NextResponse.json(
-                { error: `Erro na comunicação com Google AI (${lastStatus}): ${lastErrorText}` },
+                { success: false, error: `Serviço de IA temporariamente indisponível (${lastStatus}). Tente novamente em instantes.` },
                 { status: 502 }
             );
         }
@@ -200,12 +203,13 @@ ${
 
         if (!rawJsonText) {
             return NextResponse.json(
-                { error: 'Não foi possível gerar análise para este corte.' },
+                { success: false, error: 'Não foi possível gerar análise para este corte.' },
                 { status: 500 }
             );
         }
 
-        const parsed = JSON.parse(rawJsonText);
+        const cleanJson = rawJsonText.trim().replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim();
+        const parsed = JSON.parse(cleanJson);
         return NextResponse.json({
             success: true,
             analysis: parsed,
@@ -213,7 +217,7 @@ ${
     } catch (err: unknown) {
         console.error('[Cut Advisor Route Exception]:', err);
         const msg = err instanceof Error ? err.message : 'Erro interno ao consultar IA.';
-        return NextResponse.json({ error: msg }, { status: 500 });
+        return NextResponse.json({ success: false, error: msg }, { status: 500 });
     }
 }
 
