@@ -10,8 +10,6 @@ import {
   getDate,
   getMonth,
   getYear,
-  setMonth,
-  setYear,
   startOfMonth,
   subMonths,
 } from 'date-fns';
@@ -94,6 +92,7 @@ type ServiceStatus = 'Marcado' | 'Confirmado' | 'Em Execucao' | 'Concluido' | 'R
 type LeadServiceRecord = {
   id: string;
   name?: string | null;
+  phone?: string | null;
   value?: number | null;
   sqm?: number | null;
   film_type?: string | null;
@@ -206,11 +205,19 @@ function normalizeServiceStatus(status: unknown): ServiceStatus | null {
 }
 
 function getLeadServiceStatus(lead: LeadServiceRecord): ServiceStatus | null {
+  if (lead.status === 'Fechado') return 'Concluido';
   const explicitStatus = normalizeServiceStatus(lead.service_status);
   if (explicitStatus) return explicitStatus;
   if (lead.data_servico) return 'Marcado';
-  if (lead.status === 'Fechado') return 'Concluido';
   return null;
+}
+
+function isRealizedLead(lead: LeadServiceRecord): boolean {
+  return lead.status === 'Fechado' || getLeadServiceStatus(lead) === 'Concluido';
+}
+
+function isRealizedRecord(record: ExtratoRecord): boolean {
+  return record.lead_status === 'Fechado' || record.service_status === 'Concluido';
 }
 
 function getLeadServiceReferenceDate(lead: LeadServiceRecord) {
@@ -238,11 +245,14 @@ function normalizeRecord(row: Record<string, unknown>, lead?: LeadServiceRecord)
   const serviceStatus = lead ? getLeadServiceStatus(lead) : null;
   const serviceDate = lead ? getLeadServiceReferenceDate(lead)?.toISOString() || null : null;
   const leadExpenses = parseLeadExpenses(asString(lead?.notes) || asString(row.notes));
+  const leadValue = asNumber(lead?.value);
+  const rowValue = asNumber(row.valor);
+  const finalValue = leadValue > 0 ? leadValue : rowValue;
 
   return {
     id: asString(row.id) || lead?.id || crypto.randomUUID(),
     cliente: asString(row.cliente) || asString(row.name) || asString(row.nome) || lead?.name || '',
-    valor: asNumber(row.valor) || asNumber(lead?.value),
+    valor: finalValue,
     qtd: asNumber(row.qtd),
     created_at:
       serviceDate ||
@@ -385,8 +395,8 @@ export function ExtratosMensaisSupabase() {
   const hoje = new Date();
   const [mesSelecionado, setMesSelecionado] = useState(getMonth(hoje));
   const [anoSelecionado, setAnoSelecionado] = useState(getYear(hoje));
-  const [registros, setRegistros] = useState<ExtratoRecord[]>([]);
   const [allLeads, setAllLeads] = useState<LeadServiceRecord[]>([]);
+  const [historyMap, setHistoryMap] = useState<Map<string, Record<string, unknown>>>(new Map());
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [exportando, setExportando] = useState(false);
@@ -395,7 +405,7 @@ export function ExtratosMensaisSupabase() {
   const [metricaGrafico, setMetricaGrafico] = useState<'faturamento' | 'lucro' | 'comparativo'>('faturamento');
   const [ordenacaoPeliculas, setOrdenacaoPeliculas] = useState<'lucro' | 'faturamento' | 'area'>('lucro');
   const [filtroTabelaBusca, setFiltroTabelaBusca] = useState('');
-  const [filtroTabelaStatus, setFiltroTabelaStatus] = useState<'todos' | 'concluidos' | 'agendados'>('todos');
+  const [filtroTabelaStatus, setFiltroTabelaStatus] = useState<'todos' | 'concluidos' | 'agendados'>('concluidos');
   const [ordenacaoTabela, setOrdenacaoTabela] = useState<'data' | 'lucro' | 'faturamento' | 'margem'>('data');
 
   useEffect(() => {
@@ -413,9 +423,9 @@ export function ExtratosMensaisSupabase() {
   const meses = useMemo(
     () =>
       Array.from({ length: 12 }, (_, index) =>
-        capitalizeFirst(format(setMonth(new Date(), index), 'MMMM', { locale: ptBR }))
+        capitalizeFirst(format(new Date(anoSelecionado, index, 1), 'MMMM', { locale: ptBR }))
       ),
-    []
+    [anoSelecionado]
   );
 
   const anos = useMemo(() => {
@@ -431,23 +441,27 @@ export function ExtratosMensaisSupabase() {
       setErrorMessage(null);
 
       try {
-        const dataReferencia = setYear(setMonth(new Date(), mesSelecionado), anoSelecionado);
-        const inicio = startOfMonth(dataReferencia);
-        const fim = endOfMonth(dataReferencia);
+        const [leadsResponse, historyResponse] = await Promise.all([
+          fetchWithTimeout('/api/crm/leads?include_all=1', {
+            headers: await getCrmApiHeaders(),
+            credentials: 'same-origin',
+            cache: 'no-store',
+          }),
+          fetchWithTimeout('/api/calculator/history?scope=all&limit=1000', {
+            credentials: 'include',
+            cache: 'no-store',
+          }),
+        ]);
 
-        const leadsResponse = await fetchWithTimeout('/api/crm/leads?include_all=1', {
-          headers: await getCrmApiHeaders(),
-          credentials: 'same-origin',
-          cache: 'no-store',
-        });
         const leadsPayload = await leadsResponse.json().catch(() => null);
+        const historyPayload = historyResponse.ok ? await historyResponse.json().catch(() => null) : null;
 
         if (cancelled) return;
 
         if (!leadsResponse.ok || !Array.isArray(leadsPayload)) {
           const details = getCrmApiErrorMessage(leadsPayload, leadsResponse.statusText);
-          setRegistros([]);
           setAllLeads([]);
+          setHistoryMap(new Map());
           setErrorMessage(`Erro ao carregar serviços do CRM: ${details}`);
           toast.error('Erro ao carregar serviços do CRM');
           return;
@@ -459,42 +473,59 @@ export function ExtratosMensaisSupabase() {
           return sStatus && sStatus !== 'Reagendar' && !!getLeadServiceReferenceDate(lead);
         });
 
-        setAllLeads(validLeads);
-
-        const serviceLeads = validLeads.filter((lead) => isServiceLeadInPeriod(lead, inicio, fim));
-        const serviceLeadIds = serviceLeads.map((lead) => lead.id).filter(Boolean);
-
-        if (serviceLeadIds.length === 0) {
-          setRegistros([]);
-          return;
-        }
-
-        const historyResponse = await fetchWithTimeout(
-          `/api/calculator/history?leadIds=${encodeURIComponent(serviceLeadIds.join(','))}`,
-          { credentials: 'include', cache: 'no-store' }
-        );
-        const historyPayload = await historyResponse.json().catch(() => null);
-
-        if (cancelled) return;
-
         const historyData =
           historyPayload && Array.isArray(historyPayload.items)
             ? (historyPayload.items as Record<string, unknown>[])
             : [];
 
-        const historyByLeadId = new Map<string, Record<string, unknown>>();
+        const byLeadId = new Map<string, Record<string, unknown>>();
+        const byPhone = new Map<string, Record<string, unknown>>();
+        const byName = new Map<string, Record<string, unknown>>();
+
         historyData.forEach((row) => {
           const leadId = asNullableString(row.lead_id);
-          if (leadId && !historyByLeadId.has(leadId)) {
-            historyByLeadId.set(leadId, row);
+          if (leadId && !byLeadId.has(leadId)) {
+            byLeadId.set(leadId, row);
+          }
+          const phone = asNullableString(row.phone);
+          if (phone) {
+            const cleanPhone = phone.replace(/\D/g, '');
+            if (cleanPhone.length >= 8 && !byPhone.has(cleanPhone.slice(-8))) {
+              byPhone.set(cleanPhone.slice(-8), row);
+            }
+          }
+          const cliente = asNullableString(row.cliente);
+          if (cliente) {
+            const cleanName = cliente.trim().toLowerCase();
+            if (cleanName && !byName.has(cleanName)) {
+              byName.set(cleanName, row);
+            }
           }
         });
 
-        setRegistros(serviceLeads.map((lead) => normalizeRecord(historyByLeadId.get(lead.id) || {}, lead)));
+        const matchedMap = new Map<string, Record<string, unknown>>();
+        validLeads.forEach((lead) => {
+          if (byLeadId.has(lead.id)) {
+            matchedMap.set(lead.id, byLeadId.get(lead.id)!);
+          } else {
+            const cleanPhone = (lead.phone || '').replace(/\D/g, '');
+            if (cleanPhone.length >= 8 && byPhone.has(cleanPhone.slice(-8))) {
+              matchedMap.set(lead.id, byPhone.get(cleanPhone.slice(-8))!);
+            } else {
+              const cleanName = (lead.name || '').trim().toLowerCase();
+              if (cleanName && byName.has(cleanName)) {
+                matchedMap.set(lead.id, byName.get(cleanName)!);
+              }
+            }
+          }
+        });
+
+        setAllLeads(validLeads);
+        setHistoryMap(matchedMap);
       } catch (error) {
         if (!cancelled) {
-          setRegistros([]);
           setAllLeads([]);
+          setHistoryMap(new Map());
           setErrorMessage(
             isAbortError(error)
               ? 'A consulta demorou muito (timeout). Tente novamente.'
@@ -512,36 +543,44 @@ export function ExtratosMensaisSupabase() {
     return () => {
       cancelled = true;
     };
-  }, [mesSelecionado, anoSelecionado]);
+  }, [anoSelecionado]);
 
   const tituloMes = capitalizeFirst(
-    format(setMonth(new Date(), mesSelecionado), 'MMMM', { locale: ptBR })
+    format(new Date(anoSelecionado, mesSelecionado, 1), 'MMMM', { locale: ptBR })
+  );
+
+  const registros = useMemo(() => {
+    const inicio = new Date(anoSelecionado, mesSelecionado, 1, 0, 0, 0, 0);
+    const fim = new Date(anoSelecionado, mesSelecionado + 1, 0, 23, 59, 59, 999);
+    const serviceLeads = allLeads.filter((lead) => isServiceLeadInPeriod(lead, inicio, fim));
+    return serviceLeads.map((lead) => normalizeRecord(historyMap.get(lead.id) || {}, lead));
+  }, [allLeads, historyMap, anoSelecionado, mesSelecionado]);
+
+  const registrosRealizados = useMemo(
+    () => registros.filter(isRealizedRecord),
+    [registros]
   );
 
   const faturamentoTotal = useMemo(
-    () => registros.reduce((sum, row) => sum + Number(row.valor || 0), 0),
-    [registros]
+    () => registrosRealizados.reduce((sum, row) => sum + Number(row.valor || 0), 0),
+    [registrosRealizados]
   );
 
   const numJobs = registros.length;
   const servicosComValor = useMemo(
-    () => registros.filter((row) => Number(row.valor || 0) > 0),
-    [registros]
+    () => registrosRealizados.filter((row) => Number(row.valor || 0) > 0),
+    [registrosRealizados]
   );
   const ticketMedio = servicosComValor.length > 0 ? faturamentoTotal / servicosComValor.length : 0;
 
   const m2Total = useMemo(
-    () => registros.reduce((sum, row) => sum + getAreaTotal(row), 0),
-    [registros]
+    () => registrosRealizados.reduce((sum, row) => sum + getAreaTotal(row), 0),
+    [registrosRealizados]
   );
 
   const precoMedioPorM2 = m2Total > 0 ? faturamentoTotal / m2Total : 0;
 
-  const servicosFeitos = useMemo(
-    () => registros.filter((record) => record.service_status === 'Concluido').length,
-    [registros]
-  );
-
+  const servicosFeitos = registrosRealizados.length;
   const servicosAgendados = Math.max(0, numJobs - servicosFeitos);
   const taxaConclusao = numJobs > 0 ? Math.round((servicosFeitos / numJobs) * 100) : 0;
 
@@ -551,10 +590,10 @@ export function ExtratosMensaisSupabase() {
     let custoTotalAjudantes = 0;
     let custoTotalExtras = 0;
 
-    registros.forEach((r) => {
+    registrosRealizados.forEach((r) => {
       const area = getAreaTotal(r);
       const custoM2 = getFilmCostM2(r, catalog);
-      const custoFilme = typeof r.custo_material === 'number'
+      const custoFilme = typeof r.custo_material === 'number' && r.custo_material > 0
         ? r.custo_material
         : roundCurrency(area * custoM2);
       custoTotalFilmes += custoFilme;
@@ -580,19 +619,22 @@ export function ExtratosMensaisSupabase() {
       shareFilmes,
       shareEquipe,
     };
-  }, [registros, catalog, faturamentoTotal]);
+  }, [registrosRealizados, catalog, faturamentoTotal]);
 
   // --- COMPARAÇÃO MÊS ANTERIOR (MoM) ---
   const dadosMesAnterior = useMemo(() => {
-    const dataRefAnt = subMonths(setYear(setMonth(new Date(), mesSelecionado), anoSelecionado), 1);
+    const dataRefAnt = subMonths(new Date(anoSelecionado, mesSelecionado, 1), 1);
     const inicioAnt = startOfMonth(dataRefAnt);
     const fimAnt = endOfMonth(dataRefAnt);
-    const leadsAnt = allLeads.filter((l) => isServiceLeadInPeriod(l, inicioAnt, fimAnt));
-    const faturamento = leadsAnt.reduce((acc, l) => acc + (Number(l.value) || 0), 0);
-    const jobs = leadsAnt.length;
+    const leadsAnt = allLeads.filter(
+      (l) => isServiceLeadInPeriod(l, inicioAnt, fimAnt) && isRealizedLead(l)
+    );
+    const registrosAnt = leadsAnt.map((lead) => normalizeRecord(historyMap.get(lead.id) || {}, lead));
+    const faturamento = registrosAnt.reduce((acc, r) => acc + (Number(r.valor) || 0), 0);
+    const jobs = registrosAnt.length;
     const ticket = jobs > 0 ? faturamento / jobs : 0;
     return { faturamento, jobs, ticket };
-  }, [allLeads, mesSelecionado, anoSelecionado]);
+  }, [allLeads, historyMap, mesSelecionado, anoSelecionado]);
 
   const variacaoMoM = useMemo(() => {
     if (dadosMesAnterior.faturamento <= 0) return null;
@@ -603,14 +645,16 @@ export function ExtratosMensaisSupabase() {
 
   // --- COMPARAÇÃO ANO ANTERIOR (YoY) ---
   const dadosMesAnoAnterior = useMemo(() => {
-    const dataRefYoY = setYear(setMonth(new Date(), mesSelecionado), anoSelecionado - 1);
-    const inicioYoY = startOfMonth(dataRefYoY);
-    const fimYoY = endOfMonth(dataRefYoY);
-    const leadsYoY = allLeads.filter((l) => isServiceLeadInPeriod(l, inicioYoY, fimYoY));
-    const faturamento = leadsYoY.reduce((acc, l) => acc + (Number(l.value) || 0), 0);
-    const jobs = leadsYoY.length;
+    const inicioYoY = new Date(anoSelecionado - 1, mesSelecionado, 1, 0, 0, 0, 0);
+    const fimYoY = new Date(anoSelecionado - 1, mesSelecionado + 1, 0, 23, 59, 59, 999);
+    const leadsYoY = allLeads.filter(
+      (l) => isServiceLeadInPeriod(l, inicioYoY, fimYoY) && isRealizedLead(l)
+    );
+    const registrosYoY = leadsYoY.map((lead) => normalizeRecord(historyMap.get(lead.id) || {}, lead));
+    const faturamento = registrosYoY.reduce((acc, r) => acc + (Number(r.valor) || 0), 0);
+    const jobs = registrosYoY.length;
     return { faturamento, jobs };
-  }, [allLeads, mesSelecionado, anoSelecionado]);
+  }, [allLeads, historyMap, mesSelecionado, anoSelecionado]);
 
   const variacaoYoY = useMemo(() => {
     if (dadosMesAnoAnterior.faturamento <= 0) return null;
@@ -623,39 +667,37 @@ export function ExtratosMensaisSupabase() {
   const dadosAno12Meses = useMemo(() => {
     const mesesAbrev = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
     return mesesAbrev.map((abrev, index) => {
-      const dRef = setYear(setMonth(new Date(), index), anoSelecionado);
-      const dInicio = startOfMonth(dRef);
-      const dFim = endOfMonth(dRef);
-      const leadsDoMes = allLeads.filter((l) => isServiceLeadInPeriod(l, dInicio, dFim));
-      const faturamento = leadsDoMes.reduce((acc, l) => acc + (Number(l.value) || 0), 0);
-      const jobs = leadsDoMes.length;
+      const dInicio = new Date(anoSelecionado, index, 1, 0, 0, 0, 0);
+      const dFim = new Date(anoSelecionado, index + 1, 0, 23, 59, 59, 999);
+      const leadsDoMes = allLeads.filter(
+        (l) => isServiceLeadInPeriod(l, dInicio, dFim) && isRealizedLead(l)
+      );
+      const registrosDoMes = leadsDoMes.map((lead) => normalizeRecord(historyMap.get(lead.id) || {}, lead));
 
-      let lucroLiquido = 0;
-      let custoTotal = 0;
+      const faturamento = registrosDoMes.reduce((acc, r) => acc + (Number(r.valor) || 0), 0);
+      const jobs = registrosDoMes.length;
 
-      if (index === mesSelecionado) {
-        lucroLiquido = dre.lucroLiquido;
-        custoTotal = dre.despesasTotais;
-      } else {
-        leadsDoMes.forEach((l) => {
-          const area = Number(l.sqm || 0);
-          const custoM2 = getFilmCostM2FromLabel(l.film_type || '', catalog);
-          const exp = parseLeadExpenses(asString(l.notes));
-          const custoFilme = typeof exp.custoMaterial === 'number'
-            ? exp.custoMaterial
-            : roundCurrency(area * custoM2);
-          const despesas = (Number(l.custo_ajudante) || 0) + (Number(l.outras_despesas) || 0) + exp.custoAjudante + exp.outrasDespesas;
-          custoTotal += custoFilme + despesas;
-        });
-        lucroLiquido = Math.max(0, faturamento - custoTotal);
-      }
+      let custoTotalFilmes = 0;
+      let despesasOperacionais = 0;
 
+      registrosDoMes.forEach((r) => {
+        const area = getAreaTotal(r);
+        const custoM2 = getFilmCostM2(r, catalog);
+        const custoFilme = typeof r.custo_material === 'number' && r.custo_material > 0
+          ? r.custo_material
+          : roundCurrency(area * custoM2);
+        custoTotalFilmes += custoFilme;
+        despesasOperacionais += (Number(r.custo_ajudante) || 0) + (Number(r.outras_despesas) || 0);
+      });
+
+      const custoTotal = custoTotalFilmes + despesasOperacionais;
+      const lucroLiquido = Math.max(0, faturamento - custoTotal);
       const margemLiquida = faturamento > 0 ? (lucroLiquido / faturamento) * 100 : 0;
 
       return {
         index,
         mes: abrev,
-        mesCompleto: capitalizeFirst(format(setMonth(new Date(), index), 'MMMM', { locale: ptBR })),
+        mesCompleto: capitalizeFirst(format(new Date(anoSelecionado, index, 1), 'MMMM', { locale: ptBR })),
         valor: faturamento, // Mantém compatibilidade total com o código original
         faturamento,
         lucroLiquido,
@@ -665,12 +707,11 @@ export function ExtratosMensaisSupabase() {
         isSelected: index === mesSelecionado,
       };
     });
-  }, [allLeads, anoSelecionado, mesSelecionado, dre.lucroLiquido, dre.despesasTotais, catalog]);
+  }, [allLeads, historyMap, anoSelecionado, mesSelecionado, catalog]);
 
   // --- EVOLUÇÃO DIÁRIA DO MÊS SELECIONADO ---
   const dadosDiasDoMes = useMemo(() => {
-    const dataReferencia = setYear(setMonth(new Date(), mesSelecionado), anoSelecionado);
-    const totalDias = getDate(endOfMonth(dataReferencia));
+    const totalDias = new Date(anoSelecionado, mesSelecionado + 1, 0).getDate();
 
     return Array.from({ length: totalDias }, (_, i) => {
       const diaNum = i + 1;
@@ -683,7 +724,7 @@ export function ExtratosMensaisSupabase() {
         diaSemana = '';
       }
 
-      const registrosDoDia = registros.filter((r) => {
+      const registrosDoDia = registrosRealizados.filter((r) => {
         if (!r.created_at) return false;
         try {
           const dStr = format(new Date(r.created_at), 'yyyy-MM-dd');
@@ -700,7 +741,10 @@ export function ExtratosMensaisSupabase() {
       registrosDoDia.forEach((r) => {
         const area = getAreaTotal(r);
         const custoM2 = getFilmCostM2(r, catalog);
-        custoFilmes += roundCurrency(area * custoM2);
+        const custoFilme = typeof r.custo_material === 'number' && r.custo_material > 0
+          ? r.custo_material
+          : roundCurrency(area * custoM2);
+        custoFilmes += custoFilme;
         despesasOperacionais += (Number(r.custo_ajudante) || 0) + (Number(r.outras_despesas) || 0);
       });
 
@@ -730,7 +774,7 @@ export function ExtratosMensaisSupabase() {
         clientes,
       };
     });
-  }, [anoSelecionado, mesSelecionado, registros, catalog]);
+  }, [anoSelecionado, mesSelecionado, registrosRealizados, catalog]);
 
   const melhorMesDoAno = useMemo(() => {
     const mesesComValor = dadosAno12Meses.filter((m) => m.faturamento > 0);
@@ -770,7 +814,7 @@ export function ExtratosMensaisSupabase() {
       }
     > = {};
 
-    registros.forEach((record) => {
+    registrosRealizados.forEach((record) => {
       const nome = getFilmLabel(record);
       if (!porPelicula[nome]) {
         porPelicula[nome] = { valor: 0, jobs: 0, jobsComValor: 0, area: 0, custoTotal: 0 };
@@ -828,7 +872,7 @@ export function ExtratosMensaisSupabase() {
       return items.sort((a, b) => b.area - a.area);
     }
     return items.sort((a, b) => b.valor - a.valor);
-  }, [catalog, faturamentoTotal, m2Total, ordenacaoPeliculas, registros]);
+  }, [catalog, faturamentoTotal, m2Total, ordenacaoPeliculas, registrosRealizados]);
 
   const peliculaMaisLucrativa = useMemo(() => {
     if (rankingPeliculas.length === 0) return null;
@@ -849,13 +893,13 @@ export function ExtratosMensaisSupabase() {
   // --- RITMO OPERACIONAL & MÉDIAS DO MÊS ---
   const diasComAtendimento = useMemo(() => {
     const dias = new Set<string>();
-    registros.forEach((r) => {
+    registrosRealizados.forEach((r) => {
       if (r.created_at) {
         dias.add(format(new Date(r.created_at), 'yyyy-MM-dd'));
       }
     });
     return dias.size;
-  }, [registros]);
+  }, [registrosRealizados]);
 
   const mediaDiariaAtiva = useMemo(() => {
     return diasComAtendimento > 0 ? faturamentoTotal / diasComAtendimento : 0;
@@ -865,7 +909,7 @@ export function ExtratosMensaisSupabase() {
     if (faturamentoTotal <= 0) return null;
 
     const porDia: Record<string, { valor: number; jobs: number; clientePrincipal: string }> = {};
-    registros.forEach((record) => {
+    registrosRealizados.forEach((record) => {
       const key = format(new Date(record.created_at || new Date()), 'yyyy-MM-dd');
       if (!porDia[key]) porDia[key] = { valor: 0, jobs: 0, clientePrincipal: record.cliente || '' };
       porDia[key].valor += Number(record.valor || 0);
@@ -875,12 +919,12 @@ export function ExtratosMensaisSupabase() {
     return Object.entries(porDia)
       .map(([dia, dados]) => ({ dia, ...dados }))
       .sort((a, b) => b.valor - a.valor)[0] || null;
-  }, [faturamentoTotal, registros]);
+  }, [faturamentoTotal, registrosRealizados]);
 
   const quinzenas = useMemo(() => {
     let q1 = 0;
     let q2 = 0;
-    registros.forEach((r) => {
+    registrosRealizados.forEach((r) => {
       const dia = getDate(new Date(r.created_at || new Date()));
       const val = Number(r.valor || 0);
       if (dia <= 15) q1 += val;
@@ -893,7 +937,7 @@ export function ExtratosMensaisSupabase() {
       q1Percent: total > 0 ? (q1 / total) * 100 : 0,
       q2Percent: total > 0 ? (q2 / total) * 100 : 0,
     };
-  }, [registros]);
+  }, [registrosRealizados]);
 
   const projecaoFechamento = useMemo(() => {
     const hojeData = new Date();
@@ -912,7 +956,7 @@ export function ExtratosMensaisSupabase() {
   // --- GEOLOCALIZAÇÃO: TOP BAIRROS ---
   const topBairros = useMemo<BairroItem[]>(() => {
     const porBairro: Record<string, { valor: number; jobs: number }> = {};
-    registros.forEach((r) => {
+    registrosRealizados.forEach((r) => {
       let b = r.neighborhood || r.bairro;
       if (!b || b.trim() === '') b = 'Outros / Não inf.';
       else b = capitalizeFirst(b.trim());
@@ -931,7 +975,7 @@ export function ExtratosMensaisSupabase() {
       }))
       .sort((a, b) => b.valor - a.valor)
       .slice(0, 5);
-  }, [registros, faturamentoTotal]);
+  }, [registrosRealizados, faturamentoTotal]);
 
   // --- RAIO-X FINANCEIRO: ATENDIMENTOS DO MÊS DETALHADOS ---
   const atendimentosDetalhados = useMemo(() => {
@@ -964,7 +1008,7 @@ export function ExtratosMensaisSupabase() {
         bairro: r.neighborhood || r.bairro || 'Rio de Janeiro',
         dataObj,
         dataFormatada,
-        status: r.service_status || 'Concluido',
+        status: isRealizedRecord(r) ? 'Concluido' : (r.service_status || 'Marcado'),
         pelicula: getFilmLabel(r),
         area,
         vidrosCount,
@@ -1182,129 +1226,168 @@ export function ExtratosMensaisSupabase() {
           {/* ========================================================================= */}
           {/* DRE EXECUTIVO: DEMONSTRAÇÃO DO RESULTADO LÍQUIDO OPERACIONAL */}
           {/* ========================================================================= */}
-          <section className="relative overflow-hidden rounded-[2.25rem] border border-[#c9a227]/30 bg-[radial-gradient(ellipse_at_top,_rgba(201,162,39,0.15),_transparent_65%),linear-gradient(180deg,#0a1524_0%,#050b14_100%)] p-6 shadow-2xl shadow-black/40">
-            {/* Linha dourada superior */}
-            <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-[#c9a227]/80 to-transparent" />
+          <section className="relative overflow-hidden rounded-[2.25rem] border border-[#c9a227]/30 bg-gradient-to-b from-[#091424] via-[#050c18] to-[#04080f] p-6 shadow-2xl shadow-black/50 backdrop-blur-xl md:p-8">
+            {/* Linha dourada superior de iluminação */}
+            <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-[#c9a227] to-transparent shadow-[0_0_12px_rgba(201,162,39,0.8)]" />
 
-            {/* Cabeçalho do DRE */}
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-white/5 pb-4">
-              <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[#c9a227]/30 bg-[#c9a227]/10 text-[#f5d77a] shadow-[0_0_15px_rgba(201,162,39,0.15)]">
+            {/* Cabeçalho Executivo do DRE */}
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-white/10 pb-5">
+              <div className="flex items-center gap-3.5">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-[#c9a227]/40 bg-[#c9a227]/15 text-[#f5d77a] shadow-[0_0_20px_rgba(201,162,39,0.25)]">
                   <Sparkles className="h-6 w-6" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#f5d77a]">
-                      DRE Operacional
+                      DRE Operacional • {anoSelecionado}
                     </span>
-                    <span className="rounded-full border border-emerald-500/30 bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold uppercase text-emerald-300">
-                      Resultado Real
+                    <span className="rounded-full border border-emerald-500/40 bg-emerald-500/15 px-2.5 py-0.5 text-[10px] font-bold uppercase text-emerald-300">
+                      Resultado Líquido Real
                     </span>
                   </div>
-                  <h3 className="mt-0.5 font-display text-xl font-black tracking-tight text-white sm:text-2xl">
-                    Demonstração do Resultado Líquido
+                  <h3 className="mt-1 font-montserrat text-xl font-extrabold tracking-tight text-white sm:text-2xl">
+                    Demonstração do Resultado Operacional ({tituloMes})
                   </h3>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-right">
+              <div className="flex items-center gap-3 self-start sm:self-auto">
+                <div className="rounded-2xl border border-emerald-500/40 bg-emerald-500/10 px-5 py-2.5 text-right shadow-lg shadow-emerald-950/20 backdrop-blur-sm">
                   <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-300/80">Margem Líquida Real</p>
-                  <p className="text-xl font-black text-emerald-300">{dre.margemLiquidaReal.toFixed(1)}%</p>
+                  <p className="font-montserrat text-2xl font-black text-emerald-300">
+                    {dre.margemLiquidaReal.toFixed(1)}%
+                  </p>
+                  <p className="text-[10px] font-medium text-emerald-400/70">
+                    {dre.margemLiquidaReal >= 60 ? 'Margem de Alta Performance' : 'Retenção Líquida de Caixa'}
+                  </p>
                 </div>
               </div>
             </div>
 
             {/* Grid da Trinca Financeira */}
-            <div className="mt-5 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
-              {/* 1. Faturamento Bruto */}
-              <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-4.5 hover:border-white/10 transition">
-                <div className="flex items-center justify-between text-white/50 mb-1.5">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-white/60">1. Receita Bruta</span>
-                  <Wallet className="h-4 w-4 text-[#c9a227]" />
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {/* 1. Receita Bruta */}
+              <div className="group relative overflow-hidden rounded-2xl border border-[#c9a227]/30 bg-gradient-to-b from-[#c9a227]/15 via-[#c9a227]/[0.03] to-transparent p-5 shadow-lg shadow-black/20 transition hover:border-[#c9a227]/60">
+                <div className="flex items-center justify-between text-white/50 mb-2">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#f5d77a]">1. Receita Bruta</span>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#c9a227]/15 text-[#f5d77a]">
+                    <Wallet className="h-4 w-4" />
+                  </div>
                 </div>
-                <p className="text-2xl font-black text-white">{formatBRL(faturamentoTotal)}</p>
-                <p className="mt-1 text-xs text-white/40">100% faturado no mês</p>
+                <p className="font-montserrat text-2xl font-black text-white sm:text-3xl">
+                  {formatBRL(faturamentoTotal)}
+                </p>
+                <div className="mt-2 flex items-center justify-between text-xs text-white/50 border-t border-white/5 pt-2">
+                  <span>Base faturada</span>
+                  <span className="font-semibold text-white/70">100% da receita</span>
+                </div>
               </div>
 
               {/* 2. Custo Insumos Bluetech */}
-              <div className="rounded-2xl border border-sky-500/20 bg-sky-500/[0.03] p-4.5 hover:border-sky-500/30 transition">
-                <div className="flex items-center justify-between text-white/50 mb-1.5">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-sky-300/80">2. (−) Películas Bluetech</span>
-                  <Layers3 className="h-4 w-4 text-sky-400" />
+              <div className="group relative overflow-hidden rounded-2xl border border-sky-500/30 bg-gradient-to-b from-sky-500/15 via-sky-500/[0.03] to-transparent p-5 shadow-lg shadow-black/20 transition hover:border-sky-500/60">
+                <div className="flex items-center justify-between text-white/50 mb-2">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-sky-300">2. (−) Películas Bluetech</span>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-sky-500/15 text-sky-400">
+                    <Layers3 className="h-4 w-4" />
+                  </div>
                 </div>
-                <p className="text-2xl font-black text-sky-200">
+                <p className="font-montserrat text-2xl font-black text-sky-200 sm:text-3xl">
                   {dre.custoTotalFilmes > 0 ? `- ${formatBRL(dre.custoTotalFilmes)}` : 'R$ 0,00'}
                 </p>
-                <p className="mt-1 text-xs text-sky-300/60">
-                  {dre.shareFilmes.toFixed(1)}% da receita ({m2Total.toFixed(1)} m² aplicados)
-                </p>
+                <div className="mt-2 flex items-center justify-between text-xs text-sky-300/70 border-t border-white/5 pt-2">
+                  <span>{m2Total.toFixed(1)} m² aplicados</span>
+                  <span className="font-semibold">{dre.shareFilmes.toFixed(1)}% da receita</span>
+                </div>
               </div>
 
               {/* 3. Ajudantes & Despesas Operacionais */}
-              <div className="rounded-2xl border border-amber-500/20 bg-amber-500/[0.03] p-4.5 hover:border-amber-500/30 transition">
-                <div className="flex items-center justify-between text-white/50 mb-1.5">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300/80">3. (−) Ajudantes & Extras</span>
-                  <Clock className="h-4 w-4 text-amber-400" />
+              <div className="group relative overflow-hidden rounded-2xl border border-amber-500/30 bg-gradient-to-b from-amber-500/15 via-amber-500/[0.03] to-transparent p-5 shadow-lg shadow-black/20 transition hover:border-amber-500/60">
+                <div className="flex items-center justify-between text-white/50 mb-2">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-amber-300">3. (−) Ajudantes & Extras</span>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400">
+                    <Users className="h-4 w-4" />
+                  </div>
                 </div>
-                <p className="text-2xl font-black text-amber-200">
+                <p className="font-montserrat text-2xl font-black text-amber-200 sm:text-3xl">
                   {dre.despesasOperacionais > 0 ? `- ${formatBRL(dre.despesasOperacionais)}` : 'R$ 0,00'}
                 </p>
-                <p className="mt-1 text-xs text-amber-300/60">
-                  {dre.shareEquipe.toFixed(1)}% da receita (diárias e extras)
-                </p>
+                <div className="mt-2 flex items-center justify-between text-xs text-amber-300/70 border-t border-white/5 pt-2">
+                  <span>Diárias e operacionais</span>
+                  <span className="font-semibold">{dre.shareEquipe.toFixed(1)}% da receita</span>
+                </div>
               </div>
 
               {/* 4. Lucro Líquido Real */}
-              <div className="rounded-2xl border border-emerald-500/40 bg-gradient-to-br from-emerald-500/20 via-emerald-500/10 to-transparent p-4.5 shadow-lg shadow-emerald-500/10">
-                <div className="flex items-center justify-between text-white/50 mb-1.5">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-300">4. (=) Lucro Líquido</span>
-                  <Award className="h-4 w-4 text-emerald-400" />
+              <div className="group relative overflow-hidden rounded-2xl border border-emerald-500/50 bg-gradient-to-b from-emerald-500/25 via-emerald-500/10 to-transparent p-5 shadow-xl shadow-emerald-950/40 transition hover:border-emerald-400">
+                <div className="flex items-center justify-between text-white/50 mb-2">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-300">4. (=) Lucro Líquido Real</span>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-300">
+                    <Award className="h-4 w-4" />
+                  </div>
                 </div>
-                <p className="text-2xl font-black text-emerald-300">{formatBRL(dre.lucroLiquido)}</p>
-                <p className="mt-1 text-xs text-emerald-200/70 font-semibold">
-                  {dre.margemLiquidaReal.toFixed(1)}% líquido no bolso
+                <p className="font-montserrat text-2xl font-black text-emerald-300 sm:text-3xl">
+                  {formatBRL(dre.lucroLiquido)}
                 </p>
+                <div className="mt-2 flex items-center justify-between text-xs text-emerald-300/80 border-t border-emerald-500/20 pt-2 font-bold">
+                  <span>Margem no caixa</span>
+                  <span>{dre.margemLiquidaReal.toFixed(1)}% líquido</span>
+                </div>
               </div>
             </div>
 
             {/* Barra de Distribuição Visual do Faturamento */}
-            <div className="mt-5 space-y-2 pt-4 border-t border-white/5">
-              <div className="flex items-center justify-between text-xs text-white/60">
-                <span className="text-[11px] font-semibold uppercase tracking-wider">Composição do Faturamento</span>
-                <span className="text-[11px] font-bold text-white">
-                  Lucro {dre.margemLiquidaReal.toFixed(0)}% • Películas {dre.shareFilmes.toFixed(0)}% • Equipe {dre.shareEquipe.toFixed(0)}%
+            <div className="mt-6 space-y-3 pt-5 border-t border-white/10">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between text-xs">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-white/60">
+                  Composição da Receita Bruta
                 </span>
+                <div className="flex flex-wrap items-center gap-4 text-[11px]">
+                  <div className="flex items-center gap-1.5 text-emerald-300">
+                    <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
+                    <span>Lucro Líquido: <strong>{dre.margemLiquidaReal.toFixed(1)}%</strong> ({formatBRL(dre.lucroLiquido)})</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-sky-300">
+                    <span className="h-2.5 w-2.5 rounded-full bg-sky-400" />
+                    <span>Películas: <strong>{dre.shareFilmes.toFixed(1)}%</strong> ({formatBRL(dre.custoTotalFilmes)})</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-amber-300">
+                    <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
+                    <span>Ajudantes/Extras: <strong>{dre.shareEquipe.toFixed(1)}%</strong> ({formatBRL(dre.despesasOperacionais)})</span>
+                  </div>
+                </div>
               </div>
-              <div className="flex h-3 w-full overflow-hidden rounded-full bg-white/5 p-0.5 border border-white/10">
+
+              <div className="flex h-3.5 w-full overflow-hidden rounded-full bg-black/60 p-0.5 border border-white/10 gap-0.5">
                 <div
                   style={{ width: `${Math.min(100, Math.max(0, dre.margemLiquidaReal))}%` }}
-                  className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400 transition-all duration-500"
+                  className="h-full rounded-l-full bg-gradient-to-r from-emerald-500 to-emerald-400 transition-all duration-500 hover:brightness-110"
                   title={`Lucro Líquido: ${formatBRL(dre.lucroLiquido)} (${dre.margemLiquidaReal.toFixed(1)}%)`}
                 />
                 <div
                   style={{ width: `${Math.min(100, Math.max(0, dre.shareFilmes))}%` }}
-                  className="h-full rounded-full bg-gradient-to-r from-sky-500 to-sky-400 transition-all duration-500"
+                  className="h-full bg-gradient-to-r from-sky-500 to-sky-400 transition-all duration-500 hover:brightness-110"
                   title={`Películas Bluetech: ${formatBRL(dre.custoTotalFilmes)} (${dre.shareFilmes.toFixed(1)}%)`}
                 />
                 <div
                   style={{ width: `${Math.min(100, Math.max(0, dre.shareEquipe))}%` }}
-                  className="h-full rounded-full bg-gradient-to-r from-amber-500 to-amber-400 transition-all duration-500"
+                  className="h-full rounded-r-full bg-gradient-to-r from-amber-500 to-amber-400 transition-all duration-500 hover:brightness-110"
                   title={`Ajudantes & Extras: ${formatBRL(dre.despesasOperacionais)} (${dre.shareEquipe.toFixed(1)}%)`}
                 />
               </div>
             </div>
 
             {/* Régua de Inteligência & Métricas Operacionais */}
-            <div className="mt-5 grid grid-cols-2 gap-3 pt-4 border-t border-white/5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-6 grid grid-cols-2 gap-3.5 pt-5 border-t border-white/10 sm:grid-cols-2 lg:grid-cols-4">
               {/* 1. Ticket Médio */}
-              <div className="group rounded-2xl border border-white/5 bg-white/[0.02] p-3.5 transition hover:border-sky-400/30 hover:bg-white/[0.04]">
-                <div className="flex items-center justify-between text-white/50 mb-1">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-sky-300/80">Ticket Médio</span>
-                  <TrendingUp className="h-4 w-4 text-sky-400" />
+              <div className="group rounded-2xl border border-sky-500/20 bg-sky-500/[0.04] p-4 transition hover:border-sky-500/40 hover:bg-sky-500/[0.07]">
+                <div className="flex items-center justify-between text-white/50 mb-1.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-sky-300/90">Ticket Médio</span>
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-sky-500/15 text-sky-400">
+                    <TrendingUp className="h-3.5 w-3.5" />
+                  </div>
                 </div>
-                <p className="text-xl font-black text-white">{formatBRL(ticketMedio)}</p>
-                <p className="mt-0.5 text-[11px] text-white/45 truncate">
+                <p className="font-montserrat text-xl font-bold text-white">{formatBRL(ticketMedio)}</p>
+                <p className="mt-1 text-[11px] text-white/50 truncate">
                   {servicosComValor.length > 0
                     ? `em ${servicosComValor.length} atendimento(s) faturados`
                     : 'receita média por serviço'}
@@ -1312,47 +1395,55 @@ export function ExtratosMensaisSupabase() {
               </div>
 
               {/* 2. Metragem Total Aplicada */}
-              <div className="group rounded-2xl border border-white/5 bg-white/[0.02] p-3.5 transition hover:border-[#c9a227]/30 hover:bg-white/[0.04]">
-                <div className="flex items-center justify-between text-white/50 mb-1">
+              <div className="group rounded-2xl border border-[#c9a227]/20 bg-[#c9a227]/[0.04] p-4 transition hover:border-[#c9a227]/40 hover:bg-[#c9a227]/[0.07]">
+                <div className="flex items-center justify-between text-white/50 mb-1.5">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-[#f5d77a]">Metragem Aplicada</span>
-                  <Layers3 className="h-4 w-4 text-[#c9a227]" />
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#c9a227]/15 text-[#f5d77a]">
+                    <Layers3 className="h-3.5 w-3.5" />
+                  </div>
                 </div>
-                <p className="text-xl font-black text-white">{m2Total.toFixed(1)} m²</p>
-                <p className="mt-0.5 text-[11px] text-white/45 truncate">
-                  {precoMedioPorM2 > 0 ? `${formatBRL(precoMedioPorM2)}/m² médio` : 'área total instalada'}
+                <p className="font-montserrat text-xl font-bold text-white">{m2Total.toFixed(1)} m²</p>
+                <p className="mt-1 text-[11px] text-white/50 truncate">
+                  {precoMedioPorM2 > 0 ? `${formatBRL(precoMedioPorM2)}/m² realizado` : 'área total instalada'}
                 </p>
               </div>
 
               {/* 3. Atendimentos & Conclusão */}
-              <div className="group rounded-2xl border border-white/5 bg-white/[0.02] p-3.5 transition hover:border-emerald-500/30 hover:bg-white/[0.04]">
-                <div className="flex items-center justify-between text-white/50 mb-1">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-300/80">Atendimentos</span>
-                  <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+              <div className="group rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.04] p-4 transition hover:border-emerald-500/40 hover:bg-emerald-500/[0.07]">
+                <div className="flex items-center justify-between text-white/50 mb-1.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-300/90">Atendimentos</span>
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-400">
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                  </div>
                 </div>
-                <p className="text-xl font-black text-white">{numJobs} serviço{numJobs !== 1 ? 's' : ''}</p>
-                <p className="mt-0.5 text-[11px] text-emerald-300/70 truncate font-medium">
-                  {taxaConclusao}% concluídos ({servicosFeitos} de {numJobs})
+                <p className="font-montserrat text-xl font-bold text-white">
+                  {numJobs} atendimento{numJobs !== 1 ? 's' : ''}
+                </p>
+                <p className="mt-1 text-[11px] text-emerald-300/80 truncate font-semibold">
+                  {taxaConclusao}% concluídos • {servicosFeitos} de {numJobs} finalizados
                 </p>
               </div>
 
               {/* 4. Variação MoM */}
-              <div className="group rounded-2xl border border-white/5 bg-white/[0.02] p-3.5 transition hover:border-white/10 hover:bg-white/[0.04]">
-                <div className="flex items-center justify-between text-white/50 mb-1">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-white/60">Variação MoM</span>
-                  {variacaoMoM !== null && variacaoMoM.percentual >= 0 ? (
-                    <ArrowUpRight className="h-4 w-4 text-emerald-400" />
-                  ) : variacaoMoM !== null ? (
-                    <ArrowDownRight className="h-4 w-4 text-rose-400" />
-                  ) : (
-                    <Sparkles className="h-4 w-4 text-white/30" />
-                  )}
+              <div className="group rounded-2xl border border-white/10 bg-white/[0.03] p-4 transition hover:border-white/20 hover:bg-white/[0.06]">
+                <div className="flex items-center justify-between text-white/50 mb-1.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-white/70">Variação MoM</span>
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/10 text-white">
+                    {variacaoMoM !== null && variacaoMoM.percentual >= 0 ? (
+                      <ArrowUpRight className="h-3.5 w-3.5 text-emerald-400" />
+                    ) : variacaoMoM !== null ? (
+                      <ArrowDownRight className="h-3.5 w-3.5 text-rose-400" />
+                    ) : (
+                      <Sparkles className="h-3.5 w-3.5 text-white/40" />
+                    )}
+                  </div>
                 </div>
-                <p className="text-xl font-black text-white">
+                <p className="font-montserrat text-xl font-bold text-white">
                   {variacaoMoM !== null
                     ? `${variacaoMoM.percentual >= 0 ? '+' : ''}${variacaoMoM.percentual.toFixed(1)}%`
                     : 'Base Mensal'}
                 </p>
-                <p className="mt-0.5 text-[11px] text-white/45 truncate">
+                <p className="mt-1 text-[11px] text-white/50 truncate">
                   {variacaoMoM !== null
                     ? `${formatBRL(variacaoMoM.diff)} vs mês anterior`
                     : dadosMesAnterior.faturamento > 0
@@ -1628,7 +1719,7 @@ export function ExtratosMensaisSupabase() {
                   )
                 ) : (
                   /* VISÃO DIÁRIA DO MÊS ATIVO */
-                  registros.length === 0 ? (
+                  registrosRealizados.length === 0 ? (
                     <div className="flex h-full items-center justify-center rounded-2xl border border-dashed border-white/10 bg-white/[0.02] text-center text-sm text-white/35">
                       Nenhum serviço registrado no mês de {tituloMes} de {anoSelecionado}.
                     </div>
@@ -2277,17 +2368,6 @@ export function ExtratosMensaisSupabase() {
                 <div className="inline-flex rounded-xl border border-white/10 bg-[#04080f] p-1 shadow-inner">
                   <button
                     type="button"
-                    onClick={() => setFiltroTabelaStatus('todos')}
-                    className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition ${
-                      filtroTabelaStatus === 'todos'
-                        ? 'bg-[#c9a227] text-[#04080f] font-bold shadow'
-                        : 'text-white/60 hover:text-white'
-                    }`}
-                  >
-                    Todos ({atendimentosDetalhados.length})
-                  </button>
-                  <button
-                    type="button"
                     onClick={() => setFiltroTabelaStatus('concluidos')}
                     className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition ${
                       filtroTabelaStatus === 'concluidos'
@@ -2295,7 +2375,7 @@ export function ExtratosMensaisSupabase() {
                         : 'text-white/60 hover:text-white'
                     }`}
                   >
-                    Concluídos
+                    Concluídos ({servicosFeitos})
                   </button>
                   <button
                     type="button"
@@ -2306,7 +2386,18 @@ export function ExtratosMensaisSupabase() {
                         : 'text-white/60 hover:text-white'
                     }`}
                   >
-                    Agendados
+                    Agendados ({servicosAgendados})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFiltroTabelaStatus('todos')}
+                    className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition ${
+                      filtroTabelaStatus === 'todos'
+                        ? 'bg-[#c9a227] text-[#04080f] font-bold shadow'
+                        : 'text-white/60 hover:text-white'
+                    }`}
+                  >
+                    Todos ({atendimentosDetalhados.length})
                   </button>
                 </div>
 

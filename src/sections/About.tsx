@@ -1,5 +1,6 @@
 import { Check, Award, Users, Calendar, Shield, type LucideIcon } from 'lucide-react';
 import { ScrollReveal } from '../components/ScrollReveal';
+import { SpotlightCard } from '../components/SpotlightCard';
 
 interface StatItem {
   icon: LucideIcon;
@@ -89,7 +90,7 @@ export function About() {
           {/* Stats Grid */}
           <ScrollReveal animation="stagger-stats" className="grid grid-cols-2 gap-3 sm:gap-6">
             {stats.map((stat, index) => (
-              <div
+              <SpotlightCard
                 key={index}
                 className={`stat-card group relative p-5 sm:p-8 rounded-xl sm:rounded-2xl bg-gradient-to-b from-[#1a3a5c]/50 to-[#04080f]/70 border border-[#1a3a5c]/30 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 ${index % 2 === 1 ? 'sm:mt-8' : ''
                   }`}
@@ -123,7 +124,7 @@ export function About() {
                     )}
                   </p>
                 </div>
-              </div>
+              </SpotlightCard>
             ))}
           </ScrollReveal>
         </div>

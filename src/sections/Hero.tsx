@@ -31,9 +31,9 @@ export function Hero() {
       <div className="relative z-20 container-lume pt-24 sm:pt-20 pb-10 sm:pb-12">
         <HeroEntrance className="max-w-3xl">
           {/* Badge */}
-          <div className="animate-hero opacity-0 inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-[#c9a227]/10 border border-[#c9a227]/30 mb-4 sm:mb-6">
+          <div className="animate-hero opacity-0 inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-[#c9a227]/10 border border-[#c9a227]/30 hover:border-[#c9a227]/60 transition-all duration-300 hover:scale-[1.02] cursor-default mb-4 sm:mb-6 shadow-[0_0_15px_rgba(201,162,39,0.1)]">
             <span className="w-2 h-2 rounded-full bg-[#c9a227] animate-pulse flex-shrink-0" />
-            <span className="text-xs sm:text-sm text-[#c9a227] font-medium">
+            <span className="text-xs sm:text-sm text-[#c9a227] font-medium tracking-wide">
               8 Anos de Excelência em Insulfilm
             </span>
           </div>

@@ -6,6 +6,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Image from 'next/image';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
+import { SpotlightCard } from '../components/SpotlightCard';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -180,7 +181,7 @@ export function Products() {
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6"
         >
           {products.map((product, index) => (
-            <div
+            <SpotlightCard
               key={product.id}
               className={`product-card group relative bg-gradient-to-b from-[#0a1628]/80 to-[#070f1a]/95 rounded-xl sm:rounded-2xl border border-white/5 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2 sm:hover:-translate-y-3 hover:shadow-2xl hover:shadow-[#c9a227]/10 ${index % 2 === 1 ? 'lg:mt-8' : ''}`}
             >
@@ -245,7 +246,7 @@ export function Products() {
               </a>
 
               {/* Botão de WhatsApp fixo dentro do card, mas fora do link da página */}
-              <div className="p-4 sm:p-5 pt-0">
+              <div className="p-4 sm:p-5 pt-0 relative z-30">
                 <a
                   href={`https://wa.me/5521965140612?text=${encodeURIComponent(`Olá! Tenho interesse na ${product.name}`)}`}
                   target="_blank"
@@ -256,7 +257,7 @@ export function Products() {
                   <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 transition-transform group-hover/btn:translate-x-1" />
                 </a>
               </div>
-            </div>
+            </SpotlightCard>
           ))}
         </div>
 

@@ -110,11 +110,76 @@
     @apply px-5 py-3 sm:px-8 sm:py-4 rounded-lg font-semibold text-xs sm:text-sm uppercase tracking-wider transition-all duration-300;
     background: linear-gradient(90deg, var(--lume-gold) 0%, var(--lume-gold-light) 100%);
     color: var(--lume-navy);
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -80%;
+    width: 35%;
+    height: 200%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.45),
+      transparent
+    );
+    transform: rotate(25deg);
+    pointer-events: none;
+    animation: btn-shimmer-sweep 7s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    z-index: 1;
   }
 
   .btn-primary:hover {
     transform: translateY(-2px) scale(1.02);
     box-shadow: 0 10px 30px rgba(201, 162, 39, 0.4);
+  }
+
+  /* LUME Elite Spotlight Card & Border Illumination */
+  .spotlight-card {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .spotlight-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(
+      420px circle at var(--mouse-x, -999px) var(--mouse-y, -999px),
+      var(--spotlight-color, rgba(201, 162, 39, 0.12)),
+      transparent 70%
+    );
+    opacity: var(--spotlight-opacity, 0);
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .spotlight-card::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: radial-gradient(
+      260px circle at var(--mouse-x, -999px) var(--mouse-y, -999px),
+      rgba(201, 162, 39, 0.55),
+      transparent 65%
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: var(--spotlight-opacity, 0);
+    transition: opacity 0.4s ease;
+    z-index: 2;
   }
 
   .btn-secondary {
@@ -233,6 +298,24 @@
 
   50% {
     box-shadow: 0 0 40px rgba(201, 162, 39, 0.6);
+  }
+}
+
+@keyframes btn-shimmer-sweep {
+  0%, 75% {
+    left: -80%;
+    opacity: 0;
+  }
+  76% {
+    opacity: 1;
+  }
+  88% {
+    left: 140%;
+    opacity: 1;
+  }
+  89%, 100% {
+    left: 140%;
+    opacity: 0;
   }
 }
 

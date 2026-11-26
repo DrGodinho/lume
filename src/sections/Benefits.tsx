@@ -1,6 +1,7 @@
 import { Shield, Thermometer, PiggyBank, Lock, type LucideIcon } from 'lucide-react';
 import { ScrollReveal } from '../components/ScrollReveal';
 import { AnimatedCounter } from '../components/AnimatedCounter';
+import { SpotlightCard } from '../components/SpotlightCard';
 
 interface BenefitItem {
   id: number;
@@ -97,7 +98,7 @@ export function Benefits() {
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
         >
           {benefits.map((benefit) => (
-            <div
+            <SpotlightCard
               key={benefit.id}
               className="stat-card benefit-card group relative p-5 sm:p-8 rounded-xl sm:rounded-2xl bg-gradient-to-b from-[#1a3a5c]/40 to-[#04080f]/60 border border-[#1a3a5c]/30 hover:border-[#c9a227]/50 transition-all duration-500 hover:-translate-y-2"
             >
@@ -143,7 +144,7 @@ export function Benefits() {
               <p className="text-gray-400 text-xs sm:text-sm leading-relaxed">
                 {benefit.description}
               </p>
-            </div>
+            </SpotlightCard>
           ))}
         </ScrollReveal>
 
