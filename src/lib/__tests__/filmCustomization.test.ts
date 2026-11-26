@@ -5,7 +5,10 @@ import {
   STANDARD_FILM_TYPE_KEYS,
   normalizeFilmTypeKey,
   normalizeFilmTypes,
+  normalizeFilmWarranties,
+  buildQuoteSummaryText,
   DEFAULT_FILM_TYPES,
+  DEFAULT_FILM_WARRANTIES,
 } from '../films';
 
 describe('Film Customization Domain', () => {
@@ -59,5 +62,38 @@ describe('Film Customization Domain', () => {
     expect(FILM_TYPE_LABELS.window_blue_20).toBe('Window Blue 20%');
     expect(FILM_TYPE_LABELS.nano_carbon_20).toBe('Nano Carbon 20%');
     expect(FILM_TYPE_LABELS.nano_carbon_05).toBe('Nano Carbon 05%');
+  });
+
+  it('normalizes film warranties with defaults per line and preserves custom values', () => {
+    const normalized = normalizeFilmWarranties({
+      carbono_g20: 4,
+      nano_ceramica_g20: 12,
+      invalid: -5,
+    });
+    expect(normalized.carbono_g20).toBe(4);
+    expect(normalized.nano_ceramica_g20).toBe(12);
+    expect(normalized.carbono_g5).toBe(DEFAULT_FILM_WARRANTIES.carbono_g5);
+    expect(normalized.refletiva).toBe(5);
+    expect(normalized.jateado).toBe(5);
+    expect(normalized.nano_ceramica).toBe(7);
+    expect(normalized.window_blue_75).toBe(10);
+  });
+
+  it('builds a formal WhatsApp quote summary with film, warranty, area, cash and 3x installment', () => {
+    const text = buildQuoteSummaryText({
+      filmName: 'Nano Cerâmica G20',
+      warrantyYears: 10,
+      totalAreaM2: 12.5,
+      finalPrice: 1500,
+      cliente: 'Maria',
+      formatCurrency: (v) => `R$ ${v.toFixed(2).replace('.', ',')}`,
+    });
+
+    expect(text).toContain('Prezado(a) Maria, segue o resumo do seu orçamento:');
+    expect(text).toContain('• *Película:* Nano Cerâmica G20');
+    expect(text).toContain('• *Garantia:* 10 anos');
+    expect(text).toContain('• *Área total:* 12,50 m²');
+    expect(text).toContain('• *Investimento:* R$ 1500,00 à vista (ou PIX)');
+    expect(text).toContain('• *Parcelamento:* em até 3x de R$ 500,00 sem juros');
   });
 });

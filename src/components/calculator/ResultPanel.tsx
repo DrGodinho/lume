@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Camera, FileText, History, Scissors, TrendingUp, Check, X } from 'lucide-react';
+import { Camera, Copy, FileText, History, Scissors, TrendingUp, Check, X } from 'lucide-react';
 import type { LucroCalculadoraResult } from '../../lib/pricing';
 import type { DiscountMode } from '../../lib/films';
 
@@ -24,6 +24,7 @@ interface ResultPanelProps {
     perdasFixas: number;
     compensacaoPerda?: number;
     // Ações junto dos números (princípio 5: nenhum número sem verbo)
+    onCopiarResumo?: () => void;
     onSalvar: () => void;
     onGerarImagem: () => void;
     onGerarPDF: () => void;
@@ -57,6 +58,7 @@ export function ResultPanel({
     modoPerdas,
     perdasFixas,
     compensacaoPerda,
+    onCopiarResumo,
     onSalvar,
     onGerarImagem,
     onGerarPDF,
@@ -68,6 +70,8 @@ export function ResultPanel({
     onCustoAjudanteChange,
 }: ResultPanelProps) {
     const [mostrarLucro, setMostrarLucro] = useState(false);
+    const [copiedResumo, setCopiedResumo] = useState(false);
+    const copyResetTimerRef = useRef<NodeJS.Timeout | null>(null);
     const holdTimerRef = useRef<NodeJS.Timeout | null>(null);
     const didTriggerLongPressRef = useRef(false);
     const popoverRef = useRef<HTMLDivElement | null>(null);
@@ -116,6 +120,19 @@ export function ResultPanel({
         if (mostrarLucro && !didTriggerLongPressRef.current) {
             setMostrarLucro(false);
         }
+    };
+
+    useEffect(() => {
+        return () => {
+            if (copyResetTimerRef.current) clearTimeout(copyResetTimerRef.current);
+        };
+    }, []);
+
+    const handleCopiarClick = () => {
+        onCopiarResumo?.();
+        setCopiedResumo(true);
+        if (copyResetTimerRef.current) clearTimeout(copyResetTimerRef.current);
+        copyResetTimerRef.current = setTimeout(() => setCopiedResumo(false), 2000);
     };
 
     return (
@@ -347,7 +364,22 @@ export function ResultPanel({
                         </span>
                     </button>
                 </div>
-                <div className="flex gap-2 w-full sm:w-auto">
+                <div className="flex flex-wrap sm:flex-nowrap gap-2 w-full sm:w-auto">
+                    {onCopiarResumo && (
+                        <button
+                            type="button"
+                            onClick={handleCopiarClick}
+                            title="Copiar resumo formal do orçamento para WhatsApp"
+                            className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl font-bold uppercase text-[9px] border transition-all active:scale-95 ${
+                                copiedResumo
+                                    ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300'
+                                    : 'bg-blue-500/10 border-blue-500/30 text-blue-300 hover:bg-blue-500/20 hover:text-white'
+                            }`}
+                        >
+                            {copiedResumo ? <Check size={13} /> : <Copy size={13} />}
+                            {copiedResumo ? 'Copiado' : 'Copiar'}
+                        </button>
+                    )}
                     <button onClick={onSalvar} className="flex-1 flex items-center justify-center gap-2 bg-[#c9a227]/10 border border-[#c9a227]/30 text-[#c9a227] px-3 py-2.5 rounded-xl font-bold uppercase text-[9px] hover:bg-[#c9a227]/20 transition-all">
                         <History size={13} /> Salvar
                     </button>

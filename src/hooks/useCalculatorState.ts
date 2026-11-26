@@ -4,7 +4,9 @@ import { useEffect, useMemo, useReducer, useState, useCallback } from 'react';
 import {
   DEFAULT_ROOM_COLORS,
   normalizeFilmTypeKey,
+  DEFAULT_FILM_WARRANTIES,
   normalizeFilmTypes,
+  normalizeFilmWarranties,
   normalizeFilmCatalog,
 } from '../lib/films';
 import type {
@@ -114,6 +116,9 @@ export function useCalculatorState(cfg: AppConfig) {
   const [perdasFixas, setPerdasFixas] = useState(cfg.perdasFixas);
   const [agressividadeCorte, setAgressividadeCorte] = useState(cfg.agressividadeCorte);
   const [filmTypes, setFilmTypes] = useState<Record<FilmTypeKey, number>>(initialFilmTypes);
+  const [filmWarranties, setFilmWarranties] = useState<Record<FilmTypeKey, number>>(
+    () => normalizeFilmWarranties(cfg.filmWarranties ?? DEFAULT_FILM_WARRANTIES)
+  );
   const [filmCatalog, setFilmCatalog] = useState<Record<string, FilmCatalogItem>>(initialFilmCatalog);
   const [selectedFilm, setSelectedFilm] = useState<FilmTypeKey>(initialSelectedFilm);
   const [customFilmName, setCustomFilmName] = useState('');
@@ -167,6 +172,7 @@ export function useCalculatorState(cfg: AppConfig) {
     modoCorConfig: usarCoresPorAmbiente ? 'ambiente' : 'tamanho',
     agressividadeCorte,
     filmTypes,
+    filmWarranties,
     filmCatalog,
     selectedFilm,
     draftExpiration,
@@ -182,6 +188,7 @@ export function useCalculatorState(cfg: AppConfig) {
     usarCoresPorAmbiente,
     agressividadeCorte,
     filmTypes,
+    filmWarranties,
     filmCatalog,
     selectedFilm,
     draftExpiration,
@@ -206,6 +213,7 @@ export function useCalculatorState(cfg: AppConfig) {
     perdasFixas, setPerdasFixas,
     agressividadeCorte, setAgressividadeCorte,
     filmTypes, setFilmTypes,
+    filmWarranties, setFilmWarranties,
     filmCatalog, setFilmCatalog,
     selectedFilm, setSelectedFilm,
     customFilmName, setCustomFilmName,

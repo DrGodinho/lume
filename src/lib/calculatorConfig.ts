@@ -4,6 +4,7 @@ import {
   normalizeFilmCatalog,
   normalizeFilmTypeKey,
   normalizeFilmTypes,
+  normalizeFilmWarranties,
 } from './films';
 import type { AppConfig } from './films';
 
@@ -14,6 +15,7 @@ export function loadConfig(scopeKey?: string): AppConfig {
         if (saved) {
           const parsed = JSON.parse(saved);
           const filmTypes = normalizeFilmTypes(parsed.filmTypes);
+          const filmWarranties = normalizeFilmWarranties(parsed.filmWarranties);
           const filmCatalog = normalizeFilmCatalog(parsed.filmCatalog, filmTypes);
           Object.entries(filmCatalog).forEach(([key, item]) => {
             if (item && Number.isFinite(item.priceSale) && item.priceSale > 0) {
@@ -24,6 +26,7 @@ export function loadConfig(scopeKey?: string): AppConfig {
             ...DEFAULT_CONFIG,
             ...parsed,
             filmTypes,
+            filmWarranties,
             filmCatalog,
             selectedFilm: normalizeFilmTypeKey(parsed.selectedFilm),
             modoDesconto: parsed.modoDesconto === 'porcentagem' ? 'porcentagem' : 'real',

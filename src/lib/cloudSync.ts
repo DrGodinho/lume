@@ -3,6 +3,7 @@ import {
   FilmCatalogItem,
   normalizeFilmCatalog,
   normalizeFilmTypes,
+  normalizeFilmWarranties,
 } from './films';
 
 const logger = createScopedLogger('cloud-sync');
@@ -222,6 +223,7 @@ export interface ConfigData {
   modoCorConfig: string;
   agressividadeCorte: number;
   filmTypes: Record<string, number>;
+  filmWarranties?: Record<string, number>;
   selectedFilm: string;
   draftExpiration?: number;
   modoDesconto?: 'real' | 'porcentagem';
@@ -238,6 +240,9 @@ export async function saveConfigToCloud(config: ConfigData): Promise<boolean> {
   const filmTypesPayload: Record<string, unknown> = { ...normalizedTypes };
   if (config.filmCatalog) {
     filmTypesPayload.__catalog = config.filmCatalog;
+  }
+  if (config.filmWarranties) {
+    filmTypesPayload.__warranties = normalizeFilmWarranties(config.filmWarranties);
   }
 
   const row = {
@@ -292,7 +297,9 @@ export async function loadConfigFromCloud(): Promise<ConfigData | null> {
     if (!data) return null;
 
     const rawCatalog = data.film_catalog || (data.film_types as Record<string, unknown>)?.__catalog;
+    const rawWarranties = (data.film_types as Record<string, unknown>)?.__warranties;
     const filmTypes = normalizeFilmTypes(data.film_types);
+    const filmWarranties = normalizeFilmWarranties(rawWarranties);
     const filmCatalog = normalizeFilmCatalog(rawCatalog, filmTypes);
 
     // Garante sincronizacao bidirecional: os precos de venda do catalogo atualizam filmTypes
@@ -313,6 +320,7 @@ export async function loadConfigFromCloud(): Promise<ConfigData | null> {
       modoCorConfig: data.modo_cor_config ?? 'tamanho',
       agressividadeCorte: data.agressividade_corte ?? 35,
       filmTypes,
+      filmWarranties,
       filmCatalog,
       selectedFilm: normalizeSelectedFilm(data.selected_film),
       draftExpiration: data.draft_expiration,

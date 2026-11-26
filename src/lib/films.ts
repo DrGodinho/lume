@@ -84,12 +84,29 @@ export interface AppConfig {
   modoCorConfig: ColorMode;
   agressividadeCorte: number;
   filmTypes: Record<FilmTypeKey, number>;
+  filmWarranties?: Record<FilmTypeKey, number>;
   selectedFilm: FilmTypeKey;
   draftExpiration: number;
   modoDesconto?: DiscountMode;
   filmCatalog?: Record<string, FilmCatalogItem>;
   compensarPerdas?: boolean;
 }
+
+export const DEFAULT_FILM_WARRANTIES: Record<FilmTypeKey, number> = {
+  carbono_g5: 3,
+  carbono_g20: 3,
+  refletiva: 5,
+  dupla_camada: 5,
+  nano_ceramica: 7,
+  nano_ceramica_g20: 7,
+  jateado: 5,
+  window_blue_75: 10,
+  window_blue_05: 10,
+  window_blue_20: 10,
+  nano_carbon_20: 5,
+  nano_carbon_05: 5,
+  personalizado: 3,
+};
 
 export const DEFAULT_FILM_TYPES: Record<FilmTypeKey, number> = {
   carbono_g5: 80,
@@ -214,6 +231,7 @@ export const DEFAULT_CONFIG: AppConfig = {
   modoCorConfig: 'ambiente',
   agressividadeCorte: 35,
   filmTypes: { ...DEFAULT_FILM_TYPES },
+  filmWarranties: { ...DEFAULT_FILM_WARRANTIES },
   filmCatalog: { ...DEFAULT_FILM_CATALOG },
   selectedFilm: 'carbono_g20',
   draftExpiration: 15,
@@ -337,6 +355,70 @@ export const normalizeFilmTypes = (value: unknown): Record<FilmTypeKey, number> 
   });
 
   return next;
+};
+
+export const normalizeFilmWarranties = (raw: unknown): Record<FilmTypeKey, number> => {
+  const next: Record<FilmTypeKey, number> = { ...DEFAULT_FILM_WARRANTIES };
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return next;
+
+  const source = raw as Record<string, unknown>;
+  FILM_TYPE_KEYS.forEach((key) => {
+    const years = Number(source[key]);
+    if (Number.isFinite(years) && years >= 0) {
+      next[key] = Math.round(years);
+    }
+  });
+
+  return next;
+};
+
+export interface QuoteSummaryInput {
+  filmName: string;
+  warrantyYears: number;
+  totalAreaM2: number;
+  finalPrice: number;
+  cliente?: string;
+  formatCurrency: (v: number) => string;
+}
+
+/**
+ * Gera o resumo formal em tópicos (pronto para WhatsApp) com os dados do orçamento atual.
+ */
+export const buildQuoteSummaryText = ({
+  filmName,
+  warrantyYears,
+  totalAreaM2,
+  finalPrice,
+  cliente,
+  formatCurrency,
+}: QuoteSummaryInput): string => {
+  const trimmedClient = (cliente || '').trim();
+  const greeting = trimmedClient
+    ? `Prezado(a) ${trimmedClient}, segue o resumo do seu orçamento:`
+    : 'Segue o resumo do seu orçamento:';
+
+  const safeYears = Number.isFinite(warrantyYears) && warrantyYears >= 0 ? Math.round(warrantyYears) : 0;
+  const warrantyLabel =
+    safeYears === 0
+      ? 'Sem garantia'
+      : `${safeYears} ${safeYears === 1 ? 'ano' : 'anos'}`;
+
+  const areaLabel = `${Math.max(0, totalAreaM2).toFixed(2).replace('.', ',')} m²`;
+  const cashValue = formatCurrency(Math.max(0, finalPrice));
+  const installmentValue = formatCurrency(Math.max(0, finalPrice) / 3);
+
+  return [
+    '*Orçamento LUME Controle Solar*',
+    greeting,
+    '',
+    `• *Película:* ${filmName}`,
+    `• *Garantia:* ${warrantyLabel}`,
+    `• *Área total:* ${areaLabel}`,
+    `• *Investimento:* ${cashValue} à vista (ou PIX)`,
+    `• *Parcelamento:* em até 3x de ${installmentValue} sem juros`,
+    '',
+    'Ficamos à disposição para esclarecer qualquer dúvida ou agendar a instalação.',
+  ].join('\n');
 };
 
 export const getSizeColor = (h?: number, w?: number) => {

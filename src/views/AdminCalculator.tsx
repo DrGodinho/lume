@@ -68,6 +68,7 @@ import {
     DEFAULT_CONFIG,
     DEFAULT_FILM_CATALOG,
     DEFAULT_FILM_TYPES,
+    DEFAULT_FILM_WARRANTIES,
     DiscountMode,
     FilmCatalogItem,
     FILM_TYPE_LABELS,
@@ -76,6 +77,7 @@ import {
     LossMode,
     OptimizationMode,
     OrcamentoSalvo,
+    buildQuoteSummaryText,
     buildRoomColorMap,
     createGlassId,
     getRoomColorByIndex,
@@ -87,6 +89,7 @@ import {
     normalizeFilmCatalog,
     normalizeFilmTypeKey,
     normalizeFilmTypes,
+    normalizeFilmWarranties,
     resolveRoomKey,
 } from '../lib/films';
 import { loadConfig, saveConfig } from '../lib/calculatorConfig';
@@ -153,6 +156,7 @@ export function AdminCalculator() {
         perdasFixas, setPerdasFixas,
         agressividadeCorte, setAgressividadeCorte,
         filmTypes, setFilmTypes,
+        filmWarranties, setFilmWarranties,
         filmCatalog, setFilmCatalog,
         selectedFilm, setSelectedFilm,
         customFilmName, setCustomFilmName,
@@ -414,6 +418,7 @@ export function AdminCalculator() {
 
                 const rawTypes = source.filmTypes;
                 const normalizedTypes = normalizeFilmTypes(rawTypes);
+                const normalizedWarranties = normalizeFilmWarranties(source.filmWarranties);
                 const catalog = normalizeFilmCatalog(source.filmCatalog, normalizedTypes);
 
                 // Sincroniza os precos de venda em filmTypes a partir do catalogo
@@ -433,6 +438,7 @@ export function AdminCalculator() {
                 if (source.agressividadeCorte !== undefined) setAgressividadeCorte(source.agressividadeCorte);
 
                 setFilmTypes(normalizedTypes);
+                setFilmWarranties(normalizedWarranties);
                 setFilmCatalog(catalog);
 
                 const currentFilm = normalizeFilmTypeKey(source.selectedFilm);
@@ -457,6 +463,7 @@ export function AdminCalculator() {
                         modoCorConfig: isColorMode(source.modoCorConfig) ? source.modoCorConfig : DEFAULT_CONFIG.modoCorConfig,
                         selectedFilm: currentFilm,
                         filmTypes: normalizedTypes,
+                        filmWarranties: normalizedWarranties,
                         filmCatalog: catalog,
                         modoDesconto: source.modoDesconto || DEFAULT_CONFIG.modoDesconto,
                     }, scopeKey);
@@ -466,7 +473,7 @@ export function AdminCalculator() {
             }
         };
         restoreConfig();
-    }, [authRefreshKey, setRollW, setPrice, setMargin, setModoOtimizacao, setUserName, setModoPerdas, setPerdasFixas, setUsarCoresPorAmbiente, setAgressividadeCorte, setFilmTypes, setFilmCatalog, setSelectedFilm, setDraftExpiration, setModoDesconto, setConfigRestored]);
+    }, [authRefreshKey, setRollW, setPrice, setMargin, setModoOtimizacao, setUserName, setModoPerdas, setPerdasFixas, setUsarCoresPorAmbiente, setAgressividadeCorte, setFilmTypes, setFilmWarranties, setFilmCatalog, setSelectedFilm, setDraftExpiration, setModoDesconto, setConfigRestored]);
 
     // C1: restore do rascunho movido para useDraftSync (nuvem primeiro, local como fallback).
 
@@ -1324,6 +1331,9 @@ export function AdminCalculator() {
                 case 'filmTypes':
                     setFilmTypes(value as Record<FilmTypeKey, number>);
                     break;
+                case 'filmWarranties':
+                    setFilmWarranties(value as Record<FilmTypeKey, number>);
+                    break;
                 case 'selectedFilm':
                     setSelectedFilm(value as FilmTypeKey);
                     break;
@@ -1341,7 +1351,7 @@ export function AdminCalculator() {
         const normalizedValue = key === 'perdasFixas' ? Math.min(100, Math.max(0, value as number)) : value;
         const updated = { ...currentConfig, [key]: normalizedValue };
         resolveCalculatorScopeKey().then((scopeKey) => saveConfig(updated, scopeKey)).catch(() => saveConfig(updated));
-    }, [currentConfig, setVidros, setUsarCoresPorAmbiente, setRollW, setPrice, setMargin, setModoOtimizacao, setUserName, setModoPerdas, setPerdasFixas, setAgressividadeCorte, setFilmTypes, setSelectedFilm, setDraftExpiration, setModoDesconto, roomColors, setRoomColors, setCompensarPerdas, vidros]);
+    }, [currentConfig, setVidros, setUsarCoresPorAmbiente, setRollW, setPrice, setMargin, setModoOtimizacao, setUserName, setModoPerdas, setPerdasFixas, setAgressividadeCorte, setFilmTypes, setFilmWarranties, setSelectedFilm, setDraftExpiration, setModoDesconto, roomColors, setRoomColors, setCompensarPerdas, vidros]);
 
     const handleLogout = useCallback(async () => {
         if (isLoggingOut) return;
@@ -1481,6 +1491,44 @@ export function AdminCalculator() {
         });
     }, [finalPrice, m, catalogItem, usarSobra, custoAjudante]);
 
+    const copiarResumoOrcamento = useCallback(async () => {
+        const activeFilmName =
+            selectedFilm === 'personalizado'
+                ? (customFilmName.trim() || 'Personalizado')
+                : (filmCatalog?.[selectedFilm]?.name || FILM_TYPE_LABELS[selectedFilm] || selectedFilm);
+        const warrantyYears =
+            filmWarranties[selectedFilm] ?? DEFAULT_FILM_WARRANTIES[selectedFilm] ?? 3;
+
+        const summaryText = buildQuoteSummaryText({
+            filmName: activeFilmName,
+            warrantyYears,
+            totalAreaM2,
+            finalPrice,
+            cliente,
+            formatCurrency: formatBRL,
+        });
+
+        try {
+            if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+                await navigator.clipboard.writeText(summaryText);
+            } else {
+                const textarea = document.createElement('textarea');
+                textarea.value = summaryText;
+                textarea.setAttribute('readonly', '');
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+            }
+            showToast('Resumo do orçamento copiado!', 'success');
+        } catch (err) {
+            logger.warn('Falha ao copiar resumo do orçamento', { err });
+            showToast('Não foi possível copiar para a área de transferência.', 'error');
+        }
+    }, [selectedFilm, customFilmName, filmCatalog, filmWarranties, totalAreaM2, finalPrice, cliente, showToast]);
+
     // ─── RENDER ────────────────────────────────────────────────────────────────
 
     return (
@@ -1490,7 +1538,7 @@ export function AdminCalculator() {
             <ConfigPanel
                 aberto={configAberto}
                 setAberto={setConfigAberto}
-                config={{ rollW, price, margin, modoOtimizacao, userName, modoPerdas, perdasFixas, modoCorConfig: usarCoresPorAmbiente ? 'ambiente' : 'tamanho', agressividadeCorte, filmTypes, selectedFilm, draftExpiration, modoDesconto, compensarPerdas }}
+                config={{ rollW, price, margin, modoOtimizacao, userName, modoPerdas, perdasFixas, modoCorConfig: usarCoresPorAmbiente ? 'ambiente' : 'tamanho', agressividadeCorte, filmTypes, filmWarranties, selectedFilm, draftExpiration, modoDesconto, compensarPerdas }}
                 onUpdate={atualizarConfig}
                 onLogout={handleLogout}
                 loggingOut={isLoggingOut}
@@ -1735,6 +1783,7 @@ export function AdminCalculator() {
                                 modoPerdas={modoPerdas}
                                 perdasFixas={perdasFixas}
                                 compensacaoPerda={compensacaoPerda}
+                                onCopiarResumo={copiarResumoOrcamento}
                                 onSalvar={salvarNoHistorico}
                                 onGerarImagem={gerarImagem}
                                 onGerarPDF={gerarPDF}

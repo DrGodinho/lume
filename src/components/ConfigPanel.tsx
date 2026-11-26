@@ -2,6 +2,7 @@ import React from 'react';
 import { LogOut, Settings, X } from 'lucide-react';
 import {
   AppConfig,
+  DEFAULT_FILM_WARRANTIES,
   FILM_TYPE_KEYS,
   FILM_TYPE_LABELS,
   FilmTypeKey,
@@ -188,25 +189,47 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
             </div>
 
             <div>
-              <FieldLabel>Preços por Película (R$/m²)</FieldLabel>
+              <FieldLabel>Preços (R$/m²) e Garantia (anos)</FieldLabel>
               <div className="space-y-2">
-                {STANDARD_FILM_TYPE_KEYS.map((key) => (
-                  <div key={key} className="flex items-center gap-2">
-                    <span className="text-[10px] text-gray-400 font-bold w-24 truncate">
-                      {FILM_TYPE_LABELS[key]}
-                    </span>
-                    <input
-                      type="number"
-                      value={config.filmTypes[key]}
-                      onChange={(e) => {
-                        const updated = { ...config.filmTypes, [key]: parseFloat(e.target.value) || 0 };
-                        onUpdate('filmTypes', updated);
-                      }}
-                      onFocus={(e) => e.target.select()}
-                      className="flex-1 bg-[#040811] border border-white/10 rounded-lg px-3 py-2 text-sm font-bold text-center outline-none focus:border-[#c9a227]/50 transition-colors"
-                    />
-                  </div>
-                ))}
+                {STANDARD_FILM_TYPE_KEYS.map((key) => {
+                  const warranties = config.filmWarranties ?? DEFAULT_FILM_WARRANTIES;
+                  return (
+                    <div key={key} className="flex items-center gap-2">
+                      <span className="text-[10px] text-gray-400 font-bold w-24 truncate" title={FILM_TYPE_LABELS[key]}>
+                        {FILM_TYPE_LABELS[key]}
+                      </span>
+                      <input
+                        type="number"
+                        value={config.filmTypes[key]}
+                        onChange={(e) => {
+                          const updated = { ...config.filmTypes, [key]: parseFloat(e.target.value) || 0 };
+                          onUpdate('filmTypes', updated);
+                        }}
+                        onFocus={(e) => e.target.select()}
+                        aria-label={`Preço ${FILM_TYPE_LABELS[key]}`}
+                        className="flex-1 min-w-0 bg-[#040811] border border-white/10 rounded-lg px-2.5 py-2 text-sm font-bold text-center outline-none focus:border-[#c9a227]/50 transition-colors"
+                      />
+                      <div className="relative w-20 shrink-0">
+                        <input
+                          type="number"
+                          min={0}
+                          max={30}
+                          value={warranties[key] ?? DEFAULT_FILM_WARRANTIES[key]}
+                          onChange={(e) => {
+                            const years = Math.max(0, Math.min(30, parseInt(e.target.value, 10) || 0));
+                            onUpdate('filmWarranties', { ...warranties, [key]: years });
+                          }}
+                          onFocus={(e) => e.target.select()}
+                          aria-label={`Garantia em anos ${FILM_TYPE_LABELS[key]}`}
+                          className="w-full bg-[#040811] border border-white/10 rounded-lg pl-2 pr-8 py-2 text-sm font-bold text-center outline-none focus:border-[#c9a227]/50 transition-colors"
+                        />
+                        <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] text-gray-500 font-bold uppercase pointer-events-none">
+                          anos
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
